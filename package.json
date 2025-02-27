@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers (self) bot in under 10 lines.",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "keywords": ["shell shockers", "shellshock.io", "blue wizard", "yolkbot"],
     "homepage": "https://github.com/enbyte/yolkbot#readme",
     "bugs": {

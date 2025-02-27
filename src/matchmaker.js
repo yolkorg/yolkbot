@@ -81,12 +81,15 @@ export class Matchmaker {
         return new Promise((res) => {
             console.log('fetching regions');
 
-            this.once('msg', (data2) => {
+            const listener = (data2) => {
                 if (data2.command == 'regionList') {
                     this.regionList = data2.regionList;
+                    this.off('msg', listener);
                     res(data2.regionList);
                 }
-            });
+            };
+
+            this.on('msg', listener);
 
             this.ws.onerror = (e2) => {
                 throw new Error('Failed to get regions', e2);
@@ -125,11 +128,14 @@ export class Matchmaker {
                 sessionId: this.sessionId
             };
 
-            this.once('msg', (data2) => {
+            const listener = (data2) => {
                 if (data2.command == 'gameFound') {
+                    this.off('msg', listener);
                     res(data2);
                 }
-            });
+            };
+
+            this.on('msg', listener);
 
             this.ws.send(JSON.stringify(opts));
         });
