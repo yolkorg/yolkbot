@@ -1,5 +1,5 @@
 import { GunList } from '#constants';
-import { Cluck9mm } from '../../data/guns.js';
+import { Cluck9mm } from '../constants/guns.js';
 
 export default class GamePlayer {
     constructor(id, team, playerData) {

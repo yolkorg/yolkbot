@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { UserAgent } from '../../src/constants.js';
+import { UserAgent } from '../../src/constants/index.js';
 
 const data = await fetch('https://shellshock.io/js/shellshock.js', {
     headers: {
@@ -19,6 +19,6 @@ let parsed = '';
 eval(`parsed = ${match}`);
 
 fs.writeFileSync(
-    path.join(import.meta.dirname, '..', 'items.js'),
+    path.join(import.meta.dirname, '..', '..', 'src', 'constants', 'items.js'),
     `/* eslint-disable */\nexport const Items = ${JSON.stringify(parsed, null, 4)};`
 );

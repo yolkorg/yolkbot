@@ -21,7 +21,7 @@ import {
     UserAgent
 } from '#constants';
 
-import { Maps } from '../data/maps.js';
+import { Maps } from './constants/maps.js';
 
 const CoopStagesById = Object.fromEntries(Object.entries(CoopStates).map(([key, value]) => [value, key]));
 const GameModesById = Object.fromEntries(Object.entries(GameModes).map(([key, value]) => [value, key]));

@@ -5,7 +5,7 @@ import GameOptionsDispatch from '#dispatch/GameOptionsDispatch.js';
 
 import Matchmaker from '../src/matchmaker.js';
 
-import { Maps } from '../data/maps.js';
+import { Maps } from '../src/constants/maps.js';
 
 const bot = new Bot({ name: 'selfbot' });
 
