@@ -23,7 +23,6 @@
         "./api": "./src/api.js",
         "./bot": "./src/bot.js",
         "./comm": "./src/comm/index.js",
-        "./manager": "./src/manager.js",
         "./matchmaker": "./src/matchmaker.js",
         "./packets": "./src/packet.js",
         "./constants": "./src/constants/index.js",
@@ -53,7 +52,6 @@
         "#bot": "./src/bot.js",
         "#constants": "./src/constants/index.js",
         "#dispatch/*": "./src/dispatches/*",
-        "#manager": "./src/manager.js",
         "#matchmaker": "./src/matchmaker.js",
         "#packet": "./src/packet.js"
     }

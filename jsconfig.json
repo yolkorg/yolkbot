@@ -6,7 +6,6 @@
             "#bot": ["./src/bot.js"],
             "#constants": ["src/constants/index.js"],
             "#dispatch/*": ["src/dispatches/*"],
-            "#manager": ["./src/manager.js"],
             "#matchmaker": ["./src/matchmaker.js"],
             "#packet": ["./src/packet.js"]
         }
