@@ -191,6 +191,11 @@ export class Bot {
 
         const loginData = await loginWithCredentials(email, pass, this.proxy ? this.proxy : '');
 
+        if (!loginData) {
+            console.error('Failed to login with credentials.');
+            return this.#emit('authFail');
+        }
+
         this.account.rawLoginData = loginData;
 
         this.account.accountAge = loginData.accountAge;
@@ -226,6 +231,11 @@ export class Bot {
 
     async #anonLogin() {
         const loginData = await loginAnonymously(this.proxy ? this.proxy : '');
+
+        if (!loginData) {
+            console.error('Failed to login anonymously.');
+            return this.#emit('authFail');
+        }
 
         this.account.rawLoginData = loginData;
 
@@ -456,6 +466,7 @@ export class Bot {
 
         this.gameSocket.onclose = (e) => {
             console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
+            this.#emit('close', e.code);
         }
 
         while (!this.state.joinedGame) await new Promise(r => setTimeout(r, 5));
