@@ -24,9 +24,9 @@ async function queryServices(request, prox = '') {
                 resolve(resp);
             } catch (e) {
                 console.log('Bad API JSON response in queryServices with call: ' + request.cmd + ' and data: ' + JSON.stringify(request));
-                console.log('Full data sent: ' + JSON.stringify(request));
-                console.log('Full data received: ' + mes);
-                console.log('Full error: ' + e);
+                console.log('Full data sent: ', JSON.stringify(request));
+                console.log('Full data received: ', mes);
+                console.log('Full error: ', e);
             }
             ws.close();
         };
