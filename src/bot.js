@@ -832,6 +832,7 @@ export class Bot {
     #processSyncMePacket() {
         const id = CommIn.unPackInt8U();
         const player = this.players[id];
+        if (!player) return;
 
         CommIn.unPackInt8U(); // stateIdx
 
