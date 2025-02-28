@@ -242,12 +242,12 @@ export class Bot {
 
     async #initMatchmaker() {
         if (!this.state.loggedIn) {
-            console.log('Not logged in, attempting to create anonymous user...');
+            // console.log('Not logged in, attempting to create anonymous user...');
             await this.#anonLogin();
         }
 
         if (!this.matchmaker) {
-            console.log('No matchmaker, creating instance')
+            // console.log('No matchmaker, creating instance')
             this.matchmaker = new Matchmaker(this.account.sessionId, this.proxy);
             await this.matchmaker.getRegions();
         }
@@ -263,7 +263,7 @@ export class Bot {
                 delete this.game.raw.command; // pissed me off
 
                 this.gameFound = true;
-            } else console.log(mes);
+            }
 
             if (mes.error && mes.error == 'gameNotFound')
                 throw new Error(`Game ${code} not found (likely expired).`)
@@ -424,7 +424,7 @@ export class Bot {
             await this.#joinGameWithCode(data);
         } else if (typeof data == 'object') {
             if (!this.state.loggedIn) {
-                console.log('passed an object but you still need to be logged in!!')
+                // console.log('passed an object but you still need to be logged in!!')
                 await this.#anonLogin();
             }
 
@@ -468,13 +468,10 @@ export class Bot {
 
         console.log(`Successfully joined ${this.game.code}. Startup to join time: ${Date.now() - this.initTime} ms`);
 
-        if (this.autoUpdate) {
-            console.log('autoUpdate enabled...');
+        if (this.autoUpdate)
             setInterval(() => this.update(), this.updateInterval);
-        }
 
         if (this.autoPing) {
-            console.log('autoPing enabled...');
             const out = CommOut.getBuffer();
             out.packInt8(CommCode.ping);
             out.send(this.gameSocket);
@@ -1014,13 +1011,13 @@ export class Bot {
         const action = CommIn.unPackInt8U();
 
         if (action == GameActions.pause) {
-            console.log('settings changed, gameOwner changed game settings, force paused');
+            // console.log('settings changed, gameOwner changed game settings, force paused');
             this.#emit('gameForcePause');
             setTimeout(() => this.me.playing = false, 3000);
         }
 
         if (action == GameActions.reset) {
-            console.log('owner reset game');
+            // console.log('owner reset game');
 
             this.me.kills = 0;
             this.game.teamScore = [0, 0, 0];

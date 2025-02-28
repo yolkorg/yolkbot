@@ -83,7 +83,7 @@ class SaveLoadoutDispatch {
         bot.account.loadout = loadout;
 
         saveLoadout.then((res) => {
-            console.log('saveloadout', res);
+            console.log('saveloadout returned', res);
 
             new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.gameSocket);
 

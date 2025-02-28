@@ -16,7 +16,6 @@ class ChatDispatch {
     }
 
     execute(bot) {
-        console.log('Sending chat message:', this.msg);
         new packet.ChatPacket(this.msg).execute(bot.gameSocket);
         bot.lastChatTime = Date.now();
     }

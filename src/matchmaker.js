@@ -79,8 +79,6 @@ export class Matchmaker {
         await this.waitForConnect();
 
         return new Promise((res) => {
-            console.log('fetching regions');
-
             const listener = (data2) => {
                 if (data2.command == 'regionList') {
                     this.regionList = data2.regionList;
@@ -116,8 +114,6 @@ export class Matchmaker {
 
         if (!params.mode) { throw new Error('did not specify a mode in findGame') }
         if (GameModes[params.mode] === undefined) { throw new Error('invalid mode in findGame, see GameModes for a list') }
-
-        console.log('post-modification params', params);
 
         return new Promise((res) => {
             const opts = {
