@@ -187,14 +187,15 @@ export class Bot {
         this.email = email;
         this.pass = pass;
 
-        this.state.loggedIn = true;
-
         const loginData = await loginWithCredentials(email, pass, this.proxy ? this.proxy : '');
 
         if (!loginData) {
             console.error('Failed to login with credentials.');
-            return this.#emit('authFail');
+            this.#emit('authFail');
+            return false;
         }
+
+        this.state.loggedIn = true;
 
         this.account.rawLoginData = loginData;
 
@@ -234,8 +235,11 @@ export class Bot {
 
         if (!loginData) {
             console.error('Failed to login anonymously.');
-            return this.#emit('authFail');
+            this.#emit('authFail');
+            return false;
         }
+
+        this.state.loggedIn = true;
 
         this.account.rawLoginData = loginData;
 
@@ -248,12 +252,15 @@ export class Bot {
         this.account.session = loginData.session;
         this.account.sessionId = loginData.sessionId;
         this.account.vip = false;
+
+        return this.account;
     }
 
     async initMatchmaker() {
         if (!this.state.loggedIn) {
             // console.log('Not logged in, attempting to create anonymous user...');
-            await this.#anonLogin();
+            const anonLogin = await this.#anonLogin();
+            if (!anonLogin) return false;
         }
 
         if (!this.matchmaker) {
@@ -264,7 +271,7 @@ export class Bot {
     }
 
     async #joinGameWithCode(code) {
-        await this.initMatchmaker();
+        if (!await this.initMatchmaker()) return false;
 
         const listener = (mes) => {
             if (mes.command == 'gameFound') {
@@ -383,7 +390,7 @@ export class Bot {
     // mode - a mode name that corresponds to a GameMode id
     // map - the name of a map
     async createPrivateGame(opts = {}) {
-        await this.initMatchmaker();
+        if (!await this.initMatchmaker()) return false;
 
         if (!opts.region) { throw new Error('pass a region: createPrivateGame({ region: "useast", ... })') }
         if (!this.matchmaker.regionList.find(r => r.id == opts.region))
