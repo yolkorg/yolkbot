@@ -19,15 +19,15 @@ export class Matchmaker {
         if (customSessionId) {
             this.sessionId = customSessionId;
         } else {
-            this.createSessionId();
+            this.#createSessionId();
         }
 
         this.proxy = proxy;
 
-        this.createSocket();
+        this.#createSocket();
     }
 
-    createSocket() {
+    #createSocket() {
         this.ws = new yolkws('wss://shellshock.io/matchmaker/', this.proxy, {
             'user-agent': UserAgent,
             'accept-language': 'en-US,en;q=0.9'
@@ -42,26 +42,25 @@ export class Matchmaker {
 
         this.ws.onmessage = (e) => {
             const data = JSON.parse(e.data);
-            this.emit('msg', data);
+            this.#emit('msg', data);
         }
 
         this.ws.onclose = () => {
             if (this.forceClose) return;
 
             this.connected = false;
-            this.createSocket();
+            this.#createSocket();
         }
+    }
+
+    async #createSessionId() {
+        const j = await loginAnonymously(this.proxy);
+        this.sessionId = j.sessionId;
+        if (this.connected) this.onceConnected.forEach(func => func());
     }
 
     send(msg) {
         this.ws.send(JSON.stringify(msg));
-    }
-
-    async createSessionId() {
-        const j = await loginAnonymously(this.proxy);
-        this.sessionId = j.sessionId;
-        console.log('matchmaker got sessionid', this.sessionId);
-        if (this.connected) { this.onceConnected.forEach(func => func()); }
     }
 
     // eslint-disable-next-line require-await
@@ -170,17 +169,6 @@ export class Matchmaker {
         this.onceListeners.get(event).push(callback);
     }
 
-    emit(event, ...args) {
-        if (this.onListeners.has(event)) {
-            this.onListeners.get(event).forEach(func => func(...args));
-        }
-
-        if (this.onceListeners.has(event)) {
-            this.onceListeners.get(event).forEach(func => func(...args));
-            this.onceListeners.delete(event);
-        }
-    }
-
     off(event, callback) {
         if (this.onListeners.has(event)) {
             this.onListeners.set(event, this.onListeners.get(event).filter(func => func !== callback));
@@ -188,6 +176,17 @@ export class Matchmaker {
 
         if (this.onceListeners.has(event)) {
             this.onceListeners.set(event, this.onceListeners.get(event).filter(func => func !== callback));
+        }
+    }
+
+    #emit(event, ...args) {
+        if (this.onListeners.has(event)) {
+            this.onListeners.get(event).forEach(func => func(...args));
+        }
+
+        if (this.onceListeners.has(event)) {
+            this.onceListeners.get(event).forEach(func => func(...args));
+            this.onceListeners.delete(event);
         }
     }
 }
