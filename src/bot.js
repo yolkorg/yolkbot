@@ -240,7 +240,7 @@ export class Bot {
         this.account.vip = false;
     }
 
-    async #initMatchmaker() {
+    async initMatchmaker() {
         if (!this.state.loggedIn) {
             // console.log('Not logged in, attempting to create anonymous user...');
             await this.#anonLogin();
@@ -254,7 +254,7 @@ export class Bot {
     }
 
     async #joinGameWithCode(code) {
-        await this.#initMatchmaker();
+        await this.initMatchmaker();
 
         const listener = (mes) => {
             if (mes.command == 'gameFound') {
@@ -373,7 +373,7 @@ export class Bot {
     // mode - a mode name that corresponds to a GameMode id
     // map - the name of a map
     async createPrivateGame(opts = {}) {
-        await this.#initMatchmaker();
+        await this.initMatchmaker();
 
         if (!opts.region) { throw new Error('pass a region: createPrivateGame({ region: "useast", ... })') }
         if (!this.matchmaker.regionList.find(r => r.id == opts.region))
