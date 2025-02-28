@@ -1,4 +1,4 @@
-import AStar from './pathing/astar.js';
+import AStar from '../pathing/astar.js';
 
 class PathfindDispatch {
     constructor(target) {
@@ -10,7 +10,6 @@ class PathfindDispatch {
     }
 
     execute(bot) {
-
         this.pather = new AStar(bot.pathing.nodeList);
 
         const position = Object.entries(bot.me.position).map(entry => Math.floor(entry[1]));
@@ -25,7 +24,6 @@ class PathfindDispatch {
         bot.pathing.followingPath = true;
         bot.pathing.activeNode = bot.pathing.activePath[0];
         bot.pathing.activeNodeIdx = 0;
-
     }
 }
 

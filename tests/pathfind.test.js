@@ -9,9 +9,9 @@ bot.on('join', (player) => {
     console.log(player.name, 'joined.');
 });
 
-bot.on('chat', (_player, msg) => {
+bot.on('chat', (player, msg) => {
     if (msg == '/spawn') bot.dispatch(new SpawnDispatch());
-    if (msg == '/path') bot.dispatch(new PathfindDispatch(_player));
+    if (msg == '/path') bot.dispatch(new PathfindDispatch(player));
 })
 
 await bot.join(process.env.GAME_CODE || process.argv[2]);

@@ -19,14 +19,13 @@ class LookAtPosDispatch {
         return bot.me.playing;
     }
 
-    execute(bot) {  
-
+    execute(bot) {
         const directionVector = {
             x: this.pos.x - bot.me.position.x,
             y: this.pos.y - bot.me.position.y,
             z: this.pos.z - bot.me.position.z
         };
-        
+
         const yaw = calculateYaw(directionVector)
         const pitch = calculatePitch(directionVector);
 

@@ -1,6 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 
 import { loginAnonymously, loginWithCredentials } from '#api';
 
@@ -10,7 +9,7 @@ import { CloseCode, CommCode } from './comm/Codes.js';
 
 import GamePlayer from './bot/GamePlayer.js';
 import Matchmaker from './matchmaker.js';
-import yolkws from './socket.js';
+import yolkws, { isBrowser } from './socket.js';
 
 import {
     CollectTypes,
@@ -20,17 +19,16 @@ import {
     GameModes,
     GameOptionFlags,
     GunList,
+    Movements,
     PlayTypes,
     ShellStreaks,
-    UserAgent,
-    Move
+    UserAgent
 } from '#constants';
 
-import { NodeList } from './dispatches/pathing/mapnode.js';
 import LookAtPosDispatch from '#dispatch/LookAtPosDispatch.js';
 import MovementDispatch from '#dispatch/MovementDispatch.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { NodeList } from './pathing/mapnode.js';
 
 import { Maps } from './constants/maps.js';
 
@@ -192,13 +190,6 @@ export class Bot {
         this.controlKeys = 0;
 
         this.initTime = Date.now();
-
-        try {
-            this.maps = JSON.parse(readFileSync(join(__dirname, '..', 'data', 'maps.json'), 'utf-8'));
-        } catch (e) {
-            console.log('Failed to load maps:', e);
-            this.maps = [];
-        }
 
         this.pathing = {
             nodeList: null,
@@ -573,8 +564,8 @@ export class Bot {
                     // console.log('activeNode is ', this.pathing.activeNode.flatRadialDistance(this.me.position), 'away');
                 }
 
-                if (!(this.controlKeys & Move.FORWARD)) {
-                    this.dispatch(new MovementDispatch(Move.FORWARD));
+                if (!(this.controlKeys & Movements.FORWARD)) {
+                    this.dispatch(new MovementDispatch(Movements.FORWARD));
                 }
             }
         }
@@ -592,7 +583,7 @@ export class Bot {
                 out.packInt8(this.state.shotsFired); // shots fired
                 out.packRadU(this.me.view.yaw); // yaw
                 out.packRad(this.me.view.pitch); // pitch
-                out.packInt8(100); // not needed why is this here @1ust
+                out.packInt8(100); // fixes commcode issues, does nothing
             }
             out.send(this.gameSocket);
 
@@ -630,15 +621,26 @@ export class Bot {
     }
 
     async #fetchMap(name, hash) {
-        if (existsSync(join(__dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`))) {
-            return JSON.parse(readFileSync(join(__dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`), 'utf-8'));
+        if (!isBrowser) {
+            if (existsSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`))) {
+                return JSON.parse(readFileSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`), 'utf-8'));
+            }
+
+            console.warn(`Map "${name}" not found in cache, fetching...`);
+
+            const data = await (await fetch(`https://shellshock.io/maps/${name}.json?${hash}`)).json();
+
+            writeFileSync(
+                join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`),
+                JSON.stringify(data, null, 4),
+                { flag: 'w+' }
+            );
+            return data;
+        } else {
+            // eslint-disable-next-line no-undef
+            const data = await (await fetch(`https://${window.location.hostname}/maps/${name}.json?${hash}`)).json();
+            return data;
         }
-        console.warn(`Map "${name}" not found in cache, fetching...`);
-
-        const data = await (await fetch(`https://shellshock.io/maps/${name}.json?${hash}`)).json();
-
-        writeFileSync(join(__dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`),JSON.stringify(data, null, 4), { flag: 'w+' });
-        return data;
     }
 
     #processChatPacket() {

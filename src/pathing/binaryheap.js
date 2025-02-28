@@ -3,15 +3,18 @@ class BinaryHeap {
         this.content = [];
         this.scoreFunction = scoreFunction;
     }
+
     push(element) {
         // Add the new element to the end of the array.
         this.content.push(element);
         // Allow it to bubble up.
         this.bubbleUp(this.content.length - 1);
     }
+
     rescoreElement(node) {
         this.sinkDown(this.content.indexOf(node));
     }
+
     pop() {
         // Store the first element so we can return it later.
         const result = this.content[0];
@@ -25,6 +28,7 @@ class BinaryHeap {
         }
         return result;
     }
+
     remove(node) {
         const length = this.content.length;
         // To remove a value, we must search through the array to find
@@ -45,9 +49,11 @@ class BinaryHeap {
             break;
         }
     }
+
     size() {
         return this.content.length;
     }
+
     bubbleUp(n) {
         // Fetch the element that has to be moved.
         const element = this.content[n], score = this.scoreFunction(element);
@@ -66,9 +72,11 @@ class BinaryHeap {
             n = parentN;
         }
     }
+
     includes(n) {
         return this.content.includes(n);
     }
+
     sinkDown(n) {
         // Look up the target element and its score.
         const length = this.content.length, element = this.content[n], elemScore = this.scoreFunction(element);
@@ -106,5 +114,4 @@ class BinaryHeap {
 }
 
 export default BinaryHeap;
-
 export { BinaryHeap };

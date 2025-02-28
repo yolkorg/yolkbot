@@ -32,7 +32,6 @@ export default class AStar {
     }
 
     path(start, end) {
-
         this.list.clean();
 
         const heap = new BinaryHeap(node => node.f);

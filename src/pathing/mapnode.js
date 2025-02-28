@@ -54,15 +54,19 @@ class NodeList {
         console.log(`NodeList created in ${Date.now() - now}ms`);
 
     }
+
     add(node) {
         this.list.push(node);
     }
+
     remove(node) {
         this.list.splice(this.list.indexOf(node), 1);
     }
+
     at(x, y, z) {
         return this.list.find(node => node.x == x && node.y == y && node.z == z);
     }
+
     clean() {
         for (const node of this.list) {
             node.f = 0;
@@ -90,21 +94,27 @@ class MapNode {
         this.closed = undefined;
         this.links = [];
     }
+
     addLink(node) {
         this.links.push(node);
     }
+
     isSolid() {
         return this.meshType == 'full';
     }
+
     canWalk() {
         return this.meshType == 'none' || this.meshType == 'ladder';
     }
+
     isLadder() {
         return this.meshType == 'ladder';
     }
+
     isAvoid() {
         return !this.isSolid() && !this.isEmpty();
     }
+
     canLink(node, list) {
         const dx = Math.abs(this.x - node.x);
         const dy = Math.abs(this.y - node.y);
@@ -155,6 +165,7 @@ class MapNode {
         // eslint-disable-next-line stylistic/max-len
         throw new Error(`Erm... what the flip? Likely unrecognized node meshType, me: ${stringifyCircular(this)}, other: ${stringifyCircular(node)}, below me: ${stringifyCircular(belowMe)}, below other: ${stringifyCircular(belowOther)}`);
     }
+
     trueCenter() {
         return {
             x: this.x + 0.5,
@@ -162,6 +173,7 @@ class MapNode {
             z: this.z + 0.5
         }
     }
+
     flatCenter() {
         return {
             x: this.x + 0.5,
@@ -169,13 +181,15 @@ class MapNode {
             z: this.z + 0.5
         }
     }
+
     flatRadialDistance(position) {
         const pos = this.flatCenter();
         return Math.hypot(pos.x - position.x, pos.z - position.z);
     }
+
     floorCollides(position) {
         const posFloor = Object.entries(position).map(entry => Math.floor(entry[1]));
-        return this.x == posFloor[0] && this.y == posFloor[1] && this.z == posFloor[2]; 
+        return this.x == posFloor[0] && this.y == posFloor[1] && this.z == posFloor[2];
     }
 }
 
