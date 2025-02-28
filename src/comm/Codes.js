@@ -27,12 +27,12 @@ const CommCode = {
     musicInfo: 35, // don't use, likely for UI purposes
     hitMeHardBoiled: 36,
     playerInfo: 37, // don't use, for admins
-    challengeCompleted: 38,
+    challengeCompleted: 38, // don't use, see issue #37 on the github
     gameLocked: 39, // unused???, closecode gamelocked is used afaik
     reportPlayer: 40,
     banned: 41, // unused
     createPrivateGame: 42, // unused
-    switchTeam: 43, // don't use, because unlike official client, we don't assume the team is switched
+    switchTeam: 43, // don't use outgoing, because unlike official client, we don't assume the team is switched
     changeCharacter: 44,
     pause: 45,
     gameOptions: 46,
@@ -50,7 +50,7 @@ const CommCode = {
     hitThem: 58,
     hitMe: 59,
     collectItem: 60,
-    chlgPlayerRerollInGame: 61,
+    chlgPlayerRerollInGame: 61, // don't use, see issue #37 on the github
     playerInGameReward: 62, // unused
 
     // this is possibly the most comedic thing i've ever seen

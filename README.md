@@ -1,17 +1,10 @@
-<!--
-
-<3 bwd
-https://raw.githubusercontent.com/enbyte/deobfs-shell-source/refs/heads/main/shellshock.js
-
--->
-
 <div align='center'>
   <h1>yolkbot</h1>
   <h3>creating bots in 10 lines since 2025</h3>
   <p>
-    <a href='https://github.com/enbyte/ShellfBot'>github</a> | 
-    <a href='https://github.com/enbyte/ShellfBot/wiki'>documentation</a>
-    <!-- | <a href='https://npmjs.com/something'>npm</a> -->
+    <a href='https://github.com/enbyte/yolkbot'>github</a> | 
+    <a href='https://github.com/enbyte/yolkbot/wiki'>documentation</a>
+    <a href='https://npmjs.com/yolkbot'>npm</a>
   </p>
 </div>
 

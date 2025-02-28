@@ -7,7 +7,7 @@ import fs from 'fs';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
 
-fetch(webhook, {
+await fetch(webhook, {
     method: 'POST',
     body: JSON.stringify({
         embeds: [{
@@ -23,4 +23,6 @@ fetch(webhook, {
     headers: {
         'Content-Type': 'application/json'
     }
-}).then((r) => r.json()).then(r => console.log(r));
+});
+
+console.log('\nsent to discord webhook!');

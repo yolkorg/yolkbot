@@ -1,6 +1,3 @@
-
-import { SocksProxyAgent } from 'socks-proxy-agent';
-import { WebSocket } from 'ws';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -13,22 +10,19 @@ import { CloseCode, CommCode } from './comm/Codes.js';
 
 import GamePlayer from './bot/GamePlayer.js';
 import Matchmaker from './matchmaker.js';
+import yolkws from './socket.js';
 
 import {
     CollectTypes,
-    CoopStagesById,
     CoopStates,
     findItemById,
     GameActions,
     GameModes,
-    GameModesById,
     GameOptionFlags,
-    gunIndexes,
-    Maps,
+    GunList,
     PlayTypes,
-    ShellStreak,
-    StatsArr,
-    USER_AGENT,
+    ShellStreaks,
+    UserAgent,
     Move
 } from '#constants';
 
@@ -38,7 +32,12 @@ import MovementDispatch from '#dispatch/MovementDispatch.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-class Bot {
+import { Maps } from './constants/maps.js';
+
+const CoopStagesById = Object.fromEntries(Object.entries(CoopStates).map(([key, value]) => [value, key]));
+const GameModesById = Object.fromEntries(Object.entries(GameModes).map(([key, value]) => [value, key]));
+
+export class Bot {
     // params.name - the bot name
     // params.proxy - a socks(4|5) proxy
     // params.doUpdate - whether to auto update
@@ -169,10 +168,8 @@ class Bot {
             accountAge: 0,
             emailVerified: false,
 
-            // use in relation to commcodes
+            // balance is tracked
             eggBalance: 0,
-            challenges: [],
-            claimedChallenges: [],
 
             // raw login
             rawLoginData: {}
@@ -218,15 +215,19 @@ class Bot {
         this.email = email;
         this.pass = pass;
 
-        this.state.loggedIn = true;
-
         const loginData = await loginWithCredentials(email, pass, this.proxy ? this.proxy : '');
+
+        if (!loginData) {
+            console.error('Failed to login with credentials.');
+            this.#emit('authFail');
+            return false;
+        }
+
+        this.state.loggedIn = true;
 
         this.account.rawLoginData = loginData;
 
         this.account.accountAge = loginData.accountAge;
-        this.account.challenges = loginData.challenges;
-        this.account.claimedChallenges = loginData.claimedChallenges;
         this.account.eggBalance = loginData.currentBalance;
         this.account.emailVerified = loginData.emailVerified;
         this.account.firebaseId = loginData.firebaseId;
@@ -260,11 +261,17 @@ class Bot {
     async #anonLogin() {
         const loginData = await loginAnonymously(this.proxy ? this.proxy : '');
 
+        if (!loginData) {
+            console.error('Failed to login anonymously.');
+            this.#emit('authFail');
+            return false;
+        }
+
+        this.state.loggedIn = true;
+
         this.account.rawLoginData = loginData;
 
         this.account.accountAge = loginData.accountAge;
-        this.account.challenges = loginData.challenges;
-        this.account.claimedChallenges = loginData.claimedChallenges;
         this.account.eggBalance = loginData.currentBalance;
         this.account.emailVerified = loginData.emailVerified;
         this.account.firebaseId = loginData.firebaseId;
@@ -273,23 +280,28 @@ class Bot {
         this.account.session = loginData.session;
         this.account.sessionId = loginData.sessionId;
         this.account.vip = false;
+
+        return this.account;
     }
 
-    async #initMatchmaker() {
+    async initMatchmaker() {
         if (!this.state.loggedIn) {
-            console.log('Not logged in, attempting to create anonymous user...');
-            await this.#anonLogin();
+            // console.log('Not logged in, attempting to create anonymous user...');
+            const anonLogin = await this.#anonLogin();
+            if (!anonLogin) return false;
         }
 
         if (!this.matchmaker) {
-            console.log('No matchmaker, creating instance')
+            // console.log('No matchmaker, creating instance')
             this.matchmaker = new Matchmaker(this.account.sessionId, this.proxy);
             await this.matchmaker.getRegions();
         }
+
+        return true;
     }
 
     async #joinGameWithCode(code) {
-        await this.#initMatchmaker();
+        if (!await this.initMatchmaker()) return false;
 
         const listener = (mes) => {
             if (mes.command == 'gameFound') {
@@ -298,13 +310,10 @@ class Bot {
                 delete this.game.raw.command; // pissed me off
 
                 this.gameFound = true;
-            } else {
-                console.log(mes);
             }
 
-            if (mes.error && mes.error == 'gameNotFound') {
+            if (mes.error && mes.error == 'gameNotFound')
                 throw new Error(`Game ${code} not found (likely expired).`)
-            }
         };
 
         this.matchmaker.on('msg', listener);
@@ -316,7 +325,7 @@ class Bot {
             sessionId: this.account.sessionId
         })
 
-        while (!this.gameFound) { await new Promise(r => setTimeout(r, 10)); }
+        while (!this.gameFound) await new Promise(r => setTimeout(r, 10));
 
         this.matchmaker.off('msg', listener);
     }
@@ -414,22 +423,21 @@ class Bot {
     // mode - a mode name that corresponds to a GameMode id
     // map - the name of a map
     async createPrivateGame(opts = {}) {
-        await this.#initMatchmaker();
+        if (!await this.initMatchmaker()) return false;
 
         if (!opts.region) { throw new Error('pass a region: createPrivateGame({ region: "useast", ... })') }
-        if (!this.matchmaker.regionList.find(r => r.id == opts.region)) {
+        if (!this.matchmaker.regionList.find(r => r.id == opts.region))
             throw new Error('invalid region, see <bot>.matchmaker.regionList for a region list (pass an "id")')
-        }
 
-        if (!opts.mode) { throw new Error('pass a mode: createPrivateGame({ mode: "ffa", ... })') }
-        if (GameModes[opts.mode] == undefined) { throw new Error('invalid mode, see GameModes for a list') }
+        if (!opts.mode) throw new Error('pass a mode: createPrivateGame({ mode: "ffa", ... })')
+        if (GameModes[opts.mode] == undefined) throw new Error('invalid mode, see GameModes for a list')
 
-        if (!opts.map) { throw new Error('pass a map: createPrivateGame({ map: "downfall", ... })') }
+        if (!opts.map) throw new Error('pass a map: createPrivateGame({ map: "downfall", ... })')
 
         const map = Maps.find(m => m.name.toLowerCase() == opts.map.toLowerCase());
         const mapIdx = Maps.indexOf(map);
 
-        if (mapIdx == -1) { throw new Error('invalid map, see the Maps constant for a list') }
+        if (mapIdx == -1) throw new Error('invalid map, see the Maps constant for a list')
 
         const listener = (msg) => {
             if (msg.command == 'gameFound') {
@@ -453,7 +461,7 @@ class Bot {
             map: mapIdx
         });
 
-        while (!this.gameFound) { await new Promise(r => setTimeout(r, 10)); }
+        while (!this.gameFound) await new Promise(r => setTimeout(r, 10));
 
         this.matchmaker.off('msg', listener);
 
@@ -466,7 +474,7 @@ class Bot {
             await this.#joinGameWithCode(data);
         } else if (typeof data == 'object') {
             if (!this.state.loggedIn) {
-                console.log('passed an object but you still need to be logged in!!')
+                // console.log('passed an object but you still need to be logged in!!')
                 await this.#anonLogin();
             }
 
@@ -478,18 +486,14 @@ class Bot {
             this.gameFound = true;
         }
 
-        if (!this.game.raw.id || !this.game.raw.subdomain) {
+        if (!this.game.raw.id || !this.game.raw.subdomain)
             throw new Error('invalid game data passed to <bot>.join');
-        }
 
         console.log(`Joining ${this.game.raw.id} using proxy ${this.proxy || 'none'}`);
 
-        this.gameSocket = new WebSocket(`wss://${this.game.raw.subdomain}.shellshock.io/game/${this.game.raw.id}`, {
-            headers: {
-                'user-agent': USER_AGENT,
-                'accept-language': 'en-US,en;q=0.9'
-            },
-            agent: this.proxy ? new SocksProxyAgent(this.proxy) : null
+        this.gameSocket = new yolkws(`wss://${this.game.raw.subdomain}.shellshock.io/game/${this.game.raw.id}`, this.proxy, {
+            'user-agent': UserAgent,
+            'accept-language': 'en-US,en;q=0.9'
         });
 
         this.gameSocket.binaryType = 'arraybuffer';
@@ -502,17 +506,16 @@ class Bot {
 
         this.gameSocket.onclose = (e) => {
             console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
+            this.#emit('close', e.code);
         }
 
-        while (!this.state.joinedGame) { await new Promise(r => setTimeout(r, 1)); }
+        while (!this.state.joinedGame) await new Promise(r => setTimeout(r, 5));
 
         const out = CommOut.getBuffer();
         out.packInt8(CommCode.clientReady);
         out.send(this.gameSocket);
 
-        this.gameSocket.onmessage = (msg) => {
-            this._packetQueue.push(msg.data);
-        }
+        this.gameSocket.onmessage = (msg) => this._packetQueue.push(msg.data);
 
         console.log(`Successfully joined ${this.game.code}. Startup to join time: ${Date.now() - this.initTime} ms`);
 
@@ -522,7 +525,6 @@ class Bot {
         }
 
         if (this.autoPing) {
-            console.log('autoPing enabled...');
             const out = CommOut.getBuffer();
             out.packInt8(CommCode.ping);
             out.send(this.gameSocket);
@@ -535,10 +537,10 @@ class Bot {
 
         this.nUpdates++;
 
-        if (this._packetQueue.length === 0 && this._dispatches.length === 0) { return; }
+        if (this._packetQueue.length === 0 && this._dispatches.length === 0) return;
 
         let packet;
-        while ((packet = this._packetQueue.shift()) !== undefined) { await this.handlePacket(packet); }
+        while ((packet = this._packetQueue.shift()) !== undefined) { this.#handlePacket(packet); }
 
         this.drain();
 
@@ -599,15 +601,12 @@ class Bot {
         }
 
         let cb;
-        while ((cb = this._liveCallbacks.shift()) !== undefined) { cb(); }
+        while ((cb = this._liveCallbacks.shift()) !== undefined) cb();
     }
 
     on(event, cb) {
-        if (Object.keys(this._hooks).includes(event)) {
-            this._hooks[event].push(cb);
-        } else {
-            this._hooks[event] = [cb];
-        }
+        if (Object.keys(this._hooks).includes(event)) this._hooks[event].push(cb);
+        else this._hooks[event] = [cb];
     }
 
     onAny(cb) {
@@ -706,12 +705,6 @@ class Bot {
         playerData.gameData_.private = CommIn.unPackInt8U();
         playerData.gameData_.gameType = CommIn.unPackInt8U();
 
-        playerData.stats_ = {};
-        StatsArr.forEach((stat) => playerData.stats_[stat] = 0);
-        playerData.stats_.kills = playerData.kills_;
-        playerData.stats_.deaths = playerData.deaths_;
-        playerData.stats_.streak = playerData.streak_;
-
         if (!this.players[playerData.id_]) {
             this.players[playerData.id_] = new GamePlayer(playerData.id_, playerData.team_, playerData);
 
@@ -719,11 +712,11 @@ class Bot {
 
             if (player.playing) {
                 player.healthInterval = setInterval(() => {
-                    if (player.hp < 1) { return; }
+                    if (player.hp < 1) return;
 
                     const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
 
-                    if (player.streakRewards.includes(ShellStreak.OverHeal)) {
+                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) {
                         player.hp = Math.max(100, player.hp - regenSpeed);
                     } else {
                         player.hp = Math.min(100, player.hp + regenSpeed);
@@ -775,11 +768,11 @@ class Bot {
             }
 
             player.healthInterval = setInterval(() => {
-                if (player.hp < 1) { return; }
+                if (player.hp < 1) return;
 
                 const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options[GameOptionFlags.healthRegen] : 1);
 
-                if (player.streakRewards.includes(ShellStreak.OverHeal)) {
+                if (player.streakRewards.includes(ShellStreaks.OverHeal)) {
                     player.hp = Math.max(100, player.hp - regenSpeed);
                 } else {
                     player.hp = Math.min(100, player.hp + regenSpeed);
@@ -796,8 +789,11 @@ class Bot {
         const y = CommIn.unPackFloat();
         const z = CommIn.unPackFloat();
         const climbing = CommIn.unPackInt8U();
+
         const player = this.players[id];
-        if (!player || player.id == this.me.id) {
+        if (!player || !player.buffer) return;
+
+        if (player.id == this.me.id) {
             for (let i2 = 0; i2 < 3 /* FramesBetweenSyncs */; i2++) {
                 CommIn.unPackInt8U();
                 CommIn.unPackRadU();
@@ -880,7 +876,7 @@ class Bot {
 
         player.weapons[player.activeGun].ammo.rounds--;
 
-        this.#emit('fire', player);
+        this.#emit('playerFire', player);
     }
 
     #processCollectPacket() {
@@ -908,18 +904,19 @@ class Bot {
         const hp = CommIn.unPackInt8U();
         const player = this.players[id];
         player.hp = hp;
-        this.#emit('playerHit', player, player.hp);
+        this.#emit('playerDamaged', player, player.hp);
     }
 
     #processHitMePacket() {
         const hp = CommIn.unPackInt8U();
         this.me.hp = hp;
-        this.#emit('selfHit', this.me, this.me.hp);
+        this.#emit('selfDamaged', this.me, this.me.hp);
     }
 
     #processSyncMePacket() {
         const id = CommIn.unPackInt8U();
         const player = this.players[id];
+        if (!player) return;
 
         CommIn.unPackInt8U(); // stateIdx
 
@@ -939,7 +936,7 @@ class Bot {
         player.position.z = newZ;
 
         if (oldX != newX || oldY != newY || oldZ != newZ) {
-            this.#emit('serverMoveSelf', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
+            this.#emit('selfMoved', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
         }
     }
 
@@ -959,7 +956,7 @@ class Bot {
     }
 
     #processGameStatePacket() {
-        if (this.game.gameModeId == 2) { // spatula
+        if (this.game.gameModeId == GameModes.spatula) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
 
@@ -979,7 +976,7 @@ class Bot {
             };
 
             this.#emit('gameStateChange', this.game);
-        } else if (this.game.gameModeId == 3) { // kotc
+        } else if (this.game.gameModeId == GameModes.kotc) {
             this.game.stage = CommIn.unPackInt8U(); // constants.CoopStates
             this.game.activeZone = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
             this.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
@@ -995,11 +992,11 @@ class Bot {
             this.#emit('gameStateChange', this.game);
         }
 
-        if (this.game.gameModeId !== 2) {
+        if (this.game.gameModeId !== GameModes.spatula) {
             delete this.game.spatula;
         }
 
-        if (this.game.gameModeId !== 3) {
+        if (this.game.gameModeId !== GameModes.kotc) {
             delete this.game.stage;
             delete this.game.activeZone;
             delete this.game.capturing;
@@ -1007,7 +1004,7 @@ class Bot {
             delete this.game.numCapturing
         }
 
-        if (this.game.gameModeId !== 3 && this.game.gameModeId !== 2) {
+        if (this.game.gameModeId !== GameModes.spatula && this.game.gameModeId !== GameModes.kotc) {
             delete this.game.teamScore;
         }
     }
@@ -1018,16 +1015,16 @@ class Bot {
         const player = this.players[id];
 
         switch (ksType) {
-            case ShellStreak.HardBoiled:
+            case ShellStreaks.HardBoiled:
                 player.hpShield = 100;
-                player.streakRewards.push(ShellStreak.HardBoiled);
+                player.streakRewards.push(ShellStreaks.HardBoiled);
                 break;
 
-            case ShellStreak.EggBreaker:
-                player.streakRewards.push(ShellStreak.EggBreaker);
+            case ShellStreaks.EggBreaker:
+                player.streakRewards.push(ShellStreaks.EggBreaker);
                 break;
 
-            case ShellStreak.Restock: {
+            case ShellStreaks.Restock: {
                 player.grenades = 3;
 
                 // main weapon
@@ -1040,21 +1037,21 @@ class Bot {
                 break;
             }
 
-            case ShellStreak.OverHeal:
+            case ShellStreaks.OverHeal:
                 player.hp = Math.min(200, player.hp + 100);
-                player.streakRewards.push(ShellStreak.OverHeal);
+                player.streakRewards.push(ShellStreaks.OverHeal);
                 break;
 
-            case ShellStreak.DoubleEggs:
-                player.streakRewards.push(ShellStreak.DoubleEggs);
+            case ShellStreaks.DoubleEggs:
+                player.streakRewards.push(ShellStreaks.DoubleEggs);
                 break;
 
-            case ShellStreak.MiniEgg:
-                player.streakRewards.push(ShellStreak.MiniEgg);
+            case ShellStreaks.MiniEgg:
+                player.streakRewards.push(ShellStreaks.MiniEgg);
                 break;
         }
 
-        this.#emit('beginStreakReward', ksType, player);
+        this.#emit('playerBeginStreak', ksType, player);
     }
 
     #processEndStreakPacket() {
@@ -1063,17 +1060,17 @@ class Bot {
         const player = this.players[id];
 
         const streaks = [
-            ShellStreak.EggBreaker,
-            ShellStreak.OverHeal,
-            ShellStreak.DoubleEggs,
-            ShellStreak.MiniEgg
+            ShellStreaks.EggBreaker,
+            ShellStreaks.OverHeal,
+            ShellStreaks.DoubleEggs,
+            ShellStreaks.MiniEgg
         ];
 
         if (streaks.includes(ksType) && player.streakRewards.includes(ksType)) {
             player.streakRewards = player.streakRewards.filter((r) => r != ksType);
         }
 
-        this.#emit('endStreakReward', ksType, player);
+        this.#emit('playerEndStreak', ksType, player);
     }
 
     #processHitShieldPacket() {
@@ -1084,10 +1081,10 @@ class Bot {
         this.me.hp = hp;
 
         if (this.me.hpShield <= 0) {
-            this.me.streakRewards = this.me.streakRewards.filter((r) => r != ShellStreak.HardBoiled);
-            this.#emit('selfLoseShield');
+            this.me.streakRewards = this.me.streakRewards.filter((r) => r != ShellStreaks.HardBoiled);
+            this.#emit('selfShieldLost');
         } else {
-            this.#emit('selfHitShield', this.me.hpShield);
+            this.#emit('selfShieldHit', this.me.hpShield);
         }
     }
 
@@ -1122,13 +1119,13 @@ class Bot {
         const action = CommIn.unPackInt8U();
 
         if (action == GameActions.pause) {
-            console.log('settings changed, gameOwner changed game settings, force paused');
+            // console.log('settings changed, gameOwner changed game settings, force paused');
             this.#emit('gameForcePause');
             setTimeout(() => this.me.playing = false, 3000);
         }
 
         if (action == GameActions.reset) {
-            console.log('owner reset game');
+            // console.log('owner reset game');
 
             this.me.kills = 0;
             this.game.teamScore = [0, 0, 0];
@@ -1167,7 +1164,7 @@ class Bot {
         const toTeam = CommIn.unPackInt8U();
         const player = this.players[id];
 
-        if (!player) { return; }
+        if (!player) return;
 
         player.team = toTeam;
         player.kills = 0;
@@ -1208,7 +1205,7 @@ class Bot {
             player.character.melee = meleeItem;
 
             player.selectedGun = weaponIndex;
-            player.weapons[0] = new gunIndexes[weaponIndex]();
+            player.weapons[0] = new GunList[weaponIndex]();
 
             this.#emit('playerChangeCharacter', player, oldCharacter, player.character, oldWeaponIdx, player.selectedGun);
         }
@@ -1222,15 +1219,18 @@ class Bot {
 
     #processRespawnDeniedPacket() {
         this.me.playing = false;
-        this.#emit('respawnFail');
+        this.#emit('selfRespawnFail');
     }
 
     // we do this since reload doesn't get emitted to ourselves
-    processReloadPacket(customPlayer) {
+    processReloadPacket(customPlayer, iUnderstandThisIsForInternalUseOnlyAndIShouldNotBeCallingThis) {
+        if (!iUnderstandThisIsForInternalUseOnlyAndIShouldNotBeCallingThis)
+            throw new Error('processReloadPacket is exposed for internal use only. do not call it.');
+
         const id = customPlayer || CommIn.unPackInt8U();
         const player = this.players[id];
 
-        if (!player) { return; }
+        if (!player) return;
 
         const playerActiveWeapon = player.weapons[player.activeGun];
 
@@ -1245,7 +1245,7 @@ class Bot {
         this.#emit('playerReload', player, playerActiveWeapon);
     }
 
-    async handlePacket(packet) {
+    #handlePacket(packet) {
         CommIn.init(packet);
         this.#emit('packet', packet);
         const cmd = CommIn.unPackInt8U();
@@ -1255,7 +1255,7 @@ class Bot {
                 break;
 
             case CommCode.addPlayer:
-                await this.#processAddPlayerPacket(packet);
+                this.#processAddPlayerPacket(packet);
                 break;
 
             case CommCode.respawn:
@@ -1351,7 +1351,15 @@ class Bot {
                 break;
 
             case CommCode.reload:
-                this.processReloadPacket();
+                this.processReloadPacket(null, true);
+                break;
+
+            case CommCode.clientReady:
+            case CommCode.expireUpgrade:
+            case CommCode.musicInfo:
+            case CommCode.challengeCompleted:
+                // we do not plan to implement these
+                // for more info, see comm/codes.js
                 break;
 
             case CommCode.spawnItem:

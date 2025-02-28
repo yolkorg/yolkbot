@@ -43,14 +43,14 @@ man.on('chat', (bot, _player, msg) => {
     }
 });
 
-man.on('respawn', (bot, p) => {
+man.on('playerRespawn', (bot, p) => {
     if (bot.me.name == p.name) {
         bot.dispatch(new SpawnDispatch());
         console.log('respawned');
     }
 });
 
-man.on('join', (_bot, player) => {
+man.on('playerJoin', (_bot, player) => {
     console.log(player.name, 'joined.');
 });
 

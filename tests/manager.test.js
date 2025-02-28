@@ -1,5 +1,3 @@
-/* eslint-disable curly */
-
 import Bot from '#bot';
 import Manager from '#manager';
 
@@ -14,7 +12,7 @@ for (let i = 0; i < NUM_PLAYERS; i++) {
 
 const man = new Manager(playerList);
 
-man.on('join', (_bot, player) => {
+man.on('playerJoin', (_bot, player) => {
     console.log(player.name, 'joined.');
 });
 
@@ -23,7 +21,7 @@ man.on('chat', (bot, _player, msg) => {
     if (msg == 'spawn') bot.dispatch(new SpawnDispatch());
 });
 
-man.on('respawn', (bot, p) => {
+man.on('playerRespawn', (bot, p) => {
     if (bot.me.name == p.name) bot.dispatch(new SpawnDispatch());
 });
 

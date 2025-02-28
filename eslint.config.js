@@ -9,7 +9,6 @@ export default [
         rules: {
             'block-scoped-var': 'error',
             'camelcase': 'error',
-            'curly': 'error',
             'no-implicit-globals': 'error',
             'no-lonely-if': 'error',
             'no-var': 'error',

@@ -1,5 +1,5 @@
 import { queryServices } from '#api';
-import { findItemById, gunIndexes } from '#constants';
+import { findItemById, GunList } from '#constants';
 
 import packet from '#packet';
 
@@ -24,21 +24,21 @@ class SaveLoadoutDispatch {
     }
 
     check(bot) {
-        if (bot.me.playing) { return false; }
+        if (bot.me.playing) return false;
 
         const load = this.changes;
 
-        if (load.colorIdx !== undefined && load.colorIdx >= 7 && !bot.account.vip) { return false } // trying to use VIP color
-        if (load.colorIdx !== undefined && load.colorIdx >= 14) { return false } // trying to use color that doesn't exist
+        if (load.colorIdx !== undefined && load.colorIdx >= 7 && !bot.account.vip) return false; // trying to use VIP color
+        if (load.colorIdx !== undefined && load.colorIdx >= 14) return false; // trying to use color that doesn't exist
 
         // validate that you own all of the items you're trying to use
-        if (is(load.hatId) && !itemIsDefault(load.hatId) && !bot.account.ownedItemIds.includes(load.hatId)) { return false }
-        if (is(load.stampId) && !itemIsDefault(load.stampId) && !bot.account.ownedItemIds.includes(load.stampId)) { return false }
-        if (is(load.grenadeId) && !itemIsDefault(load.grenadeId) && !bot.account.ownedItemIds.includes(load.grenadeId)) { return false }
-        if (is(load.meleeId) && !itemIsDefault(load.meleeId) && !bot.account.ownedItemIds.includes(load.meleeId)) { return false }
+        if (is(load.hatId) && !itemIsDefault(load.hatId) && !bot.account.ownedItemIds.includes(load.hatId)) return false;
+        if (is(load.stampId) && !itemIsDefault(load.stampId) && !bot.account.ownedItemIds.includes(load.stampId)) return false;
+        if (is(load.grenadeId) && !itemIsDefault(load.grenadeId) && !bot.account.ownedItemIds.includes(load.grenadeId)) return false;
+        if (is(load.meleeId) && !itemIsDefault(load.meleeId) && !bot.account.ownedItemIds.includes(load.meleeId)) return false;
 
         // invalid classidx param
-        if (is(load.classIdx) && load.classIdx > 6 || load.classIdx < 0) { return false }
+        if (is(load.classIdx) && load.classIdx > 6 || load.classIdx < 0) return false;
 
         // validate that you own the primary guns you're trying to use
         if (this.changes.primaryId) {
@@ -64,7 +64,7 @@ class SaveLoadoutDispatch {
 
     execute(bot) {
         if (this.changes.classIdx && this.changes.classIdx !== bot.me.selectedGun) {
-            bot.me.weapons[0] = new gunIndexes[this.changes.classIdx]();
+            bot.me.weapons[0] = new GunList[this.changes.classIdx]();
         }
 
         const loadout = {
@@ -83,7 +83,7 @@ class SaveLoadoutDispatch {
         bot.account.loadout = loadout;
 
         saveLoadout.then((res) => {
-            console.log('saveloadout', res);
+            console.log('saveloadout returned', res);
 
             new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.gameSocket);
 

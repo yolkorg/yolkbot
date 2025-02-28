@@ -1,28 +1,14 @@
-import { SocksProxyAgent } from 'socks-proxy-agent';
-import { WebSocket } from 'ws';
+import yolkws from './socket.js';
 
-import { USER_AGENT } from '#constants';
+import { UserAgent } from '#constants';
 
 const firebaseKey = 'AIzaSyDP4SIjKaw6A4c-zvfYxICpbEjn1rRnN50';
 
-async function fetchConstantsRaw() {
-    const resp = await fetch('https://raw.githubusercontent.com/StateFarmNetwork/client-keys/refs/heads/main/constants_latest.json');
-    const json = await resp.json();
-    return json;
-}
-
 async function queryServices(request, prox = '') {
-    let ws;
-    if (prox) {
-        ws = new WebSocket('wss://shellshock.io/services/', {
-            agent: new SocksProxyAgent(prox)
-        });
-    } else {
-        ws = new WebSocket('wss://shellshock.io/services/');
-    }
+    const ws = new yolkws('wss://shellshock.io/services/', prox, { 'user-agent': UserAgent });
 
     const openPromise = new Promise((resolve, reject) => {
-        ws.on('open', () => resolve(ws));
+        ws.addEventListener('open', () => resolve(ws));
         ws.onerror = (err) => reject(err);
     });
 
@@ -38,10 +24,13 @@ async function queryServices(request, prox = '') {
                 resolve(resp);
             } catch (e) {
                 console.log('Bad API JSON response in queryServices with call: ' + request.cmd + ' and data: ' + JSON.stringify(request));
-                console.log('Full data sent: ' + JSON.stringify(request));
-                console.log('Full data received: ' + mes);
-                console.log('Full error: ' + e);
+                console.log('Full data sent: ', JSON.stringify(request));
+                console.log('Full data received: ', mes);
+                console.log('Full error: ', e);
+
+                resolve({ error: 'Bad JSON' });
             }
+
             ws.close();
         };
         ws.onerror = reject;
@@ -57,12 +46,6 @@ async function queryServices(request, prox = '') {
 }
 
 async function loginWithCredentials(email, password, prox = '') {
-
-    /*
-    DO NOT CALL RAW!!!! (you can if you want :3 it doesn't change anything)
-    create an Account() and then call .session() to get this data
-    */
-
     /*
     Response looks something like:
         {
@@ -93,7 +76,7 @@ async function loginWithCredentials(email, password, prox = '') {
                     returnSecureToken: true
                 }),
                 headers: {
-                    'user-agent': USER_AGENT,
+                    'user-agent': UserAgent,
                     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
                 }
             })
@@ -103,26 +86,21 @@ async function loginWithCredentials(email, password, prox = '') {
         } catch (error) {
             ++k;
             if (error.code == 'auth/network-request-failed') {
-                console.error('cw_api.login: Network req failed (auth/network-request-failed), retrying, k =', k);
+                console.error('loginWithCredentials: Network req failed (auth/network-request-failed), retrying, k =', k);
             } else if (error.code == 'auth/missing-email') {
-                console.error('cw_api.login: You did not specify any emails. Please do so in data/logins.json');
+                console.error('loginWithCredentials: You did not specify an email when using loginWithCredentials');
                 process.exit(0);
             } else {
-                console.error('cw_api.login: Error:', email, password);
-                console.error('cw_api.login: Error:', error, 'k =', k);
+                console.error('loginWithCredentials: Error:', email, password);
+                console.error('loginWithCredentials: Error:', error, 'k =', k);
             }
         }
     }
-
-    // let current_time = new Date().getTime();
 
     const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
     }, prox);
-    // let after_time = new Date().getTime();
-
-    // console.log("Took " + (after_time - current_time) + "ms to authenticate");
 
     return response;
 }
@@ -132,21 +110,23 @@ async function loginAnonymously(prox = '') {
         method: 'POST',
         body: JSON.stringify({ returnSecureToken: true }),
         headers: {
-            'user-agent': USER_AGENT,
+            'user-agent': UserAgent,
             'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
         }
     })
+
     const body = await request.json();
     const token = body.idToken;
+
     const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
     }, prox);
+
     return response
 }
 
 export {
-    fetchConstantsRaw,
     loginAnonymously,
     loginWithCredentials,
     queryServices

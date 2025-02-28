@@ -46,14 +46,14 @@ class OutBuffer {
         this.packInt32(val * 1048576);
     }
     packString(str, doMalicious = false) {
-        if (typeof str !== 'string') { str = ''; }
+        if (typeof str !== 'string') str = '';
         this.packInt8(doMalicious ? 254 : str.length);
-        for (let i2 = 0; i2 < str.length; i2++) { this.packInt16(str.charCodeAt(i2)); }
+        for (let i2 = 0; i2 < str.length; i2++) this.packInt16(str.charCodeAt(i2));
     }
     packLongString(str) {
-        if (typeof str !== 'string') { str = ''; }
+        if (typeof str !== 'string') str = '';
         this.packInt16(str.length);
-        for (let i2 = 0; i2 < str.length; i2++) { this.packInt16(str.charCodeAt(i2)); }
+        for (let i2 = 0; i2 < str.length; i2++) this.packInt16(str.charCodeAt(i2));
     }
 }
 

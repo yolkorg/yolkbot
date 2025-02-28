@@ -1,11 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 
-import { USER_AGENT } from '../../src/constants.js';
+import { UserAgent } from '../../src/constants/index.js';
 
 const data = await fetch('https://shellshock.io/js/shellshock.js', {
     headers: {
-        'User-Agent': USER_AGENT
+        'User-Agent': UserAgent
     }
 });
 
@@ -18,4 +18,7 @@ let parsed = '';
 
 eval(`parsed = ${match}`);
 
-fs.writeFileSync(path.join(import.meta.dirname, '..', 'items.json'), JSON.stringify(parsed, null, 4));
+fs.writeFileSync(
+    path.join(import.meta.dirname, '..', '..', 'src', 'constants', 'items.js'),
+    `/* eslint-disable */\nexport const Items = ${JSON.stringify(parsed, null, 4)};`
+);

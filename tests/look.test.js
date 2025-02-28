@@ -1,5 +1,3 @@
-/* eslint-disable curly */
-
 import Bot from '#bot';
 
 import LookAtDispatch from '#dispatch/LookAtDispatch.js';
@@ -8,7 +6,7 @@ import SpawnDispatch from '#dispatch/SpawnDispatch.js';
 
 const bot = new Bot({ name: 'selfbot' });
 
-bot.on('join', (player) => {
+bot.on('playerJoin', (player) => {
     console.log(player.name, 'joined.');
 });
 

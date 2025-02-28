@@ -1,12 +1,9 @@
-import EventEmitter from 'node:events';
-
-import { SocksProxyAgent } from 'socks-proxy-agent';
-import { WebSocket } from 'ws';
-
 import { loginAnonymously } from '#api';
-import { GameModes, PlayTypes, USER_AGENT } from '#constants';
+import { GameModes, PlayTypes, UserAgent } from '#constants';
 
-class Matchmaker extends EventEmitter {
+import yolkws from './socket.js';
+
+export class Matchmaker {
     connected = false;
     onceConnected = [];
 
@@ -15,29 +12,25 @@ class Matchmaker extends EventEmitter {
 
     forceClose = false;
 
-    constructor(customSessionId, proxy) {
-        super();
+    onListeners = new Map();
+    onceListeners = new Map();
 
+    constructor(customSessionId, proxy) {
         if (customSessionId) {
             this.sessionId = customSessionId;
         } else {
             this.createSessionId();
         }
 
-        if (proxy) {
-            this.proxy = new SocksProxyAgent(proxy);
-        }
+        this.proxy = proxy;
 
         this.createSocket();
     }
 
     createSocket() {
-        this.ws = new WebSocket('wss://shellshock.io/matchmaker/', {
-            headers: {
-                'user-agent': USER_AGENT,
-                'accept-language': 'en-US,en;q=0.9'
-            },
-            agent: this.proxy
+        this.ws = new yolkws('wss://shellshock.io/matchmaker/', this.proxy, {
+            'user-agent': UserAgent,
+            'accept-language': 'en-US,en;q=0.9'
         });
 
         this.ws.onopen = () => {
@@ -53,7 +46,7 @@ class Matchmaker extends EventEmitter {
         }
 
         this.ws.onclose = () => {
-            if (this.forceClose) { return; }
+            if (this.forceClose) return;
 
             this.connected = false;
             this.createSocket();
@@ -86,14 +79,15 @@ class Matchmaker extends EventEmitter {
         await this.waitForConnect();
 
         return new Promise((res) => {
-            console.log('fetching regions');
-
-            this.on('msg', (data2) => {
+            const listener = (data2) => {
                 if (data2.command == 'regionList') {
                     this.regionList = data2.regionList;
+                    this.off('msg', listener);
                     res(data2.regionList);
                 }
-            });
+            };
+
+            this.on('msg', listener);
 
             this.ws.onerror = (e2) => {
                 throw new Error('Failed to get regions', e2);
@@ -121,8 +115,6 @@ class Matchmaker extends EventEmitter {
         if (!params.mode) { throw new Error('did not specify a mode in findGame') }
         if (GameModes[params.mode] === undefined) { throw new Error('invalid mode in findGame, see GameModes for a list') }
 
-        console.log('post-modification params', params);
-
         return new Promise((res) => {
             const opts = {
                 command: 'findGame',
@@ -132,11 +124,14 @@ class Matchmaker extends EventEmitter {
                 sessionId: this.sessionId
             };
 
-            this.on('msg', (data2) => {
+            const listener = (data2) => {
                 if (data2.command == 'gameFound') {
+                    this.off('msg', listener);
                     res(data2);
                 }
-            });
+            };
+
+            this.on('msg', listener);
 
             this.ws.send(JSON.stringify(opts));
         });
@@ -157,6 +152,43 @@ class Matchmaker extends EventEmitter {
     close() {
         this.forceClose = true;
         this.ws.close();
+    }
+
+    on(event, callback) {
+        if (!this.onListeners.has(event)) {
+            this.onListeners.set(event, []);
+        }
+
+        this.onListeners.get(event).push(callback);
+    }
+
+    once(event, callback) {
+        if (!this.onceListeners.has(event)) {
+            this.onceListeners.set(event, []);
+        }
+
+        this.onceListeners.get(event).push(callback);
+    }
+
+    emit(event, ...args) {
+        if (this.onListeners.has(event)) {
+            this.onListeners.get(event).forEach(func => func(...args));
+        }
+
+        if (this.onceListeners.has(event)) {
+            this.onceListeners.get(event).forEach(func => func(...args));
+            this.onceListeners.delete(event);
+        }
+    }
+
+    off(event, callback) {
+        if (this.onListeners.has(event)) {
+            this.onListeners.set(event, this.onListeners.get(event).filter(func => func !== callback));
+        }
+
+        if (this.onceListeners.has(event)) {
+            this.onceListeners.set(event, this.onceListeners.get(event).filter(func => func !== callback));
+        }
     }
 }
 

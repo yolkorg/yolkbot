@@ -1,5 +1,3 @@
-/* eslint-disable curly */
-
 import Bot from '#bot';
 
 import SpawnDispatch from '#dispatch/SpawnDispatch.js';
@@ -7,7 +5,7 @@ import SwitchTeamDispatch from '#dispatch/SwitchTeamDispatch.js';
 
 const bot = new Bot({ name: 'selfbot' });
 
-bot.on('join', (player) => {
+bot.on('playerJoin', (player) => {
     console.log(player.name, 'joined.');
 });
 

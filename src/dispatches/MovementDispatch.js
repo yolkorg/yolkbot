@@ -5,7 +5,6 @@ class MovementDispatch {
         } else if (typeof controlKeys == typeof []) {
             this.controlKeys = controlKeys.reduce((a, b) => a | b, 0);
         }
-
     }
 
     check(bot) {

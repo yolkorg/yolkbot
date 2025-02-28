@@ -1,17 +1,18 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers (self) bot in under 10 lines.",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "keywords": ["shell shockers", "shellshock.io", "blue wizard", "yolkbot"],
-    "homepage": "https://github.com/enbyte/ShellfBot#readme",
-    "bugs": { "url": "https://github.com/enbyte/ShellfBot/issues" },
+    "homepage": "https://github.com/enbyte/yolkbot#readme",
+    "bugs": {
+        "url": "https://github.com/enbyte/yolkbot/issues"
+    },
     "author": "hijinks",
-    "contributors": [{ "name": "1ust", "url": "https://github.com/VillainsRule" }],
-    "repository": "github:enbyte/ShellfBot",
-
+    "contributors": ["1ust"],
+    "repository": "github:enbyte/yolkbot",
     "type": "module",
     "files": [
-        "data/**/*",
+        "data/*.*",
         "src/**/*",
         "package.json",
         "README.md"
@@ -19,20 +20,19 @@
     "exports": {
         "./package.json": "./package.json",
         ".": "./src/index.js",
-
         "./api": "./src/api.js",
         "./bot": "./src/bot.js",
         "./comm": "./src/comm/index.js",
-        "./constants": "./src/constants.js",
-        "./dispatch": "./src/dispatch/index.js",
         "./manager": "./src/manager.js",
         "./matchmaker": "./src/matchmaker.js",
         "./packets": "./src/packet.js",
-
-        "./dispatch/*": "./src/dispatch/*.js",
-        "./dispatch/*.js": "./src/packets/*.js"
+        "./constants": "./src/constants/index.js",
+        "./constants/*": "./src/constants/*.js",
+        "./constants/*.js": "./src/constants/*.js",
+        "./dispatch": "./src/dispatches/index.js",
+        "./dispatch/*": "./src/dispatches/*.js",
+        "./dispatch/*.js": "./src/dispatches/*.js"
     },
-
     "dependencies": {
         "socks-proxy-agent": "^8.0.5",
         "ws": "^8.18.0"
@@ -43,15 +43,15 @@
         "eslint": "^9.20.1",
         "globals": "^15.15.0"
     },
-
     "scripts": {
         "lint": "eslint --fix",
-        "postpublish": "node --env-file=.env scripts/postpublish.js"
+        "prod": "./prod.sh",
+        "test": "./build.sh"
     },
     "imports": {
         "#api": "./src/api.js",
         "#bot": "./src/bot.js",
-        "#constants": "./src/constants.js",
+        "#constants": "./src/constants/index.js",
         "#dispatch/*": "./src/dispatches/*",
         "#manager": "./src/manager.js",
         "#matchmaker": "./src/matchmaker.js",

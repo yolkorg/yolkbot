@@ -17,11 +17,11 @@ for (let i = 0; i < NUM_CREAMERS; i++) {
 
 const man = new manager.Manager(p);
 
-man.on('join', (me) => {
+man.on('playerJoin', (me) => {
     me.dispatch(new dispatch.SpawnDispatch())
 });  
 
-man.on('respawn', (me) => {
+man.on('playerRespawn', (me) => {
     me.dispatch(new dispatch.SpawnDispatch())
     me.dispatch(new dispatch.ChatDispatch('Professor Creamer on top.'))
 })

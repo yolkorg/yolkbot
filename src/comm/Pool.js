@@ -19,7 +19,7 @@ class Pool {
     }
     retrieve(id) {
         if (id != void 0) {
-            while (id >= this.size) { this.expand(this.originalSize); }
+            while (id >= this.size) this.expand(this.originalSize);
 
             this.numActive++;
             this.objects[id].active = true;
@@ -47,7 +47,7 @@ class Pool {
     forEachActive(fn) {
         for (let i2 = 0; i2 < this.size; i2++) {
             const obj = this.objects[i2];
-            if (obj.active === true) { fn(obj, i2); }
+            if (obj.active === true) fn(obj, i2);
         }
     }
 }
