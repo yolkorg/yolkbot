@@ -25,8 +25,8 @@ import {
     UserAgent
 } from '#constants';
 
-import LookAtPosDispatch from '#dispatch/LookAtPosDispatch.js';
-import MovementDispatch from '#dispatch/MovementDispatch.js';
+import LookAtPosDispatch from './dispatches/LookAtPosDispatch.js';
+import MovementDispatch from './dispatches/MovementDispatch.js';
 
 import { NodeList } from './pathing/mapnode.js';
 

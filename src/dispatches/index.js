@@ -7,6 +7,7 @@ import LookToDispatch from './LookToDispatch.js';
 import LookAtPosDispatch from './LookAtPosDispatch.js';
 import MeleeDispatch from './MeleeDispatch.js';
 import MovementDispatch from './MovementDispatch.js';
+import PathfindDispatch from './PathfindDispatch.js';
 import PauseDispatch from './PauseDispatch.js';
 import ReloadDispatch from './ReloadDispatch.js';
 import ReportPlayerDispatch from './ReportPlayerDispatch.js';
@@ -25,6 +26,7 @@ export {
     LookToDispatch,
     MeleeDispatch,
     MovementDispatch,
+    PathfindDispatch,
     PauseDispatch,
     ReloadDispatch,
     ReportPlayerDispatch,

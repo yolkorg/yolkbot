@@ -1,4 +1,4 @@
-import LookToDispatch from '#dispatch/LookToDispatch.js';
+import LookToDispatch from './LookToDispatch.js';
 
 const mod = (n, m) => ((n % m) + m) % m;
 
