@@ -27,7 +27,10 @@ async function queryServices(request, prox = '') {
                 console.log('Full data sent: ', JSON.stringify(request));
                 console.log('Full data received: ', mes);
                 console.log('Full error: ', e);
+
+                resolve({ error: 'Bad JSON' });
             }
+
             ws.close();
         };
         ws.onerror = reject;

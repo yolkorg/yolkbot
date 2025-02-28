@@ -705,8 +705,11 @@ export class Bot {
         const y = CommIn.unPackFloat();
         const z = CommIn.unPackFloat();
         const climbing = CommIn.unPackInt8U();
+
         const player = this.players[id];
-        if (!player || player.id == this.me.id) {
+        if (!player || !player.buffer) return;
+
+        if (player.id == this.me.id) {
             for (let i2 = 0; i2 < 3 /* FramesBetweenSyncs */; i2++) {
                 CommIn.unPackInt8U();
                 CommIn.unPackRadU();
