@@ -268,6 +268,8 @@ export class Bot {
             this.matchmaker = new Matchmaker(this.account.sessionId, this.proxy);
             await this.matchmaker.getRegions();
         }
+
+        return true;
     }
 
     async #joinGameWithCode(code) {
