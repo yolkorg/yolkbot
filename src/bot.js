@@ -532,7 +532,7 @@ export class Bot {
         }
     }
 
-    async update() {
+    update() {
         if (!this.state.joinedGame) { throw new Error('Not playing, can\'t update. '); }
 
         this.nUpdates++;
