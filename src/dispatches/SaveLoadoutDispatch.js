@@ -6,7 +6,7 @@ import packet from '#packet';
 const is = (variable) => typeof variable !== 'undefined';
 const itemIsDefault = (itemId) => findItemById(itemId).unlock == 'default';
 
-class SaveLoadoutDispatch {
+export class SaveLoadoutDispatch {
     constructor(opts) {
         this.changes = {
             classIdx: opts.gunId,

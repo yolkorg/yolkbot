@@ -1,6 +1,6 @@
 import packet from '#packet';
 
-class ReportPlayerDispatch {
+export class ReportPlayerDispatch {
     constructor(idOrName, reasons = {}) {
         if (typeof idOrName == 'number') this.id = idOrName
         else if (typeof idOrName == 'string') this.name = idOrName

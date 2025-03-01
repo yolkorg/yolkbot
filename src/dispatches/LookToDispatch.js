@@ -1,4 +1,4 @@
-class LookToDispatch {
+export class LookToDispatch {
     constructor(yaw, pitch) {
         this.yaw = yaw;
         this.pitch = pitch;

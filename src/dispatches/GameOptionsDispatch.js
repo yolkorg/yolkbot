@@ -1,6 +1,6 @@
 import packet from '#packet';
 
-class GameOptionsDispatch {
+export class GameOptionsDispatch {
     check(bot) {
         return bot.game.isGameOwner;
     }

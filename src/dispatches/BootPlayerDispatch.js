@@ -1,6 +1,6 @@
 import packet from '#packet';
 
-class BootPlayerDispatch {
+export class BootPlayerDispatch {
     constructor(uniqueId) {
         this.uniqueId = uniqueId;
     }

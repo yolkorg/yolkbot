@@ -1,6 +1,6 @@
 import AStar from '../pathing/astar.js';
 
-class PathfindDispatch {
+export class PathfindDispatch {
     constructor(target) {
         this.target = target;
     }

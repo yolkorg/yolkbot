@@ -8,7 +8,7 @@ const setPrecision = (value) => Math.round(value * 8192) / 8192;
 const calculateYaw = (pos) => setPrecision(mod(Math.atan2(-pos.x, -pos.z), PI2));
 const calculatePitch = (pos) => setPrecision(Math.atan2(pos.y, Math.hypot(pos.x, pos.z)));
 
-class LookAtPosDispatch {
+export class LookAtPosDispatch {
     idOrName;
 
     constructor(pos) {

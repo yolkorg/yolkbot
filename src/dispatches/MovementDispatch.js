@@ -1,4 +1,4 @@
-class MovementDispatch {
+export class MovementDispatch {
     constructor(controlKeys) {
         if (typeof controlKeys == typeof 0) {
             this.controlKeys = controlKeys;

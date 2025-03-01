@@ -1,6 +1,6 @@
 import packet from '#packet';
 
-class ReloadDispatch {
+export class ReloadDispatch {
     check(bot) {
         return bot.me.playing && !bot.state.reloading && !bot.state.swappingGun && !bot.state.usingMelee;
     }

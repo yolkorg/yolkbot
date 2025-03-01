@@ -1,6 +1,6 @@
 import packet from '#packet';
 
-class ChatDispatch {
+export class ChatDispatch {
     constructor(msg) {
         this.msg = msg;
     }

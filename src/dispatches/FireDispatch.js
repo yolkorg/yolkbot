@@ -1,4 +1,4 @@
-class FireDispatch {
+export class FireDispatch {
     constructor(amount) {
         this.amount = amount || 1;
     }

@@ -1,6 +1,6 @@
 import packet from '#packet';
 
-class PauseDispatch {
+export class PauseDispatch {
     check(bot) {
         return bot.me.playing;
     }
