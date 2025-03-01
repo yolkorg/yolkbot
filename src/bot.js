@@ -43,6 +43,9 @@ export class Bot {
     // params.doPing - whether to auto ping (for bot.<ping>)
     // params.pingInterval - the ping interval
     constructor(params = {}) {
+        if (params.proxy && isBrowser)
+            throw new Error('proxies do not work and hence are not supported in the browser');
+
         this.proxy = params.proxy || '';
         this.name = params.name || Math.random().toString(36).substring(8);
 

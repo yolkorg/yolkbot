@@ -1,7 +1,7 @@
 import { loginAnonymously } from '#api';
 import { GameModes, PlayTypes, UserAgent } from '#constants';
 
-import yolkws from './socket.js';
+import yolkws, { isBrowser } from './socket.js';
 
 export class Matchmaker {
     connected = false;
@@ -16,6 +16,9 @@ export class Matchmaker {
     onceListeners = new Map();
 
     constructor(customSessionId, proxy) {
+        if (proxy && isBrowser)
+            throw new Error('proxies do not work and hence are not supported in the browser');
+
         if (customSessionId) {
             this.sessionId = customSessionId;
         } else {
