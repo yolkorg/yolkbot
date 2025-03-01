@@ -14,7 +14,7 @@ export default class GamePlayer {
         this.joinedGame = true;
         this.playing = playerData.playing_;
 
-        this.social = JSON.parse(playerData.social_);
+        this.social = playerData.social && JSON.parse(playerData.social_);
         this.showSocial = playerData.hideBadge_;
 
         this.position = {
