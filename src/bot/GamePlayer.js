@@ -15,7 +15,7 @@ export default class GamePlayer {
         this.playing = playerData.playing_;
 
         this.social = playerData.social && JSON.parse(playerData.social_);
-        this.showSocial = playerData.hideBadge_;
+        this.showBadge = !playerData.hideBadge_;
 
         this.position = {
             x: this.data.x_,
