@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 import { loginAnonymously, loginWithCredentials } from '#api';
@@ -633,8 +633,11 @@ export class Bot {
 
             const data = await (await fetch(`https://shellshock.io/maps/${name}.json?${hash}`)).json();
 
+            const dir = join(import.meta.dirname, '..', 'data', 'cache', 'maps');
+            if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+
             writeFileSync(
-                join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`),
+                join(dir, `${name}-${hash}.json`),
                 JSON.stringify(data, null, 4),
                 { flag: 'w+' }
             );
