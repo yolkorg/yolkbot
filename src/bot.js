@@ -217,6 +217,11 @@ export class Bot {
             return false;
         }
 
+        if (loginData.banRemaining) {
+            this.#emit('banned', loginData.banRemaining);
+            return false;
+        }
+
         this.state.loggedIn = true;
 
         this.account.rawLoginData = loginData;
