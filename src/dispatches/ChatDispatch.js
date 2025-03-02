@@ -1,16 +1,17 @@
 import packet from '#packet';
 
 export class ChatDispatch {
-    constructor(msg) {
+    constructor(msg, noLimit = false) {
         this.msg = msg;
+        this.noLimit = noLimit;
     }
 
     check(bot) {
-        if (!bot.state.joinedGame || (bot.lastChatTime + 3000) > Date.now()) return false;
-        if (!bot.game.isPrivate && !bot.account.emailVerified && bot.account.accountAge < (1e3 * 60 * 60 * 12)) { 
-            console.warning('Account email is not verified. Chat dispatch will never fire.');
-            return false; 
-        }
+        if (typeof this.msg !== 'string') return false;
+        if (this.msg.length < 1 || this.msg.length > 64) return false;
+        if (!bot.state.joinedGame) return false;
+        if ((bot.lastChatTime + 3000) > Date.now() && !this.noLimit) return false;
+        if (!bot.game.isPrivate && !bot.account.emailVerified && bot.account.accountAge < (1e3 * 60 * 60 * 12)) return false;
 
         return true;
     }

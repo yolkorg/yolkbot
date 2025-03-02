@@ -5,8 +5,8 @@ export class PathfindDispatch {
         this.target = target;
     }
 
-    check() {
-        return true;
+    check(bot) {
+        return bot.me.playing && this.target && this.target.playing && this.target.position;
     }
 
     execute(bot) {

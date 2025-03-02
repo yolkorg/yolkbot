@@ -8,7 +8,7 @@ export class MovementDispatch {
     }
 
     check(bot) {
-        return bot.me.playing;
+        return bot.me.playing && this.controlKeys;
     }
 
     execute(bot) {

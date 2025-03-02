@@ -3,7 +3,6 @@ import ChatDispatch from './ChatDispatch.js';
 import FireDispatch from './FireDispatch.js';
 import GameOptionsDispatch from './GameOptionsDispatch.js';
 import LookAtDispatch from './LookAtDispatch.js';
-import LookToDispatch from './LookToDispatch.js';
 import LookAtPosDispatch from './LookAtPosDispatch.js';
 import MeleeDispatch from './MeleeDispatch.js';
 import MovementDispatch from './MovementDispatch.js';
@@ -23,7 +22,6 @@ export {
     GameOptionsDispatch,
     LookAtDispatch,
     LookAtPosDispatch,
-    LookToDispatch,
     MeleeDispatch,
     MovementDispatch,
     PathfindDispatch,
@@ -43,7 +41,6 @@ export default {
     GameOptionsDispatch,
     LookAtDispatch,
     LookAtPosDispatch,
-    LookToDispatch,
     MeleeDispatch,
     MovementDispatch,
     PauseDispatch,

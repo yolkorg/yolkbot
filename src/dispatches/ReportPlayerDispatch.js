@@ -21,7 +21,14 @@ export class ReportPlayerDispatch {
     }
 
     check(bot) {
-        return bot.state.joinedGame;
+        if (!bot.state.joinedGame) return false;
+
+        let target;
+
+        if (this.id !== undefined) target = bot.players[this.id.toString()];
+        else if (this.name !== undefined) target = bot.players.find(player => player.name == this.name);
+
+        return !!target;
     }
 
     execute(bot) {

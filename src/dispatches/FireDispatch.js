@@ -8,7 +8,8 @@ export class FireDispatch {
             !bot.state.reloading &
             !bot.state.swappingGun &&
             !bot.state.usingMelee &&
-            bot.me.weapons[bot.me.activeGun].ammo.rounds > 0;
+            this.amount >= 1 &&
+            bot.me.weapons[bot.me.activeGun].ammo.rounds >= this.amount;
     }
 
     execute(bot) {
