@@ -1,10 +1,12 @@
+/* eslint-disable stylistic/max-len */
+
 import { queryServices } from '#api';
-import { findItemById, GunList } from '#constants';
+import { findItemById, GunList, ItemTypes } from '#constants';
 
 import packet from '#packet';
 
-const is = (variable) => typeof variable !== 'undefined';
-const itemIsDefault = (itemId) => findItemById(itemId).unlock == 'default';
+const isDefault = (itemId) => findItemById(itemId) && findItemById(itemId).unlock == 'default';
+const isType = (itemId, type) => findItemById(itemId) && findItemById(itemId).item_type_id == type;
 
 export class SaveLoadoutDispatch {
     constructor(opts) {
@@ -32,18 +34,20 @@ export class SaveLoadoutDispatch {
         if (load.colorIdx !== undefined && load.colorIdx >= 14) return false; // trying to use color that doesn't exist
 
         // validate that you own all of the items you're trying to use
-        if (is(load.hatId) && !itemIsDefault(load.hatId) && !bot.account.ownedItemIds.includes(load.hatId)) return false;
-        if (is(load.stampId) && !itemIsDefault(load.stampId) && !bot.account.ownedItemIds.includes(load.stampId)) return false;
-        if (is(load.grenadeId) && !itemIsDefault(load.grenadeId) && !bot.account.ownedItemIds.includes(load.grenadeId)) return false;
-        if (is(load.meleeId) && !itemIsDefault(load.meleeId) && !bot.account.ownedItemIds.includes(load.meleeId)) return false;
+        if (isType(load.hatId, ItemTypes.Hat) && !isDefault(load.hatId) && !bot.account.ownedItemIds.includes(load.hatId)) return false;
+        if (isType(load.stampId, ItemTypes.Stamp) && !isDefault(load.stampId) && !bot.account.ownedItemIds.includes(load.stampId)) return false;
+        if (isType(load.grenadeId, ItemTypes.Grenade) && !isDefault(load.grenadeId) && !bot.account.ownedItemIds.includes(load.grenadeId)) return false;
+        if (isType(load.meleeId, ItemTypes.Melee) && !isDefault(load.meleeId) && !bot.account.ownedItemIds.includes(load.meleeId)) return false;
 
         // invalid classidx param
-        if (is(load.classIdx) && load.classIdx > 6 || load.classIdx < 0) return false;
+        if (typeof load.classIdx == 'number' && load.classIdx > 6 || load.classIdx < 0) return false;
 
         // validate that you own the primary guns you're trying to use
         if (this.changes.primaryId) {
             for (let i = 0; i < 7; i++) {
-                if (!itemIsDefault(this.changes.primaryId[i]) && !bot.account.ownedItemIds.includes(this.changes.primaryId[i])) {
+                const testingId = this.changes.primaryId[i];
+
+                if (!isType(testingId, ItemTypes.Primary) || (!isDefault(testingId) && !bot.account.ownedItemIds.includes(testingId))) {
                     return false;
                 }
             }
@@ -52,7 +56,9 @@ export class SaveLoadoutDispatch {
         // validate that you own the secondary guns you're trying to use
         if (this.changes.secondaryId) {
             for (let i = 0; i < 7; i++) {
-                if (!itemIsDefault(this.changes.secondaryId[i]) && !bot.account.ownedItemIds.includes(this.changes.secondaryId[i])) {
+                const testingId = this.changes.secondaryId[i];
+
+                if (!isType(testingId, ItemTypes.Secondary) || (!isDefault(testingId) && !bot.account.ownedItemIds.includes(testingId))) {
                     return false;
                 }
             }
@@ -85,7 +91,8 @@ export class SaveLoadoutDispatch {
         saveLoadout.then((res) => {
             console.log('saveloadout returned', res);
 
-            new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.gameSocket);
+            if (bot.state.joinedGame)
+                new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.gameSocket);
 
             // apply changes to the bot
             Object.entries(this.changes).forEach(([changeKey, changeValue]) => {

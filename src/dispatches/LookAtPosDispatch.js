@@ -1,5 +1,3 @@
-import LookToDispatch from './LookToDispatch.js';
-
 const mod = (n, m) => ((n % m) + m) % m;
 
 const PI2 = Math.PI * 2;
@@ -16,7 +14,7 @@ export class LookAtPosDispatch {
     }
 
     check(bot) {
-        return bot.me.playing;
+        return bot.me.playing && this.pos && this.pos.x && this.pos.y && this.pos.z;
     }
 
     execute(bot) {
@@ -29,7 +27,8 @@ export class LookAtPosDispatch {
         const yaw = calculateYaw(directionVector)
         const pitch = calculatePitch(directionVector);
 
-        new LookToDispatch(yaw, pitch).execute(bot);
+        bot.me.view.yaw = yaw;
+        bot.me.view.pitch = pitch;
     }
 }
 

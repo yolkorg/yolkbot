@@ -1,5 +1,5 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
 
 import { loginAnonymously, loginWithCredentials } from '#api';
 
@@ -214,6 +214,11 @@ export class Bot {
         if (!loginData) {
             console.error('Failed to login with credentials.');
             this.#emit('authFail');
+            return false;
+        }
+
+        if (loginData.banRemaining) {
+            this.#emit('banned', loginData.banRemaining);
             return false;
         }
 
@@ -648,20 +653,29 @@ export class Bot {
     }
 
     async #fetchMap(name, hash) {
-        if (existsSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`))) {
-            return JSON.parse(readFileSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`), 'utf-8'));
+        if (!isBrowser) {
+            if (existsSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`))) {
+                return JSON.parse(readFileSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`), 'utf-8'));
+            }
+
+            console.warn(`Map "${name}" not found in cache, fetching...`);
+
+            const data = await (await fetch(`https://shellshock.io/maps/${name}.json?${hash}`)).json();
+
+            const dir = join(import.meta.dirname, '..', 'data', 'cache', 'maps');
+            if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+
+            writeFileSync(
+                join(dir, `${name}-${hash}.json`),
+                JSON.stringify(data, null, 4),
+                { flag: 'w+' }
+            );
+            return data;
+        } else {
+            // eslint-disable-next-line no-undef
+            const data = await (await fetch(`https://${window.location.hostname}/maps/${name}.json?${hash}`)).json();
+            return data;
         }
-
-        console.warn(`Map "${name}" not found in cache, fetching...`);
-
-        const data = await (await fetch(`https://shellshock.io/maps/${name}.json?${hash}`)).json();
-
-        writeFileSync(
-            join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`),
-            JSON.stringify(data, null, 4),
-            { flag: 'w+' }
-        );
-        return data;
     }
 
     #processChatPacket() {
@@ -863,7 +877,7 @@ export class Bot {
         const player = this.players[id];
         if (player) {
             player.activeGun = newWeaponId;
-            this.#emit('playerSwapWeapon', player, player.weapons[player.activeGun]);
+            this.#emit('playerSwapWeapon', player, newWeaponId);
         }
     }
 
@@ -894,46 +908,55 @@ export class Bot {
     }
 
     #processFirePacket() {
-        const id = CommIn.unPackInt8U(); // there should be 6 floats after this, but that's irrelevant for our purposes 
+        const id = CommIn.unPackInt8U();
+
         const player = this.players[id];
+        const playerWeapon = player.weapons[player.activeGun];
 
-        player.weapons[player.activeGun].ammo.rounds--;
+        playerWeapon.ammo.rounds--;
 
-        this.#emit('playerFire', player);
+        this.#emit('playerFire', player, playerWeapon);
     }
 
     #processCollectPacket() {
         const playerId = CommIn.unPackInt8U();
         const type = CommIn.unPackInt8U();
         const applyToWeaponIdx = CommIn.unPackInt8U();
-        const itemId = CommIn.unPackInt16U();
 
         const player = this.players[playerId];
 
         if (type == CollectTypes.AMMO) {
             const playerWeapon = player.weapons[applyToWeaponIdx];
             playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
-            this.#emit('collectAmmo', player, playerWeapon, itemId);
+            this.#emit('collectAmmo', player, playerWeapon);
         }
 
         if (type == CollectTypes.GRENADE) {
             player.grenades >= 3 ? player.grenades = 3 : player.grenades++;
-            this.#emit('collectGrenade', player, itemId);
+            this.#emit('collectGrenade', player);
         }
     }
 
     #processHitThemPacket() {
         const id = CommIn.unPackInt8U();
         const hp = CommIn.unPackInt8U();
+
         const player = this.players[id];
+        if (!player) return;
+
+        const oldHP = player.hp;
         player.hp = hp;
-        this.#emit('playerDamaged', player, player.hp);
+
+        this.#emit('playerDamaged', player, oldHP, player.hp);
     }
 
     #processHitMePacket() {
         const hp = CommIn.unPackInt8U();
+        const oldHp = this.me.hp;
+
         this.me.hp = hp;
-        this.#emit('selfDamaged', this.me, this.me.hp);
+
+        this.#emit('selfDamaged', oldHp, this.me.hp);
     }
 
     #processSyncMePacket() {
@@ -1074,7 +1097,7 @@ export class Bot {
                 break;
         }
 
-        this.#emit('playerBeginStreak', ksType, player);
+        this.#emit('playerBeginStreak', player, ksType);
     }
 
     #processEndStreakPacket() {
@@ -1112,6 +1135,8 @@ export class Bot {
     }
 
     #processGameOptionsPacket() {
+        const oldOptions = { ...this.game.options };
+
         let gravity = CommIn.unPackInt8U();
         let damage = CommIn.unPackInt8U();
         let healthRegen = CommIn.unPackInt8U();
@@ -1134,7 +1159,7 @@ export class Bot {
         this.game.options.weaponsDisabled = Array.from({ length: 7 }, () => CommIn.unPackInt8U() === 1);
         this.game.options.mustUseSecondary = this.game.options.weaponsDisabled.every((v) => v);
 
-        this.#emit('gameOptionsChange', this.game.options);
+        this.#emit('gameOptionsChange', oldOptions, this.game.options);
         return false;
     }
 
@@ -1170,9 +1195,11 @@ export class Bot {
     }
 
     #processPingPacket() {
+        const oldPing = this.ping;
+
         this.ping = Date.now() - this.lastPingTime;
 
-        this.#emit('pingUpdate', this.ping);
+        this.#emit('pingUpdate', oldPing, this.ping);
 
         setTimeout(() => {
             const out = CommOut.getBuffer();
@@ -1185,14 +1212,16 @@ export class Bot {
     #processSwitchTeamPacket() {
         const id = CommIn.unPackInt8U();
         const toTeam = CommIn.unPackInt8U();
-        const player = this.players[id];
 
+        const player = this.players[id];
         if (!player) return;
+
+        const oldTeam = player.team;
 
         player.team = toTeam;
         player.kills = 0;
 
-        this.#emit('playerSwitchTeam', player, toTeam);
+        this.#emit('playerSwitchTeam', player, oldTeam, toTeam);
     }
 
     #processChangeCharacterPacket() {
@@ -1230,14 +1259,17 @@ export class Bot {
             player.selectedGun = weaponIndex;
             player.weapons[0] = new GunList[weaponIndex]();
 
-            this.#emit('playerChangeCharacter', player, oldCharacter, player.character, oldWeaponIdx, player.selectedGun);
+            if (oldWeaponIdx !== player.selectedGun) this.#emit('playerChangeGun', player, oldWeaponIdx, player.selectedGun);
+            if (oldCharacter !== player.character) this.#emit('playerChangeCharacter', player, oldCharacter, player.character);
         }
     }
 
     #processUpdateBalancePacket() {
         const newBalance = CommIn.unPackInt32U();
+        const oldBalance = this.account.eggBalance;
+
         this.account.eggBalance = newBalance;
-        this.#emit('balanceUpdate', newBalance);
+        this.#emit('balanceUpdate', newBalance - oldBalance, newBalance);
     }
 
     #processRespawnDeniedPacket() {

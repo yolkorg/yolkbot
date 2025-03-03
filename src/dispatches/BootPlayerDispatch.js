@@ -6,7 +6,7 @@ export class BootPlayerDispatch {
     }
 
     check(bot) {
-        return typeof this.uniqueId == 'string' && bot.game.isGameOwner;
+        return typeof this.uniqueId == 'string' && bot.game.isGameOwner && bot.players.find((player) => player.uniqueId == this.uniqueId);
     }
 
     execute(bot) {

@@ -15,7 +15,14 @@ export class LookAtDispatch {
     }
 
     check(bot) {
-        return bot.me.playing;
+        if (!bot.me.playing) return false;
+
+        let target;
+
+        if (this.id !== undefined) target = bot.players[this.id.toString()];
+        else if (this.name !== undefined) target = bot.players.find(player => player.name == this.name);
+
+        return !!target;
     }
 
     execute(bot) {
