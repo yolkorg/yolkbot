@@ -3,8 +3,9 @@
   <h3>creating bots in 10 lines since 2025</h3>
   <p>
     <a href='https://github.com/enbyte/yolkbot'>github</a> | 
-    <a href='https://github.com/enbyte/yolkbot/wiki'>documentation</a>
-    <a href='https://npmjs.com/yolkbot'>npm</a>
+    <a href='https://yolkbot.villainsrule.xyz'>documentation</a> |
+    <a href='https://npmjs.com/yolkbot'>npm</a> |
+    <a href='https://discord.gg/gYugVUCaMr'>discord</a>
   </p>
 </div>
 
@@ -12,8 +13,9 @@
 
 <h3 align='center'>why?</h3>
 <p align='center'>
-  Several of StateFarm's projects relied on the same simple game-related tasks.<br>
-  This codebase exists as a unified, elegant, single point we can build upon.
+  this library creates a unified way to create shell shockers bots for any purpose.<br>
+  you no longer have to figure out how to write hundreds of lines just to join a game.<br>
+  create a bot & put it in a game in 3 lines, down from 300.
 </p>
 
 <br>
