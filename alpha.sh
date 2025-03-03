@@ -1,2 +1,2 @@
 npm publish
-node --env-file=.env scripts/devpublish.js
+node --env-file=.env cli/publish/alpha.js
