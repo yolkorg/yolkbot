@@ -5,12 +5,12 @@ node_modules
 *.lock
 package-lock.json
 
+# browser build
+build
+
 # npm utils
 builds
 .env
 
 # mac cache
 .DS_Store
-
-# testing
-logins.json

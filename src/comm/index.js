@@ -1,10 +1,10 @@
-import CommIn from './CommIn';
-import CommOut from './CommOut';
-import OutBuffer from './OutBuffer';
-import Pool from './Pool';
+import CommIn from './CommIn.js';
+import CommOut from './CommOut.js';
+import OutBuffer from './OutBuffer.js';
+import Pool from './Pool.js';
 
-import { CommCode } from './Codes';
-import { CloseCode } from './Codes';
+import { CommCode } from './Codes.js';
+import { CloseCode } from './Codes.js';
 
 export {
     CommIn,
