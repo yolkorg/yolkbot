@@ -6,7 +6,7 @@ export class PathfindDispatch {
     }
 
     check(bot) {
-        return bot.me.playing && this.target && this.target.playing && this.target.position;
+        return bot.me.playing && this.target && this.target.playing && this.target.position && !bot.disablePathing;
     }
 
     execute(bot) {

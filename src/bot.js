@@ -42,6 +42,7 @@ export class Bot {
     // params.updateInterval - the auto update interval
     // params.doPing - whether to auto ping (for bot.<ping>)
     // params.pingInterval - the ping interval
+    // params.doPathing - whether to run pathfinding logic
     constructor(params = {}) {
         if (params.proxy && isBrowser)
             throw new Error('proxies do not work and hence are not supported in the browser');
@@ -51,6 +52,7 @@ export class Bot {
 
         this.autoPing = params.doPing || true;
         this.autoUpdate = params.doUpdate || true;
+        this.disablePathing = !params.doPathing || false;
 
         this.pingInterval = params.pingInterval || 1000;
         this.updateInterval = params.updateInterval || 5;
@@ -365,8 +367,10 @@ export class Bot {
                 // console.log("Gametype:", this.game.gameMode, this.game.gameModeId);
                 this.game.mapIdx = CommIn.unPackInt8U();
                 this.game.map = Maps[this.game.mapIdx];
-                this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
-                this.pathing.nodeList = this.#parseMap(this.game.map.raw);
+                if (!this.disablePathing) {
+                    this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
+                    this.pathing.nodeList = this.#parseMap(this.game.map.raw);
+                }
                 // console.log("Map:", this.game.map);
                 this.game.playerLimit = CommIn.unPackInt8U();
                 // console.log("Player limit:", this.game.playerLimit);
@@ -545,7 +549,7 @@ export class Bot {
 
         this.drain();
 
-        if (this.pathing.followingPath) {
+        if (this.pathing.followingPath && !this.disablePathing) {
             const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
 
             if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr()) {
