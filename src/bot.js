@@ -219,6 +219,7 @@ export class Bot {
         }
 
         if (loginData.banRemaining) {
+            console.log('oopsies bot got banned');
             this.#emit('banned', loginData.banRemaining);
             return false;
         }
