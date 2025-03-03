@@ -369,7 +369,7 @@ export class Bot {
                 this.game.map = Maps[this.game.mapIdx];
                 if (!this.disablePathing) {
                     this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
-                    this.pathing.nodeList = this.#parseMap(this.game.map.raw);
+                    this.pathing.nodeList = new NodeList(this.game.map.raw);
                 }
                 // console.log("Map:", this.game.map);
                 this.game.playerLimit = CommIn.unPackInt8U();
@@ -639,20 +639,21 @@ export class Bot {
         this._globalHooks.push(cb);
     }
 
+    // these are auth-related codes (liveCallbacks doesn't run during auth)
+    #mustBeInstant = ['authFail', 'banned'];
+
     #emit(event, ...args) {
         if (this._hooks[event]) {
             for (const cb of this._hooks[event]) {
-                this._liveCallbacks.push(() => cb(...args));
+                if (this.#mustBeInstant.includes(event)) cb(...args);
+                else this._liveCallbacks.push(() => cb(...args));
             }
         }
 
         for (const cb of this._globalHooks) {
-            this._liveCallbacks.push(() => cb(event, ...args));
+            if (this.#mustBeInstant.includes(event)) cb(event, ...args);
+            else this._liveCallbacks.push(() => cb(event, ...args));
         }
-    }
-
-    #parseMap(data) {
-        return new NodeList(data);
     }
 
     async #fetchMap(name, hash) {
