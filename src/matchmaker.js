@@ -57,8 +57,10 @@ export class Matchmaker {
     }
 
     async #createSessionId() {
-        const j = await loginAnonymously(this.proxy);
-        this.sessionId = j.sessionId;
+        const anonLogin = await loginAnonymously(this.proxy);
+        if (!anonLogin || !anonLogin.sessionId) this.#emit('authFail');
+
+        this.sessionId = anonLogin.sessionId;
         if (this.connected) this.onceConnected.forEach(func => func());
     }
 
