@@ -4,48 +4,42 @@ import { UserAgent } from '#constants';
 
 const firebaseKey = 'AIzaSyDP4SIjKaw6A4c-zvfYxICpbEjn1rRnN50';
 
-async function queryServices(request, proxy = '') {
-    const ws = new yolkws('wss://shellshock.io/services/', proxy);
+const queryServices = async (request, proxy = '') => {
+    return new Promise((resolve) => {
+        const ws = new yolkws('wss://shellshock.io/services/', proxy);
 
-    const openPromise = new Promise((resolve, reject) => {
-        ws.addEventListener('open', () => resolve(ws));
-        ws.onerror = (err) => reject(err);
-    });
-
-    const connectedWs = await openPromise;
-
-    const sendPromise = connectedWs.send(JSON.stringify(request));
-    await sendPromise;
-
-    const response = await new Promise((resolve, reject) => {
+        ws.onopen = () => {
+            // console.log('opened')
+            ws.send(JSON.stringify(request));
+        }
+        
+        let resolved = false;
+        
         ws.onmessage = (mes) => {
             try {
                 const resp = JSON.parse(mes.data);
                 resolve(resp);
-            } catch (e) {
+            } catch {
                 console.log('Bad API JSON response in queryServices with call: ' + request.cmd + ' and data: ' + JSON.stringify(request));
                 console.log('Full data sent: ', JSON.stringify(request));
-                console.log('Full data received: ', mes);
-                console.log('Full error: ', e);
+                // console.log('Full data received: ', mes);
+                // console.log('Full error: ', e);
 
-                resolve({ error: 'Bad JSON' });
+                resolve('bad_json');
             }
 
+            resolved = true;
             ws.close();
         };
-        ws.onerror = reject;
 
+        ws.onerror = () => !resolved && resolve('unknown_socket_error');
+        ws.onclose = () => !resolved && resolve('services_closed_early');
     });
-
-    if (response.error) {
-        console.log('queryServices error:', response.error);
-        return null;
-    }
-
-    return response;
 }
 
 async function loginWithCredentials(email, password, prox = '') {
+    if (!email || !password) return 'firebase_no_credentials';
+
     /*
     Response looks something like:
         {
@@ -88,13 +82,21 @@ async function loginWithCredentials(email, password, prox = '') {
             if (error.code == 'auth/network-request-failed') {
                 console.error('loginWithCredentials: Network req failed (auth/network-request-failed), retrying, k =', k);
             } else if (error.code == 'auth/missing-email') {
-                console.error('loginWithCredentials: You did not specify an email when using loginWithCredentials');
-                process.exit(0);
+                return 'firebase_no_credentials';
             } else {
                 console.error('loginWithCredentials: Error:', email, password);
                 console.error('loginWithCredentials: Error:', error, 'k =', k);
             }
+
+            if (k > 5) return 'firebase_too_many_retries';
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
         }
+    }
+
+    if (!token) {
+        console.log('did not get an idtoken', body);
+        return 'firebase_no_token';
     }
 
     const response = await queryServices({
@@ -118,12 +120,17 @@ async function loginAnonymously(prox = '') {
     const body = await request.json();
     const token = body.idToken;
 
+    if (!token) {
+        console.log('did not get an idtoken', body);
+        return 'firebase_no_token';
+    }
+
     const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
     }, prox);
 
-    return response
+    return response;
 }
 
 export {

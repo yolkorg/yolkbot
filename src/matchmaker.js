@@ -55,7 +55,7 @@ export class Matchmaker {
 
     async #createSessionId() {
         const anonLogin = await loginAnonymously(this.proxy);
-        if (!anonLogin || !anonLogin.sessionId) this.#emit('authFail');
+        if (!anonLogin || typeof anonLogin == 'string') this.#emit('authFail', anonLogin);
 
         this.sessionId = anonLogin.sessionId;
         if (this.connected) this.onceConnected.forEach(func => func());
@@ -65,7 +65,6 @@ export class Matchmaker {
         this.ws.send(JSON.stringify(msg));
     }
 
-    // eslint-disable-next-line require-await
     async waitForConnect() {
         return new Promise((res) => {
             if (this.connected) {

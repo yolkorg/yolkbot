@@ -12,8 +12,7 @@ export default [
             'no-implicit-globals': 'error',
             'no-lonely-if': 'error',
             'no-var': 'error',
-            'prefer-const': 'error',
-            'require-await': 'warn'
+            'prefer-const': 'error'
         }
     }, {
         plugins: { stylistic },

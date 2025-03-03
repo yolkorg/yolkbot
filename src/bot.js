@@ -212,9 +212,9 @@ export class Bot {
 
         const loginData = await loginWithCredentials(email, pass, this.proxy ? this.proxy : '');
 
-        if (!loginData) {
-            console.error('Failed to login with credentials.');
-            this.#emit('authFail');
+        if (typeof loginData == 'string') {
+            console.error('loginWithCredentials failed, listen to "authFail" for the reason');
+            this.#emit('authFail', loginData);
             return false;
         }
 
@@ -261,9 +261,9 @@ export class Bot {
     async #anonLogin() {
         const loginData = await loginAnonymously(this.proxy ? this.proxy : '');
 
-        if (!loginData) {
+        if (typeof loginData == 'string') {
             console.error('Failed to login anonymously.');
-            this.#emit('authFail');
+            this.#emit('authFail', loginData);
             return false;
         }
 
@@ -294,7 +294,7 @@ export class Bot {
         if (!this.matchmaker) {
             // console.log('No matchmaker, creating instance')
             this.matchmaker = new Matchmaker(this.account.sessionId, this.proxy);
-            this.matchmaker.on('authFail', () => this.#emit('authFail'));
+            this.matchmaker.on('authFail', (data) => this.#emit('authFail', data));
 
             await this.matchmaker.getRegions();
         }
