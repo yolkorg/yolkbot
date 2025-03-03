@@ -4,8 +4,8 @@ import { UserAgent } from '#constants';
 
 const firebaseKey = 'AIzaSyDP4SIjKaw6A4c-zvfYxICpbEjn1rRnN50';
 
-async function queryServices(request, prox = '') {
-    const ws = new yolkws('wss://shellshock.io/services/', prox, { 'user-agent': UserAgent });
+async function queryServices(request, proxy = '') {
+    const ws = new yolkws('wss://shellshock.io/services/', proxy);
 
     const openPromise = new Promise((resolve, reject) => {
         ws.addEventListener('open', () => resolve(ws));

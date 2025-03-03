@@ -21,8 +21,7 @@ import {
     GunList,
     Movements,
     PlayTypes,
-    ShellStreaks,
-    UserAgent
+    ShellStreaks
 } from '#constants';
 
 import LookAtPosDispatch from './dispatches/LookAtPosDispatch.js';
@@ -496,10 +495,7 @@ export class Bot {
 
         console.log(`Joining ${this.game.raw.id} using proxy ${this.proxy || 'none'}`);
 
-        this.gameSocket = new yolkws(`wss://${this.game.raw.subdomain}.shellshock.io/game/${this.game.raw.id}`, this.proxy, {
-            'user-agent': UserAgent,
-            'accept-language': 'en-US,en;q=0.9'
-        });
+        this.gameSocket = new yolkws(`wss://${this.game.raw.subdomain}.shellshock.io/game/${this.game.raw.id}`, this.proxy);
 
         this.gameSocket.binaryType = 'arraybuffer';
 

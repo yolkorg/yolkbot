@@ -1,5 +1,5 @@
 import { loginAnonymously } from '#api';
-import { GameModes, PlayTypes, UserAgent } from '#constants';
+import { GameModes, PlayTypes } from '#constants';
 
 import yolkws, { isBrowser } from './socket.js';
 
@@ -31,10 +31,7 @@ export class Matchmaker {
     }
 
     #createSocket() {
-        this.ws = new yolkws('wss://shellshock.io/matchmaker/', this.proxy, {
-            'user-agent': UserAgent,
-            'accept-language': 'en-US,en;q=0.9'
-        });
+        this.ws = new yolkws('wss://shellshock.io/matchmaker/', this.proxy);
 
         this.ws.onopen = () => {
             this.connected = true;
