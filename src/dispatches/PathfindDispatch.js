@@ -21,9 +21,17 @@ export class PathfindDispatch {
         // console.log('myNode:', !!myNode, 'target:', !!targetNode, 'pathing from my position at', position, 'to', targetPos);
 
         bot.pathing.activePath = this.pather.path(myNode, targetNode);
+        if (!bot.pathing.activePath) {
+            console.log('no path found');
+            return;
+        }
+        if (bot.pathing.activePath.length < 2) {
+            console.log('path too short');
+            return;
+        }
         bot.pathing.followingPath = true;
-        bot.pathing.activeNode = bot.pathing.activePath[0];
-        bot.pathing.activeNodeIdx = 0;
+        bot.pathing.activeNode = bot.pathing.activePath[1];
+        bot.pathing.activeNodeIdx = 1;
     }
 }
 

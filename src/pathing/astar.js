@@ -1,7 +1,7 @@
 import { NodeList } from './mapnode.js';
 import { BinaryHeap } from './binaryheap.js';
 
-/* function printPath(path) {
+function printPath(path) {
     for (const item of path) {
         console.log(item.position);
     }
@@ -50,7 +50,7 @@ export default class AStar {
             if (current === end) {
                 // console.log('done with astar - path found')
                 const val = this.reversePath(current);
-                // printPath(val);
+                printPath(val);
                 return val;
             }
 

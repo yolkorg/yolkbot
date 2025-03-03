@@ -1,5 +1,5 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 
 import { loginAnonymously, loginWithCredentials } from '#api';
 
@@ -539,7 +539,9 @@ export class Bot {
         this.drain();
 
         if (this.pathing.followingPath) {
-            if (this.pathing.activeNodeIdx == this.pathing.activePath.length - 1) {
+            const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
+
+            if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr()) {
                 console.log('Completed path to', this.pathing.activePath[this.pathing.activePath.length - 1].position);
                 this.pathing.followingPath = false;
                 this.pathing.activePath = null;
@@ -548,14 +550,20 @@ export class Bot {
 
                 this.dispatch(new MovementDispatch(0));
             } else {
-                const positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx + 1].flatCenter();
-                this.dispatch(new LookAtPosDispatch(positionTarget));
+                let positionTarget;
+                if (this.pathing.activeNodeIdx < this.pathing.activePath.length - 1) {
+                    positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx + 1].flatCenter();
+                    this.dispatch(new LookAtPosDispatch(positionTarget));
+                } else {
+                    positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx].flatCenter();
+                    this.dispatch(new LookAtPosDispatch(positionTarget));
+                }
 
                 for (const node of this.pathing.activePath) {
-                    if (node.flatRadialDistance(this.me.position) < 0.5) {
-                        if (this.pathing.activePath.indexOf(node) > this.pathing.activeNodeIdx) {
-                            this.pathing.activeNode = node;
-                            this.pathing.activeNodeIdx = this.pathing.activePath.indexOf(node);
+                    if (node.flatRadialDistance(this.me.position) < 0.1 && node.position.y == Math.floor(this.me.position.y)) {
+                        if (this.pathing.activePath.indexOf(node) >= this.pathing.activeNodeIdx) {
+                            this.pathing.activeNodeIdx = this.pathing.activePath.indexOf(node) + 1;
+                            this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
                             break;
                         } else {
                             // console.log('Close to node that\'s before, idx:', 
@@ -571,6 +579,22 @@ export class Bot {
                     this.dispatch(new MovementDispatch(Movements.FORWARD));
                 }
             }
+
+            /*let onPath = false;
+            for (const node of this.pathing.activePath) {
+                if (node.positionStr() == myPositionStr) {
+                    onPath = true;
+                    break;
+                }
+            }
+            if (!onPath) {
+                console.log('Got off-path somehow');
+                this.dispatch(new PathfindDispatch(this.pathing.activePath[this.pathing.activePath.length - 1]));
+                this.pathing.followingPath = false;
+                this.pathing.activePath = null;
+                this.pathing.activeNode = null;
+                this.pathing.activeNodeIdx = 0;
+            }*/
         }
 
         if (Date.now() - this.lastUpdateTime >= 50) {
@@ -624,26 +648,20 @@ export class Bot {
     }
 
     async #fetchMap(name, hash) {
-        if (!isBrowser) {
-            if (existsSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`))) {
-                return JSON.parse(readFileSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`), 'utf-8'));
-            }
-
-            console.warn(`Map "${name}" not found in cache, fetching...`);
-
-            const data = await (await fetch(`https://shellshock.io/maps/${name}.json?${hash}`)).json();
-
-            writeFileSync(
-                join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`),
-                JSON.stringify(data, null, 4),
-                { flag: 'w+' }
-            );
-            return data;
-        } else {
-            // eslint-disable-next-line no-undef
-            const data = await (await fetch(`https://${window.location.hostname}/maps/${name}.json?${hash}`)).json();
-            return data;
+        if (existsSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`))) {
+            return JSON.parse(readFileSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`), 'utf-8'));
         }
+
+        console.warn(`Map "${name}" not found in cache, fetching...`);
+
+        const data = await (await fetch(`https://shellshock.io/maps/${name}.json?${hash}`)).json();
+
+        writeFileSync(
+            join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`),
+            JSON.stringify(data, null, 4),
+            { flag: 'w+' }
+        );
+        return data;
     }
 
     #processChatPacket() {
