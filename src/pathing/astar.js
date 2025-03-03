@@ -5,7 +5,7 @@ function printPath(path) {
     for (const item of path) {
         console.log(item.position);
     }
-} // have it your way eslint */
+} // have it your way eslint
 
 export default class AStar {
     constructor(list) {
@@ -82,7 +82,7 @@ export default class AStar {
             }
         }
 
-        console.log('done with astar - no path found')
+        // console.log('done with astar - no path found')
         // return null if no path has been found
         return null
     }

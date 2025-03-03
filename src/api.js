@@ -20,8 +20,8 @@ const queryServices = async (request, proxy = '') => {
                 const resp = JSON.parse(mes.data);
                 resolve(resp);
             } catch {
-                console.log('Bad API JSON response in queryServices with call: ' + request.cmd + ' and data: ' + JSON.stringify(request));
-                console.log('Full data sent: ', JSON.stringify(request));
+                console.error('queryServices: Bad API JSON response with call: ' + request.cmd + ' and data:', JSON.stringify(request));
+                console.error('queryServices: Full data sent: ', JSON.stringify(request));
                 // console.log('Full data received: ', mes);
                 // console.log('Full error: ', e);
 
@@ -95,7 +95,7 @@ async function loginWithCredentials(email, password, prox = '') {
     }
 
     if (!token) {
-        console.log('did not get an idtoken', body);
+        console.error('loginWithCredentials: the game sent no idToken', body);
         return 'firebase_no_token';
     }
 
@@ -121,7 +121,7 @@ async function loginAnonymously(prox = '') {
     const token = body.idToken;
 
     if (!token) {
-        console.log('did not get an idtoken', body);
+        console.error('loginAnonymously: the game sent no idToken', body);
         return 'firebase_no_token';
     }
 

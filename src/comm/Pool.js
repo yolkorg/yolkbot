@@ -37,7 +37,7 @@ class Pool {
             }
         } while (i2 != this.idx);
         this.expand(this.originalSize);
-        console.log('Expanding pool for: ' + this.objects[0].constructor.name + ' to: ' + this.size);
+        // console.log('Expanding pool for: ' + this.objects[0].constructor.name + ' to: ' + this.size);
         return this.retrieve();
     }
     recycle(obj) {

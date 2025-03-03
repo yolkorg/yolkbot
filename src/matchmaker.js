@@ -110,7 +110,7 @@ export class Matchmaker {
             if (!region) {
                 throw new Error('did not find region in regionList, if you are attempting to force a region, avoid calling getRegions()')
             }
-        } else { console.log('regionList not found, not validating findGame region, use <Matchmaker>.regionList() to check region') }
+        } // else { console.log('regionList not found, not validating findGame region, use <Matchmaker>.regionList() to check region') }
 
         if (!params.mode) { throw new Error('did not specify a mode in findGame') }
         if (GameModes[params.mode] === undefined) { throw new Error('invalid mode in findGame, see GameModes for a list') }

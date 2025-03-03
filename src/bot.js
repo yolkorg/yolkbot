@@ -2,7 +2,7 @@ import { loginAnonymously, loginWithCredentials } from '#api';
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
-import { CloseCode, CommCode } from './comm/Codes.js';
+import { CommCode } from './comm/Codes.js';
 
 import GamePlayer from './bot/GamePlayer.js';
 import Matchmaker from './matchmaker.js';
@@ -202,7 +202,7 @@ export class Bot {
     }
 
     async login(email, pass) {
-        const time = Date.now();
+        // const time = Date.now();
 
         this.email = email;
         this.pass = pass;
@@ -210,13 +210,11 @@ export class Bot {
         const loginData = await loginWithCredentials(email, pass, this.proxy ? this.proxy : '');
 
         if (typeof loginData == 'string') {
-            console.error('loginWithCredentials failed, listen to "authFail" for the reason');
             this.#emit('authFail', loginData);
             return false;
         }
 
         if (loginData.banRemaining) {
-            console.log('oopsies bot got banned');
             this.#emit('banned', loginData.banRemaining);
             return false;
         }
@@ -234,7 +232,7 @@ export class Bot {
         this.account.sessionId = loginData.sessionId;
         this.account.vip = loginData.upgradeProductId && !loginData.upgradeIsExpired;
 
-        console.log('Logged in successfully. Time:', Date.now() - time, 'ms');
+        // console.log('Logged in successfully. Time:', Date.now() - time, 'ms');
 
         return this.account;
     }
@@ -260,7 +258,6 @@ export class Bot {
         const loginData = await loginAnonymously(this.proxy ? this.proxy : '');
 
         if (typeof loginData == 'string') {
-            console.error('Failed to login anonymously.');
             this.#emit('authFail', loginData);
             return false;
         }
@@ -411,13 +408,12 @@ export class Bot {
 
             default:
                 try {
-                    console.log('Received but did not handle a:', Object.entries(CommCode).filter(([, v]) => v == cmd)[0][0], cmd);
+                    const inferredCode = Object.entries(CommCode).filter(([, v]) => v == cmd)[0][0];
+                    console.error('onGameMessage: Received but did not handle a:', inferredCode);
                     // packet could potentially not exist, then [0][0] will error
-                } catch { null }
-                console.log('!!! You shouldn\'t be seeing this!');
-                console.log('!!! This message means the startup sequence received an unexpected packet.');
-                console.log('!!! Try refreshing comm codes. If you still see this error, contact hijinks');
-                throw new Error('Unexpected packet received during startup: ' + cmd);
+                } catch {
+                    console.error('onGameMessage: Unexpected packet received during startup: ' + cmd);
+                }
         }
     }
 
@@ -491,7 +487,7 @@ export class Bot {
         if (!this.game.raw.id || !this.game.raw.subdomain)
             throw new Error('invalid game data passed to <bot>.join');
 
-        console.log(`Joining ${this.game.raw.id} using proxy ${this.proxy || 'none'}`);
+        // console.log(`Joining ${this.game.raw.id} using proxy ${this.proxy || 'none'}`);
 
         this.gameSocket = new yolkws(`wss://${this.game.raw.subdomain}.shellshock.io/game/${this.game.raw.id}`, this.proxy);
 
@@ -504,7 +500,7 @@ export class Bot {
         this.gameSocket.onmessage = this.#onGameMesssage.bind(this);
 
         this.gameSocket.onclose = (e) => {
-            console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
+            // console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
             this.#emit('close', e.code);
         }
 
@@ -516,12 +512,10 @@ export class Bot {
 
         this.gameSocket.onmessage = (msg) => this._packetQueue.push(msg.data);
 
-        console.log(`Successfully joined ${this.game.code}. Startup to join time: ${Date.now() - this.initTime} ms`);
+        // console.log(`Successfully joined ${this.game.code}. Startup to join time: ${Date.now() - this.initTime} ms`);
 
-        if (this.autoUpdate) {
-            console.log('autoUpdate enabled...');
-            setInterval(async () => await this.update(), this.updateInterval);
-        }
+        if (this.autoUpdate)
+            setInterval(() => this.update(), this.updateInterval);
 
         if (this.autoPing) {
             const out = CommOut.getBuffer();
@@ -547,7 +541,7 @@ export class Bot {
             const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
 
             if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr()) {
-                console.log('Completed path to', this.pathing.activePath[this.pathing.activePath.length - 1].position);
+                // console.log('Completed path to', this.pathing.activePath[this.pathing.activePath.length - 1].position);
                 this.pathing.followingPath = false;
                 this.pathing.activePath = null;
                 this.pathing.activeNode = null;
@@ -1429,7 +1423,7 @@ export class Bot {
                 break;
 
             default:
-                console.log(`I got but did not handle a: ${Object.entries(CommCode).filter(([, v]) => v == cmd)[0][0]} (${cmd})`);
+                console.error(`handlePacket: I got but did not handle a: ${Object.entries(CommCode).filter(([, v]) => v == cmd)[0][0]}`);
                 break;
         }
     }
