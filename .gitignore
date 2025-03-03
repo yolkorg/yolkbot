@@ -5,9 +5,6 @@ node_modules
 *.lock
 package-lock.json
 
-# browser build
-build
-
 # npm utils
 builds
 .env

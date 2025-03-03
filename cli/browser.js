@@ -5,7 +5,7 @@ import path from 'node:path';
 
 const buildDir = path.join(import.meta.dirname, '..', 'build');
 
-if (fs.existsSync(buildDir)) fs.rmdirSync(buildDir, { recursive: true });
+if (fs.existsSync(buildDir)) fs.rmSync(buildDir, { recursive: true });
 fs.mkdirSync(buildDir);
 
 await esbuild.build({

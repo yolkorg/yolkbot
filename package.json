@@ -12,6 +12,7 @@
     "repository": "github:enbyte/yolkbot",
     "type": "module",
     "files": [
+        "build/*.js",
         "data/*.*",
         "src/**/*",
         "package.json",
@@ -22,6 +23,7 @@
         ".": "./src/index.js",
         "./api": "./src/api.js",
         "./bot": "./src/bot.js",
+        "./browser": "./build/browser.js",
         "./comm": "./src/comm/index.js",
         "./matchmaker": "./src/matchmaker.js",
         "./packets": "./src/packet.js",

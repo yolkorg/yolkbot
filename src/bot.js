@@ -1,6 +1,3 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { loginAnonymously, loginWithCredentials } from '#api';
 
 import CommIn from './comm/CommIn.js';
@@ -658,6 +655,9 @@ export class Bot {
 
     async #fetchMap(name, hash) {
         if (!isBrowser) {
+            const { existsSync, mkdirSync, readFileSync, writeFileSync } = await import('node:fs');
+            const { join } = await import('node:path');
+
             if (existsSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`))) {
                 return JSON.parse(readFileSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`), 'utf-8'));
             }
