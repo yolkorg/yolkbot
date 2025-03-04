@@ -292,7 +292,12 @@ export class Bot {
 
         if (!this.matchmaker) {
             // console.log('No matchmaker, creating instance')
-            this.matchmaker = new Matchmaker(this.account.sessionId, this.proxy);
+            this.matchmaker = new Matchmaker({
+                sessionId: this.account.sessionId,
+                proxy: this.proxy,
+                instance: this.instance
+            });
+
             this.matchmaker.on('authFail', (data) => this.#emit('authFail', data));
 
             await this.matchmaker.getRegions();
