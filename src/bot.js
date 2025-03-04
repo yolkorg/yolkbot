@@ -6,7 +6,7 @@ import { CommCode } from './comm/Codes.js';
 
 import GamePlayer from './bot/GamePlayer.js';
 import Matchmaker from './matchmaker.js';
-import yolkws, { isBrowser } from './socket.js';
+import yolkws from './socket.js';
 
 import {
     CollectTypes,
@@ -16,6 +16,7 @@ import {
     GameModes,
     GameOptionFlags,
     GunList,
+    IsBrowser,
     Movements,
     PlayTypes,
     ShellStreaks
@@ -39,8 +40,9 @@ export class Bot {
     // params.doPing - whether to auto ping (for bot.<ping>)
     // params.pingInterval - the ping interval
     // params.doPathing - whether to run pathfinding logic
+    // params.instance - a custom shell URL to run requests through
     constructor(params = {}) {
-        if (params.proxy && isBrowser)
+        if (params.proxy && IsBrowser)
             throw new Error('proxies do not work and hence are not supported in the browser');
 
         this.proxy = params.proxy || '';
@@ -52,6 +54,8 @@ export class Bot {
 
         this.pingInterval = params.pingInterval || 1000;
         this.updateInterval = params.updateInterval || 5;
+
+        this.instance = params.instance || 'shellshock.io';
 
         this._hooks = {};
         this._globalHooks = [];
@@ -207,7 +211,7 @@ export class Bot {
         this.email = email;
         this.pass = pass;
 
-        const loginData = await loginWithCredentials(email, pass, this.proxy ? this.proxy : '');
+        const loginData = await loginWithCredentials(email, pass, this.proxy, this.instance);
 
         if (typeof loginData == 'string') {
             this.#emit('authFail', loginData);
@@ -255,7 +259,7 @@ export class Bot {
     }
 
     async #anonLogin() {
-        const loginData = await loginAnonymously(this.proxy ? this.proxy : '');
+        const loginData = await loginAnonymously(this.proxy, this.instance);
 
         if (typeof loginData == 'string') {
             this.#emit('authFail', loginData);
@@ -489,7 +493,7 @@ export class Bot {
 
         // console.log(`Joining ${this.game.raw.id} using proxy ${this.proxy || 'none'}`);
 
-        this.gameSocket = new yolkws(`wss://${this.game.raw.subdomain}.shellshock.io/game/${this.game.raw.id}`, this.proxy);
+        this.gameSocket = new yolkws(`wss://${this.game.raw.subdomain}.${this.instance}/game/${this.game.raw.id}`, this.proxy);
 
         this.gameSocket.binaryType = 'arraybuffer';
 
@@ -648,7 +652,7 @@ export class Bot {
     }
 
     async #fetchMap(name, hash) {
-        if (!isBrowser) {
+        if (!IsBrowser) {
             const { existsSync, mkdirSync, readFileSync, writeFileSync } = await import('node:fs');
             const { join } = await import('node:path');
 
@@ -658,7 +662,7 @@ export class Bot {
 
             console.warn(`Map "${name}" not found in cache, fetching...`);
 
-            const data = await (await fetch(`https://shellshock.io/maps/${name}.json?${hash}`)).json();
+            const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();
 
             const dir = join(import.meta.dirname, '..', 'data', 'cache', 'maps');
             if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
@@ -670,8 +674,7 @@ export class Bot {
             );
             return data;
         } else {
-            // eslint-disable-next-line no-undef
-            const data = await (await fetch(`https://${window.location.hostname}/maps/${name}.json?${hash}`)).json();
+            const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();
             return data;
         }
     }

@@ -1,17 +1,16 @@
 import NodeWebSocket from 'ws';
 
-export const isBrowser = typeof window !== 'undefined';
+import { IsBrowser, UserAgent } from '#constants';
+
 // eslint-disable-next-line no-undef
-export const WS = isBrowser ? window.WebSocket : NodeWebSocket;
+const WS = IsBrowser ? window.WebSocket : NodeWebSocket;
 
 let SocksProxyAgent;
-if (!isBrowser) SocksProxyAgent = (await import('socks-proxy-agent')).SocksProxyAgent;
-
-import { UserAgent } from '#constants';
+if (!IsBrowser) SocksProxyAgent = (await import('socks-proxy-agent')).SocksProxyAgent;
 
 class yolkws extends WS {
     constructor(url, proxy) {
-        if (isBrowser) super(url);
+        if (IsBrowser) super(url);
         else {
             super(url, {
                 agent: proxy ? new SocksProxyAgent(proxy) : undefined,

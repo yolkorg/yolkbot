@@ -84,7 +84,7 @@ export class SaveLoadoutDispatch {
             firebaseId: bot.account.firebaseId,
             sessionId: bot.account.sessionId,
             loadout
-        });
+        }, bot.proxy, bot.instance);
 
         bot.account.loadout = loadout;
 

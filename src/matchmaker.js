@@ -1,7 +1,7 @@
 import { loginAnonymously } from '#api';
-import { GameModes, PlayTypes } from '#constants';
+import { GameModes, IsBrowser, PlayTypes } from '#constants';
 
-import yolkws, { isBrowser } from './socket.js';
+import yolkws from './socket.js';
 
 export class Matchmaker {
     connected = false;
@@ -15,23 +15,26 @@ export class Matchmaker {
     onListeners = new Map();
     onceListeners = new Map();
 
-    constructor(customSessionId, proxy) {
-        if (proxy && isBrowser)
+    // sessionId: string, a custom session id
+    // proxy: a socks5 proxy string
+    // instance: a custom game instance
+    constructor(params = {}) {
+        if (!params.instance) params.instance = 'shellshock.io';
+
+        if (params.proxy && IsBrowser)
             throw new Error('proxies do not work and hence are not supported in the browser');
 
-        if (customSessionId) {
-            this.sessionId = customSessionId;
-        } else {
-            this.#createSessionId();
-        }
+        if (params.sessionId) this.sessionId = params.sessionId;
+        else this.#createSessionId(params.instance);
 
-        this.proxy = proxy;
+        if (params.proxy && IsBrowser) throw new Error('proxies do not work and hence are not supported in the browser');
+        else if (params.proxy) this.proxy = params.proxy;
 
-        this.#createSocket();
+        this.#createSocket(params.instance);
     }
 
-    #createSocket() {
-        this.ws = new yolkws('wss://shellshock.io/matchmaker/', this.proxy);
+    #createSocket(instance) {
+        this.ws = new yolkws(`wss://${instance}/matchmaker/`, this.proxy);
 
         this.ws.onopen = () => {
             this.connected = true;
@@ -53,8 +56,8 @@ export class Matchmaker {
         }
     }
 
-    async #createSessionId() {
-        const anonLogin = await loginAnonymously(this.proxy);
+    async #createSessionId(instance) {
+        const anonLogin = await loginAnonymously(this.proxy, instance);
         if (!anonLogin || typeof anonLogin == 'string') this.#emit('authFail', anonLogin);
 
         this.sessionId = anonLogin.sessionId;

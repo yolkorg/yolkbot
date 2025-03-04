@@ -4,9 +4,9 @@ import { UserAgent } from '#constants';
 
 const firebaseKey = 'AIzaSyDP4SIjKaw6A4c-zvfYxICpbEjn1rRnN50';
 
-const queryServices = async (request, proxy = '') => {
+const queryServices = async (request, proxy = '', instance = 'shellshock.io') => {
     return new Promise((resolve) => {
-        const ws = new yolkws('wss://shellshock.io/services/', proxy);
+        const ws = new yolkws(`wss://${instance}/services/`, proxy);
 
         ws.onopen = () => {
             // console.log('opened')
@@ -37,7 +37,7 @@ const queryServices = async (request, proxy = '') => {
     });
 }
 
-async function loginWithCredentials(email, password, prox = '') {
+async function loginWithCredentials(email, password, prox = '', instance = 'shellshock.io') {
     if (!email || !password) return 'firebase_no_credentials';
 
     /*
@@ -102,12 +102,12 @@ async function loginWithCredentials(email, password, prox = '') {
     const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
-    }, prox);
+    }, prox, instance);
 
     return response;
 }
 
-async function loginAnonymously(prox = '') {
+async function loginAnonymously(prox = '', instance = 'shellshock.io') {
     const request = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + firebaseKey, {
         method: 'POST',
         body: JSON.stringify({ returnSecureToken: true }),
@@ -128,7 +128,7 @@ async function loginAnonymously(prox = '') {
     const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
-    }, prox);
+    }, prox, instance);
 
     return response;
 }
