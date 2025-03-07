@@ -120,6 +120,9 @@ export class Bot {
                 mustUseSecondary: false // if weaponsDisabled is ALL true
             },
 
+            // ammos/grenades on the ground that can be picked up
+            collectables: [[], []],
+
             // data from metaGame
             teamScore: [0, 0, 0], // [0, blue, red] - no clue what 1st index is for
 
@@ -925,12 +928,27 @@ export class Bot {
         this.#emit('playerFire', player, playerWeapon);
     }
 
+    #processSpawnItemPacket() {
+        const id = CommIn.unPackInt16U();
+        const type = CommIn.unPackInt8U();
+        const x = CommIn.unPackFloat();
+        const y = CommIn.unPackFloat();
+        const z = CommIn.unPackFloat();
+
+        this.game.collectables[type].push({ id, x, y, z });
+
+        this.#emit('spawnItem', type, id, { x, y, z });
+    }
+
     #processCollectPacket() {
         const playerId = CommIn.unPackInt8U();
         const type = CommIn.unPackInt8U();
         const applyToWeaponIdx = CommIn.unPackInt8U();
+        const id = CommIn.unPackInt16U();
 
         const player = this.players[playerId];
+
+        this.game.collectables[type] = this.game.collectables[type].filter(c => c.id != id);
 
         if (type == CollectTypes.AMMO) {
             const playerWeapon = player.weapons[applyToWeaponIdx];
@@ -1284,6 +1302,13 @@ export class Bot {
         this.#emit('selfRespawnFail');
     }
 
+    #processMeleePacket() {
+        const id = CommIn.unPackInt8U();
+        const player = this.players[id];
+
+        if (player) this.#emit('playerMelee', player);
+    }
+
     // we do this since reload doesn't get emitted to ourselves
     processReloadPacket(customPlayer, iUnderstandThisIsForInternalUseOnlyAndIShouldNotBeCallingThis) {
         if (!iUnderstandThisIsForInternalUseOnlyAndIShouldNotBeCallingThis)
@@ -1416,6 +1441,14 @@ export class Bot {
                 this.processReloadPacket(null, true);
                 break;
 
+            case CommCode.spawnItem:
+                this.#processSpawnItemPacket();
+                break;
+
+            case CommCode.melee:
+                this.#processMeleePacket();
+                break;
+
             case CommCode.clientReady:
             case CommCode.expireUpgrade:
             case CommCode.musicInfo:
@@ -1424,9 +1457,7 @@ export class Bot {
                 // for more info, see comm/codes.js
                 break;
 
-            case CommCode.spawnItem:
             case CommCode.explode:
-            case CommCode.melee:
             case CommCode.throwGrenade:
                 // do nothing
                 break;

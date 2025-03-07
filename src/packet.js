@@ -105,6 +105,12 @@ function ReloadPacket() {
     return new Packet(CommCode.reload);
 }
 
+function ThrowGrenadePacket(power) {
+    return new Packet(CommCode.throwGrenade, [
+        { type: 'float', val: power }
+    ]);
+}
+
 export default {
     Packet,
     BootPacket,
@@ -117,5 +123,6 @@ export default {
     ReportPacket,
     RespawnPacket,
     SwapWeaponPacket,
-    TeamSwitchingTraitorPacket
+    TeamSwitchingTraitorPacket,
+    ThrowGrenadePacket
 }

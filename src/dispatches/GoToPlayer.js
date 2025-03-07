@@ -1,6 +1,6 @@
 import AStar from '../pathing/astar.js';
 
-export class PathfindDispatch {
+export class GoToPlayerDispatch {
     constructor(target) {
         this.target = target;
     }
@@ -31,4 +31,4 @@ export class PathfindDispatch {
     }
 }
 
-export default PathfindDispatch;
+export default GoToPlayerDispatch;
