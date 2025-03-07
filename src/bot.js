@@ -477,6 +477,7 @@ export class Bot {
 
     async join(data) {
         if (typeof data == 'string') {
+            if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
             // this is a string code that we can pass and get the needed info from
             await this.#joinGameWithCode(data);
         } else if (typeof data == 'object') {
