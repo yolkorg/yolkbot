@@ -1,10 +1,6 @@
 import AStar from '../pathing/astar.js';
 
 export class GoToSpatulaDispatch {
-    constructor(target) {
-        this.target = target;
-    }
-
     check(bot) {
         return bot.me.playing && !bot.disablePathing && bot.game.spatula && bot.game.spatula.coords && bot.game.spatula.coords.x;
     }
