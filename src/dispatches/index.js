@@ -2,11 +2,12 @@ import BootPlayerDispatch from './BootPlayerDispatch.js';
 import ChatDispatch from './ChatDispatch.js';
 import FireDispatch from './FireDispatch.js';
 import GameOptionsDispatch from './GameOptionsDispatch.js';
+import GoToPlayerDispatch from './GoToPlayerDispatch.js';
+import GoToSpatulaDispatch from './GoToSpatulaDispatch.js';
 import LookAtDispatch from './LookAtDispatch.js';
 import LookAtPosDispatch from './LookAtPosDispatch.js';
 import MeleeDispatch from './MeleeDispatch.js';
 import MovementDispatch from './MovementDispatch.js';
-import PathfindDispatch from './PathfindDispatch.js';
 import PauseDispatch from './PauseDispatch.js';
 import ReloadDispatch from './ReloadDispatch.js';
 import ReportPlayerDispatch from './ReportPlayerDispatch.js';
@@ -20,11 +21,12 @@ export {
     ChatDispatch,
     FireDispatch,
     GameOptionsDispatch,
+    GoToPlayerDispatch,
+    GoToSpatulaDispatch,
     LookAtDispatch,
     LookAtPosDispatch,
     MeleeDispatch,
     MovementDispatch,
-    PathfindDispatch,
     PauseDispatch,
     ReloadDispatch,
     ReportPlayerDispatch,
@@ -39,6 +41,8 @@ export default {
     ChatDispatch,
     FireDispatch,
     GameOptionsDispatch,
+    GoToPlayerDispatch,
+    GoToSpatulaDispatch,
     LookAtDispatch,
     LookAtPosDispatch,
     MeleeDispatch,
