@@ -52,7 +52,7 @@ export class Matchmaker {
             if (this.forceClose) return;
 
             this.connected = false;
-            this.#createSocket();
+            this.#createSocket(instance);
         }
     }
 
