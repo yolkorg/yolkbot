@@ -11,7 +11,6 @@ export default class GamePlayer {
         this.name = playerData.name_;
         this.uniqueId = playerData.uniqueId_;
 
-        this.joinedGame = true;
         this.playing = playerData.playing_;
 
         this.social = playerData.social && JSON.parse(playerData.social_);
