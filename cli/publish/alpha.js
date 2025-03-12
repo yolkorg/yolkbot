@@ -5,7 +5,7 @@ const webhook = process.env.NPM_DEV_WEBHOOK;
 
 import fs from 'node:fs';
 
-const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)));
+const pkg = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)));
 
 await fetch(webhook, {
     method: 'POST',

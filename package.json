@@ -1,15 +1,25 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers (self) bot in under 10 lines.",
-    "version": "0.0.3",
-    "keywords": ["shell shockers", "shellshock.io", "blue wizard", "yolkbot"],
+    "version": "0.1.0-alpha.1",
+    "keywords": [
+        "shell shockers",
+        "shellshock.io",
+        "blue wizard",
+        "yolkbot"
+    ],
     "homepage": "https://github.com/enbyte/yolkbot#readme",
     "bugs": {
         "url": "https://github.com/enbyte/yolkbot/issues"
     },
     "author": "hijinks",
-    "contributors": ["1ust"],
-    "repository": "github:enbyte/yolkbot",
+    "contributors": [
+        "1ust"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/enbyte/yolkbot.git"
+    },
     "type": "module",
     "files": [
         "build/*.js",
