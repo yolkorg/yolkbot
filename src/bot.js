@@ -800,10 +800,10 @@ export class Bot {
             player.playing = true;
             player.randomSeed = seed;
 
-            player.weapons[0].ammo.rounds = rounds0;
-            player.weapons[0].ammo.store = store0;
-            player.weapons[1].ammo.rounds = rounds1;
-            player.weapons[1].ammo.store = store1;
+            if (player.weapons[0] && player.weapons[0].ammo) player.weapons[0].ammo.rounds = rounds0;
+            if (player.weapons[0] && player.weapons[0].ammo) player.weapons[0].ammo.store = store0;
+            if (player.weapons[1] && player.weapons[1].ammo) player.weapons[1].ammo.rounds = rounds1;
+            if (player.weapons[1] && player.weapons[1].ammo) player.weapons[1].ammo.store = store1;
 
             player.grenades = grenades;
             player.position = { x: x, y: y, z: z };
@@ -923,9 +923,10 @@ export class Bot {
         const player = this.players[id];
         const playerWeapon = player.weapons[player.activeGun];
 
-        playerWeapon.ammo.rounds--;
-
-        this.#emit('playerFire', player, playerWeapon);
+        if (playerWeapon && playerWeapon.ammo) {
+            playerWeapon.ammo.rounds--;
+            this.#emit('playerFire', player, playerWeapon);
+        }
     }
 
     #processSpawnItemPacket() {
@@ -952,8 +953,10 @@ export class Bot {
 
         if (type == CollectTypes.AMMO) {
             const playerWeapon = player.weapons[applyToWeaponIdx];
-            playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
-            this.#emit('collectAmmo', player, playerWeapon);
+            if (playerWeapon && playerWeapon.ammo) {
+                playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
+                this.#emit('collectAmmo', player, playerWeapon);
+            }
         }
 
         if (type == CollectTypes.GRENADE) {
@@ -1099,12 +1102,16 @@ export class Bot {
                 player.grenades = 3;
 
                 // main weapon
-                player.weapons[0].ammo.rounds = player.weapons[0].ammo.capacity;
-                player.weapons[0].ammo.store = player.weapons[0].ammo.storeMax;
+                if (player.weapons[0] && player.weapons[0].ammo) {
+                    player.weapons[0].ammo.rounds = player.weapons[0].ammo.capacity;
+                    player.weapons[0].ammo.store = player.weapons[0].ammo.storeMax;
+                }
 
                 // secondary, always cluck9mm
-                player.weapons[1].ammo.rounds = player.weapons[1].ammo.capacity;
-                player.weapons[1].ammo.store = player.weapons[1].ammo.storeMax;
+                if (player.weapons[1] && player.weapons[0].ammo) {
+                    player.weapons[1].ammo.rounds = player.weapons[1].ammo.capacity;
+                    player.weapons[1].ammo.store = player.weapons[1].ammo.storeMax;
+                }
                 break;
             }
 
@@ -1321,13 +1328,15 @@ export class Bot {
 
         const playerActiveWeapon = player.weapons[player.activeGun];
 
-        const newRounds = Math.min(
-            Math.min(playerActiveWeapon.ammo.capacity, playerActiveWeapon.ammo.reload) - playerActiveWeapon.ammo.rounds,
-            playerActiveWeapon.ammo.store
-        );
+        if (playerActiveWeapon.ammo) {
+            const newRounds = Math.min(
+                Math.min(playerActiveWeapon.ammo.capacity, playerActiveWeapon.ammo.reload) - playerActiveWeapon.ammo.rounds,
+                playerActiveWeapon.ammo.store
+            );
 
-        playerActiveWeapon.ammo.rounds += newRounds;
-        playerActiveWeapon.ammo.store -= newRounds;
+            playerActiveWeapon.ammo.rounds += newRounds;
+            playerActiveWeapon.ammo.store -= newRounds;
+        }
 
         this.#emit('playerReload', player, playerActiveWeapon);
     }
