@@ -210,9 +210,11 @@ class MapNode {
         }
 
         switch (this.meshType) {
+            // full block
             case 'full':
                 return false;
 
+            // usually useless decorations or internal things like spawnpoints
             case 'none':
                 if (dy0 == 1 && node.canWalkThrough()) {
                     return true;
@@ -281,6 +283,7 @@ class MapNode {
                 }
                 break;
 
+            // stairs
             case 'wedge':
                 // console.log(`I'm a wedge at ${stringifyCircular(this.position)}`)
                 /*console.log(`Following the RY mapping, my bottom points to ${this.x - FORWARD_RY_WEDGE_MAPPING[this.ry].x
@@ -318,10 +321,16 @@ class MapNode {
                 }
                 break;
 
+            // the various random weird shapes, sometimes block most of a block, often can either be walked over or not at all
             case 'aabb':
                 return false;
 
+            // things like trees
             case 'verysoft':
+                return false;
+
+            // usually an intenral thing? like where the spatula is supposed to go
+            case 'oob':
                 return false;
         }
 
