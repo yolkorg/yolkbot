@@ -50,7 +50,7 @@ export class Bot {
 
         this.autoPing = params.doPing || true;
         this.autoUpdate = params.doUpdate || true;
-        this.disablePathing = !params.doPathing || false;
+        this.disablePathing = !params.doPathing || true;
 
         this.pingInterval = params.pingInterval || 1000;
         this.updateInterval = params.updateInterval || 5;
