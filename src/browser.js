@@ -1,4 +1,6 @@
 export { Bot } from './bot.js';
+export { GamePlayer } from './bot/GamePlayer.js';
+
 export { Matchmaker } from './matchmaker.js';
 
 export { default as Dispatches } from './dispatches/index.js';

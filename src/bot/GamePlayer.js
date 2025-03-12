@@ -1,7 +1,7 @@
 import { GunList } from '#constants';
 import { Cluck9mm } from '../constants/guns.js';
 
-export default class GamePlayer {
+export class GamePlayer {
     constructor(id, team, playerData) {
         this.id = id;
         this.team = team;
@@ -82,3 +82,5 @@ export default class GamePlayer {
         throw new Error('you cannot call this function from a GamePlayer. call update() on an instance of Bot instead.');
     }
 }
+
+export default GamePlayer;
