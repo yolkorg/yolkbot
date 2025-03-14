@@ -6,7 +6,7 @@ import { IsBrowser, UserAgent } from '#constants';
 const WS = IsBrowser ? window.WebSocket : NodeWebSocket;
 
 let SocksProxyAgent;
-if (!IsBrowser) SocksProxyAgent = (await import('socks-proxy-agent')).SocksProxyAgent;
+if (!IsBrowser) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
 
 class yolkws extends WS {
     constructor(url, proxy) {
