@@ -8,13 +8,12 @@ import { Matchmaker, RawGameData } from './matchmaker';
 import yolkws from './socket';
 
 export interface BotParams {
-    name?: string;
-    proxy?: string;
     doUpdate?: boolean;
     updateInterval?: number;
     doPing?: boolean;
     pingInterval?: number;
     doPathing?: boolean;
+    proxy?: string;
     instance?: string;
 }
 
@@ -151,7 +150,7 @@ export class Bot {
     drain(): void;
     initMatchmaker(): Promise<boolean>;
     createPrivateGame(opts: { region: string; mode: string; map: string }): Promise<RawGameData>;
-    join(data: string | RawGameData): Promise<void>;
+    join(botName: string, data: string | RawGameData): Promise<void>;
     update(): void;
     onAny(cb: Function): void;
 
