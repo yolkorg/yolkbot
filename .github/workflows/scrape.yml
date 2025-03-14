@@ -1,9 +1,8 @@
 name: Update Maps & Items
 
 on:
-  push:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/60 * * * *'
 
 permissions:
   contents: write
