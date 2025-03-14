@@ -15,6 +15,7 @@ import SaveLoadoutDispatch from './SaveLoadoutDispatch.js';
 import SpawnDispatch from './SpawnDispatch.js';
 import SwapWeaponDispatch from './SwapWeaponDispatch.js';
 import SwitchTeamDispatch from './SwitchTeamDispatch.js';
+import ThrowGrenadeDispatch from './ThrowGrenadeDispatch.js';
 
 export {
     BootPlayerDispatch,
@@ -33,7 +34,8 @@ export {
     SaveLoadoutDispatch,
     SpawnDispatch,
     SwapWeaponDispatch,
-    SwitchTeamDispatch
+    SwitchTeamDispatch,
+    ThrowGrenadeDispatch
 }
 
 export default {
@@ -53,5 +55,6 @@ export default {
     SaveLoadoutDispatch,
     SpawnDispatch,
     SwapWeaponDispatch,
-    SwitchTeamDispatch
+    SwitchTeamDispatch,
+    ThrowGrenadeDispatch
 }

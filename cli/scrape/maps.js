@@ -19,6 +19,6 @@ let parsed = '';
 eval(`parsed = ${match}`);
 
 fs.writeFileSync(
-    path.join(import.meta.dirname, '..', 'maps.js'),
+    path.join(import.meta.dirname, '..', '..', 'src', 'constants', 'maps.js'),
     `/* eslint-disable */\nexport const Maps = ${JSON.stringify(parsed, null, 4)};`
 );

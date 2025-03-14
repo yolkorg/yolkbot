@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers (self) bot in under 10 lines.",
-    "version": "0.1.0-alpha.4",
+    "version": "0.1.0-alpha.11",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -31,18 +31,45 @@
     "exports": {
         "./package.json": "./package.json",
         ".": "./src/index.js",
-        "./api": "./src/api.js",
-        "./bot": "./src/bot.js",
+        "./api": {
+            "import": "./src/api.js",
+            "types": "./src/types/api.d.ts"
+        },
+        "./bot": {
+            "import": "./src/bot.js",
+            "types": "./src/types/bot.d.ts"
+        },
         "./browser": "./build/browser.js",
         "./comm": "./src/comm/index.js",
-        "./matchmaker": "./src/matchmaker.js",
+        "./matchmaker": {
+            "import": "./src/matchmaker.js",
+            "types": "./src/types/matchmaker.d.ts"
+        },
         "./packets": "./src/packet.js",
-        "./constants": "./src/constants/index.js",
-        "./constants/*": "./src/constants/*.js",
-        "./constants/*.js": "./src/constants/*.js",
-        "./dispatch": "./src/dispatches/index.js",
-        "./dispatch/*": "./src/dispatches/*.js",
-        "./dispatch/*.js": "./src/dispatches/*.js"
+        "./constants": {
+            "import": "./src/constants/index.js",
+            "types": "./src/types/constants/index.d.ts"
+        },
+        "./constants/*": {
+            "import": "./src/constants/*.js",
+            "types": "./src/types/constants/*.d.ts"
+        },
+        "./constants/*.js": {
+            "import": "./src/constants/*.js",
+            "types": "./src/types/constants/*.d.ts"
+        },
+        "./dispatch": {
+            "import": "./src/dispatches/index.js",
+            "types": "./src/types/dispatches.d.ts"
+        },
+        "./dispatch/*": {
+            "import": "./src/dispatches/*.js",
+            "types": "./src/types/dispatches/*.d.ts"
+        },
+        "./dispatch/*.js": {
+            "import": "./src/dispatches/*.js",
+            "types": "./src/types/dispatches/*.d.ts"
+        }
     },
     "dependencies": {
         "socks-proxy-agent": "^8.0.5",

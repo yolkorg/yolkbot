@@ -2,7 +2,7 @@ import { GunList } from '#constants';
 import { Cluck9mm } from '../constants/guns.js';
 
 export class GamePlayer {
-    constructor(id, team, playerData) {
+    constructor(id = -1, team = 0, playerData) {
         this.id = id;
         this.team = team;
 
