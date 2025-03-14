@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { UserAgent } from '../../src/constants/index.js';
+const UserAgent =
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/1230.0.0.0 Safari/537.36'
 
 const data = await fetch('https://shellshock.io/js/shellshock.js', {
     headers: {
