@@ -1,8 +1,6 @@
 import yolkws from './socket.js';
 
-import { UserAgent } from '#constants';
-
-const firebaseKey = 'AIzaSyDP4SIjKaw6A4c-zvfYxICpbEjn1rRnN50';
+import { FirebaseKey, UserAgent } from '#constants';
 
 const queryServices = async (request, proxy = '', instance = 'shellshock.io') => {
     return new Promise((resolve) => {
@@ -62,7 +60,7 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
 
     while (!SUCCESS) {
         try {
-            request = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + firebaseKey, {
+            request = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + FirebaseKey, {
                 method: 'POST',
                 body: JSON.stringify({
                     email: email,
@@ -108,7 +106,7 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
 }
 
 async function loginAnonymously(prox = '', instance = 'shellshock.io') {
-    const request = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + firebaseKey, {
+    const request = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
         method: 'POST',
         body: JSON.stringify({ returnSecureToken: true }),
         headers: {
