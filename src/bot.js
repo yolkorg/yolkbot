@@ -33,7 +33,6 @@ const CoopStagesById = Object.fromEntries(Object.entries(CoopStates).map(([key, 
 const GameModesById = Object.fromEntries(Object.entries(GameModes).map(([key, value]) => [value, key]));
 
 export class Bot {
-    // params.name - the bot name
     // params.proxy - a socks(4|5) proxy
     // params.doUpdate - whether to auto update
     // params.updateInterval - the auto update interval
@@ -46,7 +45,6 @@ export class Bot {
             throw new Error('proxies do not work and hence are not supported in the browser');
 
         this.proxy = params.proxy || '';
-        this.name = params.name || Math.random().toString(36).substring(8);
 
         this.autoPing = params.doPing || true;
         this.autoUpdate = params.doUpdate || true;
@@ -339,7 +337,7 @@ export class Bot {
         this.matchmaker.off('msg', listener);
     }
 
-    async #onGameMesssage(msg) { // to minify with vscode
+    async #onGameMesssage(msg) {
         CommIn.init(msg.data);
 
         let out;
@@ -478,7 +476,9 @@ export class Bot {
         return this.game.raw;
     }
 
-    async join(data) {
+    async join(name, data) {
+        this.name = name || 'yolkbot';
+
         if (typeof data == 'string') {
             if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
             // this is a string code that we can pass and get the needed info from

@@ -120,7 +120,7 @@ export interface BotState {
 
 export class Bot {
     proxy: string;
-    name: string;
+    name?: string;
     autoPing: boolean;
     autoUpdate: boolean;
     disablePathing: boolean;
