@@ -43,12 +43,6 @@ export class Bot {
     static Intents = intents;
     Intents = intents;
 
-    // params.proxy - a socks(4|5) proxy
-    // params.instance - a custom shell URL to run requests through
-    // params.doUpdate - whether to auto update
-    // params.updateInterval - the auto update interval
-    // params.doPing - whether to auto ping (for bot.<ping>)
-    // params.pingInterval - the ping interval
     constructor(params = {}) {
         if (params.proxy && IsBrowser)
             throw new Error('proxies do not work and hence are not supported in the browser');
