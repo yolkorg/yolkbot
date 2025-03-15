@@ -1,4 +1,4 @@
-import { loginAnonymously, loginWithCredentials, queryServices } from '#api';
+import { createAccount, loginAnonymously, loginWithCredentials, queryServices } from '#api';
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
@@ -218,14 +218,45 @@ export class Bot {
         }
     }
 
-    async login(email, pass) {
-        // const time = Date.now();
+    dispatch(disp) {
+        this._dispatches.push(disp);
+    }
 
+    #drain() {
+        for (let i = 0; i < this._dispatches.length; i++) {
+            const disp = this._dispatches[i];
+            if (disp.check(this)) {
+                disp.execute(this);
+                this._dispatches.splice(i, 1);
+                return; // only 1 dispatch per update
+            } else {
+                // console.log("Dispatch failed", this.state.joinedGame, this.lastChatTime)
+            }
+        }
+    }
+
+    async createAccount(email, pass) {
+        this.email = email;
+        this.pass = pass;
+
+        const loginData = await createAccount(email, pass, this.proxy, this.instance);
+        return this.#processLoginData(loginData);
+    }
+
+    async login(email, pass) {
         this.email = email;
         this.pass = pass;
 
         const loginData = await loginWithCredentials(email, pass, this.proxy, this.instance);
+        return this.#processLoginData(loginData);
+    }
 
+    async loginAnonymously() {
+        const loginData = await loginAnonymously(this.proxy, this.instance);
+        return this.#processLoginData(loginData);
+    }
+
+    #processLoginData(loginData) {
         if (typeof loginData == 'string') {
             this.#emit('authFail', loginData);
             return false;
@@ -247,53 +278,9 @@ export class Bot {
         this.account.id = loginData.id;
         this.account.loadout = loginData.loadout;
         this.account.ownedItemIds = loginData.ownedItemIds;
-        this.account.sessionId = loginData.sessionId;
-        this.account.vip = loginData.upgradeProductId && !loginData.upgradeIsExpired;
-
-        // console.log('Logged in successfully. Time:', Date.now() - time, 'ms');
-
-        return this.account;
-    }
-
-    dispatch(disp) {
-        this._dispatches.push(disp);
-    }
-
-    #drain() {
-        for (let i = 0; i < this._dispatches.length; i++) {
-            const disp = this._dispatches[i];
-            if (disp.check(this)) {
-                disp.execute(this);
-                this._dispatches.splice(i, 1);
-                return; // only 1 dispatch per update
-            } else {
-                // console.log("Dispatch failed", this.state.joinedGame, this.lastChatTime)
-            }
-        }
-    }
-
-    async loginAnonymously() {
-        const loginData = await loginAnonymously(this.proxy, this.instance);
-
-        if (typeof loginData == 'string') {
-            this.#emit('authFail', loginData);
-            return false;
-        }
-
-        this.state.loggedIn = true;
-
-        this.account.rawLoginData = loginData;
-
-        this.account.accountAge = loginData.accountAge;
-        this.account.eggBalance = loginData.currentBalance;
-        this.account.emailVerified = loginData.emailVerified;
-        this.account.firebaseId = loginData.firebaseId;
-        this.account.id = loginData.id;
-        this.account.loadout = loginData.loadout;
-        this.account.ownedItemIds = loginData.ownedItemIds;
         this.account.session = loginData.session;
         this.account.sessionId = loginData.sessionId;
-        this.account.vip = false;
+        this.account.vip = loginData.upgradeProductId && !loginData.upgradeIsExpired;
 
         return this.account;
     }

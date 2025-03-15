@@ -171,6 +171,7 @@ export class Bot {
 
     loginAnonymously(): Promise<Account | false>;
     login(email: string, pass: string): Promise<Account | false>;
+    createAccount(email: string, pass: string): Promise<Account | false>;
 
     initMatchmaker(): Promise<boolean>;
     createPrivateGame(opts: { region: string; mode: string; map: string }): Promise<RawGameData>;

@@ -35,7 +35,11 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
     });
 }
 
-async function loginWithCredentials(email, password, prox = '', instance = 'shellshock.io') {
+async function createAccount(email, password, prox = '', instance = 'shellshock.io') {
+    return await loginWithCredentials(email, password, prox, instance, true);
+}
+
+async function loginWithCredentials(email, password, prox = '', instance = 'shellshock.io', _useRegisterEndpoint) {
     if (!email || !password) return 'firebase_no_credentials';
 
     /*
@@ -54,13 +58,15 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
         }
     */
 
+    const endpoint = _useRegisterEndpoint ? 'signUp' : 'signInWithPassword';
+
     let SUCCESS = false;
     let request, body, token;
     let k = 0;
 
     while (!SUCCESS) {
         try {
-            request = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + FirebaseKey, {
+            request = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     email: email,
@@ -132,6 +138,7 @@ async function loginAnonymously(prox = '', instance = 'shellshock.io') {
 }
 
 export {
+    createAccount,
     loginAnonymously,
     loginWithCredentials,
     queryServices
