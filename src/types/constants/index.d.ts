@@ -3,6 +3,8 @@ import { Item } from './items';
 
 export declare const findItemById: (id: number) => Item;
 
+export declare const ChiknWinnerDailyLimit: number;
+
 export declare const CollectTypes: {
     AMMO: number;
     GRENADE: number;

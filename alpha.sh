@@ -2,14 +2,14 @@ latest_version=$(curl -s https://registry.npmjs.com/yolkbot | jq -r '.["dist-tag
 current_version=$(jq -r '.version' ./package.json)
 
 if [[ "$current_version" != *"-alpha."* ]]; then
-    echo "Please adjust the current version before publishing."
+    echo "The version provided is not a valid alpha version."
     exit 1
 fi
 
-if [ "$latest_version" == "$current_version" ]; then
-    echo "Please bump the alpha version before publishing."
-    exit 1
-fi
+new_version=$(echo "$current_version" | awk -F. -v OFS=. '{$NF = $NF + 1; print}')
+sed -i '' "s/$current_version/$new_version/g" package.json
+
+current_version=$new_version
 
 if [[ "$latest_version" == *"-alpha."* || "$current_version" == *"-alpha."* ]]; then
     latest_version_numeric=$(echo "$latest_version" | sed 's/-alpha\.[0-9]*//')

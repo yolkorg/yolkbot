@@ -1,4 +1,4 @@
-import { loginAnonymously, loginWithCredentials } from '#api';
+import { loginAnonymously, loginWithCredentials, queryServices } from '#api';
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
@@ -9,6 +9,7 @@ import Matchmaker from './matchmaker.js';
 import yolkws from './socket.js';
 
 import {
+    ChiknWinnerDailyLimit,
     CollectTypes,
     CoopStates,
     findItemById,
@@ -143,9 +144,18 @@ export class Bot {
 
         this.account = {
             // used for auth
+            id: 0,
             firebaseId: '',
             sessionId: '',
             session: '',
+
+            // chikn winner related info
+            cw: {
+                atLimit: false,
+                limit: 0,
+                secondsUntilPlay: 0, // short cooldown, in seconds
+                canPlayAgain: Date.now()
+            },
 
             // used for skin changing
             loadout: {
@@ -232,6 +242,7 @@ export class Bot {
         this.account.eggBalance = loginData.currentBalance;
         this.account.emailVerified = loginData.emailVerified;
         this.account.firebaseId = loginData.firebaseId;
+        this.account.id = loginData.id;
         this.account.loadout = loginData.loadout;
         this.account.ownedItemIds = loginData.ownedItemIds;
         this.account.sessionId = loginData.sessionId;
@@ -246,7 +257,7 @@ export class Bot {
         this._dispatches.push(disp);
     }
 
-    drain() {
+    #drain() {
         for (let i = 0; i < this._dispatches.length; i++) {
             const disp = this._dispatches[i];
             if (disp.check(this)) {
@@ -259,7 +270,7 @@ export class Bot {
         }
     }
 
-    async #anonLogin() {
+    async loginAnonymously() {
         const loginData = await loginAnonymously(this.proxy, this.instance);
 
         if (typeof loginData == 'string') {
@@ -275,6 +286,7 @@ export class Bot {
         this.account.eggBalance = loginData.currentBalance;
         this.account.emailVerified = loginData.emailVerified;
         this.account.firebaseId = loginData.firebaseId;
+        this.account.id = loginData.id;
         this.account.loadout = loginData.loadout;
         this.account.ownedItemIds = loginData.ownedItemIds;
         this.account.session = loginData.session;
@@ -287,7 +299,7 @@ export class Bot {
     async initMatchmaker() {
         if (!this.state.loggedIn) {
             // console.log('Not logged in, attempting to create anonymous user...');
-            const anonLogin = await this.#anonLogin();
+            const anonLogin = await this.loginAnonymously();
             if (!anonLogin) return false;
         }
 
@@ -486,7 +498,7 @@ export class Bot {
         } else if (typeof data == 'object') {
             if (!this.state.loggedIn) {
                 // console.log('passed an object but you still need to be logged in!!')
-                await this.#anonLogin();
+                await this.loginAnonymously();
             }
 
             // this is a game object that we can pass and get the needed info from
@@ -548,7 +560,7 @@ export class Bot {
         let packet;
         while ((packet = this._packetQueue.shift()) !== undefined) { this.#handlePacket(packet); }
 
-        this.drain();
+        this.#drain();
 
         if (this.pathing.followingPath && !this.disablePathing) {
             const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
@@ -1475,6 +1487,79 @@ export class Bot {
                 console.error(`handlePacket: I got but did not handle a: ${Object.entries(CommCode).filter(([, v]) => v == cmd)[0][0]}`);
                 break;
         }
+    }
+
+    async checkChiknWinner() {
+        const response = await queryServices({
+            cmd: 'chicknWinnerReady',
+            id: this.account.id,
+            sessionId: this.account.sessionId
+        });
+
+        this.account.cw.limit = response.limit;
+        this.account.cw.atLimit = response.limit > 3;
+
+        // if there is a "span", that means that it's under the daily limit and you can play again soon
+        // if there is a "period", that means that the account is done for the day and must wait a long time
+        this.account.cw.secondsUntilPlay = response.span || response.period || 0;
+        this.account.cw.canPlayAgain = Date.now() + (this.account.cw.secondsUntilPlay * 1000);
+
+        return this.account.cw;
+    }
+
+    async playChiknWinner() {
+        if (this.account.cw.atLimit || this.account.cw.limit > ChiknWinnerDailyLimit) return 'hit_daily_limit';
+        if (this.account.cw.canPlayAgain > Date.now()) return 'on_cooldown';
+
+        const response = await queryServices({
+            cmd: 'incentivizedVideoReward',
+            firebaseId: this.account.firebaseId,
+            id: this.account.id,
+            sessionId: this.account.sessionId,
+            token: null
+        }, this.proxy, this.instance);
+
+        if (response.error) {
+            if (response.error == 'RATELIMITED') {
+                await this.checkChiknWinner();
+                return 'on_cooldown';
+            } else {
+                console.error('Unknown Chikn Winner response', response);
+                return 'unknown_error';
+            }
+        }
+
+        if (response.reward) {
+            this.account.eggBalance += response.reward.eggsGiven;
+            response.reward.itemIds.forEach((id) => this.account.ownedItemIds.push(id));
+
+            await this.checkChiknWinner();
+
+            return response.reward;
+        }
+
+        console.error('Unknown Chikn Winner response', response);
+        return 'unknown_error';
+    }
+
+    async resetChiknWinner() {
+        if (this.account.eggBalance < 200) return 'not_enough_eggs';
+        if (!this.account.cw.atLimit) return 'not_at_limit';
+
+        const response = await queryServices({
+            cmd: 'chwReset',
+            sessionId: this.account.sessionId
+        });
+
+        if (response.result !== 'SUCCESS') {
+            console.error('Unknown Chikn Winner reset response', response);
+            return 'unknown_error';
+        }
+
+        this.account.eggBalance -= 200;
+        await this.checkChiknWinner();
+
+        return this.account.cw;
     }
 }
 

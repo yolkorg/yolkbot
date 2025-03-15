@@ -17,10 +17,19 @@ export interface BotParams {
     instance?: string;
 }
 
+export interface ChiknWinnerStatus {
+    atLimit: boolean;
+    limit: number;
+    secondsUntilPlay: number;
+    canPlayAgain: number;
+}
+
 export interface Account {
+    id: number;
     firebaseId: string;
     sessionId: string;
     session: string;
+    cw: ChiknWinnerStatus;
     loadout: {
         hatId: number | null;
         meleeId: number;
@@ -117,6 +126,12 @@ export interface BotState {
     joinedGame?: boolean;
 }
 
+export interface ChiknWinnerResponse {
+    eggsGiven: number;
+    itemIds: number[];
+    rewardTier: number;
+}
+
 export class Bot {
     proxy: string;
     name?: string;
@@ -145,13 +160,16 @@ export class Bot {
 
     constructor(params?: BotParams);
 
+    loginAnonymously(): Promise<Account | false>;
     login(email: string, pass: string): Promise<Account | false>;
-    dispatch(disp: ADispatch): void;
-    drain(): void;
+
     initMatchmaker(): Promise<boolean>;
     createPrivateGame(opts: { region: string; mode: string; map: string }): Promise<RawGameData>;
     join(botName: string, data: string | RawGameData): Promise<void>;
+
+    dispatch(disp: ADispatch): void;
     update(): void;
+
     onAny(cb: Function): void;
 
     on(event: 'authFail', cb: (reason: string) => void): void;
@@ -187,6 +205,10 @@ export class Bot {
     on(event: 'selfShieldLost', cb: () => void): void;
     on(event: 'spawnItem', cb: (type: number, _id: number, pos: { x: number; y: number; z: number }) => void): void;
     on(event: 'tick', cb: () => void): void;
+
+    checkChiknWinner(): Promise<ChiknWinnerStatus>;
+    playChiknWinner(): Promise<ChiknWinnerResponse | string>;
+    resetChiknWinner(): Promise<ChiknWinnerStatus>;
 }
 
 export default Bot;
