@@ -33,28 +33,36 @@ import { Maps } from './constants/maps.js';
 const CoopStagesById = Object.fromEntries(Object.entries(CoopStates).map(([key, value]) => [value, key]));
 const GameModesById = Object.fromEntries(Object.entries(GameModes).map(([key, value]) => [value, key]));
 
+const intents = {
+    CHALLENGES: 1,
+    STATS: 2,
+    PATHFINDING: 3
+}
+
 export class Bot {
+    static Intents = intents;
+    Intents = intents;
+
     // params.proxy - a socks(4|5) proxy
+    // params.instance - a custom shell URL to run requests through
     // params.doUpdate - whether to auto update
     // params.updateInterval - the auto update interval
     // params.doPing - whether to auto ping (for bot.<ping>)
     // params.pingInterval - the ping interval
-    // params.doPathing - whether to run pathfinding logic
-    // params.instance - a custom shell URL to run requests through
     constructor(params = {}) {
         if (params.proxy && IsBrowser)
             throw new Error('proxies do not work and hence are not supported in the browser');
 
+        this.intents = params.intents || [];
+
+        this.instance = params.instance || 'shellshock.io';
         this.proxy = params.proxy || '';
 
         this.autoPing = params.doPing || true;
         this.autoUpdate = params.doUpdate || true;
-        this.disablePathing = !params.doPathing || true;
 
         this.pingInterval = params.pingInterval || 1000;
         this.updateInterval = params.updateInterval || 5;
-
-        this.instance = params.instance || 'shellshock.io';
 
         this._hooks = {};
         this._globalHooks = [];
@@ -383,7 +391,7 @@ export class Bot {
                 // console.log("Gametype:", this.game.gameMode, this.game.gameModeId);
                 this.game.mapIdx = CommIn.unPackInt8U();
                 this.game.map = Maps[this.game.mapIdx];
-                if (!this.disablePathing) {
+                if (this.intents.includes(Bot.Intents.PATHFINDING)) {
                     this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
                     this.pathing.nodeList = new NodeList(this.game.map.raw);
                 }
@@ -562,7 +570,7 @@ export class Bot {
 
         this.#drain();
 
-        if (this.pathing.followingPath && !this.disablePathing) {
+        if (this.pathing.followingPath && this.intents.includes(Bot.Intents.PATHFINDING)) {
             const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
 
             if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr()) {

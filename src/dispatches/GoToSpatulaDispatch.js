@@ -2,7 +2,11 @@ import AStar from '../pathing/astar.js';
 
 export class GoToSpatulaDispatch {
     check(bot) {
-        return bot.me.playing && !bot.disablePathing && bot.game.spatula && bot.game.spatula.coords && bot.game.spatula.coords.x;
+        return bot.me.playing &&
+            bot.game.spatula &&
+            bot.game.spatula.coords &&
+            bot.game.spatula.coords.x &&
+            bot.intents.includes(bot.Intents.PATHFINDING);
     }
 
     execute(bot) {

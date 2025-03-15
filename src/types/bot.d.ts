@@ -8,11 +8,11 @@ import { Matchmaker, RawGameData } from './matchmaker';
 import yolkws from './socket';
 
 export interface BotParams {
+    intents?: number[];
     doUpdate?: boolean;
     updateInterval?: number;
     doPing?: boolean;
     pingInterval?: number;
-    doPathing?: boolean;
     proxy?: string;
     instance?: string;
 }
@@ -132,7 +132,16 @@ export interface ChiknWinnerResponse {
     rewardTier: number;
 }
 
+type intents = {
+    CHALLENGES: 1,
+    STATS: 2,
+    PATHFINDING: 3
+}
+
 export class Bot {
+    static Intents: intents;
+    Intents: intents;
+
     proxy: string;
     name?: string;
     autoPing: boolean;

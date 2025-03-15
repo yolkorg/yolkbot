@@ -404,7 +404,7 @@ class MapNode {
         // console.log('My meshtype, below meshtype: ', this.meshType, belowMe.meshType, 'Other meshtype, below other meshtype: ', node.meshType, belowOther.meshType);
         // console.log('My ry, other ry: ', this.ry, node.ry);
         // console.log('dx0, dy0, dz0: ', dx0, dy0, dz0);
-        throw new Error(`Unrecognized node meshType, me: ${stringifyCircular(this)}, other: ${stringifyCircular(node)}, below me: ${stringifyCircular(belowMe)}, below other: ${stringifyCircular(belowOther)}\n\nThis is NOT your fault. This is an internal error related to pathfinding.\nIf you need an immediate fix and don't use pathfinding features, set "doPathing" to false when creating a Bot.\n\nPlease paste this full error to our support server and **include the map the bot is on**.`);
+        throw new Error(`Unrecognized node meshType, me: ${stringifyCircular(this)}, other: ${stringifyCircular(node)}, below me: ${stringifyCircular(belowMe)}, below other: ${stringifyCircular(belowOther)}\n\nThis is NOT your fault. This is an internal error related to pathfinding.\nIf you need an immediate fix and don't use pathfinding features, remove the "PATHFINDING" intent.\n\nPlease paste this full error to our support server and **include the map the bot is on**.`);
     }
 
     trueCenter() {

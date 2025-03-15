@@ -10,9 +10,9 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
             // console.log('opened')
             ws.send(JSON.stringify(request));
         }
-        
+
         let resolved = false;
-        
+
         ws.onmessage = (mes) => {
             try {
                 const resp = JSON.parse(mes.data);

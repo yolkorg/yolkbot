@@ -6,7 +6,11 @@ export class GoToPlayerDispatch {
     }
 
     check(bot) {
-        return bot.me.playing && this.target && this.target.playing && this.target.position && !bot.disablePathing;
+        return bot.me.playing &&
+            this.target &&
+            this.target.playing &&
+            this.target.position &&
+            bot.intents.includes(bot.Intents.PATHFINDING);
     }
 
     execute(bot) {
