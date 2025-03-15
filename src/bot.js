@@ -36,7 +36,10 @@ const GameModesById = Object.fromEntries(Object.entries(GameModes).map(([key, va
 const intents = {
     CHALLENGES: 1,
     STATS: 2,
-    PATHFINDING: 3
+    PATHFINDING: 3,
+    BUFFERS: 4,
+    PING: 5,
+    COSMETIC_DATA: 6
 }
 
 export class Bot {
@@ -56,7 +59,7 @@ export class Bot {
         this.autoUpdate = params.doUpdate || true;
 
         this.pingInterval = params.pingInterval || 1000;
-        this.updateInterval = params.updateInterval || 5;
+        this.updateInterval = params.updateInterval || 11;
 
         this._hooks = {};
         this._globalHooks = [];
@@ -64,10 +67,7 @@ export class Bot {
 
         // private information NOT FOR OTHER PLAYERS!!
         this.state = {
-            loggedIn: false,
-            gameFound: false,
-
-            // once we implement more packets these may be moved to "players"
+            // tracking for dispatch checks
             reloading: false,
             swappingGun: false,
             usingMelee: false,
@@ -201,9 +201,7 @@ export class Bot {
 
         this.lastDeathTime = -1;
         this.lastChatTime = -1;
-
         this.lastUpdateTime = -1;
-        this.nUpdates = 0;
 
         this.controlKeys = 0;
 
@@ -267,8 +265,6 @@ export class Bot {
             return false;
         }
 
-        this.state.loggedIn = true;
-
         this.account.rawLoginData = loginData;
 
         this.account.accountAge = loginData.accountAge;
@@ -286,7 +282,7 @@ export class Bot {
     }
 
     async initMatchmaker() {
-        if (!this.state.loggedIn) {
+        if (this.account.id == 0) {
             // console.log('Not logged in, attempting to create anonymous user...');
             const anonLogin = await this.loginAnonymously();
             if (!anonLogin) return false;
@@ -311,31 +307,30 @@ export class Bot {
     async #joinGameWithCode(code) {
         if (!await this.initMatchmaker()) return false;
 
-        const listener = (mes) => {
-            if (mes.command == 'gameFound') {
-                this.game.raw = mes;
-                this.game.code = code;
-                delete this.game.raw.command; // pissed me off
+        return await new Promise((resolve) => {
+            const listener = (mes) => {
+                if (mes.command == 'gameFound') {
+                    this.matchmaker.off('msg', listener);
 
-                this.gameFound = true;
-            }
+                    this.game.raw = mes;
+                    this.game.code = code;
 
-            if (mes.error && mes.error == 'gameNotFound')
-                throw new Error(`Game ${code} not found (likely expired).`)
-        };
+                    resolve();
+                }
 
-        this.matchmaker.on('msg', listener);
+                if (mes.error && mes.error == 'gameNotFound')
+                    throw new Error(`Game ${code} not found (likely expired).`)
+            };
 
-        this.matchmaker.send({
-            command: 'joinGame',
-            id: code,
-            observe: false,
-            sessionId: this.account.sessionId
-        })
+            this.matchmaker.on('msg', listener);
 
-        while (!this.gameFound) await new Promise(r => setTimeout(r, 10));
-
-        this.matchmaker.off('msg', listener);
+            this.matchmaker.send({
+                command: 'joinGame',
+                id: code,
+                observe: false,
+                sessionId: this.account.sessionId
+            })
+        });
     }
 
     async #onGameMesssage(msg) {
@@ -362,7 +357,7 @@ export class Bot {
                 out.send(this.gameSocket);
                 break;
 
-            case CommCode.gameJoined:
+            case CommCode.gameJoined: {
                 this.me.id = CommIn.unPackInt8U();
                 // console.log("My id is:", this.me.id);
                 this.me.team = CommIn.unPackInt8U();
@@ -372,7 +367,7 @@ export class Bot {
                 // console.log("Gametype:", this.game.gameMode, this.game.gameModeId);
                 this.game.mapIdx = CommIn.unPackInt8U();
                 this.game.map = Maps[this.game.mapIdx];
-                if (this.intents.includes(Bot.Intents.PATHFINDING)) {
+                if (this.intents.includes(this.Intents.PATHFINDING)) {
                     this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
                     this.pathing.nodeList = new NodeList(this.game.map.raw);
                 }
@@ -388,7 +383,25 @@ export class Bot {
                 this.state.joinedGame = true;
                 this.lastDeathTime = Date.now();
 
+                const out = CommOut.getBuffer();
+                out.packInt8(CommCode.clientReady);
+                out.send(this.gameSocket);
+
+                this.gameSocket.onmessage = (msg) => this._packetQueue.push(msg.data);
+
+                // console.log(`Successfully joined ${this.game.code}. Startup to join time: ${Date.now() - this.initTime} ms`);
+
+                if (this.autoUpdate)
+                    setInterval(() => this.update(), this.updateInterval);
+
+                if (this.intents.includes(this.Intents.PING)) {
+                    const out = CommOut.getBuffer();
+                    out.packInt8(CommCode.ping);
+                    out.send(this.gameSocket);
+                    this.lastPingTime = Date.now();
+                }
                 break;
+            }
 
             case CommCode.eventModifier:
                 // console.log("Echoed eventModifier"); // why the fuck do you need to do this
@@ -448,31 +461,30 @@ export class Bot {
 
         if (mapIdx == -1) throw new Error('invalid map, see the Maps constant for a list')
 
-        const listener = (msg) => {
-            if (msg.command == 'gameFound') {
-                this.game.raw = msg;
-                this.game.code = this.game.raw.id;
-                delete this.game.raw.command;
+        await new Promise((resolve) => {
+            const listener = (msg) => {
+                if (msg.command == 'gameFound') {
+                    this.matchmaker.off('msg', listener);
 
-                this.gameFound = true;
-            }
-        };
+                    this.game.raw = msg;
+                    this.game.code = this.game.raw.id;
 
-        this.matchmaker.on('msg', listener);
+                    resolve();
+                }
+            };
 
-        this.matchmaker.send({
-            command: 'findGame',
-            region: opts.region,
-            playType: PlayTypes.createPrivate,
-            gameType: GameModes[opts.mode],
-            sessionId: this.account.sessionId,
-            noobLobby: false,
-            map: mapIdx
+            this.matchmaker.on('msg', listener);
+
+            this.matchmaker.send({
+                command: 'findGame',
+                region: opts.region,
+                playType: PlayTypes.createPrivate,
+                gameType: GameModes[opts.mode],
+                sessionId: this.account.sessionId,
+                noobLobby: false,
+                map: mapIdx
+            });
         });
-
-        while (!this.gameFound) await new Promise(r => setTimeout(r, 10));
-
-        this.matchmaker.off('msg', listener);
 
         return this.game.raw;
     }
@@ -485,7 +497,7 @@ export class Bot {
             // this is a string code that we can pass and get the needed info from
             await this.#joinGameWithCode(data);
         } else if (typeof data == 'object') {
-            if (!this.state.loggedIn) {
+            if (this.account.id == 0) {
                 // console.log('passed an object but you still need to be logged in!!')
                 await this.loginAnonymously();
             }
@@ -493,9 +505,6 @@ export class Bot {
             // this is a game object that we can pass and get the needed info from
             this.game.raw = data;
             this.game.code = this.game.raw.id;
-            delete this.game.raw.command;
-
-            this.gameFound = true;
         }
 
         if (!this.game.raw.id || !this.game.raw.subdomain)
@@ -517,99 +526,80 @@ export class Bot {
             // console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
             this.#emit('close', e.code);
         }
+    }
 
-        while (!this.state.joinedGame) await new Promise(r => setTimeout(r, 5));
+    #processPathfinding() {
+        const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
 
-        const out = CommOut.getBuffer();
-        out.packInt8(CommCode.clientReady);
-        out.send(this.gameSocket);
+        if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr()) {
+            // console.log('Completed path to', this.pathing.activePath[this.pathing.activePath.length - 1].position);
+            this.pathing.followingPath = false;
+            this.pathing.activePath = null;
+            this.pathing.activeNode = null;
+            this.pathing.activeNodeIdx = 0;
 
-        this.gameSocket.onmessage = (msg) => this._packetQueue.push(msg.data);
+            this.dispatch(new MovementDispatch(0));
+        } else {
+            let positionTarget;
+            if (this.pathing.activeNodeIdx < this.pathing.activePath.length - 1) {
+                positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx + 1].flatCenter();
+                this.dispatch(new LookAtPosDispatch(positionTarget));
+            } else {
+                positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx].flatCenter();
+                this.dispatch(new LookAtPosDispatch(positionTarget));
+            }
 
-        // console.log(`Successfully joined ${this.game.code}. Startup to join time: ${Date.now() - this.initTime} ms`);
+            for (const node of this.pathing.activePath) {
+                if (node.flatRadialDistance(this.me.position) < 0.1 && node.position.y == Math.floor(this.me.position.y)) {
+                    if (this.pathing.activePath.indexOf(node) >= this.pathing.activeNodeIdx) {
+                        this.pathing.activeNodeIdx = this.pathing.activePath.indexOf(node) + 1;
+                        this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
+                        break;
+                    } else {
+                        // console.log('Close to node that\'s before, idx:', 
+                        //    this.pathing.activePath.indexOf(node), 'current:', this.pathing.activeNodeIdx);
+                    }
+                } else {
+                    // console.log('Node at', node.position, 'is', node.flatRadialDistance(this.me.position), 'away.')
+                }
+                // console.log('activeNode is ', this.pathing.activeNode.flatRadialDistance(this.me.position), 'away');
+            }
 
-        if (this.autoUpdate)
-            setInterval(() => this.update(), this.updateInterval);
-
-        if (this.autoPing) {
-            const out = CommOut.getBuffer();
-            out.packInt8(CommCode.ping);
-            out.send(this.gameSocket);
-            this.lastPingTime = Date.now();
+            if (!(this.controlKeys & Movements.FORWARD)) {
+                this.dispatch(new MovementDispatch(Movements.FORWARD));
+            }
         }
+
+        /*let onPath = false;
+        for (const node of this.pathing.activePath) {
+            if (node.positionStr() == myPositionStr) {
+                onPath = true;
+                break;
+            }
+        }
+        if (!onPath) {
+            console.log('Got off-path somehow');
+            this.dispatch(new PathfindDispatch(this.pathing.activePath[this.pathing.activePath.length - 1]));
+            this.pathing.followingPath = false;
+            this.pathing.activePath = null;
+            this.pathing.activeNode = null;
+            this.pathing.activeNodeIdx = 0;
+        }*/
     }
 
     update() {
-        if (!this.state.joinedGame) { throw new Error('Not playing, can\'t update. '); }
+        if (!this.state.joinedGame) throw new Error('Not playing, can\'t update. ');
 
-        this.nUpdates++;
+        // process pathfinding
+        if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING)) this.#processPathfinding();
 
-        if (this._packetQueue.length === 0 && this._dispatches.length === 0) return;
+        // process incoming packets
+        while (this._packetQueue.length > 0) this.#handlePacket(this._packetQueue.shift());
 
-        let packet;
-        while ((packet = this._packetQueue.shift()) !== undefined) { this.#handlePacket(packet); }
+        // process dispatches
+        if (this._dispatches.length > 0) this.#drain();
 
-        this.#drain();
-
-        if (this.pathing.followingPath && this.intents.includes(Bot.Intents.PATHFINDING)) {
-            const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
-
-            if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr()) {
-                // console.log('Completed path to', this.pathing.activePath[this.pathing.activePath.length - 1].position);
-                this.pathing.followingPath = false;
-                this.pathing.activePath = null;
-                this.pathing.activeNode = null;
-                this.pathing.activeNodeIdx = 0;
-
-                this.dispatch(new MovementDispatch(0));
-            } else {
-                let positionTarget;
-                if (this.pathing.activeNodeIdx < this.pathing.activePath.length - 1) {
-                    positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx + 1].flatCenter();
-                    this.dispatch(new LookAtPosDispatch(positionTarget));
-                } else {
-                    positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx].flatCenter();
-                    this.dispatch(new LookAtPosDispatch(positionTarget));
-                }
-
-                for (const node of this.pathing.activePath) {
-                    if (node.flatRadialDistance(this.me.position) < 0.1 && node.position.y == Math.floor(this.me.position.y)) {
-                        if (this.pathing.activePath.indexOf(node) >= this.pathing.activeNodeIdx) {
-                            this.pathing.activeNodeIdx = this.pathing.activePath.indexOf(node) + 1;
-                            this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
-                            break;
-                        } else {
-                            // console.log('Close to node that\'s before, idx:', 
-                            //    this.pathing.activePath.indexOf(node), 'current:', this.pathing.activeNodeIdx);
-                        }
-                    } else {
-                        // console.log('Node at', node.position, 'is', node.flatRadialDistance(this.me.position), 'away.')
-                    }
-                    // console.log('activeNode is ', this.pathing.activeNode.flatRadialDistance(this.me.position), 'away');
-                }
-
-                if (!(this.controlKeys & Movements.FORWARD)) {
-                    this.dispatch(new MovementDispatch(Movements.FORWARD));
-                }
-            }
-
-            /*let onPath = false;
-            for (const node of this.pathing.activePath) {
-                if (node.positionStr() == myPositionStr) {
-                    onPath = true;
-                    break;
-                }
-            }
-            if (!onPath) {
-                console.log('Got off-path somehow');
-                this.dispatch(new PathfindDispatch(this.pathing.activePath[this.pathing.activePath.length - 1]));
-                this.pathing.followingPath = false;
-                this.pathing.activePath = null;
-                this.pathing.activeNode = null;
-                this.pathing.activeNodeIdx = 0;
-            }*/
-        }
-
+        // process syncMe
         if (Date.now() - this.lastUpdateTime >= 50) {
             this.#emit('tick');
 
@@ -631,8 +621,10 @@ export class Bot {
             this.state.shotsFired = 0;
         }
 
-        let cb;
-        while ((cb = this._liveCallbacks.shift()) !== undefined) cb();
+        while (this._liveCallbacks.length > 0) {
+            const cb = this._liveCallbacks.shift();
+            cb();
+        }
     }
 
     on(event, cb) {
@@ -705,6 +697,7 @@ export class Bot {
         const name = CommIn.unPackString();
         const safename = CommIn.unPackString(); // ??? (a)
         const charClass = CommIn.unPackInt8U();
+        const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
         const playerData = {
             id_: id_,
             uniqueId_: uniqueId,
@@ -713,14 +706,14 @@ export class Bot {
             charClass_: charClass,
             team_: CommIn.unPackInt8U(),
             primaryWeaponItem_: findItemById(CommIn.unPackInt16U()),
-            secondaryWeaponItem_: findItemById(CommIn.unPackInt16U()), // b
+            secondaryWeaponItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
             shellColor_: CommIn.unPackInt8U(),
-            hatItem_: findItemById(CommIn.unPackInt16U()),
-            stampItem_: findItemById(CommIn.unPackInt16U()),
+            hatItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
+            stampItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
             unknownInt8: CommIn.unPackInt8(), // c
             otherUnknownInt8: CommIn.unPackInt8(),
-            grenadeItem_: findItemById(CommIn.unPackInt16U()),
-            meleeItem_: findItemById(CommIn.unPackInt16U()),
+            grenadeItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
+            meleeItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
             x_: CommIn.unPackFloat(),
             y_: CommIn.unPackFloat(),
             z_: CommIn.unPackFloat(),
@@ -839,37 +832,42 @@ export class Bot {
         const climbing = CommIn.unPackInt8U();
 
         const player = this.players[id];
-        if (!player || !player.buffer) return;
+        if (!player) return;
 
-        if (player.id == this.me.id) {
-            for (let i2 = 0; i2 < 3 /* FramesBetweenSyncs */; i2++) {
-                CommIn.unPackInt8U();
-                CommIn.unPackRadU();
-                CommIn.unPackRad();
-            }
-        }
+        if (player.position.x !== x) player.position.x = x;
+        if (player.position.z !== z) player.position.z = z;
 
-        let yaw, pitch;
-        for (let i2 = 0; i2 < 3; i2++) {
-            player.buffer[i2].controlKeys = CommIn.unPackInt8U();
-            yaw = CommIn.unPackRadU();
-            if (!isNaN(yaw)) { player.buffer[i2].yaw_ = yaw }
-            pitch = CommIn.unPackRad();
-            if (!isNaN(pitch)) { player.buffer[i2].pitch_ = pitch }
-        }
-
-        player.position.x = x;
-
-        if (!player.jumping || Math.abs(player.position.y - y) > 0.5) {
+        if (!player.jumping || Math.abs(player.position.y - y) > 0.5 && player.position.y !== y)
             player.position.y = y;
-        }
 
-        player.position.z = z;
-        player.buffer[0].x = x;
-        player.buffer[0].y = y;
-        player.buffer[0].z = z;
-        player.climbing = climbing;
-        // console.log(`Player ${player.name} is now at ${x}, ${y}, ${z} (climbing = ${climbing})`);
+        if (player.climbing !== climbing) player.climbing = climbing;
+
+        if (this.intents.includes(this.Intents.BUFFERS)) {
+            if (!player.buffer) return;
+
+            if (player.id == this.me.id) {
+                for (let i2 = 0; i2 < 3 /* FramesBetweenSyncs */; i2++) {
+                    CommIn.unPackInt8U();
+                    CommIn.unPackRadU();
+                    CommIn.unPackRad();
+                }
+            }
+
+            let yaw, pitch;
+            for (let i2 = 0; i2 < 3; i2++) {
+                player.buffer[i2].controlKeys = CommIn.unPackInt8U();
+
+                yaw = CommIn.unPackRadU();
+                if (!isNaN(yaw)) player.buffer[i2].yaw_ = yaw
+
+                pitch = CommIn.unPackRad();
+                if (!isNaN(pitch)) player.buffer[i2].pitch_ = pitch
+            }
+
+            player.buffer[0].x = x;
+            player.buffer[0].y = y;
+            player.buffer[0].z = z;
+        }
     }
 
     #processPausePacket() {
@@ -1228,6 +1226,8 @@ export class Bot {
     }
 
     #processPingPacket() {
+        if (!this.intents.includes(this.Intents.PING)) return;
+
         const oldPing = this.ping;
 
         this.ping = Date.now() - this.lastPingTime;
@@ -1269,12 +1269,15 @@ export class Bot {
         const grenadeIdx = CommIn.unPackInt16U();
         const meleeIdx = CommIn.unPackInt16U();
 
+        const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
+
         const primaryWeaponItem = findItemById(primaryWeaponIdx);
-        const secondaryWeaponItem = findItemById(secondaryWeaponIdx);
-        const hatItem = findItemById(hatIdx);
-        const stampItem = findItemById(stampIdx);
-        const grenadeItem = findItemById(grenadeIdx);
-        const meleeItem = findItemById(meleeIdx);
+
+        const secondaryWeaponItem = findCosmetics ? findItemById(secondaryWeaponIdx) : secondaryWeaponIdx;
+        const hatItem = findCosmetics ? findItemById(hatIdx) : hatIdx;
+        const stampItem = findCosmetics ? findItemById(stampIdx) : stampIdx;
+        const grenadeItem = findCosmetics ? findItemById(grenadeIdx) : grenadeIdx;
+        const meleeItem = findCosmetics ? findItemById(meleeIdx) : meleeIdx;
 
         const player = this.players[id];
         if (player) {
@@ -1344,9 +1347,50 @@ export class Bot {
 
     #handlePacket(packet) {
         CommIn.init(packet);
-        this.#emit('packet', packet);
+
         const cmd = CommIn.unPackInt8U();
+
         switch (cmd) {
+            case CommCode.syncThem:
+                this.#processExternalSyncPacket(packet);
+                break;
+
+            case CommCode.fire:
+                this.#processFirePacket(packet);
+                break;
+
+            case CommCode.hitThem:
+                this.#processHitThemPacket(packet);
+                break;
+
+            case CommCode.syncMe:
+                this.#processSyncMePacket(packet);
+                break;
+
+            case CommCode.hitMe:
+                this.#processHitMePacket(packet);
+                break;
+
+            case CommCode.swapWeapon:
+                this.#processSwapWeaponPacket(packet);
+                break;
+
+            case CommCode.collectItem:
+                this.#processCollectPacket(packet);
+                break;
+
+            case CommCode.respawn:
+                this.#processRespawnPacket(packet);
+                break;
+
+            case CommCode.die:
+                this.#processDeathPacket(packet);
+                break;
+
+            case CommCode.pause:
+                this.#processPausePacket(packet);
+                break;
+
             case CommCode.chat:
                 this.#processChatPacket(packet);
                 break;
@@ -1355,52 +1399,12 @@ export class Bot {
                 this.#processAddPlayerPacket(packet);
                 break;
 
-            case CommCode.respawn:
-                this.#processRespawnPacket(packet);
-                break;
-
-            case CommCode.swapWeapon:
-                this.#processSwapWeaponPacket(packet);
-                break;
-
-            case CommCode.syncThem:
-                this.#processExternalSyncPacket(packet);
-                break;
-
-            case CommCode.pause:
-                this.#processPausePacket(packet);
-                break;
-
-            case CommCode.die:
-                this.#processDeathPacket(packet);
-                break;
-
-            case CommCode.fire:
-                this.#processFirePacket(packet);
-                break;
-
-            case CommCode.collectItem:
-                this.#processCollectPacket(packet);
-                break;
-
-            case CommCode.hitThem:
-                this.#processHitThemPacket(packet);
-                break;
-
-            case CommCode.hitMe:
-                this.#processHitMePacket(packet);
-                break;
-
-            case CommCode.syncMe:
-                this.#processSyncMePacket(packet);
+            case CommCode.removePlayer:
+                this.#processRemovePlayerPacket(packet);
                 break;
 
             case CommCode.eventModifier:
                 this.#processEventModifierPacket(packet);
-                break;
-
-            case CommCode.removePlayer:
-                this.#processRemovePlayerPacket(packet);
                 break;
 
             case CommCode.metaGameState:

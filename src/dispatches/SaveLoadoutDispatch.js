@@ -92,41 +92,18 @@ export class SaveLoadoutDispatch {
             if (bot.state.joinedGame)
                 new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.gameSocket);
 
+            const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
+
             // apply changes to the bot
             Object.entries(this.changes).forEach(([changeKey, changeValue]) => {
-                switch (changeKey) {
-                    case 'classIdx':
-                        bot.me.selectedGun = changeValue;
-                        break;
-
-                    case 'hatId':
-                        bot.me.character.hat = findItemById(changeValue);
-                        break;
-
-                    case 'stampId':
-                        bot.me.character.stamp = findItemById(changeValue);
-                        break;
-
-                    case 'grenadeId':
-                        bot.me.character.grenade = findItemById(changeValue);
-                        break;
-
-                    case 'meleeId':
-                        bot.me.character.melee = findItemById(changeValue);
-                        break;
-
-                    case 'colorIdx':
-                        bot.me.character.eggColor = changeValue;
-                        break;
-
-                    case 'primaryId':
-                        bot.me.character.primaryGun = findItemById(changeValue[bot.me.selectedGun]);
-                        break;
-
-                    case 'secondaryId':
-                        bot.me.character.secondaryGun = findItemById(changeValue[bot.me.selectedGun]);
-                        break;
-                }
+                if (changeKey === 'classIdx') bot.me.selectedGun = changeValue;
+                else if (changeKey === 'hatId') bot.me.character.hat = findCosmetics ? findItemById(changeValue) : changeValue;
+                else if (changeKey === 'stampId') bot.me.character.stamp = findCosmetics ? findItemById(changeValue) : changeValue;
+                else if (changeKey === 'grenadeId') bot.me.character.grenade = findCosmetics ? findItemById(changeValue) : changeValue;
+                else if (changeKey === 'meleeId') bot.me.character.melee = findCosmetics ? findItemById(changeValue) : changeValue;
+                else if (changeKey === 'colorIdx') bot.me.character.eggColor = changeValue;
+                else if (changeKey === 'primaryId') bot.me.character.primaryGun = findItemById(changeValue[bot.me.selectedGun]);
+                else if (changeKey === 'secondaryId') bot.me.character.secondaryGun = findCosmetics ? findItemById(changeValue[bot.me.selectedGun]) : changeValue;
             })
         })
     }

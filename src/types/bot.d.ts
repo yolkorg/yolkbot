@@ -117,13 +117,10 @@ export interface Pathing {
 }
 
 export interface BotState {
-    loggedIn: boolean;
-    gameFound: boolean;
     reloading: boolean;
     swappingGun: boolean;
     usingMelee: boolean;
     shotsFired: number;
-    joinedGame?: boolean;
 }
 
 export interface ChiknWinnerResponse {
@@ -135,7 +132,10 @@ export interface ChiknWinnerResponse {
 type intents = {
     CHALLENGES: 1,
     STATS: 2,
-    PATHFINDING: 3
+    PATHFINDING: 3,
+    BUFFERS: 4,
+    PING: 5,
+    COSMETIC_DATA: 6
 }
 
 export class Bot {
@@ -144,10 +144,8 @@ export class Bot {
 
     proxy: string;
     name?: string;
-    autoPing: boolean;
     autoUpdate: boolean;
     disablePathing: boolean;
-    pingInterval: number;
     updateInterval: number;
     instance: string;
     state: BotState;
@@ -161,7 +159,6 @@ export class Bot {
     lastDeathTime: number;
     lastChatTime: number;
     lastUpdateTime: number;
-    nUpdates: number;
     controlKeys: number;
     initTime: number;
     pathing: Pathing;

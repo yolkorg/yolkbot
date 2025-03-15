@@ -93,8 +93,7 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
             }
 
             if (k > 5) return 'firebase_too_many_retries';
-
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            else await new Promise((resolve) => setTimeout(resolve, 100));
         }
     }
 

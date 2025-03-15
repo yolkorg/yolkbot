@@ -15,11 +15,11 @@ export interface View {
 export interface Character {
     eggColor: string;
     primaryGun: Item;
-    secondaryGun: Item;
-    stamp: Item;
-    hat: Item;
-    grenade: Item;
-    melee: Item;
+    secondaryGun: Item | number;
+    stamp: Item | number;
+    hat: Item | number;
+    grenade: Item | number;
+    melee: Item | number;
 }
 
 export interface Buffer {
@@ -41,11 +41,11 @@ export interface PlayerData {
     pitch_: number;
     shellColor_: string;
     primaryWeaponItem_: Item;
-    secondaryWeaponItem_: Item;
-    stampItem_: Item;
-    hatItem_: Item;
-    grenadeItem_: Item;
-    meleeItem_: Item;
+    secondaryWeaponItem_: Item | number;
+    stampItem_: Item | number;
+    hatItem_: Item | number;
+    grenadeItem_: Item | number;
+    meleeItem_: Item | number;
     weaponIdx_: number;
 }
 
