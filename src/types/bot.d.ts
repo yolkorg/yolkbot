@@ -11,8 +11,6 @@ export interface BotParams {
     intents?: number[];
     doUpdate?: boolean;
     updateInterval?: number;
-    doPing?: boolean;
-    pingInterval?: number;
     proxy?: string;
     instance?: string;
 }

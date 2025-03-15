@@ -55,10 +55,7 @@ export class Bot {
         this.instance = params.instance || 'shellshock.io';
         this.proxy = params.proxy || '';
 
-        this.autoPing = params.doPing || true;
         this.autoUpdate = params.doUpdate || true;
-
-        this.pingInterval = params.pingInterval || 1000;
         this.updateInterval = params.updateInterval || 11;
 
         this._hooks = {};
