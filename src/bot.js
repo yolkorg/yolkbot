@@ -407,25 +407,9 @@ export class Bot {
                 out.send(this.gameSocket);
                 break;
 
-            case CommCode.requestGameOptions: {
-                out = CommOut.getBuffer();
-                out.packInt8(CommCode.gameOptions);
-                out.packInt8(this.game.options.gravity * 4);
-                out.packInt8(this.game.options.damage * 4);
-                out.packInt8(this.game.options.healthRegen * 4);
-
-                const flags =
-                    (this.game.options.locked ? 1 : 0) |
-                    (this.game.options.noTeamChange ? 2 : 0) |
-                    (this.game.options.noTeamShuffle ? 4 : 0);
-
-                out.packInt8(flags);
-
-                this.game.options.weaponsDisabled.forEach((v) => {
-                    out.packInt8(v ? 1 : 0);
-                });
+            case CommCode.requestGameOptions:
+                this.#processGameRequestOptionsPacket();
                 break;
-            }
 
             default:
                 try {
@@ -1342,6 +1326,25 @@ export class Bot {
         this.#emit('playerReload', player, playerActiveWeapon);
     }
 
+    #processGameRequestOptionsPacket() {
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.gameOptions);
+        out.packInt8(this.game.options.gravity * 4);
+        out.packInt8(this.game.options.damage * 4);
+        out.packInt8(this.game.options.healthRegen * 4);
+
+        const flags =
+            (this.game.options.locked ? 1 : 0) |
+            (this.game.options.noTeamChange ? 2 : 0) |
+            (this.game.options.noTeamShuffle ? 4 : 0);
+
+        out.packInt8(flags);
+
+        this.game.options.weaponsDisabled.forEach((v) => {
+            out.packInt8(v ? 1 : 0);
+        });
+    }
+
     #handlePacket(packet) {
         CommIn.init(packet);
 
@@ -1458,6 +1461,10 @@ export class Bot {
 
             case CommCode.melee:
                 this.#processMeleePacket();
+                break;
+
+            case CommCode.requestGameOptions:
+                this.#processGameRequestOptionsPacket();
                 break;
 
             case CommCode.clientReady:
