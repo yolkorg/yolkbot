@@ -148,6 +148,10 @@ export class Bot {
             sessionId: '',
             session: '',
 
+            // raw login params
+            email: '',
+            password: '',
+
             // chikn winner related info
             cw: {
                 atLimit: false,
@@ -231,22 +235,25 @@ export class Bot {
     }
 
     async createAccount(email, pass) {
-        this.email = email;
-        this.pass = pass;
+        this.account.email = email;
+        this.account.password = pass;
 
         const loginData = await createAccount(email, pass, this.proxy, this.instance);
         return this.#processLoginData(loginData);
     }
 
     async login(email, pass) {
-        this.email = email;
-        this.pass = pass;
+        this.account.email = email;
+        this.account.password = pass;
 
         const loginData = await loginWithCredentials(email, pass, this.proxy, this.instance);
         return this.#processLoginData(loginData);
     }
 
     async loginAnonymously() {
+        delete this.account.email;
+        delete this.account.password;
+
         const loginData = await loginAnonymously(this.proxy, this.instance);
         return this.#processLoginData(loginData);
     }
