@@ -104,6 +104,7 @@ export interface Game {
     numCapturing: number;
     stageName: string;
     capturePercent: number;
+    socket: yolkws | null;
 }
 
 export interface Pathing {
@@ -115,6 +116,7 @@ export interface Pathing {
 }
 
 export interface BotState {
+    name: string;
     reloading: boolean;
     swappingGun: boolean;
     usingMelee: boolean;
@@ -151,14 +153,12 @@ export class Bot {
     me: GamePlayer;
     game: Game;
     account: Account;
-    gameSocket: yolkws | null;
     ping: number;
     lastPingTime: number;
     lastDeathTime: number;
     lastChatTime: number;
     lastUpdateTime: number;
     controlKeys: number;
-    initTime: number;
     pathing: Pathing;
     matchmaker: Matchmaker | null;
 

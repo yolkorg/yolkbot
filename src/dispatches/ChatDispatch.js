@@ -17,7 +17,7 @@ export class ChatDispatch {
     }
 
     execute(bot) {
-        new packet.ChatPacket(this.msg).execute(bot.gameSocket);
+        new packet.ChatPacket(this.msg).execute(bot.game.socket);
         bot.lastChatTime = Date.now();
     }
 }

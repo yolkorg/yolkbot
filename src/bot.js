@@ -64,6 +64,9 @@ export class Bot {
 
         // private information NOT FOR OTHER PLAYERS!!
         this.state = {
+            // kept for specifying socket open sequence
+            name: '',
+
             // tracking for dispatch checks
             reloading: false,
             swappingGun: false,
@@ -79,6 +82,7 @@ export class Bot {
         this.game = {
             raw: {}, // matchmaker response
             code: '',
+            socket: null,
 
             // data given on sign in
             gameModeId: 0, // assume ffa
@@ -195,7 +199,7 @@ export class Bot {
         this._dispatches = [];
         this._packetQueue = [];
 
-        this.gameSocket = null;
+        this.matchmaker = null;
 
         this.ping = 0;
         this.lastPingTime = -1;
@@ -205,8 +209,6 @@ export class Bot {
         this.lastUpdateTime = -1;
 
         this.controlKeys = 0;
-
-        this.initTime = Date.now();
 
         this.pathing = {
             nodeList: null,
@@ -348,7 +350,7 @@ export class Bot {
                 out = CommOut.getBuffer();
                 out.packInt8(CommCode.joinGame);
 
-                out.packString(this.name); // name
+                out.packString(this.state.name); // name
                 out.packString(this.game.raw.uuid); // game id
 
                 out.packInt8(0); // hidebadge
@@ -358,7 +360,7 @@ export class Bot {
                 out.packString(this.account.firebaseId); // firebase id
                 out.packString(this.account.sessionId); // session id
 
-                out.send(this.gameSocket);
+                out.send(this.game.socket);
                 break;
 
             case CommCode.gameJoined: {
@@ -389,11 +391,9 @@ export class Bot {
 
                 const out = CommOut.getBuffer();
                 out.packInt8(CommCode.clientReady);
-                out.send(this.gameSocket);
+                out.send(this.game.socket);
 
-                this.gameSocket.onmessage = (msg) => this._packetQueue.push(msg.data);
-
-                // console.log(`Successfully joined ${this.game.code}. Startup to join time: ${Date.now() - this.initTime} ms`);
+                this.game.socket.onmessage = (msg) => this._packetQueue.push(msg.data);
 
                 if (this.autoUpdate)
                     setInterval(() => this.update(), this.updateInterval);
@@ -401,7 +401,7 @@ export class Bot {
                 if (this.intents.includes(this.Intents.PING)) {
                     const out = CommOut.getBuffer();
                     out.packInt8(CommCode.ping);
-                    out.send(this.gameSocket);
+                    out.send(this.game.socket);
                     this.lastPingTime = Date.now();
                 }
                 break;
@@ -411,7 +411,7 @@ export class Bot {
                 // console.log("Echoed eventModifier"); // why the fuck do you need to do this
                 out = CommOut.getBuffer();
                 out.packInt8(CommCode.eventModifier);
-                out.send(this.gameSocket);
+                out.send(this.game.socket);
                 break;
 
             case CommCode.requestGameOptions:
@@ -478,7 +478,7 @@ export class Bot {
     }
 
     async join(name, data) {
-        this.name = name || 'yolkbot';
+        this.state.name = name || 'yolkbot';
 
         if (typeof data == 'string') {
             if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
@@ -500,17 +500,17 @@ export class Bot {
 
         // console.log(`Joining ${this.game.raw.id} using proxy ${this.proxy || 'none'}`);
 
-        this.gameSocket = new yolkws(`wss://${this.game.raw.subdomain}.${this.instance}/game/${this.game.raw.id}`, this.proxy);
+        this.game.socket = new yolkws(`wss://${this.game.raw.subdomain}.${this.instance}/game/${this.game.raw.id}`, this.proxy);
 
-        this.gameSocket.binaryType = 'arraybuffer';
+        this.game.socket.binaryType = 'arraybuffer';
 
-        this.gameSocket.onopen = () => {
+        this.game.socket.onopen = () => {
             // console.log('Successfully connected to game server.');
         }
 
-        this.gameSocket.onmessage = this.#onGameMesssage.bind(this);
+        this.game.socket.onmessage = this.#onGameMesssage.bind(this);
 
-        this.gameSocket.onclose = (e) => {
+        this.game.socket.onclose = (e) => {
             // console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
             this.#emit('close', e.code);
         }
@@ -603,7 +603,7 @@ export class Bot {
                 out.packRad(this.me.view.pitch); // pitch
                 out.packInt8(100); // fixes commcode issues, does nothing
             }
-            out.send(this.gameSocket);
+            out.send(this.game.socket);
 
             this.lastUpdateTime = Date.now();
             this.state.shotsFired = 0;
@@ -1004,7 +1004,7 @@ export class Bot {
     #processEventModifierPacket() {
         const out = CommOut.getBuffer();
         out.packInt8(CommCode.eventModifier);
-        out.send(this.gameSocket);
+        out.send(this.game.socket);
     }
 
     #processRemovePlayerPacket() {
@@ -1225,7 +1225,7 @@ export class Bot {
         setTimeout(() => {
             const out = CommOut.getBuffer();
             out.packInt8(CommCode.ping);
-            out.send(this.gameSocket);
+            out.send(this.game.socket);
             this.lastPingTime = Date.now();
         }, this.pingInterval);
     }

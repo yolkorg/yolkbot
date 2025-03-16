@@ -21,7 +21,7 @@ export class GameOptionsDispatch {
     }
 
     execute(bot) {
-        new packet.GameOptionsPacket(bot.game.options).execute(bot.gameSocket);
+        new packet.GameOptionsPacket(bot.game.options).execute(bot.game.socket);
     }
 }
 

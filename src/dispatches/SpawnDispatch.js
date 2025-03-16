@@ -8,7 +8,7 @@ export class SpawnDispatch {
     }
 
     execute(bot) {
-        new packet.RespawnPacket().execute(bot.gameSocket);
+        new packet.RespawnPacket().execute(bot.game.socket);
 
         bot.lastSpawnedTime = Date.now();
         bot.me.playing = true;

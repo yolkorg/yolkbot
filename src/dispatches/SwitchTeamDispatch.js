@@ -24,7 +24,7 @@ export class SwitchTeamDispatch {
     }
 
     execute(bot) {
-        new packet.TeamSwitchingTraitorPacket().execute(bot.gameSocket);
+        new packet.TeamSwitchingTraitorPacket().execute(bot.game.socket);
     }
 }
 

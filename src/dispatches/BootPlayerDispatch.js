@@ -10,7 +10,7 @@ export class BootPlayerDispatch {
     }
 
     execute(bot) {
-        new packet.BootPacket(this.uniqueId).execute(bot.gameSocket);
+        new packet.BootPacket(this.uniqueId).execute(bot.game.socket);
     }
 }
 

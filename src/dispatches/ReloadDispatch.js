@@ -6,7 +6,7 @@ export class ReloadDispatch {
     }
 
     execute(bot) {
-        new packet.ReloadPacket().execute(bot.gameSocket);
+        new packet.ReloadPacket().execute(bot.game.socket);
 
         bot.processReloadPacket(bot.me.id, true);
 

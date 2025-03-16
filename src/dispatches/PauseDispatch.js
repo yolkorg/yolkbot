@@ -6,7 +6,7 @@ export class PauseDispatch {
     }
 
     execute(bot) {
-        new packet.PausePacket().execute(bot.gameSocket);
+        new packet.PausePacket().execute(bot.game.socket);
         setTimeout(() => bot.me.playing = false, 3000); 
     }
 }

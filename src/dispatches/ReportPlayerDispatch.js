@@ -39,7 +39,7 @@ export class ReportPlayerDispatch {
 
         if (!target) throw new Error('target player for ReportPlayerDispatch not found')
 
-        new packet.ReportPacket(target, this.reasonInt).execute(bot.gameSocket);
+        new packet.ReportPacket(target, this.reasonInt).execute(bot.game.socket);
     }
 }
 

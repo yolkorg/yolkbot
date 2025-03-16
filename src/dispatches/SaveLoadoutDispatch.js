@@ -90,7 +90,7 @@ export class SaveLoadoutDispatch {
 
         saveLoadout.then(() => {
             if (bot.state.joinedGame)
-                new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.gameSocket);
+                new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.game.socket);
 
             const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
 

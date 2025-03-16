@@ -15,7 +15,7 @@ export class ThrowGrenadeDispatch {
     }
 
     execute(bot) {
-        new packet.ThrowGrenadePacket(this.power).execute(bot.gameSocket);
+        new packet.ThrowGrenadePacket(this.power).execute(bot.game.socket);
     }
 }
 
