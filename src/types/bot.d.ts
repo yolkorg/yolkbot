@@ -1,9 +1,9 @@
 import { NodeList } from '../pathing/mapnode.js';
 
 import { Character, GamePlayer } from './bot/GamePlayer';
+import { AnyGun } from './constants/guns';
 import { Map } from './constants/maps';
 import { ADispatch } from './dispatches/index';
-import { Gun } from './gun';
 import { Matchmaker, RawGameData } from './matchmaker';
 import yolkws from './socket';
 
@@ -182,7 +182,7 @@ export class Bot {
     on(event: 'banned', cb: (banRemaining: string) => void): void;
     on(event: 'chat', cb: (player: GamePlayer | undefined, message: string, flags: number) => void): void;
     on(event: 'close', cb: (code: number) => void): void;
-    on(event: 'collectAmmo', cb: (player: GamePlayer, weapon: Gun) => void): void;
+    on(event: 'collectAmmo', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'collectGrenade', cb: (player: GamePlayer) => void): void;
     on(event: 'gameForcePause', cb: () => void): void;
     on(event: 'gameOptionsChange', cb: (oldOptions: GameOptions, newOptions: GameOptions) => void): void;
@@ -194,12 +194,12 @@ export class Bot {
     on(event: 'playerChangeGun', cb: (player: GamePlayer, oldGun: number, newGun: number) => void): void;
     on(event: 'playerDamaged', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
     on(event: 'playerDeath', cb: (player: GamePlayer, killer: GamePlayer) => void): void;
-    on(event: 'playerFire', cb: (player: GamePlayer, weapon: Gun) => void): void;
+    on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'playerJoin', cb: (player: GamePlayer) => void): void;
     on(event: 'playerLeave', cb: (player: GamePlayer) => void): void;
     on(event: 'playerMelee', cb: (player: GamePlayer) => void): void;
     on(event: 'playerPause', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerReload', cb: (player: GamePlayer, weapon: Gun) => void): void;
+    on(event: 'playerReload', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
