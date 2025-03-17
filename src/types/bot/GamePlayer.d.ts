@@ -50,9 +50,9 @@ export interface PlayerData {
 }
 
 export interface Social {
-    // another property but i forgot it
-    id: string;
+    id: number;
     url: string;
+    active: boolean;
 }
 
 export class GamePlayer {
