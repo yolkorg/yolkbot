@@ -33,8 +33,17 @@ export class Matchmaker {
         this.#createSocket(params.instance);
     }
 
-    #createSocket(instance) {
-        this.ws = new yolkws(`wss://${instance}/matchmaker/`, this.proxy);
+    async #createSocket(instance) {
+        const attempt = async () => {
+            try {
+                this.ws = new yolkws(`wss://${instance}/matchmaker/`, this.proxy);
+            } catch {
+                await new Promise((resolve) => setTimeout(resolve, 100));
+                await attempt();
+            }
+        }
+
+        await attempt();
 
         this.ws.onopen = () => {
             this.connected = true;

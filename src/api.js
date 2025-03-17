@@ -8,9 +8,20 @@ let SocksProxyAgent;
 if (!IsBrowser) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
 
 const queryServices = async (request, proxy = '', instance = 'shellshock.io') => {
-    return new Promise((resolve) => {
-        const ws = new yolkws(`wss://${instance}/services/`, proxy);
+    let ws;
 
+    const attempt = async () => {
+        try {
+            ws = new yolkws(`wss://${instance}/services/`, proxy);
+        } catch {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            await attempt();
+        }
+    }
+
+    await attempt();
+
+    return new Promise((resolve) => {
         ws.onopen = () => {
             // console.log('opened')
             ws.send(JSON.stringify(request));

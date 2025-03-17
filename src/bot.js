@@ -500,7 +500,16 @@ export class Bot {
 
         // console.log(`Joining ${this.game.raw.id} using proxy ${this.proxy || 'none'}`);
 
-        this.game.socket = new yolkws(`wss://${this.game.raw.subdomain}.${this.instance}/game/${this.game.raw.id}`, this.proxy);
+        const attempt = async () => {
+            try {
+                this.game.socket = new yolkws(`wss://${this.game.raw.subdomain}.${this.instance}/game/${this.game.raw.id}`, this.proxy);
+            } catch {
+                await new Promise((resolve) => setTimeout(resolve, 100));
+                await attempt();
+            }
+        }
+
+        await attempt();
 
         this.game.socket.binaryType = 'arraybuffer';
 
