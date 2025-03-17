@@ -2,7 +2,7 @@ name: Update Maps & Items
 
 on:
   schedule:
-    - cron: '*/60 * * * *'
+    - cron: '*/10 * * * *'
 
 permissions:
   contents: write
@@ -20,9 +20,6 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
 
       - name: Run scrapers
         run: |
