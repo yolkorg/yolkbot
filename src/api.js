@@ -1,6 +1,11 @@
+import axios from 'axios';
+
 import yolkws from './socket.js';
 
-import { FirebaseKey, UserAgent } from '#constants';
+import { FirebaseKey, IsBrowser, UserAgent } from '#constants';
+
+let SocksProxyAgent;
+if (!IsBrowser) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
 
 const queryServices = async (request, proxy = '', instance = 'shellshock.io') => {
     return new Promise((resolve) => {
@@ -66,19 +71,18 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
 
     while (!SUCCESS) {
         try {
-            request = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                    returnSecureToken: true
-                }),
+            request = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
+                email: email,
+                password: password,
+                returnSecureToken: true
+            }, {
                 headers: {
                     'user-agent': UserAgent,
                     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
-                }
+                },
+                httpsAgent: new SocksProxyAgent(prox)
             })
-            body = await request.json();
+            body = request.data
             token = body.idToken;
             SUCCESS = true;
         } catch (error) {
@@ -111,16 +115,16 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
 }
 
 async function loginAnonymously(prox = '', instance = 'shellshock.io') {
-    const request = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
-        method: 'POST',
-        body: JSON.stringify({ returnSecureToken: true }),
+    const { data: body } = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
+        returnSecureToken: true
+    }, {
         headers: {
             'user-agent': UserAgent,
             'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
-        }
-    })
+        },
+        httpsAgent: new SocksProxyAgent(prox)
+    });
 
-    const body = await request.json();
     const token = body.idToken;
 
     if (!token) {
