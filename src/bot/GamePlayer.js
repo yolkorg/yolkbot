@@ -13,7 +13,7 @@ export class GamePlayer {
 
         this.playing = playerData.playing_;
 
-        this.social = playerData.social && JSON.parse(playerData.social_);
+        this.social = playerData.social_ && JSON.parse(playerData.social_);
         this.showBadge = !playerData.hideBadge_ || false;
 
         this.position = {
