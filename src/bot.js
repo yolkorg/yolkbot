@@ -1536,6 +1536,8 @@ export class Bot {
             if (response.error == 'RATELIMITED') {
                 await this.checkChiknWinner();
                 return 'on_cooldown';
+            } else if (response.error == 'SESSION_EXPIRED') {
+                return 'session_expired';
             } else {
                 console.error('Unknown Chikn Winner response', response);
                 return 'unknown_error';
