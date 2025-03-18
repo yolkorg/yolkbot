@@ -1445,6 +1445,23 @@ export class Bot {
         else this.#emit('rocketHit', { x, y, z }, damage, radius);
     }
 
+    #processThrowGrenadePacket() {
+        const id = CommIn.unPackInt8U();
+        const x = CommIn.unPackFloat();
+        const y = CommIn.unPackFloat();
+        const z = CommIn.unPackFloat();
+        const dx = CommIn.unPackFloat();
+        const dy = CommIn.unPackFloat();
+        const dz = CommIn.unPackFloat();
+
+        const player = this.players[id];
+
+        if (player) {
+            player.grenades--;
+            this.#emit('playerThrowGrenade', player, { x, y, z }, { x: dx, y: dy, z: dz });
+        }
+    }
+
     #handlePacket(packet) {
         CommIn.init(packet);
 
@@ -1547,6 +1564,10 @@ export class Bot {
                 this.#processExplodePacket();
                 break;
 
+            case CommCode.throwGrenade:
+                this.#processThrowGrenadePacket();
+                break;
+
             case CommCode.spawnItem:
                 this.#processSpawnItemPacket();
                 break;
@@ -1577,10 +1598,6 @@ export class Bot {
             case CommCode.challengeCompleted:
                 // we do not plan to implement these
                 // for more info, see comm/codes.js
-                break;
-
-            case CommCode.throwGrenade:
-                // do nothing
                 break;
 
             default:
