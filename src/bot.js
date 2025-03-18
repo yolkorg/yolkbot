@@ -1714,6 +1714,88 @@ export class Bot {
 
         return targetPlayer;
     }
+
+    async refreshBalance() {
+        const result = await queryServices({
+            cmd: 'checkBalance',
+            firebaseId: this.account.firebaseId,
+            sessionId: this.account.sessionId
+        }, this.proxy, this.instance);
+
+        this.account.eggBalance = result.currentBalance;
+
+        return result.currentBalance;
+    }
+
+    async redeemCode(code) {
+        const result = await queryServices({
+            cmd: 'redeem',
+            firebaseId: this.account.firebaseId,
+            sessionId: this.account.sessionId,
+            id: this.account.id,
+            code
+        }, this.proxy, this.instance);
+
+        if (result.result === 'SUCCESS') {
+            this.account.eggBalance = result.eggs_given;
+            result.item_ids.forEach((id) => this.account.ownedItemIds.push(id));
+
+            return {
+                result,
+                eggsGiven: result.eggs_given,
+                itemIds: result.item_ids
+            };
+        } else return result;
+    }
+
+    async claimURLReward(reward) {
+        const result = await queryServices({
+            cmd: 'urlRewardParams',
+            firebaseId: this.account.firebaseId,
+            sessionId: this.account.sessionId,
+            reward
+        }, this.proxy, this.instance);
+
+        if (result.result === 'SUCCESS') {
+            this.account.eggBalance += result.eggsGiven;
+            result.itemIds.forEach((id) => this.account.ownedItemIds.push(id));
+        }
+
+        return result;
+    }
+
+    async claimSocialReward(rewardTag) {
+        const result = await queryServices({
+            cmd: 'reward',
+            firebaseId: this.account.firebaseId,
+            sessionId: this.account.sessionId,
+            rewardTag
+        }, this.proxy, this.instance);
+
+        if (result.result === 'SUCCESS') {
+            this.account.eggBalance += result.eggsGiven;
+            result.itemIds.forEach((id) => this.account.ownedItemIds.push(id));
+        }
+
+        return result;
+    }
+
+    async buyItem(itemId) {
+        const result = await queryServices({
+            cmd: 'buy',
+            firebaseId: this.account.firebaseId,
+            sessionId: this.account.sessionId,
+            itemId,
+            save: true
+        }, this.proxy, this.instance);
+
+        if (result.result === 'SUCCESS') {
+            this.account.eggBalance = result.currentBalance;
+            this.account.ownedItemIds.push(result.itemId);
+        }
+
+        return result;
+    }
 }
 
 export default Bot;

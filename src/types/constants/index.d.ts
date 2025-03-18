@@ -80,9 +80,21 @@ export declare const ShellStreaks: {
     MiniEgg: number;
 };
 
+export declare const SocialRewards: {
+    Discord: string;
+    Tiktok: string;
+    Instagram: string;
+    Steam: string;
+    Facebook: string;
+    Twitter: string;
+    Twitch: string;
+}
+
 export declare const Teams: {
     blue: number;
     red: number;
 };
+
+export declare const URLRewards: string[];
 
 export declare const UserAgent: string;

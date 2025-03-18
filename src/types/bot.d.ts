@@ -228,6 +228,12 @@ export class Bot {
     checkChiknWinner(): Promise<ChiknWinnerStatus>;
     playChiknWinner(): Promise<ChiknWinnerResponse | string>;
     resetChiknWinner(): Promise<ChiknWinnerStatus>;
+
+    refreshBalance(): Promise<number>;
+    redeemCode(code: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
+    claimURLReward(reward: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
+    claimSocialReward(rewardTag: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
+    buyItem(itemId: number): Promise<{ result: string; currentBalance: number; itemId: number; }>;
 }
 
 export default Bot;
