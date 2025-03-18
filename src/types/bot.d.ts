@@ -175,6 +175,8 @@ export class Bot {
     dispatch(disp: ADispatch): void;
     update(): void;
 
+    canSee(player: GamePlayer): boolean;
+
     onAny(cb: Function): void;
 
     on(event: 'authFail', cb: (reason: string) => void): void;

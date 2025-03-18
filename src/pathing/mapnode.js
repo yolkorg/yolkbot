@@ -87,6 +87,34 @@ class NodeList {
             node.closed = undefined;
         }
     }
+
+    hasLineOfSight(bot, target) {
+        const dx = target.x - bot.x;
+        const dy = target.y - bot.y;
+        const dz = target.z - bot.z;
+
+        const steps = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
+
+        const xStep = dx / steps;
+        const yStep = dy / steps;
+        const zStep = dz / steps;
+
+        let x = bot.x;
+        let y = bot.y;
+        let z = bot.z;
+
+        for (let i = 0; i <= steps; i++) {
+            const node = this.at(Math.round(x), Math.round(y), Math.round(z));
+            if (node && node.isSolid()) {
+                return false;
+            }
+            x += xStep;
+            y += yStep;
+            z += zStep;
+        }
+
+        return true;
+    }
 }
 
 class MapNode {

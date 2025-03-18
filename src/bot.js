@@ -1576,6 +1576,11 @@ export class Bot {
 
         return this.account.cw;
     }
+
+    canSee(target) {
+        if (!this.intents.includes(this.Intents.PATHFINDING)) throw new Error('You must have the PATHFINDING intent to use this method.');
+        return this.pathing.nodeList.hasLineOfSight(this.me.position, target.position);
+    }
 }
 
 export default Bot;
