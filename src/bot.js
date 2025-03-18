@@ -831,11 +831,6 @@ export class Bot {
         }
 
         this.#emit('playerJoin', this.players[playerData.id_]);
-
-        const unp = CommIn.unPackInt8U();
-        if (unp == CommCode.addPlayer) { // there is another player stacked
-            this.#processAddPlayerPacket();
-        }
     }
 
     #processRespawnPacket() {
@@ -910,7 +905,9 @@ export class Bot {
                     CommIn.unPackInt8U();
                     CommIn.unPackRadU();
                     CommIn.unPackRad();
+                    CommIn.unPackInt8U();
                 }
+                return;
             }
 
             let yaw, pitch;
@@ -922,11 +919,20 @@ export class Bot {
 
                 pitch = CommIn.unPackRad();
                 if (!isNaN(pitch)) player.buffer[i2].pitch_ = pitch
+
+                CommIn.unPackInt8U();
             }
 
             player.buffer[0].x = x;
             player.buffer[0].y = y;
             player.buffer[0].z = z;
+        } else {
+            for (let i2 = 0; i2 < 3; i2++) {
+                CommIn.unPackInt8U();
+                CommIn.unPackRadU();
+                CommIn.unPackRad();
+                CommIn.unPackInt8U();
+            }
         }
     }
 
@@ -953,15 +959,13 @@ export class Bot {
     #processDeathPacket() {
         const killedId = CommIn.unPackInt8U();
         const byId = CommIn.unPackInt8U();
-        // const rs = CommIn.unPackInt8U();
+
+        CommIn.unPackInt8U();
+        CommIn.unPackInt8U();
+        CommIn.unPackInt8U();
 
         const killed = this.players[killedId];
         const killer = this.players[byId];
-
-        /*
-        const killerLastDmg = CommIn.unPackInt8U();
-        const killedLastDmg = CommIn.unPackInt8U();
-        */
 
         if (killed) {
             killed.playing = false;
@@ -978,6 +982,9 @@ export class Bot {
 
     #processFirePacket() {
         const id = CommIn.unPackInt8U();
+
+        for (let i = 0; i < 6; i++)
+            CommIn.unPackFloat();
 
         const player = this.players[id];
         const playerWeapon = player.weapons[player.activeGun];
@@ -1039,8 +1046,11 @@ export class Bot {
 
     #processHitMePacket() {
         const hp = CommIn.unPackInt8U();
-        const oldHp = this.me.hp;
 
+        CommIn.unPackFloat();
+        CommIn.unPackFloat();
+
+        const oldHp = this.me.hp;
         this.me.hp = hp;
 
         this.#emit('selfDamaged', oldHp, this.me.hp);
@@ -1059,6 +1069,10 @@ export class Bot {
         const newX = CommIn.unPackFloat();
         const newY = CommIn.unPackFloat();
         const newZ = CommIn.unPackFloat();
+
+        CommIn.unPackInt8U();
+        CommIn.unPackInt8U();
+        CommIn.unPackInt8U();
 
         const oldX = player.position.x;
         const oldY = player.position.y;
@@ -1124,6 +1138,9 @@ export class Bot {
             this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
 
             this.#emit('gameStateChange', this.game);
+        } else if (this.game.gameModeId == GameModes.team) {
+            this.game.teamScore[1] = CommIn.unPackInt16U();
+            this.game.teamScore[2] = CommIn.unPackInt16U();
         }
 
         if (this.game.gameModeId !== GameModes.spatula) {
@@ -1141,7 +1158,7 @@ export class Bot {
             delete this.game.activeZone;
         }
 
-        if (this.game.gameModeId !== GameModes.spatula && this.game.gameModeId !== GameModes.kotc) {
+        if (this.game.gameModeId == GameModes.ffa) {
             delete this.game.teamScore;
         }
     }
@@ -1217,6 +1234,9 @@ export class Bot {
     #processHitShieldPacket() {
         const hb = CommIn.unPackInt8U();
         const hp = CommIn.unPackInt8U();
+
+        CommIn.unPackFloat();
+        CommIn.unPackFloat();
 
         this.me.hpShield = hb;
         this.me.hp = hp;
@@ -1334,6 +1354,9 @@ export class Bot {
         const grenadeIdx = CommIn.unPackInt16U();
         const meleeIdx = CommIn.unPackInt16U();
 
+        CommIn.unPackInt8();
+        CommIn.unPackInt8();
+
         const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
 
         const primaryWeaponItem = findItemById(primaryWeaponIdx);
@@ -1385,7 +1408,8 @@ export class Bot {
         if (player) this.#emit('playerMelee', player);
     }
 
-    // we do this since reload doesn't get emitted to ourselves
+    // we do this since reload doesn't get emitted for the bot itself
+    // so we simulate it when calling a reload dispatch
     processReloadPacket(customPlayer, iUnderstandThisIsForInternalUseOnlyAndIShouldNotBeCallingThis) {
         if (!iUnderstandThisIsForInternalUseOnlyAndIShouldNotBeCallingThis)
             throw new Error('processReloadPacket is exposed for internal use only. do not call it.');
@@ -1465,144 +1489,160 @@ export class Bot {
     #handlePacket(packet) {
         CommIn.init(packet);
 
-        const cmd = CommIn.unPackInt8U();
+        let lastCommand = 0;
+        let abort = false;
 
-        switch (cmd) {
-            case CommCode.syncThem:
-                this.#processExternalSyncPacket(packet);
-                break;
+        while (CommIn.isMoreDataAvailable() && !abort) {
+            const cmd = CommIn.unPackInt8U();
 
-            case CommCode.fire:
-                this.#processFirePacket(packet);
-                break;
+            switch (cmd) {
+                case CommCode.syncThem:
+                    this.#processExternalSyncPacket(packet);
+                    break;
 
-            case CommCode.hitThem:
-                this.#processHitThemPacket(packet);
-                break;
+                case CommCode.fire:
+                    this.#processFirePacket(packet);
+                    break;
 
-            case CommCode.syncMe:
-                this.#processSyncMePacket(packet);
-                break;
+                case CommCode.hitThem:
+                    this.#processHitThemPacket(packet);
+                    break;
 
-            case CommCode.hitMe:
-                this.#processHitMePacket(packet);
-                break;
+                case CommCode.syncMe:
+                    this.#processSyncMePacket(packet);
+                    break;
 
-            case CommCode.swapWeapon:
-                this.#processSwapWeaponPacket(packet);
-                break;
+                case CommCode.hitMe:
+                    this.#processHitMePacket(packet);
+                    break;
 
-            case CommCode.collectItem:
-                this.#processCollectPacket(packet);
-                break;
+                case CommCode.swapWeapon:
+                    this.#processSwapWeaponPacket(packet);
+                    break;
 
-            case CommCode.respawn:
-                this.#processRespawnPacket(packet);
-                break;
+                case CommCode.collectItem:
+                    this.#processCollectPacket(packet);
+                    break;
 
-            case CommCode.die:
-                this.#processDeathPacket(packet);
-                break;
+                case CommCode.respawn:
+                    this.#processRespawnPacket(packet);
+                    break;
 
-            case CommCode.pause:
-                this.#processPausePacket(packet);
-                break;
+                case CommCode.die:
+                    this.#processDeathPacket(packet);
+                    break;
 
-            case CommCode.chat:
-                this.#processChatPacket(packet);
-                break;
+                case CommCode.pause:
+                    this.#processPausePacket(packet);
+                    break;
 
-            case CommCode.addPlayer:
-                this.#processAddPlayerPacket(packet);
-                break;
+                case CommCode.chat:
+                    this.#processChatPacket(packet);
+                    break;
 
-            case CommCode.removePlayer:
-                this.#processRemovePlayerPacket(packet);
-                break;
+                case CommCode.addPlayer:
+                    this.#processAddPlayerPacket(packet);
+                    break;
 
-            case CommCode.eventModifier:
-                this.#processEventModifierPacket(packet);
-                break;
+                case CommCode.removePlayer:
+                    this.#processRemovePlayerPacket(packet);
+                    break;
 
-            case CommCode.metaGameState:
-                this.#processGameStatePacket(packet);
-                break;
+                case CommCode.eventModifier:
+                    this.#processEventModifierPacket(packet);
+                    break;
 
-            case CommCode.beginShellStreak:
-                this.#processBeginStreakPacket(packet);
-                break;
+                case CommCode.metaGameState:
+                    this.#processGameStatePacket(packet);
+                    break;
 
-            case CommCode.endShellStreak:
-                this.#processEndStreakPacket(packet);
-                break;
+                case CommCode.beginShellStreak:
+                    this.#processBeginStreakPacket(packet);
+                    break;
 
-            case CommCode.hitMeHardBoiled:
-                this.#processHitShieldPacket(packet);
-                break;
+                case CommCode.endShellStreak:
+                    this.#processEndStreakPacket(packet);
+                    break;
 
-            case CommCode.gameOptions:
-                this.#processGameOptionsPacket(packet);
-                break;
+                case CommCode.hitMeHardBoiled:
+                    this.#processHitShieldPacket(packet);
+                    break;
 
-            case CommCode.ping:
-                this.#processPingPacket(packet);
-                break;
+                case CommCode.gameOptions:
+                    this.#processGameOptionsPacket(packet);
+                    break;
 
-            case CommCode.switchTeam:
-                this.#processSwitchTeamPacket(packet);
-                break;
+                case CommCode.ping:
+                    this.#processPingPacket(packet);
+                    break;
 
-            case CommCode.changeCharacter:
-                this.#processChangeCharacterPacket(packet);
-                break;
+                case CommCode.switchTeam:
+                    this.#processSwitchTeamPacket(packet);
+                    break;
 
-            case CommCode.reload:
-                this.processReloadPacket(null, true);
-                break;
+                case CommCode.changeCharacter:
+                    this.#processChangeCharacterPacket(packet);
+                    break;
 
-            case CommCode.explode:
-                this.#processExplodePacket();
-                break;
+                case CommCode.reload:
+                    this.processReloadPacket(null, true);
+                    break;
 
-            case CommCode.throwGrenade:
-                this.#processThrowGrenadePacket();
-                break;
+                case CommCode.explode:
+                    this.#processExplodePacket();
+                    break;
 
-            case CommCode.spawnItem:
-                this.#processSpawnItemPacket();
-                break;
+                case CommCode.throwGrenade:
+                    this.#processThrowGrenadePacket();
+                    break;
 
-            case CommCode.melee:
-                this.#processMeleePacket();
-                break;
+                case CommCode.spawnItem:
+                    this.#processSpawnItemPacket();
+                    break;
 
-            case CommCode.updateBalance:
-                this.#processUpdateBalancePacket(packet);
-                break;
+                case CommCode.melee:
+                    this.#processMeleePacket();
+                    break;
 
-            case CommCode.gameAction:
-                this.#processGameActionPacket(packet);
-                break;
+                case CommCode.updateBalance:
+                    this.#processUpdateBalancePacket(packet);
+                    break;
 
-            case CommCode.requestGameOptions:
-                this.#processGameRequestOptionsPacket();
-                break;
+                case CommCode.gameAction:
+                    this.#processGameActionPacket(packet);
+                    break;
 
-            case CommCode.respawnDenied:
-                this.#processRespawnDeniedPacket(packet);
-                break;
+                case CommCode.requestGameOptions:
+                    this.#processGameRequestOptionsPacket();
+                    break;
 
-            case CommCode.clientReady:
-            case CommCode.expireUpgrade:
-            case CommCode.musicInfo:
-            case CommCode.challengeCompleted:
+                case CommCode.respawnDenied:
+                    this.#processRespawnDeniedPacket(packet);
+                    break;
+
                 // we do not plan to implement these
                 // for more info, see comm/codes.js
-                break;
+                case CommCode.clientReady:
+                case CommCode.expireUpgrade:
+                    break;
 
-            default:
-                console.error(`handlePacket: I got but did not handle a: ${Object.entries(CommCode).filter(([, v]) => v == cmd)[0][0]}`);
-                break;
+                case CommCode.musicInfo:
+                    CommIn.unPackLongString();
+                    break;
+
+                case CommCode.challengeCompleted:
+                    CommIn.unPackInt8U();
+                    CommIn.unPackInt8U();
+                    break;
+
+                default:
+                    console.error(`handlePacket: I got but did not handle a: ${Object.keys(CommCode).find(k => CommCode[k] === cmd)}`);
+                    if (lastCommand) console.error(`handlePacket: It may be a result of the ${lastCommand} command.`);
+                    abort = true
+                    break;
+            }
+
+            lastCommand = Object.keys(CommCode).find(k => CommCode[k] === cmd);
         }
     }
 
