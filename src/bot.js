@@ -100,8 +100,10 @@ export class Bot {
                 },
                 availability: 'both',
                 numPlayers: '18',
+
                 raw: {},
-                nodes: {}
+                nodes: {},
+                zones: []
             },
             playerLimit: 0,
             isGameOwner: false,
@@ -137,7 +139,8 @@ export class Bot {
 
             // data from kotc
             stage: CoopStates.capturing,
-            activeZone: 0,
+            zoneNumber: 0,
+            activeZone: [],
             capturing: 0,
             captureProgress: 0,
             numCapturing: 0,
@@ -376,6 +379,7 @@ export class Bot {
                 if (this.intents.includes(this.Intents.PATHFINDING)) {
                     this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
                     this.pathing.nodeList = new NodeList(this.game.map.raw);
+                    this.#initKotcZones();
                 }
                 // console.log("Map:", this.game.map);
                 this.game.playerLimit = CommIn.unPackInt8U();
@@ -676,6 +680,64 @@ export class Bot {
             const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();
             return data;
         }
+    }
+
+    #initKotcZones() {
+        const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
+        if (!meshData) delete this.game.map.zones;
+
+        let numCaptureZones = 0;
+        const mapData = {};
+        const zones = [];
+
+        for (const cell of meshData) {
+            if (!mapData[cell.x]) mapData[cell.x] = {};
+            if (!mapData[cell.x][cell.y]) mapData[cell.x][cell.y] = {};
+            mapData[cell.x][cell.y][cell.z] = { zone: null };
+        }
+
+        const offsets = [
+            { x: -1, z: 0 },
+            { x: 1, z: 0 },
+            { x: 0, z: -1 },
+            { x: 0, z: 1 }
+        ];
+
+        function getMapCellAt(x, y, z) {
+            return mapData[x] && mapData[x][y] && mapData[x][y][z] ? mapData[x][y][z] : null;
+        }
+
+        for (const cellA of meshData) {
+            if (!mapData[cellA.x][cellA.y][cellA.z].zone) {
+                cellA.zone = ++numCaptureZones;
+                mapData[cellA.x][cellA.y][cellA.z].zone = cellA.zone;
+
+                const currentZone = [cellA];
+                let hits;
+
+                do {
+                    hits = 0;
+                    for (const cellB of meshData) {
+                        if (!mapData[cellB.x][cellB.y][cellB.z].zone) {
+                            for (const o of offsets) {
+                                const cell = getMapCellAt(cellB.x + o.x, cellB.y, cellB.z + o.z);
+                                if (cell && cell.zone == cellA.zone) {
+                                    hits++;
+                                    cellB.zone = cellA.zone;
+                                    mapData[cellB.x][cellB.y][cellB.z].zone = cellA.zone;
+                                    currentZone.push(cellB);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } while (hits > 0);
+
+                zones.push(currentZone);
+            }
+        }
+
+        this.game.map.zones = zones;
     }
 
     #processChatPacket() {
@@ -1048,7 +1110,7 @@ export class Bot {
             this.#emit('gameStateChange', this.game);
         } else if (this.game.gameModeId == GameModes.kotc) {
             this.game.stage = CommIn.unPackInt8U(); // constants.CoopStates
-            this.game.activeZone = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
+            this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
             this.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
             this.game.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
             this.game.numCapturing = CommIn.unPackInt8U(); // number of players capturing - number/1000
@@ -1058,6 +1120,7 @@ export class Bot {
             // not in shell, for utility purposes =D
             this.game.stageName = CoopStagesById[this.game.stage]; // name of the stage ('start' / 'capturing' / 'etc')
             this.game.capturePercent = this.game.captureProgress / 1000; // progress of the capture as a percentage
+            this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
 
             this.#emit('gameStateChange', this.game);
         }
@@ -1068,10 +1131,13 @@ export class Bot {
 
         if (this.game.gameModeId !== GameModes.kotc) {
             delete this.game.stage;
-            delete this.game.activeZone;
+            delete this.game.zoneNumber;
             delete this.game.capturing;
             delete this.game.captureProgress;
-            delete this.game.numCapturing
+            delete this.game.numCapturing;
+            delete this.game.stageName;
+            delete this.game.numCapturing;
+            delete this.game.activeZone;
         }
 
         if (this.game.gameModeId !== GameModes.spatula && this.game.gameModeId !== GameModes.kotc) {
@@ -1211,7 +1277,8 @@ export class Bot {
             this.game.spatula.coords = { x: 0, y: 0, z: 0 };
 
             this.game.stage = CoopStates.capturing;
-            this.game.activeZone = 0;
+            this.game.zoneNumber = 0;
+            this.game.activeZone = null;
             this.game.capturing = 0;
             this.game.captureProgress = 0;
             this.game.numCapturing = 0;

@@ -66,6 +66,13 @@ export interface Collectable {
     z: number;
 }
 
+export interface Zone {
+    x: number;
+    y: number;
+    z: number;
+    zone: number;
+}
+
 export interface Game {
     raw: RawGameData;
     code: string;
@@ -85,6 +92,7 @@ export interface Game {
         availability: string;
         numPlayers: string;
         raw: Map;
+        zones: Zone[][];
     };
     playerLimit: number;
     isGameOwner: boolean;
@@ -98,7 +106,8 @@ export interface Game {
         controlledByTeam: number;
     };
     stage: number;
-    activeZone: number;
+    zoneNumber: number;
+    activeZone: Zone[];
     capturing: number;
     captureProgress: number;
     numCapturing: number;
