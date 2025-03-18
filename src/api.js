@@ -91,7 +91,7 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
                     'user-agent': UserAgent,
                     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
                 },
-                httpsAgent: new SocksProxyAgent(prox)
+                httpsAgent: !IsBrowser && new SocksProxyAgent(prox)
             })
             body = request.data
             token = body.idToken;
@@ -133,7 +133,7 @@ async function loginAnonymously(prox = '', instance = 'shellshock.io') {
             'user-agent': UserAgent,
             'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
         },
-        httpsAgent: new SocksProxyAgent(prox)
+        httpsAgent: !IsBrowser && new SocksProxyAgent(prox)
     });
 
     const token = body.idToken;
