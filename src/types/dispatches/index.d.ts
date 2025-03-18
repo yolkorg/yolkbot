@@ -2,7 +2,9 @@ import BootPlayerDispatch from './BootPlayerDispatch';
 import ChatDispatch from './ChatDispatch';
 import FireDispatch from './FireDispatch';
 import GameOptionsDispatch from './GameOptionsDispatch';
+import GoToAmmoDispatch from './GoToAmmoDispatch';
 import GoToCoopDispatch from './GoToCoopDispatch';
+import GoToGrenadeDispatch from './GoToGrenadeDispatch';
 import GoToPlayerDispatch from './GoToPlayerDispatch';
 import GoToSpatulaDispatch from './GoToSpatulaDispatch';
 import LookAtDispatch from './LookAtDispatch';
@@ -34,8 +36,16 @@ declare module 'GameOptionsDispatch' {
     export default GameOptionsDispatch;
 }
 
+declare module 'GoToAmmoDispatch' {
+    export default GoToAmmoDispatch;
+}
+
 declare module 'GoToCoopDispatch' {
     export default GoToCoopDispatch;
+}
+
+declare module 'GoToGrenadeDispatch' {
+    export default GoToGrenadeDispatch;
 }
 
 declare module 'GoToPlayerDispatch' {
@@ -96,7 +106,9 @@ declare module 'dispatches' {
         ChatDispatch,
         FireDispatch,
         GameOptionsDispatch,
+        GoToAmmoDispatch,
         GoToCoopDispatch,
+        GoToGreandeDispatch,
         GoToPlayerDispatch,
         GoToSpatulaDispatch,
         LookAtDispatch,
@@ -117,7 +129,9 @@ declare module 'dispatches' {
         ChatDispatch: typeof ChatDispatch,
         FireDispatch: typeof FireDispatch,
         GameOptionsDispatch: typeof GameOptionsDispatch,
+        GoToAmmoDispatch: typeof GoToAmmoDispatch,
         GoToCoopDispatch: typeof GoToCoopDispatch,
+        GoToGrenadeDispatch: typeof GoToGrenadeDispatch,
         GoToPlayerDispatch: typeof GoToPlayerDispatch,
         GoToSpatulaDispatch: typeof GoToSpatulaDispatch,
         LookAtDispatch: typeof LookAtDispatch,
@@ -136,4 +150,25 @@ declare module 'dispatches' {
     export default dispatches;
 }
 
-export type ADispatch = BootPlayerDispatch | ChatDispatch | FireDispatch | GameOptionsDispatch | GoToCoopDispatch | GoToPlayerDispatch | GoToSpatulaDispatch | LookAtDispatch | LookAtPosDispatch | MeleeDispatch | MovementDispatch | PauseDispatch | ReloadDispatch | ReportPlayerDispatch | SaveLoadoutDispatch | SpawnDispatch | SwapWeaponDispatch | SwitchTeamDispatch | ThrowGrenadeDispatch;
+export type ADispatch =
+    BootPlayerDispatch |
+    ChatDispatch |
+    FireDispatch |
+    GameOptionsDispatch |
+    GoToAmmoDispatch |
+    GoToCoopDispatch |
+    GoToGrenadeDispatch |
+    GoToPlayerDispatch |
+    GoToSpatulaDispatch |
+    LookAtDispatch |
+    LookAtPosDispatch |
+    MeleeDispatch |
+    MovementDispatch |
+    PauseDispatch |
+    ReloadDispatch |
+    ReportPlayerDispatch |
+    SaveLoadoutDispatch |
+    SpawnDispatch |
+    SwapWeaponDispatch |
+    SwitchTeamDispatch |
+    ThrowGrenadeDispatch;

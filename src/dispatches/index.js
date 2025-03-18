@@ -2,7 +2,9 @@ import BootPlayerDispatch from './BootPlayerDispatch.js';
 import ChatDispatch from './ChatDispatch.js';
 import FireDispatch from './FireDispatch.js';
 import GameOptionsDispatch from './GameOptionsDispatch.js';
+import GoToAmmoDispatch from './GoToAmmoDispatch.js';
 import GoToCoopDispatch from './GoToCoopDispatch.js';
+import GoToGrenadeDispatch from './GoToGrenadeDispatch.js';
 import GoToPlayerDispatch from './GoToPlayerDispatch.js';
 import GoToSpatulaDispatch from './GoToSpatulaDispatch.js';
 import LookAtDispatch from './LookAtDispatch.js';
@@ -23,7 +25,9 @@ export {
     ChatDispatch,
     FireDispatch,
     GameOptionsDispatch,
+    GoToAmmoDispatch,
     GoToCoopDispatch,
+    GoToGrenadeDispatch,
     GoToPlayerDispatch,
     GoToSpatulaDispatch,
     LookAtDispatch,
@@ -45,7 +49,9 @@ export default {
     ChatDispatch,
     FireDispatch,
     GameOptionsDispatch,
+    GoToAmmoDispatch,
     GoToCoopDispatch,
+    GoToGrenadeDispatch,
     GoToPlayerDispatch,
     GoToSpatulaDispatch,
     LookAtDispatch,
