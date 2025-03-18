@@ -200,6 +200,7 @@ export class Bot {
     on(event: 'gameOptionsChange', cb: (oldOptions: GameOptions, newOptions: GameOptions) => void): void;
     on(event: 'gameReset', cb: () => void): void;
     on(event: 'gameStateChange', cb: (oldState: Game, newState: Game) => void): void;
+    on(event: 'grenadeExploded', cb: (item: Item | number, pos: { x: number; y: number; z: number }, damage: number, radius: number) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streak: number) => void): void;
     on(event: 'playerChangeCharacter', cb: (player: GamePlayer, oldCharacter: Character, newCharacter: Character) => void): void;
@@ -215,6 +216,7 @@ export class Bot {
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
+    on(event: 'rocketHit', cb: (pos: { x: number; y: number; z: number }, damage: number, radius: number) => void): void;
     on(event: 'selfDamaged', cb: (oldHp: number, newHp: number) => void): void;
     on(event: 'selfMoved', cb: (oldPos: { x: number; y: number; z: number }, newPos: { x: number; y: number; z: number }) => void): void;
     on(event: 'selfRespawnFail', cb: () => void): void;

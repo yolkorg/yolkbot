@@ -18,6 +18,7 @@ import {
     GameOptionFlags,
     GunList,
     IsBrowser,
+    ItemTypes,
     Movements,
     PlayTypes,
     ShellStreaks
@@ -379,7 +380,7 @@ export class Bot {
                 if (this.intents.includes(this.Intents.PATHFINDING)) {
                     this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
                     this.pathing.nodeList = new NodeList(this.game.map.raw);
-                    this.#initKotcZones();
+                    if (this.game.gameModeId === GameModes.kotc) this.#initKotcZones();
                 }
                 // console.log("Map:", this.game.map);
                 this.game.playerLimit = CommIn.unPackInt8U();
@@ -684,7 +685,7 @@ export class Bot {
 
     #initKotcZones() {
         const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
-        if (!meshData) delete this.game.map.zones;
+        if (!meshData) return delete this.game.map.zones;
 
         let numCaptureZones = 0;
         const mapData = {};
@@ -1428,6 +1429,22 @@ export class Bot {
         });
     }
 
+    #processExplodePacket() {
+        const itemType = CommIn.unPackInt8U();
+        let item = CommIn.unPackInt16U();
+        const x = CommIn.unPackFloat();
+        const y = CommIn.unPackFloat();
+        const z = CommIn.unPackFloat();
+        const damage = CommIn.unPackInt8U();
+        const radius = CommIn.unPackFloat();
+
+        if (this.intents.includes(this.Intents.COSMETIC_DATA))
+            item = findItemById(item);
+
+        if (itemType == ItemTypes.Grenade) this.#emit('grenadeExploded', item, { x, y, z }, damage, radius);
+        else this.#emit('rocketHit', { x, y, z }, damage, radius);
+    }
+
     #handlePacket(packet) {
         CommIn.init(packet);
 
@@ -1510,10 +1527,6 @@ export class Bot {
                 this.#processGameOptionsPacket(packet);
                 break;
 
-            case CommCode.gameAction:
-                this.#processGameActionPacket(packet);
-                break;
-
             case CommCode.ping:
                 this.#processPingPacket(packet);
                 break;
@@ -1526,16 +1539,12 @@ export class Bot {
                 this.#processChangeCharacterPacket(packet);
                 break;
 
-            case CommCode.updateBalance:
-                this.#processUpdateBalancePacket(packet);
-                break;
-
-            case CommCode.respawnDenied:
-                this.#processRespawnDeniedPacket(packet);
-                break;
-
             case CommCode.reload:
                 this.processReloadPacket(null, true);
+                break;
+
+            case CommCode.explode:
+                this.#processExplodePacket();
                 break;
 
             case CommCode.spawnItem:
@@ -1546,8 +1555,20 @@ export class Bot {
                 this.#processMeleePacket();
                 break;
 
+            case CommCode.updateBalance:
+                this.#processUpdateBalancePacket(packet);
+                break;
+
+            case CommCode.gameAction:
+                this.#processGameActionPacket(packet);
+                break;
+
             case CommCode.requestGameOptions:
                 this.#processGameRequestOptionsPacket();
+                break;
+
+            case CommCode.respawnDenied:
+                this.#processRespawnDeniedPacket(packet);
                 break;
 
             case CommCode.clientReady:
@@ -1558,7 +1579,6 @@ export class Bot {
                 // for more info, see comm/codes.js
                 break;
 
-            case CommCode.explode:
             case CommCode.throwGrenade:
                 // do nothing
                 break;
