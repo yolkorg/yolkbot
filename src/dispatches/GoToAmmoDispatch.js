@@ -2,7 +2,7 @@ import AStar from '../pathing/astar.js';
 
 export class GoToAmmoDispatch {
     check(bot) {
-        return bot.me.playing && bot.intents.includes(bot.Intents.PATHFINDING);
+        return bot.me.playing && bot.game.collectables[0].length && bot.intents.includes(bot.Intents.PATHFINDING);
     }
 
     execute(bot) {
@@ -12,9 +12,9 @@ export class GoToAmmoDispatch {
         let closestAmmo = null;
 
         for (const ammo of bot.game.collectables[0]) {
-            const dx = ammo.x - this.me.position.x;
-            const dy = ammo.y - this.me.position.y;
-            const dz = ammo.z - this.me.position.z;
+            const dx = ammo.x - bot.me.position.x;
+            const dy = ammo.y - bot.me.position.y;
+            const dz = ammo.z - bot.me.position.z;
 
             const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 

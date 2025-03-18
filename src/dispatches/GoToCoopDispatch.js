@@ -12,9 +12,9 @@ export class GoToCoopDispatch {
         let closestZone = null;
 
         for (const zone of bot.game.activeZone) {
-            const dx = zone.x - this.me.position.x;
-            const dy = zone.y - this.me.position.y;
-            const dz = zone.z - this.me.position.z;
+            const dx = zone.x - bot.me.position.x;
+            const dy = zone.y - bot.me.position.y;
+            const dz = zone.z - bot.me.position.z;
 
             const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
