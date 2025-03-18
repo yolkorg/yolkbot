@@ -52,7 +52,7 @@ export class GamePlayer {
             this.weapons[1] = new Cluck9mm();
         }
 
-        this.grenades = 0;
+        this.grenades = 1;
 
         this.buffer = {
             0: {},

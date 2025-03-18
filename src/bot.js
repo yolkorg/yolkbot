@@ -1026,7 +1026,10 @@ export class Bot {
         }
 
         if (type == CollectTypes.GRENADE) {
-            player.grenades >= 3 ? player.grenades = 3 : player.grenades++;
+            
+            player.grenades++;
+            if (player.grenades > 3) player.grenades = 3
+
             this.#emit('collectGrenade', player);
         }
     }
