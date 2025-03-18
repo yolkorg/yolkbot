@@ -176,6 +176,7 @@ export class Bot {
     update(): void;
 
     canSee(player: GamePlayer): boolean;
+    getBestTarget(): GamePlayer | undefined;
 
     onAny(cb: Function): void;
 

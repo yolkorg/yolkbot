@@ -1581,6 +1581,35 @@ export class Bot {
         if (!this.intents.includes(this.Intents.PATHFINDING)) throw new Error('You must have the PATHFINDING intent to use this method.');
         return this.pathing.nodeList.hasLineOfSight(this.me.position, target.position);
     }
+
+    getBestTarget() {
+        const options = Object.values(this.players)
+            .filter((player) => player)
+            .filter((player) => player !== this.me)
+            .filter((player) => player.playing)
+            .filter((player) => player.hp > 0)
+            .filter((player) => player.name !== this.me.name)
+            .filter((player) => this.me.team === 0 || player.team !== this.me.team)
+            .filter((player) => this.canSee(player));
+
+        let minDistance = 200;
+        let targetPlayer = null;
+
+        for (const player of options) {
+            const dx = player.position.x - this.me.position.x;
+            const dy = player.position.y - this.me.position.y;
+            const dz = player.position.z - this.me.position.z;
+
+            const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                targetPlayer = player;
+            }
+        }
+
+        return targetPlayer;
+    }
 }
 
 export default Bot;
