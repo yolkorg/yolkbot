@@ -2,6 +2,7 @@ import BootPlayerDispatch from './BootPlayerDispatch.js';
 import ChatDispatch from './ChatDispatch.js';
 import FireDispatch from './FireDispatch.js';
 import GameOptionsDispatch from './GameOptionsDispatch.js';
+import GoToCoopDispatch from './GoToCoopDispatch.js';
 import GoToPlayerDispatch from './GoToPlayerDispatch.js';
 import GoToSpatulaDispatch from './GoToSpatulaDispatch.js';
 import LookAtDispatch from './LookAtDispatch.js';
@@ -22,6 +23,7 @@ export {
     ChatDispatch,
     FireDispatch,
     GameOptionsDispatch,
+    GoToCoopDispatch,
     GoToPlayerDispatch,
     GoToSpatulaDispatch,
     LookAtDispatch,
@@ -43,6 +45,7 @@ export default {
     ChatDispatch,
     FireDispatch,
     GameOptionsDispatch,
+    GoToCoopDispatch,
     GoToPlayerDispatch,
     GoToSpatulaDispatch,
     LookAtDispatch,
