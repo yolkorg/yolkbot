@@ -275,12 +275,12 @@ export class Bot {
 
     #processLoginData(loginData) {
         if (typeof loginData == 'string') {
-            this.#emit('authFail', loginData);
+            this.emit('authFail', loginData);
             return false;
         }
 
         if (loginData.banRemaining) {
-            this.#emit('banned', loginData.banRemaining);
+            this.emit('banned', loginData.banRemaining);
             return false;
         }
 
@@ -315,7 +315,7 @@ export class Bot {
                 instance: this.instance
             });
 
-            this.matchmaker.on('authFail', (data) => this.#emit('authFail', data));
+            this.matchmaker.on('authFail', (data) => this.emit('authFail', data));
 
             await this.matchmaker.getRegions();
         }
@@ -535,7 +535,7 @@ export class Bot {
 
         this.game.socket.onclose = (e) => {
             // console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
-            this.#emit('close', e.code);
+            this.emit('close', e.code);
         }
     }
 
@@ -622,7 +622,7 @@ export class Bot {
         // process syncMe
         const now = Date.now();
         if (now - this.lastUpdateTime >= 50) {
-            this.#emit('tick');
+            this.emit('tick');
 
             // Send out update packet
             const out = CommOut.getBuffer();
@@ -660,7 +660,7 @@ export class Bot {
     // these are auth-related codes (liveCallbacks doesn't run during auth)
     #mustBeInstant = ['authFail', 'banned'];
 
-    #emit(event, ...args) {
+    emit(event, ...args) {
         if (this._hooks[event]) {
             for (const cb of this._hooks[event]) {
                 if (this.#mustBeInstant.includes(event)) cb(...args);
@@ -769,7 +769,7 @@ export class Bot {
         const player = this.players[Object.keys(this.players).find(p => this.players[p].id == id)];
         // console.log(`Player ${player.name}: ${text} (flags: ${msgFlags})`);
         // console.log(`Their position: ${player.position.x}, ${player.position.y}, ${player.position.z}`);
-        this.#emit('chat', player, text, msgFlags);
+        this.emit('chat', player, text, msgFlags);
     }
 
     #processAddPlayerPacket() {
@@ -834,7 +834,7 @@ export class Bot {
             this.me = this.players[playerData.id_];
         }
 
-        this.#emit('playerJoin', this.players[playerData.id_]);
+        this.emit('playerJoin', this.players[playerData.id_]);
     }
 
     #processRespawnPacket() {
@@ -861,7 +861,7 @@ export class Bot {
             player.grenades = grenades;
             player.position = { x: x, y: y, z: z };
             // console.log(`Player ${player.name} respawned at ${x}, ${y}, ${z}`);
-            this.#emit('playerRespawn', player);
+            this.emit('playerRespawn', player);
         } else {
             // console.log(`Player ${id} not found. (me: ${this.me.id}) (respawn)`);
         }
@@ -929,7 +929,7 @@ export class Bot {
         const player = this.players[id];
         if (player) {
             player.playing = false;
-            this.#emit('playerPause', player);
+            this.emit('playerPause', player);
         }
     }
 
@@ -940,7 +940,7 @@ export class Bot {
         const player = this.players[id];
         if (player) {
             player.activeGun = newWeaponId;
-            this.#emit('playerSwapWeapon', player, newWeaponId);
+            this.emit('playerSwapWeapon', player, newWeaponId);
         }
     }
 
@@ -965,7 +965,7 @@ export class Bot {
         if (killer) { killer.kills++; }
         // console.log(`Player ${killer.name} is on a streak of ${killer.kills} kills.`);
 
-        this.#emit('playerDeath', killed, killer); // killed, killer
+        this.emit('playerDeath', killed, killer); // killed, killer
     }
 
     #processFirePacket() {
@@ -979,7 +979,7 @@ export class Bot {
 
         if (playerWeapon && playerWeapon.ammo) {
             playerWeapon.ammo.rounds--;
-            this.#emit('playerFire', player, playerWeapon);
+            this.emit('playerFire', player, playerWeapon);
         }
     }
 
@@ -992,7 +992,7 @@ export class Bot {
 
         this.game.collectables[type].push({ id, x, y, z });
 
-        this.#emit('spawnItem', type, id, { x, y, z });
+        this.emit('spawnItem', type, id, { x, y, z });
     }
 
     #processCollectPacket() {
@@ -1009,7 +1009,7 @@ export class Bot {
             const playerWeapon = player.weapons[applyToWeaponIdx];
             if (playerWeapon && playerWeapon.ammo) {
                 playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
-                this.#emit('collectAmmo', player, playerWeapon);
+                this.emit('collectAmmo', player, playerWeapon);
             }
         }
 
@@ -1017,7 +1017,7 @@ export class Bot {
             player.grenades++;
             if (player.grenades > 3) player.grenades = 3
 
-            this.#emit('collectGrenade', player);
+            this.emit('collectGrenade', player);
         }
     }
 
@@ -1031,7 +1031,7 @@ export class Bot {
         const oldHP = player.hp;
         player.hp = hp;
 
-        this.#emit('playerDamaged', player, oldHP, player.hp);
+        this.emit('playerDamaged', player, oldHP, player.hp);
     }
 
     #processHitMePacket() {
@@ -1043,7 +1043,7 @@ export class Bot {
         const oldHp = this.me.hp;
         this.me.hp = hp;
 
-        this.#emit('selfDamaged', oldHp, this.me.hp);
+        this.emit('selfDamaged', oldHp, this.me.hp);
     }
 
     #processSyncMePacket() {
@@ -1073,7 +1073,7 @@ export class Bot {
         player.position.z = newZ;
 
         if (oldX != newX || oldY != newY || oldZ != newZ) {
-            this.#emit('selfMoved', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
+            this.emit('selfMoved', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
         }
     }
 
@@ -1089,7 +1089,7 @@ export class Bot {
 
         delete this.players[id.toString()];
 
-        this.#emit('playerLeave', removedPlayer);
+        this.emit('playerLeave', removedPlayer);
     }
 
     #processGameStatePacket() {
@@ -1112,7 +1112,7 @@ export class Bot {
                 controlledByTeam: controlledByTeam
             };
 
-            this.#emit('gameStateChange', this.game);
+            this.emit('gameStateChange', this.game);
         } else if (this.game.gameModeId == GameModes.kotc) {
             this.game.stage = CommIn.unPackInt8U(); // constants.CoopStates
             this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
@@ -1127,7 +1127,7 @@ export class Bot {
             this.game.capturePercent = this.game.captureProgress / 1000; // progress of the capture as a percentage
             this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
 
-            this.#emit('gameStateChange', this.game);
+            this.emit('gameStateChange', this.game);
         } else if (this.game.gameModeId == GameModes.team) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
@@ -1199,7 +1199,7 @@ export class Bot {
                 break;
         }
 
-        this.#emit('playerBeginStreak', player, ksType);
+        this.emit('playerBeginStreak', player, ksType);
     }
 
     #processEndStreakPacket() {
@@ -1218,7 +1218,7 @@ export class Bot {
             player.streakRewards = player.streakRewards.filter((r) => r != ksType);
         }
 
-        this.#emit('playerEndStreak', ksType, player);
+        this.emit('playerEndStreak', ksType, player);
     }
 
     #processHitShieldPacket() {
@@ -1233,9 +1233,9 @@ export class Bot {
 
         if (this.me.hpShield <= 0) {
             this.me.streakRewards = this.me.streakRewards.filter((r) => r != ShellStreaks.HardBoiled);
-            this.#emit('selfShieldLost');
+            this.emit('selfShieldLost');
         } else {
-            this.#emit('selfShieldHit', this.me.hpShield);
+            this.emit('selfShieldHit', this.me.hpShield);
         }
     }
 
@@ -1264,7 +1264,7 @@ export class Bot {
         this.game.options.weaponsDisabled = Array.from({ length: 7 }, () => CommIn.unPackInt8U() === 1);
         this.game.options.mustUseSecondary = this.game.options.weaponsDisabled.every((v) => v);
 
-        this.#emit('gameOptionsChange', oldOptions, this.game.options);
+        this.emit('gameOptionsChange', oldOptions, this.game.options);
         return false;
     }
 
@@ -1273,7 +1273,7 @@ export class Bot {
 
         if (action == GameActions.pause) {
             // console.log('settings changed, gameOwner changed game settings, force paused');
-            this.#emit('gameForcePause');
+            this.emit('gameForcePause');
             setTimeout(() => this.me.playing = false, 3000);
         }
 
@@ -1301,7 +1301,7 @@ export class Bot {
                 this.game.capturePercent = 0.0;
             }
 
-            this.#emit('gameReset');
+            this.emit('gameReset');
         }
     }
 
@@ -1312,7 +1312,7 @@ export class Bot {
 
         this.ping = Date.now() - this.lastPingTime;
 
-        this.#emit('pingUpdate', oldPing, this.ping);
+        this.emit('pingUpdate', oldPing, this.ping);
 
         setTimeout(() => {
             const out = CommOut.getBuffer();
@@ -1334,7 +1334,7 @@ export class Bot {
         player.team = toTeam;
         player.kills = 0;
 
-        this.#emit('playerSwitchTeam', player, oldTeam, toTeam);
+        this.emit('playerSwitchTeam', player, oldTeam, toTeam);
     }
 
     #processChangeCharacterPacket() {
@@ -1378,8 +1378,8 @@ export class Bot {
             player.selectedGun = weaponIndex;
             player.weapons[0] = new GunList[weaponIndex]();
 
-            if (oldWeaponIdx !== player.selectedGun) this.#emit('playerChangeGun', player, oldWeaponIdx, player.selectedGun);
-            if (oldCharacter !== player.character) this.#emit('playerChangeCharacter', player, oldCharacter, player.character);
+            if (oldWeaponIdx !== player.selectedGun) this.emit('playerChangeGun', player, oldWeaponIdx, player.selectedGun);
+            if (oldCharacter !== player.character) this.emit('playerChangeCharacter', player, oldCharacter, player.character);
         }
     }
 
@@ -1388,28 +1388,23 @@ export class Bot {
         const oldBalance = this.account.eggBalance;
 
         this.account.eggBalance = newBalance;
-        this.#emit('balanceUpdate', newBalance - oldBalance, newBalance);
+        this.emit('balanceUpdate', newBalance - oldBalance, newBalance);
     }
 
     #processRespawnDeniedPacket() {
         this.me.playing = false;
-        this.#emit('selfRespawnFail');
+        this.emit('selfRespawnFail');
     }
 
     #processMeleePacket() {
         const id = CommIn.unPackInt8U();
         const player = this.players[id];
 
-        if (player) this.#emit('playerMelee', player);
+        if (player) this.emit('playerMelee', player);
     }
 
-    // we do this since reload doesn't get emitted for the bot itself
-    // so we simulate it when calling a reload dispatch
-    processReloadPacket(customPlayer, iUnderstandThisIsForInternalUseOnlyAndIShouldNotBeCallingThis) {
-        if (!iUnderstandThisIsForInternalUseOnlyAndIShouldNotBeCallingThis)
-            throw new Error('processReloadPacket is exposed for internal use only. do not call it.');
-
-        const id = customPlayer || CommIn.unPackInt8U();
+    #processReloadPacket() {
+        const id = CommIn.unPackInt8U();
         const player = this.players[id];
 
         if (!player) return;
@@ -1426,7 +1421,7 @@ export class Bot {
             playerActiveWeapon.ammo.store -= newRounds;
         }
 
-        this.#emit('playerReload', player, playerActiveWeapon);
+        this.emit('playerReload', player, playerActiveWeapon);
     }
 
     #processGameRequestOptionsPacket() {
@@ -1460,8 +1455,8 @@ export class Bot {
         if (this.intents.includes(this.Intents.COSMETIC_DATA))
             item = findItemById(item);
 
-        if (itemType == ItemTypes.Grenade) this.#emit('grenadeExploded', item, { x, y, z }, damage, radius);
-        else this.#emit('rocketHit', { x, y, z }, damage, radius);
+        if (itemType == ItemTypes.Grenade) this.emit('grenadeExploded', item, { x, y, z }, damage, radius);
+        else this.emit('rocketHit', { x, y, z }, damage, radius);
     }
 
     #processThrowGrenadePacket() {
@@ -1477,7 +1472,7 @@ export class Bot {
 
         if (player) {
             player.grenades--;
-            this.#emit('playerThrowGrenade', player, { x, y, z }, { x: dx, y: dy, z: dz });
+            this.emit('playerThrowGrenade', player, { x, y, z }, { x: dx, y: dy, z: dz });
         }
     }
 
@@ -1580,7 +1575,7 @@ export class Bot {
                     break;
 
                 case CommCode.reload:
-                    this.processReloadPacket(null, true);
+                    this.#processReloadPacket();
                     break;
 
                 case CommCode.explode:
