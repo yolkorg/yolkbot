@@ -40,7 +40,8 @@ const intents = {
     PATHFINDING: 3,
     BUFFERS: 4,
     PING: 5,
-    COSMETIC_DATA: 6
+    COSMETIC_DATA: 6,
+    PLAYER_HEALTH: 7
 }
 
 export class Bot {
@@ -816,7 +817,7 @@ export class Bot {
 
             const player = this.players[playerData.id_];
 
-            if (player.playing) {
+            if (player.playing && this.intents.includes(this.Intents.PLAYER_HEALTH)) {
                 player.healthInterval = setInterval(() => {
                     if (player.hp < 1) return;
 
@@ -864,21 +865,22 @@ export class Bot {
             // console.log(`Player ${player.name} respawned at ${x}, ${y}, ${z}`);
             this.#emit('playerRespawn', player);
 
-            if (player.healthInterval) {
-                clearInterval(player.healthInterval);
+            if (this.intents.includes(this.Intents.PLAYER_HEALTH)) {
+                if (player.healthInterval)
+                    clearInterval(player.healthInterval);
+
+                player.healthInterval = setInterval(() => {
+                    if (player.hp < 1) return;
+
+                    const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options[GameOptionFlags.healthRegen] : 1);
+
+                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) {
+                        player.hp = Math.max(100, player.hp - regenSpeed);
+                    } else {
+                        player.hp = Math.min(100, player.hp + regenSpeed);
+                    }
+                }, 33);
             }
-
-            player.healthInterval = setInterval(() => {
-                if (player.hp < 1) return;
-
-                const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options[GameOptionFlags.healthRegen] : 1);
-
-                if (player.streakRewards.includes(ShellStreaks.OverHeal)) {
-                    player.hp = Math.max(100, player.hp - regenSpeed);
-                } else {
-                    player.hp = Math.min(100, player.hp + regenSpeed);
-                }
-            }, 33);
         } else {
             // console.log(`Player ${id} not found. (me: ${this.me.id}) (respawn)`);
         }
