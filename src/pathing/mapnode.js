@@ -1,5 +1,5 @@
 /* eslint-disable stylistic/max-len */
-function stringifyCircular(obj) {
+/*function stringifyCircular(obj) {
     const cache = [];
     return JSON.stringify(obj, (_, value) => {
         if (typeof value === 'object' && value !== null) {
@@ -14,7 +14,7 @@ function stringifyCircular(obj) {
         }
         return value;
     }, 4);
-}
+}*/
 
 class NodeList {
     constructor(raw) {
@@ -337,7 +337,7 @@ class MapNode {
                             if (this.y - 1 == node.y) {
                                 return true;
                             }
-                            console.log(`Wedge at ${stringifyCircular(this.position)} can't walk to wedge/air at ${stringifyCircular(node.position)}`);
+                            // console.log(`Wedge at ${stringifyCircular(this.position)} can't walk to wedge/air at ${stringifyCircular(node.position)}`);
                             return false;
                         }
                         return false;
