@@ -1839,6 +1839,7 @@ export class Bot {
         clearInterval(this.updateInterval);
 
         this.game.socket.close();
+        this.matchmaker.close();
 
         if (!noCleanup) {
             delete this.account;
