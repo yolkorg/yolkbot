@@ -665,23 +665,25 @@ export class Bot {
         if (!IsBrowser) {
             const { existsSync, mkdirSync, readFileSync, writeFileSync } = await import('node:fs');
             const { join } = await import('node:path');
+            const { homedir } = await import('node:os');
 
-            if (existsSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`))) {
-                return JSON.parse(readFileSync(join(import.meta.dirname, '..', 'data', 'cache', 'maps', `${name}-${hash}.json`), 'utf-8'));
-            }
+            const yolkbotCache = join(homedir(), '.yolkbot');
+            const mapCache = join(yolkbotCache, 'maps');
 
-            console.warn(`Map "${name}" not found in cache, fetching...`);
+            if (!existsSync(yolkbotCache)) mkdirSync(yolkbotCache);
+            if (!existsSync(mapCache)) mkdirSync(mapCache);
+
+            const mapFile = join(mapCache, `${name}-${hash}.json`);
+
+            if (existsSync(mapFile))
+                return JSON.parse(readFileSync(mapFile, 'utf-8'));
+
+            console.log('map not in cache, IMPORT!!', name, hash);
 
             const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();
 
-            const dir = join(import.meta.dirname, '..', 'data', 'cache', 'maps');
-            if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+            writeFileSync(mapFile, JSON.stringify(data, null, 4), { flag: 'w+' });
 
-            writeFileSync(
-                join(dir, `${name}-${hash}.json`),
-                JSON.stringify(data, null, 4),
-                { flag: 'w+' }
-            );
             return data;
         } else {
             const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();

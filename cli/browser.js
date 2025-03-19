@@ -19,7 +19,7 @@ await esbuild.build({
     banner: {
         js: '/* eslint-disable */\n'
     },
-    external: ['smallsocks', 'node:fs', 'node:path']
+    external: ['smallsocks', 'node:fs', 'node:os', 'node:path']
 });
 
 console.log('completed browser build!');
