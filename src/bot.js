@@ -1026,7 +1026,6 @@ export class Bot {
         }
 
         if (type == CollectTypes.GRENADE) {
-            
             player.grenades++;
             if (player.grenades > 3) player.grenades = 3
 
@@ -1294,20 +1293,25 @@ export class Bot {
             // console.log('owner reset game');
 
             this.me.kills = 0;
-            this.game.teamScore = [0, 0, 0];
 
-            this.game.spatula.controlledBy = 0;
-            this.game.spatula.controlledByTeam = 0;
-            this.game.spatula.coords = { x: 0, y: 0, z: 0 };
+            if (this.game.gameModeId !== GameModes.ffa) this.game.teamScore = [0, 0, 0];
 
-            this.game.stage = CoopStates.capturing;
-            this.game.zoneNumber = 0;
-            this.game.activeZone = null;
-            this.game.capturing = 0;
-            this.game.captureProgress = 0;
-            this.game.numCapturing = 0;
-            this.game.stageName = CoopStagesById[CoopStates.capturing];
-            this.game.capturePercent = 0.0;
+            if (this.game.gameModeId === GameModes.spatula) {
+                this.game.spatula.controlledBy = 0;
+                this.game.spatula.controlledByTeam = 0;
+                this.game.spatula.coords = { x: 0, y: 0, z: 0 };
+            }
+
+            if (this.game.gameModeId === GameModes.kotc) {
+                this.game.stage = CoopStates.capturing;
+                this.game.zoneNumber = 0;
+                this.game.activeZone = null;
+                this.game.capturing = 0;
+                this.game.captureProgress = 0;
+                this.game.numCapturing = 0;
+                this.game.stageName = CoopStagesById[CoopStates.capturing];
+                this.game.capturePercent = 0.0;
+            }
 
             this.#emit('gameReset');
         }
