@@ -222,6 +222,22 @@ export class Bot {
             activeNode: null,
             activeNodeIdx: 0
         }
+
+        if (this.intents.includes(this.Intents.PLAYER_HEALTH)) this.healthIntervalId = setInterval(() => {
+            if (!this.players) return;
+
+            for (const player of Object.values(this.players)) {
+                if (player.playing && player.hp > 0) {
+                    const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
+
+                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) {
+                        player.hp = Math.max(100, player.hp - regenSpeed);
+                    } else {
+                        player.hp = Math.min(100, player.hp + regenSpeed);
+                    }
+                }
+            }
+        }, 33);
     }
 
     dispatch(disp) {
@@ -811,25 +827,8 @@ export class Bot {
         playerData.gameData_.private = CommIn.unPackInt8U();
         playerData.gameData_.gameType = CommIn.unPackInt8U();
 
-        if (!this.players[playerData.id_]) {
+        if (!this.players[playerData.id_])
             this.players[playerData.id_] = new GamePlayer(playerData.id_, playerData.team_, playerData);
-
-            const player = this.players[playerData.id_];
-
-            if (player.playing && this.intents.includes(this.Intents.PLAYER_HEALTH)) {
-                player.healthInterval = setInterval(() => {
-                    if (player.hp < 1) return;
-
-                    const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
-
-                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) {
-                        player.hp = Math.max(100, player.hp - regenSpeed);
-                    } else {
-                        player.hp = Math.min(100, player.hp + regenSpeed);
-                    }
-                }, 33);
-            }
-        }
 
         if (this.me.id == playerData.id_) {
             this.me = this.players[playerData.id_];
@@ -863,23 +862,6 @@ export class Bot {
             player.position = { x: x, y: y, z: z };
             // console.log(`Player ${player.name} respawned at ${x}, ${y}, ${z}`);
             this.#emit('playerRespawn', player);
-
-            if (this.intents.includes(this.Intents.PLAYER_HEALTH)) {
-                if (player.healthInterval)
-                    clearInterval(player.healthInterval);
-
-                player.healthInterval = setInterval(() => {
-                    if (player.hp < 1) return;
-
-                    const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options[GameOptionFlags.healthRegen] : 1);
-
-                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) {
-                        player.hp = Math.max(100, player.hp - regenSpeed);
-                    } else {
-                        player.hp = Math.min(100, player.hp + regenSpeed);
-                    }
-                }, 33);
-            }
         } else {
             // console.log(`Player ${id} not found. (me: ${this.me.id}) (respawn)`);
         }
@@ -1848,6 +1830,22 @@ export class Bot {
         }
 
         return result;
+    }
+
+    quit(noCleanup = false) {
+        if (this.intents.includes(this.Intents.PLAYER_HEALTH))
+            clearInterval(this.healthIntervalId);
+
+        clearInterval(this.updateInterval);
+
+        this.game.socket.close();
+
+        if (!noCleanup) {
+            delete this.account;
+            delete this.game;
+            delete this.me;
+            delete this.players;
+        }
     }
 }
 
