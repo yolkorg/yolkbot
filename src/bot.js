@@ -58,7 +58,7 @@ export class Bot {
         this.proxy = params.proxy || '';
 
         this.autoUpdate = params.doUpdate || true;
-        this.updateInterval = params.updateInterval || 11;
+        this.updateInterval = params.updateInterval || 16.5;
 
         this._hooks = {};
         this._globalHooks = [];
@@ -226,19 +226,6 @@ export class Bot {
 
     dispatch(disp) {
         this._dispatches.push(disp);
-    }
-
-    #drain() {
-        for (let i = 0; i < this._dispatches.length; i++) {
-            const disp = this._dispatches[i];
-            if (disp.check(this)) {
-                disp.execute(this);
-                this._dispatches.splice(i, 1);
-                return; // only 1 dispatch per update
-            } else {
-                // console.log("Dispatch failed", this.state.joinedGame, this.lastChatTime)
-            }
-        }
     }
 
     async createAccount(email, pass) {
@@ -605,10 +592,20 @@ export class Bot {
         while (this._packetQueue.length > 0) this.#handlePacket(this._packetQueue.shift());
 
         // process dispatches
-        if (this._dispatches.length > 0) this.#drain();
+        if (this._dispatches.length > 0) {
+            for (let i = 0; i < this._dispatches.length; i++) {
+                const disp = this._dispatches[i];
+                if (disp.check(this)) {
+                    disp.execute(this);
+                    this._dispatches.splice(i, 1);
+                    break; // only 1 dispatch per update
+                }
+            }
+        }
 
         // process syncMe
-        if (Date.now() - this.lastUpdateTime >= 50) {
+        const now = Date.now();
+        if (now - this.lastUpdateTime >= 50) {
             this.#emit('tick');
 
             // Send out update packet
@@ -625,7 +622,7 @@ export class Bot {
             }
             out.send(this.game.socket);
 
-            this.lastUpdateTime = Date.now();
+            this.lastUpdateTime = now;
             this.state.shotsFired = 0;
         }
 
@@ -888,7 +885,7 @@ export class Bot {
         }
     }
 
-    #processExternalSyncPacket() {
+    #processSyncThemPacket() {
         const id = CommIn.unPackInt8U();
         const x = CommIn.unPackFloat();
         const y = CommIn.unPackFloat();
@@ -1513,7 +1510,7 @@ export class Bot {
 
             switch (cmd) {
                 case CommCode.syncThem:
-                    this.#processExternalSyncPacket(packet);
+                    this.#processSyncThemPacket(packet);
                     break;
 
                 case CommCode.fire:

@@ -20,49 +20,51 @@ class NodeList {
     constructor(raw) {
         const now = Date.now();
         this.list = [];
-
-        const addedPositions = [];
+        const addedPositions = new Set();
 
         for (const meshName of Object.keys(raw.data)) {
             for (const nodeData of raw.data[meshName]) {
-                addedPositions.push(nodeData);
+                addedPositions.add(`${nodeData.x},${nodeData.y},${nodeData.z}`);
                 this.add(new MapNode(meshName, nodeData));
             }
         }
 
-        // data doesn't include air, but we need to include them anyway 
-        // addedPositions stores all the blocks with nodes - create a node for every block not in there.
-        // width/height/depth are given by raw.width/height/depth
         for (let x = 0; x < raw.width; x++) {
             for (let y = 0; y < raw.height; y++) {
                 for (let z = 0; z < raw.depth; z++) {
-                    if (!addedPositions.find(node => node.x == x && node.y == y && node.z == z)) {
-                        this.add(new MapNode('SPECIAL.fuckitweball.none', { x: x, y: y, z: z }));
+                    const posKey = `${x},${y},${z}`;
+                    if (!addedPositions.has(posKey)) {
+                        this.add(new MapNode('SPECIAL.__yolkbot_air__.none', { x: x, y: y, z: z }));
                     }
                 }
             }
         }
 
+        const nodeMap = new Map();
         for (const node of this.list) {
-            // add all nodes around it
-            for (const other of this.list) {
-                const dx = Math.abs(node.x - other.x);
-                const dy = Math.abs(node.y - other.y);
-                const dz = Math.abs(node.z - other.z);
-                if (dx > 1 || dy > 1 || dz > 1) {
-                    continue;
-                }
-                if (other == this) {
-                    continue;
-                }
-                if (node.canLink(other, this)) {
-                    node.addLink(other);
+            nodeMap.set(node.positionStr(), node);
+        }
+
+        for (const node of this.list) {
+            const neighbors = [
+                { x: node.x + 1, y: node.y, z: node.z },
+                { x: node.x - 1, y: node.y, z: node.z },
+                { x: node.x, y: node.y + 1, z: node.z },
+                { x: node.x, y: node.y - 1, z: node.z },
+                { x: node.x, y: node.y, z: node.z + 1 },
+                { x: node.x, y: node.y, z: node.z - 1 }
+            ];
+
+            for (const neighborPos of neighbors) {
+                const neighborKey = `${neighborPos.x},${neighborPos.y},${neighborPos.z}`;
+                const neighborNode = nodeMap.get(neighborKey);
+                if (neighborNode && node.canLink(neighborNode, this)) {
+                    node.addLink(neighborNode);
                 }
             }
         }
 
         console.log(`NodeList created in ${Date.now() - now}ms`);
-
     }
 
     add(node) {
@@ -74,7 +76,16 @@ class NodeList {
     }
 
     at(x, y, z) {
-        return this.list.find(node => node.x == x && node.y == y && node.z == z);
+        if (!this.nodeMap) {
+            this.nodeMap = new Map();
+            for (const node of this.list) {
+                const key = `${node.x},${node.y},${node.z}`;
+                this.nodeMap.set(key, node);
+            }
+        }
+
+        const key = `${x},${y},${z}`;
+        return this.nodeMap.get(key);
     }
 
     clean() {
@@ -185,255 +196,48 @@ class MapNode {
         const dy = Math.abs(dy0);
         const dz = Math.abs(dz0);
 
-        if (dx + dy + dz == 0) {
-            return false;
-        }
-
-        if (dx + dz > 1) {
-            return false;
-        }
-        /*
-        if (i am solid || target is solid) // can't walk into solid
-        -> return false
-        if (solid || ladder directly below me) and (solid directly below target) // above solid to above solid
-        -> return true
-        if (i am ladder && target is ladder && dy == 1 && dx, dz == 0) // up/down ladders
-        -> return true
-        if (below me is solid && target is wedge && dy == 0 && ry matches) // can walk onto stairs
-        -> return true
-        if (i am a wedge && dy == 1 && dx/dz matches my ry) // can walk up stairs
-        -> return true
-        */
-
-        /*
-        Wedge rotation data:
-
-        ry | facing
-        0  | -z
-        1  | -x
-        2  | +z
-        3  | +x
-        */
-
-        const FORWARD_RY_WEDGE_MAPPING = {
-            0: { x: 0, z: -1 },
-            1: { x: -1, z: 0 },
-            2: { x: 0, z: 1 },
-            3: { x: 1, z: 0 }
-        }
-
-        if ((!this.isStair() && !node.isStair()) && dx + dy + dz > 1) { // if we are more than 1 unit away and no stairs, we can't travel
-            return false;
-        }
-
-        if (this.isSolid() || node.isSolid()) { // if either of us are impassable, we obviously can't travel between
+        if (dx + dy + dz === 0 || dx + dz > 1 || this.isSolid() || node.isSolid()) {
             return false;
         }
 
         const belowMe = list.at(this.x, this.y - 1, this.z);
         const belowOther = list.at(node.x, node.y - 1, node.z);
 
-        if (!belowMe || !belowOther) { // if we are at the bottom of the map, we can't travel
+        if (!belowMe || !belowOther) {
             return false;
         }
+
+        const FORWARD_RY_WEDGE_MAPPING = {
+            0: { x: 0, z: -1 },
+            1: { x: -1, z: 0 },
+            2: { x: 0, z: 1 },
+            3: { x: 1, z: 0 }
+        };
 
         switch (this.meshType) {
-            // full block
-            case 'full':
-                return false;
-
-            // usually useless decorations or internal things like spawnpoints
             case 'none':
-                if (dy0 == 1 && node.canWalkThrough()) {
-                    return true;
+                if (dy0 === 1 && node.canWalkThrough()) return true;
+                if (belowMe.canWalkOn() || belowMe.isLadder()) {
+                    if (node.meshType === 'none' || (node.meshType === 'ladder' && dy === 0) || (node.meshType === 'wedge' && dy0 === 0 && dx0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].x && dz0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].z)) {
+                        return true;
+                    }
                 }
-                switch (node.meshType) {
-                    case 'none':
-                        if (belowMe.canWalkOn() || belowMe.isLadder()) {
-                            return true;
-                        }
-                        return false;
-                    case 'ladder':
-                        if (dy == 0) {
-                            if (belowMe.canWalkOn()) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    case 'wedge':
-                        if (dy0 == 0) { // same level
-                            if (belowMe.canWalkOn()) {
-                                // if the stair is pointing to me
-                                if (dx0 == -FORWARD_RY_WEDGE_MAPPING[node.ry].x && dz0 == -FORWARD_RY_WEDGE_MAPPING[node.ry].z) {
-                                    return true;
-                                }
-                                return false;
-                            }
-                        }
-                        return false;
-                    case 'aabb':
-                        return false;
-                    case 'verysoft':
-                        return false;
-
-                }
-                break;
+                return false;
 
             case 'ladder':
-                if (dy == 1 && node.canWalkThrough()) {
-                    return true;
-                }
-                switch (node.meshType) {
-                    case 'none':
-                        if (dy == 0) {
-                            if (belowMe.canWalkOn()) {
-                                return true;
-                            }
-                        }
-                        if (dy == 1) {
-                            if (node.canWalkThrough()) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    case 'ladder':
-                        if (dy == 1) {
-                            return true;
-                        }
-                        if (belowMe.canWalkOn() && belowOther.canWalkOn()) {
-                            return true;
-                        }
-                        return false;
-                    case 'wedge':
-                        return false; // wrong but this should never happen wtf :sob:
-                    case 'aabb':
-                        return false;
-                }
-                break;
+                if (dy === 1 && node.canWalkThrough()) return true;
+                if (dy === 0 && belowMe.canWalkOn()) return true;
+                if (node.meshType === 'ladder' && (dy === 1 || (belowMe.canWalkOn() && belowOther.canWalkOn()))) return true;
+                return false;
 
-            // stairs
             case 'wedge':
-                // console.log(`I'm a wedge at ${stringifyCircular(this.position)}`)
-                /*console.log(`Following the RY mapping, my bottom points to ${this.x - FORWARD_RY_WEDGE_MAPPING[this.ry].x
-                }, ${this.y
-                }, ${this.z - FORWARD_RY_WEDGE_MAPPING[this.ry].z
-                }`)*/
-                switch (node.meshType) {
-                    case 'none':
-                    case 'wedge':
-                        // if i'm pointing to it and dy0 = -1, i can walk to it (above)
-                        // if i'm reverse pointing and dy0 = 0, i can walk to it (level)
-                        // if i'm reverse pointing and dy0 = 1, i can walk to it (below)
-                        if (this.x + FORWARD_RY_WEDGE_MAPPING[this.ry].x == node.x && this.z + FORWARD_RY_WEDGE_MAPPING[this.ry].z == node.z) {
-                            if (this.y + 1 == node.y) {
-                                return true;
-                            }
-                            return false;
-                        }
-                        if (this.x - FORWARD_RY_WEDGE_MAPPING[this.ry].x == node.x && this.z - FORWARD_RY_WEDGE_MAPPING[this.ry].z == node.z) {
-                            if (this.y == node.y) {
-                                return true;
-                            }
-                            if (this.y - 1 == node.y) {
-                                return true;
-                            }
-                            // console.log(`Wedge at ${stringifyCircular(this.position)} can't walk to wedge/air at ${stringifyCircular(node.position)}`);
-                            return false;
-                        }
-                        return false;
-                    case 'ladder':
-                        return false; // same as above, should never happen
-                    case 'aabb':
-                    case 'verysoft':
-                        return false;
-                }
-                break;
-
-            // the various random weird shapes, sometimes block most of a block, often can either be walked over or not at all
-            case 'aabb':
+                if (this.x + FORWARD_RY_WEDGE_MAPPING[this.ry].x === node.x && this.z + FORWARD_RY_WEDGE_MAPPING[this.ry].z === node.z && this.y + 1 === node.y) return true;
+                if (this.x - FORWARD_RY_WEDGE_MAPPING[this.ry].x === node.x && this.z - FORWARD_RY_WEDGE_MAPPING[this.ry].z === node.z && (this.y === node.y || this.y - 1 === node.y)) return true;
                 return false;
 
-            // things like trees
-            case 'verysoft':
-                return false;
-
-            // usually an intenral thing? like where the spatula is supposed to go
-            case 'oob':
+            default:
                 return false;
         }
-
-        /*if (this.isAir() && node.isAir()) {
-            if (dy == 0) {
-                if (belowMe.isSolid() || belowMe.isLadder()) {
-                    if (belowOther.isSolid()) { // if there is a solid block below both of us, we can travel
-                        return true;
-                    } else if (belowOther.canWalk()) { // if we can fall off a corner, we can travel
-                        return true;
-                    } else {
-                        return false; // prevent falling multiple blocks (i think?) may not be necessary
-                    }
-                }
-            } else {
-                if (dy0 == 1) { // if we are above the other node, we can travel
-                    return true;
-                }
-                return false;
-            }
-        }
- 
-        if (!belowMe.isSolid()) {
-            if (this.y - node.y == 1) { // i can fall down one node
-                return true;
-            } else {
-                return false; // if there's air beneath me, we can't move side to side
-            }
-        }
- 
-        if (this.isLadder() && node.isLadder() && dy == 1 && dx + dz == 0) { // we can climb up and down ladders
-            return true;
-        }
- 
-        if (belowMe.isSolid() && node.isStair() && dy == 0) { // we can walk onto stairs but the stair needs to be pointing to me
-            if (dz0 == FORWARD_RY_WEDGE_MAPPING[node.ry].z && dx0 == FORWARD_RY_WEDGE_MAPPING[node.ry].x) {
-                return true;
-            }
-            return false;
-        }
- 
-        if (this.isStair()) {
-            if (dx + dz > 1) {
-                return false;
-            }
-            if (dy == 1) { // node is below me
-                if (dx0 == FORWARD_RY_WEDGE_MAPPING[this.ry].x && dz0 == FORWARD_RY_WEDGE_MAPPING[this.ry].z) { // if i'm pointing to it
-                    const inTheWay = list.at(this.x + FORWARD_RY_WEDGE_MAPPING[this.ry].x, this.y, this.z + FORWARD_RY_WEDGE_MAPPING[this.ry].z);
-                    if (inTheWay && inTheWay.isSolid()) {
-                        return false;
-                    }
-                    return true;
-                }
-                return false;
-            } else if (dy == 0) { // node is level with me
-                if (dx0 == FORWARD_RY_WEDGE_MAPPING[this.ry].x && dz0 == FORWARD_RY_WEDGE_MAPPING[this.ry].z) { // if i'm pointing to it
-                    return true;
-                }
-                return false;
-            } else { // node is above me
-                if (dx0 == FORWARD_RY_WEDGE_MAPPING[this.ry].x && dz0 == FORWARD_RY_WEDGE_MAPPING[this.ry].z) { // if i'm pointing to it
-                    const inTheWay = list.at(this.x, this.y + 1, this.z);
-                    if (inTheWay && inTheWay.isSolid()) {
-                        return false;
-                    }
-                    return true;
-                }
-                return false;
-            }
-        }*/
-        // console.log('My meshtype, below meshtype: ', this.meshType, belowMe.meshType, 'Other meshtype, below other meshtype: ', node.meshType, belowOther.meshType);
-        // console.log('My ry, other ry: ', this.ry, node.ry);
-        // console.log('dx0, dy0, dz0: ', dx0, dy0, dz0);
-        // console.error(`Unrecognized node meshType, me: ${stringifyCircular(this)}, other: ${stringifyCircular(node)}, below me: ${stringifyCircular(belowMe)}, below other: ${stringifyCircular(belowOther)}\n\nThis is NOT your fault. This is an internal error related to pathfinding.\nIf you need an immediate fix and don't use pathfinding features, remove the "PATHFINDING" intent.\n\nPlease paste this full error to our support server and **include the map the bot is on**.`);
-        return false;
     }
 
     trueCenter() {
