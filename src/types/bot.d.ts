@@ -174,6 +174,7 @@ export class Bot {
     constructor(params?: BotParams);
 
     loginAnonymously(): Promise<Account | false>;
+    loginWithRefreshToken(refreshToken: string): Promise<Account | false>;
     login(email: string, pass: string): Promise<Account | false>;
     createAccount(email: string, pass: string): Promise<Account | false>;
 

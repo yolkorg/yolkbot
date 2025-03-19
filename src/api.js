@@ -125,6 +125,58 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
     return response;
 }
 
+async function loginWithRefreshToken(refreshToken, prox = '', instance = 'shellshock.io') {
+    if (!refreshToken) return 'firebase_no_credentials';
+
+    const formData = new URLSearchParams();
+    formData.append('grant_type', 'refresh_token');
+    formData.append('refresh_token', refreshToken);
+
+    let SUCCESS = false;
+    let request, body, token;
+    let k = 0;
+
+    while (!SUCCESS) {
+        try {
+            request = await axios.post(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, formData, {
+                headers: {
+                    'user-agent': UserAgent,
+                    'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
+                },
+                httpsAgent: (!IsBrowser && prox) ? new SocksProxyAgent(prox) : false
+            })
+            body = request.data
+            token = body.id_token;
+            SUCCESS = true;
+        } catch (error) {
+            ++k;
+            if (error.code == 'auth/network-request-failed') {
+                console.error('loginWithRefreshToken: Network req failed (auth/network-request-failed), retrying, k =', k);
+            } else if (error.code == 'auth/missing-email') {
+                return 'firebase_no_credentials';
+            } else {
+                console.error('loginWithRefreshToken: Error:', refreshToken);
+                console.error('loginWithRefreshToken: Error:', error, 'k =', k);
+            }
+
+            if (k > 5) return 'firebase_too_many_retries';
+            else await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+    }
+
+    if (!token) {
+        console.error('loginWithRefreshToken: the game sent no idToken', body);
+        return 'firebase_no_token';
+    }
+
+    const response = await queryServices({
+        cmd: 'auth',
+        firebaseToken: token
+    }, prox, instance);
+
+    return response;
+}
+
 async function loginAnonymously(prox = '', instance = 'shellshock.io') {
     const { data: body } = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
         returnSecureToken: true
@@ -155,5 +207,6 @@ export {
     createAccount,
     loginAnonymously,
     loginWithCredentials,
+    loginWithRefreshToken,
     queryServices
 }

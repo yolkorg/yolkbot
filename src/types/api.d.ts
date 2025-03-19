@@ -17,4 +17,5 @@ export interface QueryResponse {
 
 export function queryServices(request: QueryRequest, proxy?: string, instance?: string): Promise<QueryResponse | string>;
 export function loginWithCredentials(email: string, password: string, prox?: string, instance?: string): Promise<QueryResponse | string>;
+export function loginWithRefreshToken(refreshToken: string, prox?: string, instance?: string): Promise<QueryResponse | string>;
 export function loginAnonymously(prox?: string, instance?: string): Promise<QueryResponse | string>;

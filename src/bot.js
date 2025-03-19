@@ -1,4 +1,4 @@
-import { createAccount, loginAnonymously, loginWithCredentials, queryServices } from '#api';
+import { createAccount, loginAnonymously, loginWithCredentials, loginWithRefreshToken, queryServices } from '#api';
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
@@ -253,6 +253,11 @@ export class Bot {
         this.account.password = pass;
 
         const loginData = await loginWithCredentials(email, pass, this.proxy, this.instance);
+        return this.#processLoginData(loginData);
+    }
+
+    async loginWithRefreshToken(refreshToken) {
+        const loginData = await loginWithRefreshToken(refreshToken, this.proxy, this.instance);
         return this.#processLoginData(loginData);
     }
 
