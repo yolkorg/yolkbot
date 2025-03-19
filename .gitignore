@@ -5,8 +5,8 @@ node_modules
 *.lock
 package-lock.json
 
-# npm utils
-builds
+# packaging
+build/*.tgz
 .env
 
 # mac cache
