@@ -249,7 +249,7 @@ export class Bot {
         this.account.password = pass;
 
         const loginData = await createAccount(email, pass, this.proxy, this.instance);
-        return this.#processLoginData(loginData);
+        return await this.#processLoginData(loginData);
     }
 
     async login(email, pass) {
@@ -257,12 +257,12 @@ export class Bot {
         this.account.password = pass;
 
         const loginData = await loginWithCredentials(email, pass, this.proxy, this.instance);
-        return this.#processLoginData(loginData);
+        return await this.#processLoginData(loginData);
     }
 
     async loginWithRefreshToken(refreshToken) {
         const loginData = await loginWithRefreshToken(refreshToken, this.proxy, this.instance);
-        return this.#processLoginData(loginData);
+        return await this.#processLoginData(loginData);
     }
 
     async loginAnonymously() {
@@ -270,10 +270,10 @@ export class Bot {
         delete this.account.password;
 
         const loginData = await loginAnonymously(this.proxy, this.instance);
-        return this.#processLoginData(loginData);
+        return await this.#processLoginData(loginData);
     }
 
-    #processLoginData(loginData) {
+    async #processLoginData(loginData) {
         if (typeof loginData == 'string') {
             this.emit('authFail', loginData);
             return false;
@@ -301,6 +301,24 @@ export class Bot {
             lifetime: loginData.statsLifetime,
             monthly: loginData.statsCurrent
         };
+
+        if (this.intents.includes(this.Intents.CHALLENGES)) {
+            this.account.challenges = [];
+
+            const { Challenges } = await import('./constants/challenges.js');
+
+            for (const challenge of loginData.challenges) {
+                const challengeData = Challenges.find(c => c.id == challenge.challengeId);
+                if (!challengeData) continue;
+
+                delete challenge.playerId;
+
+                this.account.challenges.push({
+                    ...challengeData,
+                    ...challenge
+                });
+            }
+        }
 
         return this.account;
     }

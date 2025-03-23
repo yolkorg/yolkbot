@@ -1,6 +1,7 @@
 import { NodeList } from '../pathing/mapnode.js';
 
 import { Character, GamePlayer } from './bot/GamePlayer';
+import { Challenge } from './constants/challenges';
 import { AnyGun } from './constants/guns';
 import { Map } from './constants/maps';
 import { ADispatch } from './dispatches/index';
@@ -87,7 +88,8 @@ export interface Account {
         lifetime: Stats;
         monthly: Stats;
     }
-    rawLoginData: any; // i ain't typoing allat
+    challenges: Challenge[];
+    rawLoginData: any; // i ain't typing allat
 }
 
 export interface GameOptions {
