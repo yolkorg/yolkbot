@@ -92,7 +92,7 @@ export class SaveLoadoutDispatch {
             if (bot.state.joinedGame)
                 new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.game.socket);
 
-            const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
+            const findCosmetics = bot.intents.includes(bot.Intents.COSMETIC_DATA);
 
             // apply changes to the bot
             Object.entries(this.changes).forEach(([changeKey, changeValue]) => {
