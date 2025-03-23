@@ -7,8 +7,6 @@ const calculateYaw = (pos) => setPrecision(mod(Math.atan2(-pos.x, -pos.z), PI2))
 const calculatePitch = (pos) => setPrecision(Math.atan2(pos.y, Math.hypot(pos.x, pos.z)));
 
 export class LookAtPosDispatch {
-    idOrName;
-
     constructor(pos) {
         this.pos = pos;
     }

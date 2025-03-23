@@ -41,7 +41,8 @@ const intents = {
     BUFFERS: 4,
     PING: 5,
     COSMETIC_DATA: 6,
-    PLAYER_HEALTH: 7
+    PLAYER_HEALTH: 7,
+    PACKET_HOOK: 8
 }
 
 export class Bot {
@@ -1499,8 +1500,27 @@ export class Bot {
         }
     }
 
+    #processChallengeCompletePacket() {
+        const id = CommIn.unPackInt8U();
+        const challengeId = CommIn.unPackInt8U();
+
+        const player = this.players[id];
+        if (!player) return;
+
+        if (!this.intents.includes(this.Intents.CHALLENGES))
+            return this.emit('challengeComplete', player, challengeId);
+
+        const challenge = this.account.challenges.find(c => c.id == challengeId);
+        this.emit('challengeComplete', player, challenge);
+
+        if (player.id == this.me.id) this.refreshChallenges();
+    }
+
     #handlePacket(packet) {
         CommIn.init(packet);
+
+        if (this.intents.includes(this.Intents.PACKET_HOOK))
+            this.emit('packet', packet);
 
         let lastCommand = 0;
         let abort = false;
@@ -1510,91 +1530,91 @@ export class Bot {
 
             switch (cmd) {
                 case CommCode.syncThem:
-                    this.#processSyncThemPacket(packet);
+                    this.#processSyncThemPacket();
                     break;
 
                 case CommCode.fire:
-                    this.#processFirePacket(packet);
+                    this.#processFirePacket();
                     break;
 
                 case CommCode.hitThem:
-                    this.#processHitThemPacket(packet);
+                    this.#processHitThemPacket();
                     break;
 
                 case CommCode.syncMe:
-                    this.#processSyncMePacket(packet);
+                    this.#processSyncMePacket();
                     break;
 
                 case CommCode.hitMe:
-                    this.#processHitMePacket(packet);
+                    this.#processHitMePacket();
                     break;
 
                 case CommCode.swapWeapon:
-                    this.#processSwapWeaponPacket(packet);
+                    this.#processSwapWeaponPacket();
                     break;
 
                 case CommCode.collectItem:
-                    this.#processCollectPacket(packet);
+                    this.#processCollectPacket();
                     break;
 
                 case CommCode.respawn:
-                    this.#processRespawnPacket(packet);
+                    this.#processRespawnPacket();
                     break;
 
                 case CommCode.die:
-                    this.#processDeathPacket(packet);
+                    this.#processDeathPacket();
                     break;
 
                 case CommCode.pause:
-                    this.#processPausePacket(packet);
+                    this.#processPausePacket();
                     break;
 
                 case CommCode.chat:
-                    this.#processChatPacket(packet);
+                    this.#processChatPacket();
                     break;
 
                 case CommCode.addPlayer:
-                    this.#processAddPlayerPacket(packet);
+                    this.#processAddPlayerPacket();
                     break;
 
                 case CommCode.removePlayer:
-                    this.#processRemovePlayerPacket(packet);
+                    this.#processRemovePlayerPacket();
                     break;
 
                 case CommCode.eventModifier:
-                    this.#processEventModifierPacket(packet);
+                    this.#processEventModifierPacket();
                     break;
 
                 case CommCode.metaGameState:
-                    this.#processGameStatePacket(packet);
+                    this.#processGameStatePacket();
                     break;
 
                 case CommCode.beginShellStreak:
-                    this.#processBeginStreakPacket(packet);
+                    this.#processBeginStreakPacket();
                     break;
 
                 case CommCode.endShellStreak:
-                    this.#processEndStreakPacket(packet);
+                    this.#processEndStreakPacket();
                     break;
 
                 case CommCode.hitMeHardBoiled:
-                    this.#processHitShieldPacket(packet);
+                    this.#processHitShieldPacket();
                     break;
 
                 case CommCode.gameOptions:
-                    this.#processGameOptionsPacket(packet);
+                    this.#processGameOptionsPacket();
                     break;
 
                 case CommCode.ping:
-                    this.#processPingPacket(packet);
+                    this.#processPingPacket();
                     break;
 
                 case CommCode.switchTeam:
-                    this.#processSwitchTeamPacket(packet);
+                    this.#processSwitchTeamPacket();
                     break;
 
                 case CommCode.changeCharacter:
-                    this.#processChangeCharacterPacket(packet);
+                    this.#processChangeCharacterPacket();
                     break;
 
                 case CommCode.reload:
@@ -1618,11 +1638,15 @@ export class Bot {
                     break;
 
                 case CommCode.updateBalance:
-                    this.#processUpdateBalancePacket(packet);
+                    this.#processUpdateBalancePacket();
+                    break;
+
+                case CommCode.challengeCompleted:
+                    this.#processChallengeCompletePacket();
                     break;
 
                 case CommCode.gameAction:
-                    this.#processGameActionPacket(packet);
+                    this.#processGameActionPacket();
                     break;
 
                 case CommCode.requestGameOptions:
@@ -1630,7 +1654,7 @@ export class Bot {
                     break;
 
                 case CommCode.respawnDenied:
-                    this.#processRespawnDeniedPacket(packet);
+                    this.#processRespawnDeniedPacket();
                     break;
 
                 // we do not plan to implement these
@@ -1641,11 +1665,6 @@ export class Bot {
 
                 case CommCode.musicInfo:
                     CommIn.unPackLongString();
-                    break;
-
-                case CommCode.challengeCompleted:
-                    CommIn.unPackInt8U();
-                    CommIn.unPackInt8U();
                     break;
 
                 default:
