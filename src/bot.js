@@ -297,6 +297,11 @@ export class Bot {
         this.account.sessionId = loginData.sessionId;
         this.account.vip = loginData.upgradeProductId && !loginData.upgradeIsExpired;
 
+        if (this.intents.includes(this.Intents.STATS)) this.account.stats = {
+            lifetime: loginData.statsLifetime,
+            monthly: loginData.statsCurrent
+        };
+
         return this.account;
     }
 

@@ -22,6 +22,44 @@ export interface ChiknWinnerStatus {
     canPlayAgain: number;
 }
 
+export interface StatKD {
+    total: number;
+    mode: {
+        public: number;
+        private: number;
+    };
+    dmgType: {
+        pistol: number;
+        grenade: number;
+        rpegg: number;
+        eggk: number;
+        scrambler: number;
+        ranger: number;
+        whpper: number;
+        crackshot: number;
+        trihard: number;
+        melee: number;
+    };
+    gameType: {
+        kotc: number;
+        spatula: number;
+        ffa: number;
+        team: number;
+    }
+}
+
+export interface Stats {
+    streak: number;
+    kills: StatKD;
+    deaths: StatKD;
+    gameType: {
+        kotc: {
+            captured: number;
+            wins: number;
+        }
+    };
+}
+
 export interface Account {
     id: number;
     firebaseId: string;
@@ -45,6 +83,10 @@ export interface Account {
     accountAge: number;
     emailVerified: boolean;
     eggBalance: number;
+    stats: {
+        lifetime: Stats;
+        monthly: Stats;
+    }
     rawLoginData: any; // i ain't typoing allat
 }
 
