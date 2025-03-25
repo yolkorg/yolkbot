@@ -20,11 +20,14 @@ class NodeList {
     constructor(raw) {
         const now = Date.now();
         this.list = [];
-        const addedPositions = new Set();
+        const addedPositions = {};
 
         for (const meshName of Object.keys(raw.data)) {
             for (const nodeData of raw.data[meshName]) {
-                addedPositions.add(`${nodeData.x},${nodeData.y},${nodeData.z}`);
+                addedPositions[(
+                    (nodeData.x << 16) |
+                    (nodeData.y << 8) |
+                    (nodeData.z))] = true;
                 this.add(new MapNode(meshName, nodeData));
             }
         }
@@ -32,8 +35,11 @@ class NodeList {
         for (let x = 0; x < raw.width; x++) {
             for (let y = 0; y < raw.height; y++) {
                 for (let z = 0; z < raw.depth; z++) {
-                    const posKey = `${x},${y},${z}`;
-                    if (!addedPositions.has(posKey)) {
+                    if (!addedPositions[(
+                        (x << 16) |
+                        (y << 8) |
+                        (z)
+                    )]) {
                         this.add(new MapNode('SPECIAL.__yolkbot_air__.none', { x: x, y: y, z: z }));
                     }
                 }
