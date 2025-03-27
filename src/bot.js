@@ -899,7 +899,15 @@ export class Bot {
         const climbing = CommIn.unPackInt8U();
 
         const player = this.players[id];
-        if (!player) return;
+        if (!player || player.id == this.me.id) {
+            for (let i2 = 0; i2 < 3 /* FramesBetweenSyncs */; i2++) {
+                CommIn.unPackInt8U();
+                CommIn.unPackRadU();
+                CommIn.unPackRad();
+                CommIn.unPackInt8U();
+            }
+            return;
+        }
 
         if (player.position.x !== x) player.position.x = x;
         if (player.position.z !== z) player.position.z = z;
@@ -912,24 +920,13 @@ export class Bot {
         if (this.intents.includes(this.Intents.BUFFERS)) {
             if (!player.buffer) return;
 
-            if (player.id == this.me.id) {
-                for (let i2 = 0; i2 < 3 /* FramesBetweenSyncs */; i2++) {
-                    CommIn.unPackInt8U();
-                    CommIn.unPackRadU();
-                    CommIn.unPackRad();
-                    CommIn.unPackInt8U();
-                }
-                return;
-            }
-
-            let yaw, pitch;
             for (let i2 = 0; i2 < 3; i2++) {
                 player.buffer[i2].controlKeys = CommIn.unPackInt8U();
 
-                yaw = CommIn.unPackRadU();
+                const yaw = CommIn.unPackRadU();
                 if (!isNaN(yaw)) player.buffer[i2].yaw_ = yaw
 
-                pitch = CommIn.unPackRad();
+                const pitch = CommIn.unPackRad();
                 if (!isNaN(pitch)) player.buffer[i2].pitch_ = pitch
 
                 CommIn.unPackInt8U();
