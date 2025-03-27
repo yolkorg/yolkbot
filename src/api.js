@@ -2,10 +2,10 @@ import axios from 'axios';
 
 import yolkws from './socket.js';
 
-import { FirebaseKey, IsBrowser, UserAgent } from '#constants';
+import { FirebaseKey, ProxiesEnabled, UserAgent } from '#constants';
 
 let SocksProxyAgent;
-if (!IsBrowser) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
+if (ProxiesEnabled) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
 
 const queryServices = async (request, proxy = '', instance = 'shellshock.io') => {
     let ws;
@@ -91,7 +91,7 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
                     'user-agent': UserAgent,
                     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
                 },
-                httpsAgent: (!IsBrowser && prox) ? new SocksProxyAgent(prox) : false
+                httpsAgent: (ProxiesEnabled && prox) ? new SocksProxyAgent(prox) : false
             })
             body = request.data
             token = body.idToken;
@@ -143,7 +143,7 @@ async function loginWithRefreshToken(refreshToken, prox = '', instance = 'shells
                     'user-agent': UserAgent,
                     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
                 },
-                httpsAgent: (!IsBrowser && prox) ? new SocksProxyAgent(prox) : false
+                httpsAgent: (ProxiesEnabled && prox) ? new SocksProxyAgent(prox) : false
             })
             body = request.data
             token = body.id_token;
@@ -185,7 +185,7 @@ async function loginAnonymously(prox = '', instance = 'shellshock.io') {
             'user-agent': UserAgent,
             'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
         },
-        httpsAgent: (!IsBrowser && prox) ? new SocksProxyAgent(prox) : false
+        httpsAgent: (ProxiesEnabled && prox) ? new SocksProxyAgent(prox) : false
     });
 
     const token = body.idToken;

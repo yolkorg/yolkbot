@@ -4,7 +4,14 @@ import stylistic from '@stylistic/eslint-plugin';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-    { languageOptions: { globals: globals.node } },
+    {
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                window: true
+            }
+        }
+    },
     pluginJs.configs.recommended, {
         rules: {
             'block-scoped-var': 'error',

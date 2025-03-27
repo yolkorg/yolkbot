@@ -1,12 +1,11 @@
 import NodeWebSocket from 'ws';
 
-import { IsBrowser, UserAgent } from '#constants';
+import { IsBrowser, ProxiesEnabled, UserAgent } from '#constants';
 
-// eslint-disable-next-line no-undef
 const WS = IsBrowser ? window.WebSocket : NodeWebSocket;
 
 let SocksProxyAgent;
-if (!IsBrowser) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
+if (ProxiesEnabled) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
 
 class yolkws extends WS {
     constructor(url, proxy) {

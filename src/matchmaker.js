@@ -1,5 +1,5 @@
 import { loginAnonymously } from '#api';
-import { GameModes, IsBrowser, PlayTypes } from '#constants';
+import { GameModes, PlayTypes, ProxiesEnabled } from '#constants';
 
 import yolkws from './socket.js';
 
@@ -21,13 +21,10 @@ export class Matchmaker {
     constructor(params = {}) {
         if (!params.instance) params.instance = 'shellshock.io';
 
-        if (params.proxy && IsBrowser)
-            throw new Error('proxies do not work and hence are not supported in the browser');
-
         if (params.sessionId) this.sessionId = params.sessionId;
         else this.#createSessionId(params.instance);
 
-        if (params.proxy && IsBrowser) throw new Error('proxies do not work and hence are not supported in the browser');
+        if (params.proxy && !ProxiesEnabled) throw new Error('proxies do not work and hence are not supported in the browser');
         else if (params.proxy) this.proxy = params.proxy;
 
         this.#createSocket(params.instance);

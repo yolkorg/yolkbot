@@ -71,6 +71,8 @@ export declare const PlayTypes: {
     joinPrivate: number;
 };
 
+export declare const ProxiesEnabled: boolean;
+
 export declare const ShellStreaks: {
     HardBoiled: number;
     EggBreaker: number;

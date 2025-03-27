@@ -21,6 +21,7 @@ import {
     ItemTypes,
     Movements,
     PlayTypes,
+    ProxiesEnabled,
     ShellStreaks
 } from '#constants';
 
@@ -50,7 +51,7 @@ export class Bot {
     Intents = intents;
 
     constructor(params = {}) {
-        if (params.proxy && IsBrowser)
+        if (params.proxy && !ProxiesEnabled)
             throw new Error('proxies do not work and hence are not supported in the browser');
 
         this.intents = params.intents || [];
