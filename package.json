@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers (self) bot in under 10 lines.",
-    "version": "0.1.1-alpha.6",
+    "version": "0.1.1-alpha.7",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -35,10 +35,6 @@
             "import": "./src/api.js",
             "types": "./src/types/api.d.ts"
         },
-        "./bot": {
-            "import": "./src/bot.js",
-            "types": "./src/types/bot.d.ts"
-        },
         "./browser": "./build/browser.js",
         "./comm": "./src/comm/index.js",
         "./matchmaker": {
@@ -48,6 +44,18 @@
         "./packets": "./src/packet.js",
         "./pathing/*": "./src/pathing/*.js",
         "./pathing/*.js": "./src/pathing/*.js",
+        "./bot": {
+            "import": "./src/bot.js",
+            "types": "./src/types/bot.d.ts"
+        },
+        "./bot/*": {
+            "import": "./src/bot/*.js",
+            "types": "./src/types/bot/*.d.ts"
+        },
+        "./bot/*.js": {
+            "import": "./src/bot/*.js",
+            "types": "./src/types/bot/*.d.ts"
+        },
         "./constants": {
             "import": "./src/constants/index.js",
             "types": "./src/types/constants/index.d.ts"
