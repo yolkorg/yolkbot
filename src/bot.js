@@ -724,7 +724,7 @@ export class Bot {
 
             return data;
         } else {
-            const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();
+            const data = await (await fetch(`https://esm.sh/gh/yolkorg/maps/maps/${name}.json`)).json();
             return data;
         }
     }
