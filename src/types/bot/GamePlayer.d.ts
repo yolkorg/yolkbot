@@ -14,7 +14,7 @@ export interface View {
 
 export interface Character {
     eggColor: string;
-    primaryGun: Item;
+    primaryGun: Item | number;
     secondaryGun: Item | number;
     stamp: Item | number;
     hat: Item | number;
@@ -29,28 +29,51 @@ export interface Buffer {
 }
 
 export interface PlayerData {
-    name_: string;
+    id_: string;
     uniqueId_: string;
-    playing_: boolean;
-    social_: string;
-    hideBadge_: boolean;
+    name_: string;
+    safename_: string;
+    charClass_: number;
+    team_: 0 | 1 | 2;
+    primaryWeaponItem_: Item | number;
+    secondaryWeaponItem_: Item | number;
+    shellColor_: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+    hatItem_: Item | number;
+    stampItem_: Item | number;
+    _unused: number;
+    _unused2: number;
+    grenadeItem_: Item | number;
+    meleeItem_: Item | number;
     x_: number;
     y_: number;
     z_: number;
+    dx_: number;
+    dy_: number;
+    dz_: number;
     yaw_: number;
     pitch_: number;
-    shellColor_: string;
-    primaryWeaponItem_: Item;
-    secondaryWeaponItem_: Item | number;
-    stampItem_: Item | number;
-    hatItem_: Item | number;
-    grenadeItem_: Item | number;
-    meleeItem_: Item | number;
+    score_: number;
+    kills_: number;
+    deaths_: number;
+    streak_: number;
+    totalKills_: number;
+    totalDeaths_: number;
+    bestGameStreak_: number;
+    bestOverallStreak_: number;
+    shield_: number;
+    hp_: number;
+    playing_: boolean;
     weaponIdx_: number;
+    controlKeys_: number;
+    upgradeProductId_: number;
+    activeShellStreaks_: number;
+    social_: string;
+    hideBadge_: boolean;
 }
 
 export interface Social {
     id: number;
+    type: 'Facebook' | 'Instagram' | 'Tiktok' | 'Discord' | 'Youtube' | 'Twitter' | 'Twitch';
     url: string;
     active: boolean;
 }
@@ -58,11 +81,12 @@ export interface Social {
 export class GamePlayer {
     id: string;
     team: 0 | 1 | 2;
-    data: PlayerData;
+    raw: PlayerData;
     name: string;
     uniqueId: string;
     playing: boolean;
-    social: Social[];
+    socials: Social[];
+    isVip: boolean;
     showBadge: boolean;
     position: Position;
     jumping: boolean;
@@ -74,7 +98,7 @@ export class GamePlayer {
     weapons: AnyGun[];
     grenades: number;
     buffer: Buffer;
-    kills: number;
+    streak: number;
     hp: number;
     hpShield: number;
     streakRewards: number[];

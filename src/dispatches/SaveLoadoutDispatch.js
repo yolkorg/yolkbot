@@ -102,7 +102,7 @@ export class SaveLoadoutDispatch {
                 else if (changeKey === 'grenadeId') bot.me.character.grenade = findCosmetics ? findItemById(changeValue) : changeValue;
                 else if (changeKey === 'meleeId') bot.me.character.melee = findCosmetics ? findItemById(changeValue) : changeValue;
                 else if (changeKey === 'colorIdx') bot.me.character.eggColor = changeValue;
-                else if (changeKey === 'primaryId') bot.me.character.primaryGun = findItemById(changeValue[bot.me.selectedGun]);
+                else if (changeKey === 'primaryId') bot.me.character.primaryGun = findCosmetics ? findItemById(changeValue[bot.me.selectedGun]) : changeValue;
                 else if (changeKey === 'secondaryId') bot.me.character.secondaryGun = findCosmetics ? findItemById(changeValue[bot.me.selectedGun]) : changeValue;
             })
         })

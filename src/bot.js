@@ -799,25 +799,21 @@ export class Bot {
 
     #processAddPlayerPacket() {
         const id_ = CommIn.unPackInt8U();
-        const uniqueId = CommIn.unPackString();
-        const name = CommIn.unPackString();
-        const safename = CommIn.unPackString(); // ??? (a)
-        const charClass = CommIn.unPackInt8U();
         const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
         const playerData = {
             id_: id_,
-            uniqueId_: uniqueId,
-            name_: name,
-            safename_: safename,
-            charClass_: charClass,
+            uniqueId_: CommIn.unPackString(),
+            name_: CommIn.unPackString(),
+            safename_: CommIn.unPackString(),
+            charClass_: CommIn.unPackInt8U(),
             team_: CommIn.unPackInt8U(),
-            primaryWeaponItem_: findItemById(CommIn.unPackInt16U()),
+            primaryWeaponItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
             secondaryWeaponItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
             shellColor_: CommIn.unPackInt8U(),
             hatItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
             stampItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            unknownInt8: CommIn.unPackInt8(), // c
-            otherUnknownInt8: CommIn.unPackInt8(),
+            _unused: CommIn.unPackInt8(),
+            _unused2: CommIn.unPackInt8(),
             grenadeItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
             meleeItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
             x_: CommIn.unPackFloat(),
@@ -829,6 +825,7 @@ export class Bot {
             yaw_: CommIn.unPackRadU(),
             pitch_: CommIn.unPackRad(),
             score_: CommIn.unPackInt32U(),
+            // the following are all stats
             kills_: CommIn.unPackInt16U(),
             deaths_: CommIn.unPackInt16U(),
             streak_: CommIn.unPackInt16U(),
@@ -836,6 +833,7 @@ export class Bot {
             totalDeaths_: CommIn.unPackInt32U(),
             bestGameStreak_: CommIn.unPackInt16U(),
             bestOverallStreak_: CommIn.unPackInt16U(),
+            // end stats
             shield_: CommIn.unPackInt8U(),
             hp_: CommIn.unPackInt8U(),
             playing_: CommIn.unPackInt8U(),
@@ -1376,8 +1374,7 @@ export class Bot {
 
         const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
 
-        const primaryWeaponItem = findItemById(primaryWeaponIdx);
-
+        const primaryWeaponItem = findCosmetics ? findItemById(primaryWeaponIdx) : primaryWeaponIdx;
         const secondaryWeaponItem = findCosmetics ? findItemById(secondaryWeaponIdx) : secondaryWeaponIdx;
         const hatItem = findCosmetics ? findItemById(hatIdx) : hatIdx;
         const stampItem = findCosmetics ? findItemById(stampIdx) : stampIdx;

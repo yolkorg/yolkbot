@@ -1,4 +1,4 @@
-import { GunList } from '#constants';
+import { GunList, ShellStreaks, SocialMedias } from '#constants';
 import { Cluck9mm } from '../constants/guns.js';
 
 export class GamePlayer {
@@ -6,28 +6,31 @@ export class GamePlayer {
         this.id = id;
         this.team = team;
 
-        this.data = playerData;
+        this.raw = playerData;
 
         this.name = playerData.name_;
         this.uniqueId = playerData.uniqueId_;
 
         this.playing = playerData.playing_;
 
-        this.social = playerData.social_ && JSON.parse(playerData.social_);
+        this.socials = playerData.social_ && JSON.parse(playerData.social_);
+        if (this.socials) this.socials.forEach((social) => social.type = SocialMedias[social.id]);
+
+        this.isVip = playerData.upgradeProductId_ > 0;
         this.showBadge = !playerData.hideBadge_ || false;
 
         this.position = {
-            x: this.data.x_,
-            y: this.data.y_,
-            z: this.data.z_
+            x: playerData.x_,
+            y: playerData.y_,
+            z: playerData.z_
         };
 
         this.jumping = false;
         this.climbing = false;
 
         this.view = {
-            yaw: this.data.yaw_,
-            pitch: this.data.pitch_
+            yaw: playerData.yaw_,
+            pitch: playerData.pitch_
         };
 
         this.character = {
@@ -40,15 +43,14 @@ export class GamePlayer {
             melee: playerData.meleeItem_
         }
 
-        this.activeGun = this.data.weaponIdx_;
+        this.activeGun = playerData.weaponIdx_;
         this.selectedGun = 0;
         this.weapons = [{}, {}];
 
         if (this.character.primaryGun) {
-            const weaponClass = GunList[this.character.primaryGun.exclusive_for_class];
-            this.selectedGun = this.character.primaryGun.exclusive_for_class;
+            this.selectedGun = playerData.charClass_;
 
-            this.weapons[0] = new weaponClass();
+            this.weapons[0] = new GunList[this.selectedGun]();
             this.weapons[1] = new Cluck9mm();
         }
 
@@ -60,11 +62,11 @@ export class GamePlayer {
             2: {}
         };
 
-        this.kills = 0;
-        this.hp = 100;
+        this.streak = playerData.score_;
+        this.hp = playerData.hp_;
 
-        this.hpShield = 0;
-        this.streakRewards = [];
+        this.hpShield = playerData.shield_;
+        this.streakRewards = Object.values(ShellStreaks).filter(streak => playerData.activeShellStreaks_ & streak);
 
         this.randomSeed = 0;
         this.serverStateIdx = 0;
