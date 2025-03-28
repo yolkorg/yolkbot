@@ -30,6 +30,7 @@ declare class Eggk47 extends Gun {
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
+    internalName: string;
     standardMeshName: string;
     rof: number;
     recoil: number;
@@ -53,6 +54,7 @@ declare class DozenGauge extends Gun {
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
+    internalName: string;
     standardMeshName: string;
     rof: number;
     recoil: number;
@@ -80,6 +82,7 @@ declare class CSG1 extends Gun {
     shortReloadTime: number;
     highPrecision: boolean;
     weaponName: string;
+    internalName: string;
     standardMeshName: string;
     rof: number;
     recoil: number;
@@ -103,6 +106,7 @@ declare class Cluck9mm extends Gun {
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
+    internalName: string;
     standardMeshName: string;
     rof: number;
     recoil: number;
@@ -129,6 +133,7 @@ declare class RPEGG extends Gun {
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
+    internalName: string;
     standardMeshName: string;
     rof: number;
     recoil: number;
@@ -158,6 +163,7 @@ declare class SMG extends Gun {
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
+    internalName: string;
     standardMeshName: string;
     rof: number;
     recoil: number;
@@ -184,6 +190,7 @@ declare class M24 extends Gun {
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
+    internalName: string;
     standardMeshName: string;
     rof: number;
     recoil: number;
@@ -210,6 +217,7 @@ declare class AUG extends Gun {
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
+    internalName: string;
     standardMeshName: string;
     rof: number;
     recoil: number;
