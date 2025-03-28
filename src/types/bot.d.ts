@@ -231,7 +231,7 @@ export class Bot {
     update(): void;
 
     canSee(player: GamePlayer): boolean;
-    getBestTarget(): GamePlayer | undefined;
+    getBestTarget(customFilter: (player: GamePlayer) => boolean): GamePlayer | undefined;
 
     onAny(cb: Function): void;
 

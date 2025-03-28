@@ -1756,7 +1756,7 @@ export class Bot {
         return this.pathing.nodeList.hasLineOfSight(this.me.position, target.position);
     }
 
-    getBestTarget() {
+    getBestTarget(customFilter) {
         const options = Object.values(this.players)
             .filter((player) => player)
             .filter((player) => player !== this.me)
@@ -1764,7 +1764,8 @@ export class Bot {
             .filter((player) => player.hp > 0)
             .filter((player) => player.name !== this.me.name)
             .filter((player) => this.me.team === 0 || player.team !== this.me.team)
-            .filter((player) => this.canSee(player));
+            .filter((player) => this.canSee(player))
+            .filter((player) => !!customFilter(player));
 
         let minDistance = 200;
         let targetPlayer = null;
