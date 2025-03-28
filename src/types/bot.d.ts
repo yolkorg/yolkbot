@@ -198,7 +198,6 @@ export class Bot {
     Intents: intents;
 
     proxy: string;
-    name?: string;
     autoUpdate: boolean;
     disablePathing: boolean;
     updateInterval: number;
