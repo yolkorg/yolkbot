@@ -1753,7 +1753,7 @@ export class Bot {
         return this.pathing.nodeList.hasLineOfSight(this.me.position, target.position);
     }
 
-    getBestTarget(customFilter) {
+    getBestTarget(customFilter = () => true) {
         const options = Object.values(this.players)
             .filter((player) => player)
             .filter((player) => player !== this.me)
