@@ -22,4 +22,10 @@ await esbuild.build({
     external: ['smallsocks', 'node:fs', 'node:os', 'node:path']
 });
 
+let build = fs.readFileSync(path.join(buildDir, 'browser.js'), 'utf-8');
+
+build = build.replace(/import\("[a-zA-Z]+"\)/g, 'void 0');
+
+fs.writeFileSync(path.join(buildDir, 'browser.js'), build);
+
 console.log('completed browser build!');

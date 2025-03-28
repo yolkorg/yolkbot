@@ -1,15 +1,43 @@
-export { Bot } from './bot.js';
-export { GamePlayer } from './bot/GamePlayer.js';
+import { Bot } from './bot.js';
+import { GamePlayer } from './bot/GamePlayer.js';
 
-export { Matchmaker } from './matchmaker.js';
+import { Matchmaker } from './matchmaker.js';
 
-export { default as Dispatches } from './dispatches/index.js';
+import { default as Dispatches } from './dispatches/index.js';
 
-export * as API from './api.js';
-export * as Comm from './comm/index.js';
-export * as Packet from './packet.js';
+import * as API from './api.js';
+import * as Comm from './comm/index.js';
+import * as Packet from './packet.js';
 
-export * as Constants from './constants/index.js';
-export * as Guns from './constants/guns.js';
-export { Items } from './constants/items.js';
-export { Maps } from './constants/maps.js';
+import * as Constants from './constants/index.js';
+import * as Guns from './constants/guns.js';
+import { Items } from './constants/items.js';
+import { Maps } from './constants/maps.js';
+
+const yolkbot = {
+    Bot,
+    GamePlayer,
+    Matchmaker,
+    Dispatches,
+    API,
+    Comm,
+    Packet,
+    Constants,
+    Guns,
+    Items,
+    Maps
+};
+
+window.yolkbot = yolkbot;
+
+export { Bot };
+export { GamePlayer };
+export { Matchmaker };
+export { Dispatches };
+export { API };
+export { Comm };
+export { Packet };
+export { Constants };
+export { Guns };
+export { Items };
+export { Maps };
