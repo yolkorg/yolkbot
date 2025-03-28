@@ -31,6 +31,6 @@ if [ "$(printf '%s\n' "$latest_version" "$current_version" | sort -V | head -n1)
     exit 1
 fi
 
-node cli/browser.js
+node browser/compile.js
 npm publish --tag alpha
 node --env-file=.env cli/publish/alpha.js
