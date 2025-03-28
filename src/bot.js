@@ -435,7 +435,7 @@ export class Bot {
                 this.game.socket.onmessage = (msg) => this._packetQueue.push(msg.data);
 
                 if (this.autoUpdate)
-                    setInterval(() => this.update(), this.updateInterval);
+                    this.updateIntervalId = setInterval(() => this.update(), this.updateInterval);
 
                 if (this.intents.includes(this.Intents.PING)) {
                     const out = CommOut.getBuffer();
@@ -1871,7 +1871,7 @@ export class Bot {
         if (this.intents.includes(this.Intents.PLAYER_HEALTH))
             clearInterval(this.healthIntervalId);
 
-        clearInterval(this.updateInterval);
+        clearInterval(this.updateIntervalId);
 
         this.game.socket.close();
         this.matchmaker.close();
