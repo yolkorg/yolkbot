@@ -977,13 +977,13 @@ export class Bot {
 
         if (killed) {
             killed.playing = false;
-            killed.kills = 0;
+            killed.streak = 0;
             killed.lastDeathTime = Date.now();
             // console.log(`Player ${killed.name} died.`);
         }
 
-        if (killer) { killer.kills++; }
-        // console.log(`Player ${killer.name} is on a streak of ${killer.kills} kills.`);
+        if (killer) killer.streak++;
+        // console.log(`Player ${killer.name} is on a streak of ${killer.streak} kills.`);
 
         this.emit('playerDeath', killed, killer); // killed, killer
     }
@@ -1300,7 +1300,7 @@ export class Bot {
         if (action == GameActions.reset) {
             // console.log('owner reset game');
 
-            this.me.kills = 0;
+            Object.values(this.players).forEach((player) => player.streak = 0);
 
             if (this.game.gameModeId !== GameModes.ffa) this.game.teamScore = [0, 0, 0];
 
@@ -1352,7 +1352,7 @@ export class Bot {
         const oldTeam = player.team;
 
         player.team = toTeam;
-        player.kills = 0;
+        player.streak = 0;
 
         this.emit('playerSwitchTeam', player, oldTeam, toTeam);
     }
