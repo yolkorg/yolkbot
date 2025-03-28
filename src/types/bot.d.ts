@@ -280,6 +280,8 @@ export class Bot {
     claimURLReward(reward: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
     claimSocialReward(rewardTag: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
     buyItem(itemId: number): Promise<{ result: string; currentBalance: number; itemId: number; }>;
+
+    quit(noCleanup?: boolean): void;
 }
 
 export default Bot;
