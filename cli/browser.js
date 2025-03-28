@@ -24,7 +24,7 @@ await esbuild.build({
 
 let build = fs.readFileSync(path.join(buildDir, 'browser.js'), 'utf-8');
 
-build = build.replace(/import\("[a-zA-Z]+"\)/g, 'void 0');
+build = build.replace(/import\("[a-zA-Z:]+"\)/g, 'void 0');
 
 fs.writeFileSync(path.join(buildDir, 'browser.js'), build);
 
