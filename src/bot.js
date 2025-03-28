@@ -979,13 +979,13 @@ export class Bot {
             killed.playing = false;
             killed.streak = 0;
             killed.lastDeathTime = Date.now();
-            // console.log(`Player ${killed.name} died.`);
+            killed.hp = 100;
+            killed.hpShield = 0;
         }
 
         if (killer) killer.streak++;
-        // console.log(`Player ${killer.name} is on a streak of ${killer.streak} kills.`);
 
-        this.emit('playerDeath', killed, killer); // killed, killer
+        this.emit('playerDeath', killed, killer);
     }
 
     #processFirePacket() {
