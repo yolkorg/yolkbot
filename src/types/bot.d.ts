@@ -188,7 +188,9 @@ type intents = {
     PATHFINDING: 3,
     BUFFERS: 4,
     PING: 5,
-    COSMETIC_DATA: 6
+    COSMETIC_DATA: 6,
+    PLAYER_HEALTH: 7,
+    PACKET_HOOK: 8
 }
 
 export class Bot {
