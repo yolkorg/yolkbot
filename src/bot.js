@@ -1518,6 +1518,7 @@ export class Bot {
             this.emit('packet', packet);
 
         let lastCommand = 0;
+        let lastCode = 0;
         let abort = false;
 
         while (CommIn.isMoreDataAvailable() && !abort) {
@@ -1663,13 +1664,14 @@ export class Bot {
                     break;
 
                 default:
-                    console.error(`handlePacket: I got but did not handle a: ${Object.keys(CommCode).find(k => CommCode[k] === cmd)}`);
-                    if (lastCommand) console.error(`handlePacket: It may be a result of the ${lastCommand} command.`);
+                    console.error(`handlePacket: I got but did not handle a: ${Object.keys(CommCode).find(k => CommCode[k] === cmd)} ${cmd}`);
+                    if (lastCommand) console.error(`handlePacket: It may be a result of the ${lastCommand} command (${lastCode}).`);
                     abort = true
                     break;
             }
 
             lastCommand = Object.keys(CommCode).find(k => CommCode[k] === cmd);
+            lastCode = cmd;
         }
     }
 
@@ -1873,6 +1875,9 @@ export class Bot {
 
         this.game.socket.close();
         this.matchmaker.close();
+
+        this._dispatches = [];
+        this._packetQueue = [];
 
         if (!noCleanup) {
             delete this.account;

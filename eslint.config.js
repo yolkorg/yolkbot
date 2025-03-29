@@ -36,7 +36,7 @@ export default [
                 'beforeColon': false
             }],
             'stylistic/max-len': ['error', {
-                'code': 140,
+                'code': 150,
                 'tabWidth': 4
             }],
             'stylistic/no-extra-semi': 'error',

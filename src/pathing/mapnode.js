@@ -18,7 +18,6 @@
 
 class NodeList {
     constructor(raw) {
-        const now = Date.now();
         this.list = [];
         const addedPositions = {};
 
@@ -69,8 +68,6 @@ class NodeList {
                 }
             }
         }
-
-        console.log(`NodeList created in ${Date.now() - now}ms`);
     }
 
     add(node) {
