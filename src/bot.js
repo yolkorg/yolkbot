@@ -561,6 +561,7 @@ export class Bot {
         this.game.socket.onclose = (e) => {
             // console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
             this.emit('close', e.code);
+            this.quit(true, true);
         }
     }
 
@@ -1867,7 +1868,7 @@ export class Bot {
         return result;
     }
 
-    quit(noCleanup = false) {
+    quit(noCleanup = false, finishDispatches = false) {
         if (this.intents.includes(this.Intents.PLAYER_HEALTH))
             clearInterval(this.healthIntervalId);
 
@@ -1876,7 +1877,7 @@ export class Bot {
         this.game.socket.close();
         this.matchmaker.close();
 
-        this._dispatches = [];
+        if (!finishDispatches) this._dispatches = [];
         this._packetQueue = [];
 
         if (!noCleanup) {
