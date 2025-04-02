@@ -1,5 +1,5 @@
 /* eslint-disable */
-export const CommCodes = {
+export const CommCode = {
     "syncMe": 54,
     "swapWeapon": 0,
     "pause": 15,
