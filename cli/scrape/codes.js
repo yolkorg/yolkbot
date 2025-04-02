@@ -7,7 +7,7 @@ const js = await data.json();
 
 fs.writeFileSync(
     path.join(import.meta.dirname, '..', '..', 'src', 'constants', 'codes.js'),
-    `/* eslint-disable */\nexport const CommCodes = ${JSON.stringify(js.codes, null, 4)};`
+    `/* eslint-disable */\nexport const CommCode = ${JSON.stringify(js.codes, null, 4)};`
 );
 
 console.log('scraped codes');
