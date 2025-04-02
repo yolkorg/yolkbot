@@ -2,7 +2,7 @@ import { createAccount, loginAnonymously, loginWithCredentials, loginWithRefresh
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
-import { CommCode } from './comm/Codes.js';
+import { CommCode } from './constants/codes.js';
 
 import GamePlayer from './bot/GamePlayer.js';
 import Matchmaker from './matchmaker.js';
