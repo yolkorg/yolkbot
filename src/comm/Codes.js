@@ -74,76 +74,6 @@ const CommCode = {
 
 */
 
-const CommCode = {
-    swapWeapon: 0,
-    joinGame: 0,
-    refreshGameState: 0,
-    spawnItem: 0,
-    observeGame: 0,
-    ping: 0,
-    bootPlayer: 0,
-    banPlayer: 0,
-    loginRequired: 0,
-    gameLocked: 0,
-    reportPlayer: 0,
-    banned: 0,
-    createPrivateGame: 0,
-    switchTeam: 0,
-    changeCharacter: 0,
-    pause: 0,
-    gameOptions: 0,
-    gameAction: 0,
-    requestGameOptions: 0,
-    gameJoined: 0,
-    socketReady: 0,
-    addPlayer: 0,
-    removePlayer: 0,
-    fire: 0,
-    melee: 0,
-    throwGrenade: 0,
-    info: 0,
-    eventModifier: 0,
-    hitThem: 0,
-    hitMe: 0,
-    collectItem: 0,
-    chlgPlayerRerollInGame: 0,
-    playerInGameReward: 0,
-    playerRewards: 0,
-    chat: 0,
-    syncThem: 0,
-    syncAmmo: 0,
-    die: 0,
-    beginShellStreak: 0,
-    endShellStreak: 0,
-    startReload: 0,
-    announcement: 0,
-    updateBalance: 0,
-    reload: 0,
-    respawn: 0,
-    respawnDenied: 0,
-    pong: 0,
-    clientReady: 0,
-    requestRespawn: 0,
-    joinPublicGame: 0,
-    joinPrivateGame: 0,
-    switchTeamFail: 0,
-    expireUpgrade: 0,
-    metaGameState: 0,
-    syncMe: 0,
-    explode: 0,
-    keepAlive: 0,
-    musicInfo: 0,
-    hitMeHardBoiled: 0,
-    playerInfo: 0,
-    challengeCompleted: 0
-};
-
-let ih = 1;
-
-Object.keys(CommCode).forEach(e => {
-    CommCode[e] = ih++;
-});
-
 const CloseCode = {
     gameNotFound: 4000,
     gameFull: 4001,
@@ -166,7 +96,4 @@ const CloseCode = {
     locked: 4023
 }
 
-export {
-    CommCode,
-    CloseCode
-}
+export { CloseCode }
