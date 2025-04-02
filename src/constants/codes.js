@@ -36,5 +36,6 @@ export const CommCode = {
     "respawnDenied": 45,
     "syncThem": 35,
     "respawn": 44,
+    "addPlayer": 21,
     "keepAlive": 56
 };
