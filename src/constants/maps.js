@@ -127,7 +127,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -335,7 +335,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -348,7 +348,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -400,7 +400,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -491,7 +491,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "14"
     },
     {
@@ -574,7 +574,7 @@ export const Maps = [
     },
     {
         "filename": "metamorph",
-        "hash": "hlpma5zbhi",
+        "hash": "l9o69l8e1b",
         "name": "Metamorph",
         "modes": {
             "FFA": true,
@@ -582,7 +582,7 @@ export const Maps = [
             "Spatula": true,
             "King": false
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "14"
     },
     {
@@ -634,7 +634,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -764,7 +764,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "14"
     },
     {
@@ -816,7 +816,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "16"
     },
     {
@@ -829,7 +829,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -972,7 +972,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -1024,7 +1024,7 @@ export const Maps = [
             "Spatula": true,
             "King": false
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "12"
     },
     {
@@ -1076,7 +1076,20 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
+        "numPlayers": "18"
+    },
+    {
+        "filename": "yolkido",
+        "hash": "127ppvq4k6n",
+        "name": "Yolkido Garrison",
+        "modes": {
+            "FFA": true,
+            "Teams": true,
+            "Spatula": true,
+            "King": true
+        },
+        "availability": "both",
         "numPlayers": "18"
     }
 ];

@@ -2055,7 +2055,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.12025224778385146,
@@ -2082,7 +2082,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.063050017457572,
@@ -2108,7 +2108,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.07051683154538146,
@@ -2719,7 +2719,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -3093,7 +3093,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -3171,7 +3171,6 @@ export const Items = [
                 "Eggwalker",
                 "Green",
                 "Black",
-                "premFeatTwo",
                 "Mar25"
             ]
         },
@@ -3535,10 +3534,12 @@ export const Items = [
                 "RaidLand",
                 "Mar23",
                 "Purple",
-                "Aug24"
+                "Aug24",
+                "Apr25",
+                "premFeatTwo"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": 0.040752448565812394,
@@ -3781,7 +3782,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.02668556941149891,
@@ -3809,7 +3810,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.017915658211507868,
@@ -3837,7 +3838,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.009818349718689667,
@@ -5288,10 +5289,11 @@ export const Items = [
             "tags": [
                 "EGGORG",
                 "Black",
-                "Red"
+                "Red",
+                "Apr25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.07552652492916812,
@@ -6228,7 +6230,6 @@ export const Items = [
             "tags": [
                 "Food",
                 "Yellow",
-                "premFeatTwo",
                 "Mar25"
             ]
         },
@@ -7125,8 +7126,7 @@ export const Items = [
                 "MarM23",
                 "Green",
                 "Mar24",
-                "Mar25",
-                "premFeatTwo"
+                "Mar25"
             ]
         },
         "is_available": false,
@@ -9203,7 +9203,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.08104278879501514,
@@ -9232,7 +9232,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.16684042187958514,
@@ -9259,8 +9259,7 @@ export const Items = [
                 "Blurple",
                 "Music",
                 "SepM24",
-                "Mar25",
-                "premFeatTwo"
+                "Mar25"
             ]
         },
         "is_available": false,
@@ -9296,7 +9295,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.00973114550144527,
@@ -10215,7 +10214,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.21431328988746134,
@@ -12389,7 +12388,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.07898811547084694,
@@ -12415,7 +12414,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.10272882257863225,
@@ -14419,7 +14418,7 @@ export const Items = [
                 "Camo"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "manual",
         "align": {
             "x": -0.029641633446784166,
@@ -14670,6 +14669,172 @@ export const Items = [
             "x": -0.08221047186945785,
             "y": -0.27911238654565806,
             "z": -0.03762758719242561
+        }
+    },
+    {
+        "id": 1584,
+        "name": "Eggfu Master Robe",
+        "price": 2147483647,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_faction1",
+            "tags": [
+                "Apr25",
+                "White",
+                "EGGORG",
+                "Shadow",
+                "Blue",
+                "Fairest"
+            ]
+        },
+        "is_available": false,
+        "unlock": "premium",
+        "align": {
+            "x": -0.01449132984450241,
+            "y": -0.0009178330569876714,
+            "z": -0.006627248762252735
+        }
+    },
+    {
+        "id": 1585,
+        "name": "Eggsassin Robe",
+        "price": 2147483647,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_faction2",
+            "tags": [
+                "Apr25",
+                "Black",
+                "EGGORG",
+                "Shadow",
+                "Red",
+                "Black"
+            ]
+        },
+        "is_available": false,
+        "unlock": "premium",
+        "align": {
+            "x": -0.014150440215876081,
+            "y": -0.0010135521043506124,
+            "z": -0.006471303595696698
+        }
+    },
+    {
+        "id": 1586,
+        "name": "Yellow Dragon Hat",
+        "price": 2147483647,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_yellowDragon",
+            "tags": [
+                "Apr25",
+                "Yellow",
+                "EGGORG",
+                "Shadow",
+                "Black",
+                "Eyes",
+                "Newsletter"
+            ]
+        },
+        "is_available": false,
+        "unlock": "manual",
+        "align": {
+            "x": -0.07748001937217763,
+            "y": -0.23917631028239605,
+            "z": -0.035459316781735556
+        }
+    },
+    {
+        "id": 1587,
+        "name": "Red Dragon Hat",
+        "price": 2147483647,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_redDragon",
+            "tags": [
+                "Apr25",
+                "Red",
+                "EGGORG",
+                "Shadow",
+                "Black",
+                "Eyes",
+                "Bundle"
+            ]
+        },
+        "is_available": false,
+        "unlock": "manual",
+        "align": {
+            "x": -0.07950583309832826,
+            "y": -0.24790143060378877,
+            "z": -0.03638644575222899
+        }
+    },
+    {
+        "id": 1588,
+        "name": "Sumo suit",
+        "price": 4,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_sumo",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadow",
+                "Black",
+                "Eyes",
+                "Premium"
+            ]
+        },
+        "is_available": true,
+        "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_hat_sumo"
+        ],
+        "align": {
+            "x": -0.002183832012569553,
+            "y": -0.07013694363675205,
+            "z": 0.0006322943492174105
+        }
+    },
+    {
+        "id": 1589,
+        "name": "Pixel Airplane Wings",
+        "price": 2147483647,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_premium_PixelAirplane",
+            "tags": [
+                "AprM25",
+                "Retro",
+                "Wes",
+                "Premium"
+            ]
+        },
+        "is_available": false,
+        "unlock": "premium",
+        "align": {
+            "x": 0.213094379983787,
+            "y": -0.16645957884834417,
+            "z": 0.09752425471968085
         }
     },
     {
@@ -15687,7 +15852,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -15709,7 +15874,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -15730,7 +15895,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -16749,7 +16914,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -16772,7 +16937,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -16795,7 +16960,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -18069,10 +18234,11 @@ export const Items = [
                 "EGGORG",
                 "Wizard",
                 "Blue",
-                "Apr24"
+                "Apr24",
+                "Apr25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -18088,10 +18254,11 @@ export const Items = [
             "y": 11,
             "tags": [
                 "EGGORG",
-                "Apr24"
+                "Apr24",
+                "Apr25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -18126,10 +18293,11 @@ export const Items = [
             "y": 9,
             "tags": [
                 "EGGORG",
-                "Apr24"
+                "Apr24",
+                "Apr25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -19783,10 +19951,11 @@ export const Items = [
                 "EGGORG",
                 "Apr23",
                 "Red",
-                "Yellow"
+                "Yellow",
+                "Apr25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -21640,7 +21809,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -21685,7 +21854,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -21708,7 +21877,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -21731,7 +21900,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -22274,7 +22443,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24662,10 +24831,13 @@ export const Items = [
                 "Player",
                 "Face",
                 "Blue",
-                "Sbros"
+                "Sbros",
+                "Ronaldo",
+                "Apr25",
+                "premFeatTwo"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -24711,7 +24883,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24734,7 +24906,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24757,7 +24929,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24802,7 +24974,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24825,7 +24997,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24850,7 +25022,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -27491,7 +27663,7 @@ export const Items = [
                 "Green"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -27769,7 +27941,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28040,7 +28212,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28726,7 +28898,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -28856,6 +29028,26 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "manual"
+    },
+    {
+        "id": 3161,
+        "name": "Golden Dragon Eggk-47",
+        "price": 5000,
+        "item_type_id": 3,
+        "item_type_name": "Primary",
+        "category_name": "Soldier Primary Weapons",
+        "exclusive_for_class": 0,
+        "item_data": {
+            "meshName": "gun_eggk47_dragongold",
+            "tags": [
+                "EGGORG",
+                "Shadows",
+                "Apr25",
+                "Gold"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
     },
     {
         "id": 3400,
@@ -29093,7 +29285,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -29374,7 +29566,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -30194,6 +30386,27 @@ export const Items = [
                 "Mar25"
             ]
         },
+        "is_available": false,
+        "unlock": "purchase"
+    },
+    {
+        "id": 3461,
+        "name": "Golden Dragon Free Ranger",
+        "price": 5000,
+        "item_type_id": 3,
+        "item_type_name": "Primary",
+        "category_name": "Ranger Primary Weapons",
+        "exclusive_for_class": 2,
+        "item_data": {
+            "meshName": "gun_csg1_dragongold",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadows",
+                "Gold",
+                "Yellow"
+            ]
+        },
         "is_available": true,
         "unlock": "purchase"
     },
@@ -30432,7 +30645,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -30707,7 +30920,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -31359,7 +31572,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -31378,10 +31591,12 @@ export const Items = [
                 "Purple",
                 "Yellow",
                 "Eyes",
-                "Apr24"
+                "Apr24",
+                "Apr25",
+                "premFeatTwo"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -31590,8 +31805,7 @@ export const Items = [
                 "Green",
                 "Gold",
                 "Mar24",
-                "Mar25",
-                "premFeatTwo"
+                "Mar25"
             ]
         },
         "is_available": false,
@@ -31703,6 +31917,27 @@ export const Items = [
             ]
         },
         "is_available": false,
+        "unlock": "purchase"
+    },
+    {
+        "id": 3669,
+        "name": "Golden Dragon Scrambler",
+        "price": 5000,
+        "item_type_id": 3,
+        "item_type_name": "Primary",
+        "category_name": "Scrambler Primary Weapons",
+        "exclusive_for_class": 1,
+        "item_data": {
+            "meshName": "gun_dozenGauge_dragongold",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadows",
+                "Gold",
+                "Yellow"
+            ]
+        },
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -31940,7 +32175,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -32222,7 +32457,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -33264,6 +33499,27 @@ export const Items = [
         ]
     },
     {
+        "id": 3071,
+        "name": "Golden Dragon 9mm",
+        "price": 5000,
+        "item_type_id": 4,
+        "item_type_name": "Secondary",
+        "category_name": "Shared Secondary Weapons",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "gun_cluck9mm_dragongold",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadows",
+                "Yellow",
+                "Gold"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
         "id": 3800,
         "name": "The RPEGG",
         "price": 0,
@@ -33476,7 +33732,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -33773,7 +34029,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -34655,6 +34911,27 @@ export const Items = [
         "unlock": "premium"
     },
     {
+        "id": 3964,
+        "name": "Golden Dragon RPEGG",
+        "price": 5000,
+        "item_type_id": 3,
+        "item_type_name": "Primary",
+        "category_name": "Eggsploder Primary Weapons",
+        "exclusive_for_class": 3,
+        "item_data": {
+            "meshName": "gun_rpegg_dragongold",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadows",
+                "Gold",
+                "Yellow"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
         "id": 4000,
         "name": "The Whipper",
         "price": 0,
@@ -34889,7 +35166,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -35163,7 +35440,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -35944,12 +36221,33 @@ export const Items = [
                 "Green"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": false,
         "sku": [
             "item_smg_irish"
         ]
+    },
+    {
+        "id": 4059,
+        "name": "Golden Dragon Whipper",
+        "price": 5000,
+        "item_type_id": 3,
+        "item_type_name": "Primary",
+        "category_name": "Whipper Primary Weapons",
+        "exclusive_for_class": 4,
+        "item_data": {
+            "meshName": "gun_smg_dragongold",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadows",
+                "Gold",
+                "Yellow"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
     },
     {
         "id": 4200,
@@ -36186,7 +36484,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -36486,7 +36784,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -37189,12 +37487,15 @@ export const Items = [
                 "Apr24",
                 "RotR",
                 "Robot",
-                "Grey"
+                "Grey",
+                "EGGORG",
+                "Apr25",
+                "premFeatTwo"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
-        "activeProduct": false,
+        "activeProduct": true,
         "sku": [
             "item_m24_cyborg"
         ]
@@ -37341,6 +37642,27 @@ export const Items = [
             ]
         },
         "is_available": false,
+        "unlock": "purchase"
+    },
+    {
+        "id": 4264,
+        "name": "Golden Dragon Crackshot",
+        "price": 5000,
+        "item_type_id": 3,
+        "item_type_name": "Primary",
+        "category_name": "Crackshot Primary Weapons",
+        "exclusive_for_class": 5,
+        "item_data": {
+            "meshName": "gun_m24_dragongold",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadows",
+                "Gold",
+                "Yellow"
+            ]
+        },
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -37685,7 +38007,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -37745,10 +38067,11 @@ export const Items = [
                 "EGGORG",
                 "Apr23",
                 "Brown",
-                "Frown"
+                "Frown",
+                "Apr25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -38283,14 +38606,16 @@ export const Items = [
                 "EGGORG",
                 "Blue",
                 "Face",
-                "Apr24"
+                "Apr24",
+                "Apr25",
+                "premFeatTwo"
             ],
             "sound": "grenade_diablocannon",
             "cell": 12,
             "smokeColors": "white",
             "fireColors": "default"
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -38674,7 +38999,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -39328,6 +39653,28 @@ export const Items = [
         "unlock": "manual"
     },
     {
+        "id": 16091,
+        "name": "Green Snack Grenade",
+        "price": 1500,
+        "item_type_id": 6,
+        "item_type_name": "Grenade",
+        "category_name": "Grenades",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "grenade_greenSnack",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadows",
+                "Green",
+                "Food",
+                "Rice"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
         "id": 4500,
         "name": "The Tri-Hard",
         "price": 0,
@@ -39570,7 +39917,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -40122,7 +40469,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -40372,7 +40719,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -40524,6 +40871,27 @@ export const Items = [
         "sku": [
             "item_aug_techno"
         ]
+    },
+    {
+        "id": 4555,
+        "name": "Golden Dragon Tri-Hard",
+        "price": 5000,
+        "item_type_id": 3,
+        "item_type_name": "Primary",
+        "category_name": "TriHard Primary Weapons",
+        "exclusive_for_class": 6,
+        "item_data": {
+            "meshName": "gun_aug_dragongold",
+            "tags": [
+                "Apr25",
+                "EGGORG",
+                "Shadows",
+                "Gold",
+                "Yellow"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
     },
     {
         "id": 15000,
@@ -40864,7 +41232,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -42296,9 +42664,30 @@ export const Items = [
         },
         "is_available": true,
         "unlock": "premium",
-        "activeProduct": true,
+        "activeProduct": false,
         "sku": [
             "item_melee_moai"
         ]
+    },
+    {
+        "id": 15088,
+        "name": "Your Greatest Fan",
+        "price": 2147483647,
+        "item_type_id": 7,
+        "item_type_name": "Melee",
+        "category_name": "Melee",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "melee_fan",
+            "tags": [
+                "Shadows",
+                "Bundle",
+                "Red",
+                "Premium",
+                "Apr25"
+            ]
+        },
+        "is_available": true,
+        "unlock": "premium"
     }
 ];
