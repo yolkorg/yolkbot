@@ -149,7 +149,13 @@ export class Bot {
             captureProgress: 0,
             numCapturing: 0,
             stageName: '',
-            capturePercent: 0.0
+            capturePercent: 0.0,
+
+            // egg org
+            eggOrg: {
+                evil: 0,
+                good: 0
+            }
         }
 
         this.account = {
@@ -1512,6 +1518,26 @@ export class Bot {
         if (player.id == this.me.id) this.refreshChallenges();
     }
 
+    // egg org
+    #processClientReadyPacket() {
+        this.#processEggOrgUpdatePacket();
+    }
+
+    // egg org
+    #processEggOrgUpdatePacket() {
+        const str = CommIn.unPackString();
+
+        try {
+            const eggOrgStats = JSON.parse(str);
+            this.game.eggOrg.evil = eggOrgStats[0];
+            this.game.eggOrg.good = eggOrgStats[1];
+
+            this.emit('eggOrgUpdate', this.game.eggOrg);
+        } catch {
+            // hopefully never =D
+        }
+    }
+
     #handlePacket(packet) {
         CommIn.init(packet);
 
@@ -1626,6 +1652,11 @@ export class Bot {
                     this.#processThrowGrenadePacket();
                     break;
 
+                // egg org
+                case CommCode.eggOrgUpdate:
+                    this.#processEggOrgUpdatePacket();
+                    break;
+
                 case CommCode.spawnItem:
                     this.#processSpawnItemPacket();
                     break;
@@ -1654,9 +1685,13 @@ export class Bot {
                     this.#processRespawnDeniedPacket();
                     break;
 
+                // egg org
+                case CommCode.clientReady:
+                    this.#processClientReadyPacket();
+                    break;
+
                 // we do not plan to implement these
                 // for more info, see comm/codes.js
-                case CommCode.clientReady:
                 case CommCode.expireUpgrade:
                     break;
 
