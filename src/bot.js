@@ -548,6 +548,11 @@ export class Bot {
         const attempt = async () => {
             try {
                 this.game.socket = new yolkws(`wss://${this.game.raw.subdomain}.${this.instance}/game/${this.game.raw.id}`, this.proxy);
+                this.game.socket.onerror = async (e) => {
+                    console.error(e);
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                    return await attempt();
+                }
             } catch {
                 await new Promise((resolve) => setTimeout(resolve, 100));
                 await attempt();
@@ -559,7 +564,7 @@ export class Bot {
         this.game.socket.binaryType = 'arraybuffer';
 
         this.game.socket.onopen = () => {
-            // console.log('Successfully connected to game server.');
+            this.game.socket.onerror = null;
         }
 
         this.game.socket.onmessage = this.#onGameMesssage.bind(this);
@@ -1718,6 +1723,8 @@ export class Bot {
             sessionId: this.account.sessionId
         });
 
+        if (typeof response === 'string') return response;
+
         this.account.cw.limit = response.limit;
         this.account.cw.atLimit = response.limit > 3;
 
@@ -1740,6 +1747,8 @@ export class Bot {
             sessionId: this.account.sessionId,
             token: null
         }, this.proxy, this.instance);
+
+        if (typeof response === 'string') return response;
 
         if (response.error) {
             if (response.error == 'RATELIMITED') {
@@ -1774,6 +1783,8 @@ export class Bot {
             cmd: 'chwReset',
             sessionId: this.account.sessionId
         });
+
+        if (typeof response === 'string') return response;
 
         if (response.result !== 'SUCCESS') {
             console.error('Unknown Chikn Winner reset response', response);
@@ -1909,7 +1920,7 @@ export class Bot {
 
         clearInterval(this.updateIntervalId);
 
-        this.game.socket.close();
+        if (this.game) this.game.socket.close();
         this.matchmaker.close();
 
         if (!finishDispatches) this._dispatches = [];
