@@ -10,10 +10,10 @@ export class Matchmaker {
     proxy = null;
     sessionId = '';
 
-    forceClose = false;
-
     onListeners = new Map();
     onceListeners = new Map();
+
+    #forceClose = false;
 
     // sessionId: string, a custom session id
     // proxy: a socks5 proxy string
@@ -34,6 +34,11 @@ export class Matchmaker {
         const attempt = async () => {
             try {
                 this.ws = new yolkws(`wss://${instance}/matchmaker/`, this.proxy);
+                this.ws.onerror = async (e) => {
+                    console.error(e);
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                    return await attempt();
+                }
             } catch {
                 await new Promise((resolve) => setTimeout(resolve, 100));
                 await attempt();
@@ -44,6 +49,8 @@ export class Matchmaker {
 
         this.ws.onopen = () => {
             this.connected = true;
+            this.ws.onerror = null;
+
             if (this.sessionId) {
                 this.onceConnected.forEach(func => func());
             }
@@ -55,7 +62,7 @@ export class Matchmaker {
         }
 
         this.ws.onclose = () => {
-            if (this.forceClose) return;
+            if (this.#forceClose) return;
 
             this.connected = false;
             this.#createSocket(instance);
@@ -159,7 +166,7 @@ export class Matchmaker {
     }
 
     close() {
-        this.forceClose = true;
+        this.#forceClose = true;
         this.ws.close();
     }
 

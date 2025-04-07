@@ -40,20 +40,26 @@ type CommandSend = {
 export declare class Matchmaker {
     connected: boolean;
     onceConnected: Function[];
+
     proxy: string | null;
     sessionId: string;
-    forceClose: boolean;
     onListeners: Map<string, Function[]>;
     onceListeners: Map<string, Function[]>;
+
+    regionList: Region[] | null;
+    ws: yolkws;
 
     constructor(params?: MatchmakerParams);
 
     send(msg: CommandSend): void;
-    waitForConnect(): Promise<void>;
+
     getRegions(): Promise<Region[]>;
     findPublicGame(params: FindGameParams): Promise<RawGameData>;
+
     getRandomRegion(): string;
     getRandomGameMode(): keyof typeof GameModes;
+
+    waitForConnect(): Promise<void>;
     close(): void;
 
     on(event: string, callback: Function): void;

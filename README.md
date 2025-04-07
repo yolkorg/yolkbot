@@ -2,7 +2,7 @@
   <h1>yolkbot</h1>
   <h3>creating bots in 10 lines since 2025</h3>
   <p>
-    <a href='https://github.com/enbyte/yolkbot'>github</a> | 
+    <a href='https://github.com/yolkorg/yolkbot'>github</a> | 
     <a href='https://yolkbot.villainsrule.xyz'>documentation</a> |
     <a href='https://npmjs.com/yolkbot'>npm</a> |
     <a href='https://discord.gg/gYugVUCaMr'>discord</a>
@@ -23,6 +23,6 @@
 <h3 align='center'>credits</h3>
 
 <p align='center'>
-  this repository was created & imagined by <a href='https://github.com/enbyte'>hijinks</a> & <a href='https://github.com/villainsrule'>1ust</a> :trollface:<br>
+  this codebase was written by <a href='https://github.com/villainsrule'>1ust</a> with large contributions from <a href='https://github.com/enbyte'>hijinks</a> :trollface: <br>
   special thanks to BWD for leaking the source, which made development 100x easier ❤️
 </p>

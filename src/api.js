@@ -13,6 +13,11 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
     const attempt = async () => {
         try {
             ws = new yolkws(`wss://${instance}/services/`, proxy);
+            ws.onerror = async (e) => {
+                console.error(e);
+                await new Promise((resolve) => setTimeout(resolve, 100));
+                return await attempt();
+            }
         } catch {
             await new Promise((resolve) => setTimeout(resolve, 100));
             await attempt();
@@ -23,7 +28,7 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
 
     return new Promise((resolve) => {
         ws.onopen = () => {
-            // console.log('opened')
+            ws.onerror = null;
             ws.send(JSON.stringify(request));
         }
 
@@ -88,8 +93,10 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
                 returnSecureToken: true
             }, {
                 headers: {
+                    'origin': 'https://shellshock.io',
                     'user-agent': UserAgent,
-                    'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
+                    'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
+                    'x-firebase-locale': 'en'
                 },
                 httpsAgent: (ProxiesEnabled && prox) ? new SocksProxyAgent(prox) : false
             })
@@ -102,6 +109,9 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
                 console.error('loginWithCredentials: Network req failed (auth/network-request-failed), retrying, k =', k);
             } else if (error.code == 'auth/missing-email') {
                 return 'firebase_no_credentials';
+            } else if (error.code == 'ERR_BAD_REQUEST') {
+                console.error('loginWithCredentials: Error:', email, password);
+                console.error('loginWithCredentials: Error:', error.response?.data || error, 'k =', k);
             } else {
                 console.error('loginWithCredentials: Error:', email, password);
                 console.error('loginWithCredentials: Error:', error, 'k =', k);
