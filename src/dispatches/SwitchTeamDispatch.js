@@ -1,4 +1,5 @@
-import packet from '#packet';
+import CommOut from '../comm/CommOut.js';
+import { CommCode } from '../constants/codes.js';
 
 export class SwitchTeamDispatch {
     check(bot) {
@@ -24,7 +25,9 @@ export class SwitchTeamDispatch {
     }
 
     execute(bot) {
-        new packet.TeamSwitchingTraitorPacket().execute(bot.game.socket);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.switchTeam);
+        out.send(bot.game.socket);
     }
 }
 

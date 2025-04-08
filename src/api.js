@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import yolkws from './socket.js';
 
-import { FirebaseKey, ProxiesEnabled, UserAgent } from '#constants';
+import { FirebaseKey, ProxiesEnabled, UserAgent } from './constants/index.js';
 
 let SocksProxyAgent;
 if (ProxiesEnabled) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;

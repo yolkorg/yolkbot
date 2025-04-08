@@ -1,4 +1,5 @@
-import packet from '#packet';
+import CommOut from '../comm/CommOut.js';
+import { CommCode } from '../constants/codes.js';
 
 export class ChatDispatch {
     constructor(msg, noLimit = false) {
@@ -17,7 +18,11 @@ export class ChatDispatch {
     }
 
     execute(bot) {
-        new packet.ChatPacket(this.msg).execute(bot.game.socket);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.chat);
+        out.packString(this.msg);
+        out.send(bot.game.socket);
+
         bot.lastChatTime = Date.now();
     }
 }

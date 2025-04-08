@@ -1,4 +1,5 @@
-import packet from '#packet';
+import CommOut from '../comm/CommOut.js';
+import { CommCode } from '../constants/codes.js';
 
 export class ReportPlayerDispatch {
     constructor(idOrName, reasons = {}) {
@@ -39,7 +40,11 @@ export class ReportPlayerDispatch {
 
         if (!target) throw new Error('target player for ReportPlayerDispatch not found')
 
-        new packet.ReportPacket(target, this.reasonInt).execute(bot.game.socket);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.reportPlayer);
+        out.packString(target);
+        out.packInt8(this.reasonInt);
+        out.send(bot.game.socket);
     }
 }
 
