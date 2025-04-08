@@ -1,0 +1,40 @@
+name: Sync Data
+
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Run scrapers
+        run: |
+          bun ./cli/scrape/challenges.js
+          bun ./cli/scrape/codes.js
+          bun ./cli/scrape/items.js
+          bun ./cli/scrape/maps.js
+          git diff --quiet ./src/constants/* || echo "CHANGED=true" >> $GITHUB_ENV
+          echo $GITHUB_ENV
+
+      - name: Commit and push changes
+        if: env.CHANGED == 'true'
+        run: |
+          git config --global user.name "yolkbot"
+          git config --global user.email "octocat@github.com"
+          git add .
+          git commit -m "update maps & items" -m "this is an automatic commit that updates shell shockers data"
+          git push origin main
