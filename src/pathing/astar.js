@@ -1,12 +1,6 @@
 import { NodeList } from './mapnode.js';
 import { BinaryHeap } from './binaryheap.js';
 
-function printPath(path) {
-    for (const item of path) {
-        console.log(item.position);
-    }
-} // have it your way eslint
-
 export default class AStar {
     constructor(list) {
         this.list = list;
@@ -16,7 +10,7 @@ export default class AStar {
         }
     }
 
-    heuristic(pos1, pos2) { // @1ust Taxicab3D!
+    heuristic(pos1, pos2) {
         return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y) + Math.abs(pos1.z - pos2.z);
     }
 
@@ -50,7 +44,6 @@ export default class AStar {
             if (current === end) {
                 // console.log('done with astar - path found')
                 const val = this.reversePath(current);
-                printPath(val);
                 return val;
             }
 
