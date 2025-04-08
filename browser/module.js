@@ -7,7 +7,6 @@ export { default as Dispatches } from '../src/dispatches/index.js';
 
 export * as API from '../src/api.js';
 export * as Comm from '../src/comm/index.js';
-export * as Packet from '../src/packet.js';
 
 export * as Constants from '../src/constants/index.js';
 export * as Guns from '../src/constants/guns.js';
