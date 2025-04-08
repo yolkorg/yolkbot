@@ -10,7 +10,7 @@ fs.mkdirSync(buildDir);
 
 const build = async (module) => {
     await esbuild.build({
-        entryPoints: [path.join(import.meta.dirname, `${module}.js`)],
+        entryPoints: [path.join(import.meta.dirname, 'entry', `${module}.js`)],
         outfile: path.join(buildDir, `${module}.js`),
 
         minify: true,
