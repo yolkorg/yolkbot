@@ -7,7 +7,6 @@ import { default as Dispatches } from '../src/dispatches/index.js';
 
 import * as API from '../src/api.js';
 import * as Comm from '../src/comm/index.js';
-import * as Packet from '../src/packet.js';
 
 import * as Constants from '../src/constants/index.js';
 import * as Guns from '../src/constants/guns.js';
@@ -21,7 +20,6 @@ const yolkbot = {
     Dispatches,
     API,
     Comm,
-    Packet,
     Constants,
     Guns,
     Items,
