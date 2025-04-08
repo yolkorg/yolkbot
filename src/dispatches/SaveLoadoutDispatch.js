@@ -1,9 +1,10 @@
 /* eslint-disable stylistic/max-len */
 
-import { queryServices } from '#api';
-import { findItemById, GunList, ItemTypes } from '#constants';
+import { queryServices } from '../api.js';
+import { findItemById, GunList, ItemTypes } from '../constants/index.js';
 
-import packet from '#packet';
+import CommOut from '../comm/CommOut.js';
+import { CommCode } from '../constants/codes.js';
 
 const isDefault = (itemId) => findItemById(itemId) && findItemById(itemId).unlock == 'default';
 const isType = (itemId, type) => findItemById(itemId) && findItemById(itemId).item_type_id == type;
@@ -89,8 +90,12 @@ export class SaveLoadoutDispatch {
         bot.account.loadout = loadout;
 
         saveLoadout.then(() => {
-            if (bot.state.joinedGame)
-                new packet.ChangeCharacterPacket(this.changes?.classIdx || bot.me.selectedGun).execute(bot.game.socket);
+            if (bot.state.joinedGame) {
+                const out = CommOut.getBuffer();
+                out.packInt8(CommCode.changeCharacter);
+                out.packInt8(this.changes?.classIdx || bot.me.selectedGun);
+                out.send(bot.game.socket);
+            }
 
             const findCosmetics = bot.intents.includes(bot.Intents.COSMETIC_DATA);
 

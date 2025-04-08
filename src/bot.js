@@ -1,4 +1,4 @@
-import { createAccount, loginAnonymously, loginWithCredentials, loginWithRefreshToken, queryServices } from '#api';
+import { createAccount, loginAnonymously, loginWithCredentials, loginWithRefreshToken, queryServices } from './api.js';
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
@@ -23,7 +23,7 @@ import {
     PlayTypes,
     ProxiesEnabled,
     ShellStreaks
-} from '#constants';
+} from './constants/index.js';
 
 import LookAtPosDispatch from './dispatches/LookAtPosDispatch.js';
 import MovementDispatch from './dispatches/MovementDispatch.js';
@@ -363,7 +363,7 @@ export class Bot {
                     this.matchmaker.off('msg', listener);
 
                     this.game.raw = mes;
-                    this.game.code = code;
+                    this.game.code = mes.id;
 
                     resolve();
                 }
@@ -1210,7 +1210,7 @@ export class Bot {
                 }
 
                 // secondary, always cluck9mm
-                if (player.weapons[1] && player.weapons[0].ammo) {
+                if (player.weapons[1] && player.weapons[1].ammo) {
                     player.weapons[1].ammo.rounds = player.weapons[1].ammo.capacity;
                     player.weapons[1].ammo.store = player.weapons[1].ammo.storeMax;
                 }

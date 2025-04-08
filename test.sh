@@ -1,6 +1,7 @@
 #!/bin/bash
 
-rm -f ./build/*.tgz
+rm -f ./build/
+mkdir build
 
 version=$(jq -r '.version' package.json)
 buildId=$RANDOM

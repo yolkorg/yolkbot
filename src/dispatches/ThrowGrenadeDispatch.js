@@ -1,4 +1,5 @@
-import packet from '#packet';
+import CommOut from '../comm/CommOut.js';
+import { CommCode } from '../constants/codes.js';
 
 export class ThrowGrenadeDispatch {
     constructor(power = 1) {
@@ -15,7 +16,10 @@ export class ThrowGrenadeDispatch {
     }
 
     execute(bot) {
-        new packet.ThrowGrenadePacket(this.power).execute(bot.game.socket);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.throwGrenade);
+        out.packFloat(this.power);
+        out.send(bot.game.socket);
     }
 }
 

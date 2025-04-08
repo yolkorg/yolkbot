@@ -1,4 +1,5 @@
-import packet from '#packet';
+import CommOut from '../comm/CommOut.js';
+import { CommCode } from '../constants/codes.js';
 
 export class SwapWeaponDispatch {
     check(bot) {
@@ -7,7 +8,11 @@ export class SwapWeaponDispatch {
 
     execute(bot) {
         bot.me.activeGun = +!bot.me.activeGun;
-        new packet.SwapWeaponPacket(bot.me.activeGun).execute(bot.game.socket);
+        
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.swapWeapon);
+        out.packInt8(bot.me.activeGun);
+        out.send(bot.game.socket);
     }
 }
 

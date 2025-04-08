@@ -1,4 +1,5 @@
-import packet from '#packet';
+import CommOut from '../comm/CommOut.js';
+import { CommCode } from '../constants/codes.js';
 
 export class ReloadDispatch {
     check(bot) {
@@ -6,7 +7,9 @@ export class ReloadDispatch {
     }
 
     execute(bot) {
-        new packet.ReloadPacket().execute(bot.game.socket);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.reload);
+        out.send(bot.game.socket);
 
         const playerActiveWeapon = bot.me.weapons[bot.me.activeGun];
 

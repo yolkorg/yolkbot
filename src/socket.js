@@ -1,6 +1,6 @@
 import NodeWebSocket from 'ws';
 
-import { IsBrowser, ProxiesEnabled, UserAgent } from '#constants';
+import { IsBrowser, ProxiesEnabled, UserAgent } from './constants/index.js';
 
 const WS = IsBrowser ? window.WebSocket : NodeWebSocket;
 

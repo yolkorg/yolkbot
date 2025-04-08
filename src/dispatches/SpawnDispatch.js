@@ -1,4 +1,5 @@
-import packet from '#packet';
+import CommOut from '../comm/CommOut.js';
+import { CommCode } from '../constants/codes.js';
 
 export class SpawnDispatch {
     check(bot) {
@@ -8,7 +9,9 @@ export class SpawnDispatch {
     }
 
     execute(bot) {
-        new packet.RespawnPacket().execute(bot.game.socket);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.requestRespawn);
+        out.send(bot.game.socket);
 
         bot.lastSpawnedTime = Date.now();
         bot.me.playing = true;

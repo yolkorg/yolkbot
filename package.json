@@ -1,6 +1,6 @@
 {
     "name": "yolkbot",
-    "description": "create a shell shockers (self) bot in under 10 lines.",
+    "description": "create a shell shockers bot in under 10 lines.",
     "version": "0.1.1-alpha.40",
     "keywords": [
         "shell shockers",
@@ -39,7 +39,6 @@
             "import": "./src/matchmaker.js",
             "types": "./src/types/matchmaker.d.ts"
         },
-        "./packets": "./src/packet.js",
         "./pathing/*": "./src/pathing/*.js",
         "./pathing/*.js": "./src/pathing/*.js",
         "./bot": {
@@ -92,16 +91,6 @@
         "globals": "^15.15.0"
     },
     "scripts": {
-        "lint": "eslint --fix",
-        "prod": "./prod.sh",
-        "test": "./build.sh"
-    },
-    "imports": {
-        "#api": "./src/api.js",
-        "#bot": "./src/bot.js",
-        "#constants": "./src/constants/index.js",
-        "#dispatch/*": "./src/dispatches/*",
-        "#matchmaker": "./src/matchmaker.js",
-        "#packet": "./src/packet.js"
+        "lint": "eslint --fix"
     }
 }

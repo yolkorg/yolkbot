@@ -1,4 +1,4 @@
-import { GunList, ShellStreaks, SocialMedias } from '#constants';
+import { GunList, ShellStreaks, SocialMedias } from '../constants/index.js';
 import { Cluck9mm } from '../constants/guns.js';
 
 export class GamePlayer {

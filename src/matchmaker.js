@@ -1,5 +1,5 @@
-import { loginAnonymously } from '#api';
-import { GameModes, PlayTypes, ProxiesEnabled } from '#constants';
+import { loginAnonymously } from './api.js';
+import { GameModes, PlayTypes, ProxiesEnabled } from './constants/index.js';
 
 import yolkws from './socket.js';
 
@@ -15,9 +15,6 @@ export class Matchmaker {
 
     #forceClose = false;
 
-    // sessionId: string, a custom session id
-    // proxy: a socks5 proxy string
-    // instance: a custom game instance
     constructor(params = {}) {
         if (!params.instance) params.instance = 'shellshock.io';
 
