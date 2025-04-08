@@ -636,7 +636,7 @@ export class Bot {
     }
 
     update() {
-        if (!this.state.joinedGame) throw new Error('Not playing, can\'t update. ');
+        if (!this.state.joinedGame) throw new Error('You cannot call update() if the bot is not in a game.');
 
         // process pathfinding
         if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING)) this.#processPathfinding();
