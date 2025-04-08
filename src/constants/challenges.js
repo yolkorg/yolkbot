@@ -2,7 +2,7 @@
 export const Challenges = [
     {
         "id": 1,
-        "loc_ref": "chlg_kill_streak_five",
+        "loc_ref": "chlg_kill_streak_five_test",
         "type": 0,
         "subType": 0,
         "period": 0,
