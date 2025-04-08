@@ -1,20 +1,4 @@
 /* eslint-disable stylistic/max-len */
-/*function stringifyCircular(obj) {
-    const cache = [];
-    return JSON.stringify(obj, (_, value) => {
-        if (typeof value === 'object' && value !== null) {
-
-            // Duplicate reference found, discard key
-            if (cache.includes(value)) {
-                return '* Circular';
-            }
-
-            // Store value in our collection
-            cache.push(value);
-        }
-        return value;
-    }, 4);
-}*/
 
 class NodeList {
     constructor(raw) {
@@ -27,7 +11,7 @@ class NodeList {
                     (nodeData.x << 16) |
                     (nodeData.y << 8) |
                     (nodeData.z))] = true;
-                this.add(new MapNode(meshName, nodeData));
+                this.list.push(new MapNode(meshName, nodeData));
             }
         }
 
@@ -39,7 +23,7 @@ class NodeList {
                         (y << 8) |
                         (z)
                     )]) {
-                        this.add(new MapNode('SPECIAL.__yolkbot_air__.none', { x: x, y: y, z: z }));
+                        this.list.push(new MapNode('SPECIAL.air.none', { x: x, y: y, z: z }));
                     }
                 }
             }
@@ -68,14 +52,6 @@ class NodeList {
                 }
             }
         }
-    }
-
-    add(node) {
-        this.list.push(node);
-    }
-
-    remove(node) {
-        this.list.splice(this.list.indexOf(node), 1);
     }
 
     at(x, y, z) {
@@ -119,9 +95,7 @@ class NodeList {
 
         for (let i = 0; i <= steps; i++) {
             const node = this.at(Math.round(x), Math.round(y), Math.round(z));
-            if (node && node.isSolid()) {
-                return false;
-            }
+            if (node && node.isSolid()) return false;
             x += xStep;
             y += yStep;
             z += zStep;
@@ -186,10 +160,6 @@ class MapNode {
         return this.meshType == 'none';
     }
 
-    canPassThroughOnAllFaces() {
-        return this.isAir();
-    }
-
     canLink(node, list) {
         const dx0 = this.x - node.x;
         const dz0 = this.z - node.z;
@@ -205,10 +175,7 @@ class MapNode {
 
         const belowMe = list.at(this.x, this.y - 1, this.z);
         const belowOther = list.at(node.x, node.y - 1, node.z);
-
-        if (!belowMe || !belowOther) {
-            return false;
-        }
+        if (!belowMe || !belowOther) return false;
 
         const FORWARD_RY_WEDGE_MAPPING = {
             0: { x: 0, z: -1 },
@@ -243,14 +210,6 @@ class MapNode {
         }
     }
 
-    trueCenter() {
-        return {
-            x: this.x + 0.5,
-            y: this.y + 0.5,
-            z: this.z + 0.5
-        }
-    }
-
     flatCenter() {
         return {
             x: this.x + 0.5,
@@ -262,11 +221,6 @@ class MapNode {
     flatRadialDistance(position) {
         const pos = this.flatCenter();
         return Math.hypot(pos.x - position.x, pos.z - position.z);
-    }
-
-    floorCollides(position) {
-        const posFloor = Object.entries(position).map(entry => Math.floor(entry[1]));
-        return this.x == posFloor[0] && this.y == posFloor[1] && this.z == posFloor[2];
     }
 
     positionStr() {
