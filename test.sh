@@ -1,6 +1,4 @@
-#!/bin/bash
-
-rm -f ./build/
+rm -rf ./build/
 mkdir build
 
 version=$(jq -r '.version' package.json)

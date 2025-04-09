@@ -205,6 +205,9 @@ export class Bot {
             // balance is tracked
             eggBalance: 0,
 
+            // egg org side
+            eggOrgSide: 'none',
+
             // raw login
             rawLoginData: {}
         };
@@ -296,6 +299,7 @@ export class Bot {
 
         this.account.accountAge = loginData.accountAge;
         this.account.eggBalance = loginData.currentBalance;
+        this.account.eggOrgSide = loginData.eggOrgNeedsFaction === 'rew_eggfu' ? 'good' : 'evil';
         this.account.emailVerified = loginData.emailVerified;
         this.account.firebaseId = loginData.firebaseId;
         this.account.id = loginData.id;
