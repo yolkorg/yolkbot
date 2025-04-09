@@ -170,6 +170,7 @@ export interface Pathing {
 
 export interface BotState {
     name: string;
+    weaponIdx: number;
     reloading: boolean;
     swappingGun: boolean;
     usingMelee: boolean;
@@ -190,7 +191,8 @@ type intents = {
     PING: 5,
     COSMETIC_DATA: 6,
     PLAYER_HEALTH: 7,
-    PACKET_HOOK: 8
+    PACKET_HOOK: 8,
+    MONITOR: 9
 }
 
 export class Bot {

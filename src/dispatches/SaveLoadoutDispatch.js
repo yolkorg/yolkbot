@@ -70,9 +70,11 @@ export class SaveLoadoutDispatch {
     }
 
     execute(bot) {
-        if (this.changes.classIdx && this.changes.classIdx !== bot.me.selectedGun) {
+        if (bot.me && this.changes.classIdx && this.changes.classIdx !== bot.me.selectedGun) {
             bot.me.weapons[0] = new GunList[this.changes.classIdx]();
         }
+
+        bot.state.weaponIdx = this.changes.classIdx || bot.state.weaponIdx;
 
         const loadout = {
             ...bot.account.loadout,
@@ -89,7 +91,7 @@ export class SaveLoadoutDispatch {
 
         bot.account.loadout = loadout;
 
-        saveLoadout.then(() => {
+        if (bot.me) saveLoadout.then(() => {
             if (bot.state.joinedGame) {
                 const out = CommOut.getBuffer();
                 out.packInt8(CommCode.changeCharacter);
