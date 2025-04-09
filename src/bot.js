@@ -646,7 +646,7 @@ export class Bot {
         if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING)) this.#processPathfinding();
 
         // process incoming packets
-        while (this._packetQueue.length > 0) this.#handlePacket(this._packetQueue.shift());
+        while (this._packetQueue.length > 0) this.processPacket(this._packetQueue.shift());
 
         // process dispatches
         if (this._dispatches.length > 0) {
@@ -1547,7 +1547,7 @@ export class Bot {
         }
     }
 
-    #handlePacket(packet) {
+    processPacket(packet) {
         CommIn.init(packet);
 
         if (this.intents.includes(this.Intents.PACKET_HOOK))
