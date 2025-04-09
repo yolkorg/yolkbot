@@ -18,7 +18,7 @@ const build = async (module) => {
         target: 'esnext',
         format: 'esm',
         banner: { js: '/* eslint-disable */\n' },
-        external: ['smallsocks', 'undici', 'node:fs', 'node:os', 'node:path']
+        external: ['smallsocks', 'ws', 'undici', 'node:fs', 'node:os', 'node:path']
     });
 
     let build = fs.readFileSync(path.join(buildDir, `${module}.js`), 'utf-8');

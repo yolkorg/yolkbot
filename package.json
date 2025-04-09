@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "0.1.2-alpha.1",
+    "version": "0.1.2-alpha.8",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -34,6 +34,8 @@
             "types": "./src/types/api.d.ts"
         },
         "./browser": "./browser/build/module.js",
+        "./browser/*": "./browser/build/*.js",
+        "./browser/*.js": "./browser/build/*.js",
         "./comm": "./src/comm/index.js",
         "./matchmaker": {
             "import": "./src/matchmaker.js",

@@ -43,7 +43,8 @@ const intents = {
     PING: 5,
     COSMETIC_DATA: 6,
     PLAYER_HEALTH: 7,
-    PACKET_HOOK: 8
+    PACKET_HOOK: 8,
+    MONITOR: 9
 }
 
 export class Bot {
@@ -68,8 +69,9 @@ export class Bot {
 
         // private information NOT FOR OTHER PLAYERS!!
         this.state = {
-            // kept for specifying socket open sequence
+            // kept for specifying various params
             name: '',
+            weaponIdx: 0,
 
             // tracking for dispatch checks
             reloading: false,
@@ -387,97 +389,6 @@ export class Bot {
         });
     }
 
-    async #onGameMesssage(msg) {
-        CommIn.init(msg.data);
-
-        let out;
-        const cmd = CommIn.unPackInt8U();
-
-        switch (cmd) {
-            case CommCode.socketReady:
-                out = CommOut.getBuffer();
-                out.packInt8(CommCode.joinGame);
-
-                out.packString(this.state.name); // name
-                out.packString(this.game.raw.uuid); // game id
-
-                out.packInt8(0); // hidebadge
-                out.packInt8(0); // weapon choice
-
-                out.packInt32(this.account.session); // session int
-                out.packString(this.account.firebaseId); // firebase id
-                out.packString(this.account.sessionId); // session id
-
-                out.send(this.game.socket);
-                break;
-
-            case CommCode.gameJoined: {
-                this.me.id = CommIn.unPackInt8U();
-                // console.log("My id is:", this.me.id);
-                this.me.team = CommIn.unPackInt8U();
-                // console.log("My team is:", this.me.team);
-                this.game.gameModeId = CommIn.unPackInt8U(); // aka gameType
-                this.game.gameMode = GameModesById[this.game.gameModeId];
-                // console.log("Gametype:", this.game.gameMode, this.game.gameModeId);
-                this.game.mapIdx = CommIn.unPackInt8U();
-                this.game.map = Maps[this.game.mapIdx];
-                if (this.intents.includes(this.Intents.PATHFINDING)) {
-                    this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
-                    this.pathing.nodeList = new NodeList(this.game.map.raw);
-                    if (this.game.gameModeId === GameModes.kotc) this.#initKotcZones();
-                }
-                // console.log("Map:", this.game.map);
-                this.game.playerLimit = CommIn.unPackInt8U();
-                // console.log("Player limit:", this.game.playerLimit);
-                this.game.isGameOwner = CommIn.unPackInt8U() == 1;
-                // console.log("Is game owner:", this.game.isGameOwner);
-                this.game.isPrivate = CommIn.unPackInt8U() == 1;
-                // console.log("Is private game:", this.game.isPrivate);
-
-                // console.log('Successfully joined game.');
-                this.state.joinedGame = true;
-                this.lastDeathTime = Date.now();
-
-                const out = CommOut.getBuffer();
-                out.packInt8(CommCode.clientReady);
-                out.send(this.game.socket);
-
-                this.game.socket.onmessage = (msg) => this._packetQueue.push(msg.data);
-
-                if (this.autoUpdate)
-                    this.updateIntervalId = setInterval(() => this.update(), this.updateInterval);
-
-                if (this.intents.includes(this.Intents.PING)) {
-                    const out = CommOut.getBuffer();
-                    out.packInt8(CommCode.ping);
-                    out.send(this.game.socket);
-                    this.lastPingTime = Date.now();
-                }
-                break;
-            }
-
-            case CommCode.eventModifier:
-                // console.log("Echoed eventModifier"); // why the fuck do you need to do this
-                out = CommOut.getBuffer();
-                out.packInt8(CommCode.eventModifier);
-                out.send(this.game.socket);
-                break;
-
-            case CommCode.requestGameOptions:
-                this.#processGameRequestOptionsPacket();
-                break;
-
-            default:
-                try {
-                    const inferredCode = Object.entries(CommCode).filter(([, v]) => v == cmd)[0][0];
-                    console.error('onGameMessage: Received but did not handle a:', inferredCode);
-                    // packet could potentially not exist, then [0][0] will error
-                } catch {
-                    console.error('onGameMessage: Unexpected packet received during startup: ' + cmd);
-                }
-        }
-    }
-
     // region - a region id ('useast', 'germany', etc)
     // mode - a mode name that corresponds to a GameMode id
     // map - the name of a map
@@ -571,7 +482,7 @@ export class Bot {
             this.game.socket.onerror = null;
         }
 
-        this.game.socket.onmessage = this.#onGameMesssage.bind(this);
+        this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
         this.game.socket.onclose = (e) => {
             // console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
@@ -665,19 +576,20 @@ export class Bot {
         if (now - this.lastUpdateTime >= 50) {
             this.emit('tick');
 
-            // Send out update packet
-            const out = CommOut.getBuffer();
-            out.packInt8(CommCode.syncMe);
-            out.packInt8(Math.random() * 128 | 0); // stateIdx
-            out.packInt8(this.me.serverStateIdx); // serverStateIdx
-            for (let i = 0; i < 3; i++) {
-                out.packInt8(this.controlKeys); // controlkeys
-                out.packInt8(this.state.shotsFired); // shots fired
-                out.packRadU(this.me.view.yaw); // yaw
-                out.packRad(this.me.view.pitch); // pitch
-                out.packInt8(100); // fixes commcode issues, does nothing
+            if (!this.intents.includes(this.Intents.MONITOR)) {
+                const out = CommOut.getBuffer();
+                out.packInt8(CommCode.syncMe);
+                out.packInt8(Math.random() * 128 | 0); // stateIdx
+                out.packInt8(this.me.serverStateIdx); // serverStateIdx
+                for (let i = 0; i < 3; i++) {
+                    out.packInt8(this.controlKeys); // controlkeys
+                    out.packInt8(this.state.shotsFired); // shots fired
+                    out.packRadU(this.me.view.yaw); // yaw
+                    out.packRad(this.me.view.pitch); // pitch
+                    out.packInt8(100); // fixes commcode issues, does nothing
+                }
+                out.send(this.game.socket);
             }
-            out.send(this.game.socket);
 
             this.lastUpdateTime = now;
             this.state.shotsFired = 0;
@@ -1114,9 +1026,11 @@ export class Bot {
     }
 
     #processEventModifierPacket() {
-        const out = CommOut.getBuffer();
-        out.packInt8(CommCode.eventModifier);
-        out.send(this.game.socket);
+        if (!this.intents.includes(this.Intents.MONITOR)) {
+            const out = CommOut.getBuffer();
+            out.packInt8(CommCode.eventModifier);
+            out.send(this.game.socket);
+        }
     }
 
     #processRemovePlayerPacket() {
@@ -1350,7 +1264,7 @@ export class Bot {
 
         this.emit('pingUpdate', oldPing, this.ping);
 
-        setTimeout(() => {
+        if (!this.intents.includes(this.Intents.MONITOR)) setTimeout(() => {
             const out = CommOut.getBuffer();
             out.packInt8(CommCode.ping);
             out.send(this.game.socket);
@@ -1547,6 +1461,68 @@ export class Bot {
         }
     }
 
+    #processSocketReadyPacket() {
+        if (!this.intents.includes(this.Intents.MONITOR)) {
+            const out = CommOut.getBuffer();
+            out.packInt8(CommCode.joinGame);
+
+            out.packString(this.state.name);
+            out.packString(this.game.raw.uuid);
+
+            out.packInt8(0); // hidebadge
+            out.packInt8(this.state.weaponIdx || 0); // weapon idx
+
+            out.packInt32(this.account.session);
+            out.packString(this.account.firebaseId);
+            out.packString(this.account.sessionId);
+
+            out.send(this.game.socket);
+        }
+    }
+
+    async #processGameJoinedPacket() {
+        this.me.id = CommIn.unPackInt8U();
+        this.me.team = CommIn.unPackInt8U();
+        this.game.gameModeId = CommIn.unPackInt8U(); // aka gameType
+        this.game.gameMode = GameModesById[this.game.gameModeId];
+        this.game.mapIdx = CommIn.unPackInt8U();
+        this.game.map = Maps[this.game.mapIdx];
+        if (this.intents.includes(this.Intents.PATHFINDING)) {
+            this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
+            this.pathing.nodeList = new NodeList(this.game.map.raw);
+            if (this.game.gameModeId === GameModes.kotc) this.#initKotcZones();
+        }
+        this.game.playerLimit = CommIn.unPackInt8U();
+        this.game.isGameOwner = CommIn.unPackInt8U() == 1;
+        this.game.isPrivate = CommIn.unPackInt8U() == 1;
+
+        // console.log('Successfully joined game.');
+
+        this.state.joinedGame = true;
+        this.lastDeathTime = Date.now();
+
+        if (!this.intents.includes(this.Intents.MONITOR)) {
+            const out = CommOut.getBuffer();
+            out.packInt8(CommCode.clientReady);
+            out.send(this.game.socket);
+
+            this.game.socket.onmessage = (msg) => this._packetQueue.push(msg.data);
+        }
+
+        if (this.autoUpdate)
+            this.updateIntervalId = setInterval(() => this.update(), this.updateInterval);
+
+        if (this.intents.includes(this.Intents.PING)) {
+            this.lastPingTime = Date.now();
+
+            if (!this.intents.includes(this.Intents.MONITOR)) {
+                const out = CommOut.getBuffer();
+                out.packInt8(CommCode.ping);
+                out.send(this.game.socket);
+            }
+        }
+    }
+
     processPacket(packet) {
         CommIn.init(packet);
 
@@ -1680,6 +1656,14 @@ export class Bot {
 
                 case CommCode.challengeCompleted:
                     this.#processChallengeCompletePacket();
+                    break;
+
+                case CommCode.socketReady:
+                    this.#processSocketReadyPacket();
+                    break;
+
+                case CommCode.gameJoined:
+                    this.#processGameJoinedPacket();
                     break;
 
                 case CommCode.gameAction:
