@@ -1,11 +1,7 @@
-import axios from 'axios';
-
+import globals from './globals.js';
 import yolkws from './socket.js';
 
-import { FirebaseKey, ProxiesEnabled, UserAgent } from './constants/index.js';
-
-let SocksProxyAgent;
-if (ProxiesEnabled) SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
+import { FirebaseKey, UserAgent } from './constants/index.js';
 
 const queryServices = async (request, proxy = '', instance = 'shellshock.io') => {
     let ws;
@@ -56,11 +52,11 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
     });
 }
 
-async function createAccount(email, password, prox = '', instance = 'shellshock.io') {
-    return await loginWithCredentials(email, password, prox, instance, true);
+async function createAccount(email, password, proxy = '', instance = 'shellshock.io') {
+    return await loginWithCredentials(email, password, proxy, instance, true);
 }
 
-async function loginWithCredentials(email, password, prox = '', instance = 'shellshock.io', _useRegisterEndpoint) {
+async function loginWithCredentials(email, password, proxy = '', instance = 'shellshock.io', _useRegisterEndpoint) {
     if (!email || !password) return 'firebase_no_credentials';
 
     /*
@@ -87,20 +83,24 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
 
     while (!SUCCESS) {
         try {
-            request = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
-                email: email,
-                password: password,
-                returnSecureToken: true
-            }, {
+            request = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                    returnSecureToken: true
+                }),
                 headers: {
+                    'content-type': 'application/json',
                     'origin': 'https://shellshock.io',
                     'user-agent': UserAgent,
                     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
                     'x-firebase-locale': 'en'
                 },
-                httpsAgent: (ProxiesEnabled && prox) ? new SocksProxyAgent(prox) : false
-            })
-            body = request.data
+                dispatcher: proxy ? new globals.ProxyAgent(proxy) : undefined
+            });
+
+            body = await request.json();
             token = body.idToken;
             SUCCESS = true;
         } catch (error) {
@@ -130,12 +130,12 @@ async function loginWithCredentials(email, password, prox = '', instance = 'shel
     const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
-    }, prox, instance);
+    }, proxy, instance);
 
     return response;
 }
 
-async function loginWithRefreshToken(refreshToken, prox = '', instance = 'shellshock.io') {
+async function loginWithRefreshToken(refreshToken, proxy = '', instance = 'shellshock.io') {
     if (!refreshToken) return 'firebase_no_credentials';
 
     const formData = new URLSearchParams();
@@ -148,14 +148,20 @@ async function loginWithRefreshToken(refreshToken, prox = '', instance = 'shells
 
     while (!SUCCESS) {
         try {
-            request = await axios.post(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, formData, {
+            request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
+                method: 'POST',
+                body: formData,
                 headers: {
+                    'content-type': 'application/x-www-form-urlencoded',
+                    'origin': 'https://shellshock.io',
                     'user-agent': UserAgent,
-                    'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
+                    'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
+                    'x-firebase-locale': 'en'
                 },
-                httpsAgent: (ProxiesEnabled && prox) ? new SocksProxyAgent(prox) : false
-            })
-            body = request.data
+                dispatcher: proxy ? new globals.ProxyAgent(proxy) : undefined
+            });
+
+            body = await request.json();
             token = body.id_token;
             SUCCESS = true;
         } catch (error) {
@@ -182,22 +188,28 @@ async function loginWithRefreshToken(refreshToken, prox = '', instance = 'shells
     const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
-    }, prox, instance);
+    }, proxy, instance);
 
     return response;
 }
 
-async function loginAnonymously(prox = '', instance = 'shellshock.io') {
-    const { data: body } = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
-        returnSecureToken: true
-    }, {
+async function loginAnonymously(proxy = '', instance = 'shellshock.io') {
+    const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
+        method: 'POST',
+        body: JSON.stringify({
+            returnSecureToken: true
+        }),
         headers: {
+            'content-type': 'application/json',
+            'origin': 'https://shellshock.io',
             'user-agent': UserAgent,
-            'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web'
+            'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
+            'x-firebase-locale': 'en'
         },
-        httpsAgent: (ProxiesEnabled && prox) ? new SocksProxyAgent(prox) : false
+        dispatcher: proxy ? new globals.ProxyAgent(proxy) : undefined
     });
 
+    const body = await req.json();
     const token = body.idToken;
 
     if (!token) {
@@ -208,7 +220,7 @@ async function loginAnonymously(prox = '', instance = 'shellshock.io') {
     const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
-    }, prox, instance);
+    }, proxy, instance);
 
     return response;
 }
