@@ -79,7 +79,10 @@ export class Bot {
             usingMelee: false,
 
             // shots fired ezzz
-            shotsFired: 0
+            shotsFired: 0,
+
+            // holy glitch
+            quit: false
         }
 
         this.players = {}
@@ -552,6 +555,7 @@ export class Bot {
 
     update() {
         if (!this.state.joinedGame) throw new Error('You cannot call update() if the bot is not in a game.');
+        if (this.state.quit) return;
 
         // process pathfinding
         if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING)) this.#processPathfinding();
@@ -614,6 +618,8 @@ export class Bot {
     #mustBeInstant = ['authFail', 'banned'];
 
     emit(event, ...args) {
+        if (this.state.quit) return;
+
         if (this._hooks[event]) {
             for (const cb of this._hooks[event]) {
                 if (this.#mustBeInstant.includes(event)) cb(...args);
@@ -1374,22 +1380,26 @@ export class Bot {
     }
 
     #processGameRequestOptionsPacket() {
-        const out = CommOut.getBuffer();
-        out.packInt8(CommCode.gameOptions);
-        out.packInt8(this.game.options.gravity * 4);
-        out.packInt8(this.game.options.damage * 4);
-        out.packInt8(this.game.options.healthRegen * 4);
+        if (!this.intents.includes(this.Intents.MONITOR)) {
+            const out = CommOut.getBuffer();
+            out.packInt8(CommCode.gameOptions);
+            out.packInt8(this.game.options.gravity * 4);
+            out.packInt8(this.game.options.damage * 4);
+            out.packInt8(this.game.options.healthRegen * 4);
 
-        const flags =
-            (this.game.options.locked ? 1 : 0) |
-            (this.game.options.noTeamChange ? 2 : 0) |
-            (this.game.options.noTeamShuffle ? 4 : 0);
+            const flags =
+                (this.game.options.locked ? 1 : 0) |
+                (this.game.options.noTeamChange ? 2 : 0) |
+                (this.game.options.noTeamShuffle ? 4 : 0);
 
-        out.packInt8(flags);
+            out.packInt8(flags);
 
-        this.game.options.weaponsDisabled.forEach((v) => {
-            out.packInt8(v ? 1 : 0);
-        });
+            this.game.options.weaponsDisabled.forEach((v) => {
+                out.packInt8(v ? 1 : 0);
+            });
+
+            out.send(this.game.socket);
+        }
     }
 
     #processExplodePacket() {
@@ -1714,11 +1724,11 @@ export class Bot {
         if (typeof response === 'string') return response;
 
         this.account.cw.limit = response.limit;
-        this.account.cw.atLimit = response.limit > 3;
+        this.account.cw.atLimit = response.limit >= 5;
 
         // if there is a "span", that means that it's under the daily limit and you can play again soon
         // if there is a "period", that means that the account is done for the day and must wait a long time
-        this.account.cw.secondsUntilPlay = response.span || response.period || 0;
+        this.account.cw.secondsUntilPlay = (this.account.cw.atLimit ? response.period : response.span) || 0;
         this.account.cw.canPlayAgain = Date.now() + (this.account.cw.secondsUntilPlay * 1000);
 
         return this.account.cw;
@@ -1739,7 +1749,7 @@ export class Bot {
         if (typeof response === 'string') return response;
 
         if (response.error) {
-            if (response.error == 'RATELIMITED') {
+            if (response.error == 'RATELIMITED' || response.error == 'RATELMITED') {
                 await this.checkChiknWinner();
                 return 'on_cooldown';
             } else if (response.error == 'SESSION_EXPIRED') {
@@ -1920,6 +1930,8 @@ export class Bot {
             delete this.me;
             delete this.players;
         }
+
+        this.state.quit = true;
     }
 }
 
