@@ -66,6 +66,8 @@ export interface Account {
     firebaseId: string;
     sessionId: string;
     session: string;
+    email: string;
+    password: string;
     cw: ChiknWinnerStatus;
     loadout: {
         hatId: number | null;
@@ -175,6 +177,7 @@ export interface BotState {
     swappingGun: boolean;
     usingMelee: boolean;
     shotsFired: number;
+    quit: boolean;
 }
 
 export interface ChiknWinnerResponse {
@@ -229,11 +232,12 @@ export class Bot {
     createPrivateGame(opts: { region: string; mode: string; map: string }): Promise<RawGameData>;
     join(botName: string, data: string | RawGameData): Promise<void>;
 
+    processPacket(data: number[]): void;
     dispatch(disp: ADispatch): void;
     update(): void;
 
     canSee(player: GamePlayer): boolean;
-    getBestTarget(customFilter: (player: GamePlayer) => boolean): GamePlayer | undefined;
+    getBestTarget(customFilter?: (player: GamePlayer) => boolean): GamePlayer | undefined;
 
     onAny(cb: Function): void;
 

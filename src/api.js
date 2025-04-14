@@ -97,7 +97,7 @@ async function loginWithCredentials(email, password, proxy = '', instance = 'she
                     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
                     'x-firebase-locale': 'en'
                 },
-                dispatcher: proxy ? new globals.ProxyAgent(proxy) : undefined
+                dispatcher: proxy ? new globals.ProxyAgent(proxy.replace(/socks([4|5|4a|5h]+)/g, 'https')) : undefined
             });
 
             body = await request.json();
@@ -158,7 +158,7 @@ async function loginWithRefreshToken(refreshToken, proxy = '', instance = 'shell
                     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
                     'x-firebase-locale': 'en'
                 },
-                dispatcher: proxy ? new globals.ProxyAgent(proxy) : undefined
+                dispatcher: proxy ? new globals.ProxyAgent(proxy.replace(/socks([4|5|4a|5h]+)/g, 'https')) : undefined
             });
 
             body = await request.json();
@@ -206,7 +206,7 @@ async function loginAnonymously(proxy = '', instance = 'shellshock.io') {
             'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
             'x-firebase-locale': 'en'
         },
-        dispatcher: proxy ? new globals.ProxyAgent(proxy) : undefined
+        dispatcher: proxy ? new globals.ProxyAgent(proxy.replace(/socks([4|5|4a|5h]+)/g, 'https')) : undefined
     });
 
     const body = await req.json();
