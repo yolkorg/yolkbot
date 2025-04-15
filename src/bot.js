@@ -1724,7 +1724,7 @@ export class Bot {
         if (typeof response === 'string') return response;
 
         this.account.cw.limit = response.limit;
-        this.account.cw.atLimit = response.limit >= 5;
+        this.account.cw.atLimit = response.limit >= 4;
 
         // if there is a "span", that means that it's under the daily limit and you can play again soon
         // if there is a "period", that means that the account is done for the day and must wait a long time

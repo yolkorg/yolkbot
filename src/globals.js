@@ -5,11 +5,11 @@ if (typeof process !== 'undefined') {
     globals.SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
     globals.ProxyAgent = (await import('undici')).ProxyAgent;
     globals.WebSocket = (await import('ws')).default;
-} else {
-    globals.fetch = fetch;
+} else if (typeof window !== 'undefined') {
+    globals.fetch = fetch.bind(window);
     globals.SocksProxyAgent = undefined;
     globals.ProxyAgent = class {};
     globals.WebSocket = WebSocket;
-}
+} else throw new Error('unknown environment...could not detect node.js or browser...open an issue in the yolkbot github');
 
 export default globals;
