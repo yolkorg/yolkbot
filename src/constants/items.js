@@ -2055,7 +2055,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.12025224778385146,
@@ -2082,7 +2082,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.063050017457572,
@@ -2108,7 +2108,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.07051683154538146,
@@ -2719,7 +2719,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -3093,7 +3093,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -3174,7 +3174,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.09010359208146834,
@@ -3782,7 +3782,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.02668556941149891,
@@ -3810,7 +3810,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.017915658211507868,
@@ -3838,7 +3838,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.009818349718689667,
@@ -4571,10 +4571,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "vip",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_golden_wing"
-        ],
         "align": {
             "x": 0.02761299490618674,
             "y": -0.14516558338113816,
@@ -5734,7 +5730,7 @@ export const Items = [
     {
         "id": 1232,
         "name": "Toilet Paper Wings",
-        "price": 10,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -5750,10 +5746,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_toilet_papr"
-        ],
         "align": {
             "x": 0.010997881077290383,
             "y": -0.24427555574888432,
@@ -6233,7 +6225,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.09736025924578184,
@@ -7167,7 +7159,7 @@ export const Items = [
     {
         "id": 1290,
         "name": "Ukraine Bandana",
-        "price": 3,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -7182,10 +7174,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_ukraine"
-        ],
         "align": {
             "x": -0.037327876564546614,
             "y": -0.09202308400058623,
@@ -7916,7 +7904,7 @@ export const Items = [
     {
         "id": 1320,
         "name": "Cross Fighter Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -7935,10 +7923,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_crosswing"
-        ],
         "align": {
             "x": 0.15930024282913313,
             "y": -0.18075422946571956,
@@ -9203,7 +9187,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.08104278879501514,
@@ -9232,7 +9216,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.16684042187958514,
@@ -9295,7 +9279,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.00973114550144527,
@@ -9703,7 +9687,7 @@ export const Items = [
     {
         "id": 1389,
         "name": "Harp Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -9719,10 +9703,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_harp"
-        ],
         "align": {
             "x": 0.1072334707841979,
             "y": -0.146697731985604,
@@ -10214,7 +10194,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.21431328988746134,
@@ -10715,7 +10695,7 @@ export const Items = [
     {
         "id": 1428,
         "name": "Hang Glider Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -10730,10 +10710,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_glider"
-        ],
         "align": {
             "x": 0.15806814144004577,
             "y": -0.19535527419964233,
@@ -11145,7 +11121,7 @@ export const Items = [
     {
         "id": 1445,
         "name": "The Grand Entrance Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -11161,10 +11137,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_wbs"
-        ],
         "align": {
             "x": -0.0572610207721147,
             "y": -0.2426137142559055,
@@ -11274,7 +11246,7 @@ export const Items = [
     {
         "id": 1450,
         "name": "Demon Pixel Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -11289,10 +11261,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_demonpixel"
-        ],
         "align": {
             "x": 0.05466192320814933,
             "y": -0.14156134563379286,
@@ -11557,7 +11525,7 @@ export const Items = [
     {
         "id": 1461,
         "name": "Ruins Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -11574,10 +11542,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_mayan"
-        ],
         "align": {
             "x": 0.13483230162508453,
             "y": -0.28814409860433626,
@@ -11682,10 +11646,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "manual",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_breadcat"
-        ],
         "align": {
             "x": -0.106919336396047,
             "y": -0.2016934352689943,
@@ -11933,7 +11893,7 @@ export const Items = [
     {
         "id": 1475,
         "name": "Disco Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -11949,10 +11909,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_disco"
-        ],
         "align": {
             "x": 0.030166434329798042,
             "y": -0.27482812378136545,
@@ -12063,7 +12019,7 @@ export const Items = [
     {
         "id": 1480,
         "name": "The Racing Spoiler Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -12079,10 +12035,6 @@ export const Items = [
         },
         "is_available": true,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_racecar"
-        ],
         "align": {
             "x": -0.00825870243090332,
             "y": -0.07832172595582376,
@@ -12388,7 +12340,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.07898811547084694,
@@ -12414,7 +12366,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.10272882257863225,
@@ -12817,7 +12769,7 @@ export const Items = [
     {
         "id": 1510,
         "name": "Golden Waffle Wings",
-        "price": 4,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -12833,10 +12785,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_waffle"
-        ],
         "align": {
             "x": 0.11523366883526381,
             "y": -0.19511899730781984,
@@ -12967,7 +12915,7 @@ export const Items = [
     {
         "id": 1516,
         "name": "Dragonfly Wings",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -12982,10 +12930,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_dfly"
-        ],
         "align": {
             "x": 0.11760358438311785,
             "y": -0.204291946057281,
@@ -13523,7 +13467,7 @@ export const Items = [
     {
         "id": 1539,
         "name": "Rizz Lightyear",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -13537,10 +13481,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_lighty"
-        ],
         "align": {
             "x": 0.16984050226076874,
             "y": -0.1521365675214874,
@@ -13642,7 +13582,7 @@ export const Items = [
     {
         "id": 1544,
         "name": "Dracolich Wings ",
-        "price": 4,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -13656,10 +13596,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_dlich"
-        ],
         "align": {
             "x": 0.1090015378592365,
             "y": -0.17438504153549697,
@@ -13788,7 +13724,7 @@ export const Items = [
     {
         "id": 1550,
         "name": "The Raiders Garb",
-        "price": 4,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -13803,10 +13739,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_raid"
-        ],
         "align": {
             "x": -0.06081399440956914,
             "y": -0.17548223840044253,
@@ -13841,7 +13773,7 @@ export const Items = [
     {
         "id": 1552,
         "name": "Neon Birdo Mask",
-        "price": 3,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -13857,10 +13789,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_neon"
-        ],
         "align": {
             "x": -0.04860903410989448,
             "y": -0.21843568312173384,
@@ -14012,7 +13940,7 @@ export const Items = [
     {
         "id": 1559,
         "name": "Robot Police Person",
-        "price": 4,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -14027,10 +13955,6 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_robo"
-        ],
         "align": {
             "x": -0.10415364027513307,
             "y": -0.2544572301225956,
@@ -14784,7 +14708,7 @@ export const Items = [
     {
         "id": 1588,
         "name": "Sumo suit",
-        "price": 4,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -14802,10 +14726,6 @@ export const Items = [
         },
         "is_available": true,
         "unlock": "premium",
-        "activeProduct": true,
-        "sku": [
-            "item_hat_sumo"
-        ],
         "align": {
             "x": -0.002183832012569553,
             "y": -0.07013694363675205,
@@ -14815,7 +14735,7 @@ export const Items = [
     {
         "id": 1589,
         "name": "Pixel Airplane Wings",
-        "price": 2147483647,
+        "price": 5,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -14831,6 +14751,10 @@ export const Items = [
         },
         "is_available": false,
         "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_hat_pixair"
+        ],
         "align": {
             "x": 0.213094379983787,
             "y": -0.16645957884834417,
@@ -15852,7 +15776,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -15874,7 +15798,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -15895,7 +15819,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -16914,7 +16838,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -16937,7 +16861,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -16960,7 +16884,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -18809,11 +18733,7 @@ export const Items = [
             ]
         },
         "is_available": true,
-        "unlock": "vip",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_golden_wing"
-        ]
+        "unlock": "vip"
     },
     {
         "id": 2205,
@@ -21809,7 +21729,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -21854,7 +21774,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -21877,7 +21797,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -21900,7 +21820,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -22443,7 +22363,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -24883,7 +24803,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -24906,7 +24826,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -24929,7 +24849,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -24974,7 +24894,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -24997,7 +24917,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -25022,7 +24942,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -27663,7 +27583,7 @@ export const Items = [
                 "Green"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -27941,7 +27861,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -28212,7 +28132,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -28898,7 +28818,7 @@ export const Items = [
                 "MarM25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -28961,11 +28881,7 @@ export const Items = [
             ]
         },
         "is_available": true,
-        "unlock": "purchase",
-        "activeProduct": false,
-        "sku": [
-            "item_ak_alien"
-        ]
+        "unlock": "purchase"
     },
     {
         "id": 3158,
@@ -29285,7 +29201,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -29566,7 +29482,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -30386,7 +30302,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -30645,7 +30561,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -30920,7 +30836,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -31572,7 +31488,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -32175,7 +32091,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -32457,7 +32373,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -33732,7 +33648,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -34029,7 +33945,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -34851,7 +34767,7 @@ export const Items = [
     {
         "id": 3961,
         "name": "The BFG",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 3,
         "item_type_name": "Primary",
         "category_name": "Eggsploder Primary Weapons",
@@ -34866,11 +34782,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_rpegg_bfg"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 3962,
@@ -35166,7 +35078,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -35440,7 +35352,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -36142,7 +36054,7 @@ export const Items = [
     {
         "id": 4055,
         "name": "Jack O' Lantern Whipper",
-        "price": 6,
+        "price": 2147483647,
         "item_type_id": 3,
         "item_type_name": "Primary",
         "category_name": "Whipper Primary Weapons",
@@ -36158,11 +36070,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_smg_jack"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 4056,
@@ -36208,7 +36116,7 @@ export const Items = [
     {
         "id": 4058,
         "name": "Irish Whipper",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 3,
         "item_type_name": "Primary",
         "category_name": "Whipper Primary Weapons",
@@ -36222,11 +36130,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_smg_irish"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 4059,
@@ -36484,7 +36388,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -36784,7 +36688,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -37521,7 +37425,7 @@ export const Items = [
     {
         "id": 4258,
         "name": "The Quackshot",
-        "price": 4,
+        "price": 2147483647,
         "item_type_id": 3,
         "item_type_name": "Primary",
         "category_name": "Crackshot Primary Weapons",
@@ -37535,11 +37439,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_m24_quack"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 4259,
@@ -37563,7 +37463,7 @@ export const Items = [
     {
         "id": 4260,
         "name": "The Checkmate Crackshot",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 3,
         "item_type_name": "Primary",
         "category_name": "Crackshot Primary Weapons",
@@ -37578,11 +37478,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_m24_chess"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 4261,
@@ -37912,11 +37808,7 @@ export const Items = [
             "fireColors": "gold"
         },
         "is_available": false,
-        "unlock": "vip",
-        "activeProduct": false,
-        "sku": [
-            "item_hat_golden_wing"
-        ]
+        "unlock": "vip"
     },
     {
         "id": 16012,
@@ -38007,7 +37899,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -38999,7 +38891,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -39027,7 +38919,7 @@ export const Items = [
     {
         "id": 16059,
         "name": "Slop Bucket Grenade",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 6,
         "item_type_name": "Grenade",
         "category_name": "Grenades",
@@ -39047,11 +38939,7 @@ export const Items = [
             "fireColors": "default"
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_gre_pail"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 16060,
@@ -39299,7 +39187,7 @@ export const Items = [
     {
         "id": 16071,
         "name": "Rogue Tire Grenade",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 6,
         "item_type_name": "Grenade",
         "category_name": "Grenades",
@@ -39318,11 +39206,7 @@ export const Items = [
             "fireColors": "default"
         },
         "is_available": true,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_gre_racecar"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 16074,
@@ -39414,7 +39298,7 @@ export const Items = [
     {
         "id": 16081,
         "name": "Mort Face Grenade",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 6,
         "item_type_name": "Grenade",
         "category_name": "Grenades",
@@ -39431,11 +39315,7 @@ export const Items = [
             "fireColors": "default"
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_gre_mort"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 16082,
@@ -39579,7 +39459,7 @@ export const Items = [
     {
         "id": 16088,
         "name": "Kettlebell Grenade",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 6,
         "item_type_name": "Grenade",
         "category_name": "Grenades",
@@ -39599,11 +39479,7 @@ export const Items = [
             "cell": 8
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_gre_kettleb"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 16089,
@@ -39917,7 +39793,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -40469,7 +40345,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -40719,7 +40595,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -40811,7 +40687,7 @@ export const Items = [
     {
         "id": 4552,
         "name": "The Pumpkin Pie-hard",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 3,
         "item_type_name": "Primary",
         "category_name": "TriHard Primary Weapons",
@@ -40824,11 +40700,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_aug_pie"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 4553,
@@ -40854,7 +40726,7 @@ export const Items = [
     {
         "id": 4554,
         "name": "Techno Tri-Hard",
-        "price": 10,
+        "price": 2147483647,
         "item_type_id": 3,
         "item_type_name": "Primary",
         "category_name": "TriHard Primary Weapons",
@@ -40866,11 +40738,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_aug_techno"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 4555,
@@ -41232,7 +41100,7 @@ export const Items = [
                 "Mar25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -41797,7 +41665,7 @@ export const Items = [
     {
         "id": 15045,
         "name": "Mayan Macuahuitl",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 7,
         "item_type_name": "Melee",
         "category_name": "Melee",
@@ -41813,11 +41681,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_melee_mayan"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 15046,
@@ -42016,7 +41880,7 @@ export const Items = [
     {
         "id": 15055,
         "name": "World Cup Melee",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 7,
         "item_type_name": "Melee",
         "category_name": "Melee",
@@ -42030,11 +41894,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_melee_worldcup"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 15056,
@@ -42117,7 +41977,7 @@ export const Items = [
     {
         "id": 15060,
         "name": "Goldfish Melee",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 7,
         "item_type_name": "Melee",
         "category_name": "Melee",
@@ -42130,11 +41990,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_melee_gfish"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 15061,
@@ -42201,7 +42057,7 @@ export const Items = [
     {
         "id": 15064,
         "name": "Pickleball Melee",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 7,
         "item_type_name": "Melee",
         "category_name": "Melee",
@@ -42213,11 +42069,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_melee_pball"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 15065,
@@ -42243,7 +42095,7 @@ export const Items = [
     {
         "id": 15066,
         "name": "Techno Melee",
-        "price": 10,
+        "price": 2147483647,
         "item_type_id": 7,
         "item_type_name": "Melee",
         "category_name": "Melee",
@@ -42259,11 +42111,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_melee_techno"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 15067,
@@ -42606,7 +42454,7 @@ export const Items = [
     {
         "id": 15085,
         "name": "Fishing Rod Melee",
-        "price": 3,
+        "price": 2147483647,
         "item_type_id": 7,
         "item_type_name": "Melee",
         "category_name": "Melee",
@@ -42619,11 +42467,7 @@ export const Items = [
             ]
         },
         "is_available": false,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_melee_frod"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 15086,
@@ -42647,7 +42491,7 @@ export const Items = [
     {
         "id": 15087,
         "name": "Moai Melee",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 7,
         "item_type_name": "Melee",
         "category_name": "Melee",
@@ -42663,11 +42507,7 @@ export const Items = [
             ]
         },
         "is_available": true,
-        "unlock": "premium",
-        "activeProduct": false,
-        "sku": [
-            "item_melee_moai"
-        ]
+        "unlock": "premium"
     },
     {
         "id": 15088,
