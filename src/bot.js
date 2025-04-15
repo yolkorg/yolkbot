@@ -398,7 +398,7 @@ export class Bot {
     async createPrivateGame(opts = {}) {
         if (!await this.initMatchmaker()) return false;
 
-        if (!opts.region) { throw new Error('pass a region: createPrivateGame({ region: "useast", ... })') }
+        if (!opts.region) throw new Error('pass a region: createPrivateGame({ region: "useast", ... })')
         if (!this.matchmaker.regionList.find(r => r.id == opts.region))
             throw new Error('invalid region, see <bot>.matchmaker.regionList for a region list (pass an "id")')
 
@@ -1918,8 +1918,8 @@ export class Bot {
 
         clearInterval(this.updateIntervalId);
 
-        if (this.game) this.game.socket.close();
-        this.matchmaker.close();
+        if (this.game.socket) this.game.socket.close();
+        if (this.matchmaker) this.matchmaker.close();
 
         if (!finishDispatches) this._dispatches = [];
         this._packetQueue = [];
