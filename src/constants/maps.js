@@ -417,19 +417,6 @@ export const Maps = [
         "numPlayers": "10"
     },
     {
-        "filename": "greenhouse",
-        "hash": "220ztaj45wo",
-        "name": "Greenhouse",
-        "modes": {
-            "FFA": true,
-            "Teams": true,
-            "Spatula": true,
-            "King": true
-        },
-        "availability": "both",
-        "numPlayers": "18"
-    },
-    {
         "filename": "growler",
         "hash": "1izyni7tb1e",
         "name": "Growler",
