@@ -35,7 +35,7 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
 
             try {
                 const resp = JSON.parse(mes.data);
-                resolve(resp.playerOutput);
+                resolve(resp);
             } catch {
                 console.error('queryServices: Bad API JSON response with call: ' + request.cmd + ' and data:', JSON.stringify(request));
                 console.error('queryServices: Full data sent: ', JSON.stringify(request));
@@ -128,10 +128,10 @@ async function loginWithCredentials(email, password, proxy = '', instance = 'she
         return 'firebase_no_token';
     }
 
-    const response = await queryServices({
+    const response = (await queryServices({
         cmd: 'auth',
         firebaseToken: token
-    }, proxy, instance);
+    }, proxy, instance)).playerOutput;
 
     return response;
 }
