@@ -34,7 +34,7 @@ jobs:
         if: env.CHANGED == 'true'
         run: |
           git config --global user.name "yolkbot"
-          git config --global user.email "octocat@github.com"
+          git config --global user.email "octocat@nowhere.com"
           git add .
           git commit -m "update maps & items" -m "this is an automatic commit that updates shell shockers data"
           git push origin main
