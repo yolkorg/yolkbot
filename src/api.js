@@ -31,9 +31,11 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
         let resolved = false;
 
         ws.onmessage = (mes) => {
+            resolved = true;
+
             try {
                 const resp = JSON.parse(mes.data);
-                resolve(resp);
+                resolve(resp.playerOutput);
             } catch {
                 console.error('queryServices: Bad API JSON response with call: ' + request.cmd + ' and data:', JSON.stringify(request));
                 console.error('queryServices: Full data sent: ', JSON.stringify(request));
@@ -43,7 +45,6 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
                 resolve('bad_json');
             }
 
-            resolved = true;
             ws.close();
         };
 
