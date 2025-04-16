@@ -1,3 +1,3 @@
-node browser/compile.js
-npm publish
-node --env-file=.env cli/publish/prod.js
+bun browser/compile.js
+bun publish
+bun --env-file=.env cli/publish/prod.js
