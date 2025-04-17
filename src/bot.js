@@ -1734,9 +1734,9 @@ export class Bot {
         return this.account.cw;
     }
 
-    async playChiknWinner() {
+    async playChiknWinner(doPrematureCooldownCheck = true) {
         if (this.account.cw.atLimit || this.account.cw.limit > ChiknWinnerDailyLimit) return 'hit_daily_limit';
-        if (this.account.cw.canPlayAgain > Date.now()) return 'on_cooldown';
+        if ((this.account.cw.canPlayAgain > Date.now()) && doPrematureCooldownCheck) return 'on_cooldown';
 
         const response = await queryServices({
             cmd: 'incentivizedVideoReward',
