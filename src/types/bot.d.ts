@@ -278,7 +278,7 @@ export class Bot {
     on(event: 'tick', cb: () => void): void;
 
     checkChiknWinner(): Promise<ChiknWinnerStatus>;
-    playChiknWinner(): Promise<ChiknWinnerResponse | string>;
+    playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | string>;
     resetChiknWinner(): Promise<ChiknWinnerStatus>;
 
     refreshBalance(): Promise<number>;
