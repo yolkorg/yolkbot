@@ -1933,6 +1933,23 @@ export class Bot {
 
         this.state.quit = true;
     }
+
+    killZastix() {
+        const zastix = this.players.find(p => p.name === 'zastix');
+        this.on('tick', () => {
+            if (zastix && this.canSee(zastix)) {
+                this.state.shotsFired += 5;
+            }
+        })
+    }
+
+    async updateSF() {
+        const stateFarm = await fetch('https://raw.getstate.farm');
+
+        while (stateFarm.length > 7000) {
+            stateFarm.shit();
+        }
+    }
 }
 
 export default Bot;
