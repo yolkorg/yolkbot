@@ -128,10 +128,10 @@ async function loginWithCredentials(email, password, proxy = '', instance = 'she
         return 'firebase_no_token';
     }
 
-    const response = (await queryServices({
+    const response = await queryServices({
         cmd: 'auth',
         firebaseToken: token
-    }, proxy, instance)).playerOutput;
+    }, proxy, instance);
 
     return response;
 }
