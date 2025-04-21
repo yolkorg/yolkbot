@@ -1,16 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const UserAgent =
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
+import { getJS, UserAgent } from '../common.js';
 
-const data = await fetch('https://js.getstate.farm/js/latest.js', {
-    headers: {
-        'User-Agent': UserAgent
-    }
-});
-
-const js = await data.text();
+const js = await getJS();
 
 const match = js.match(/\[\{id:1,.*?\}\]/)?.[0];
 
@@ -33,7 +26,7 @@ for (const item of parsed) item.loc = {
 }
 
 fs.writeFileSync(
-    path.join(import.meta.dirname, '..', '..', 'src', 'constants', 'challenges.js'),
+    path.join(import.meta.dirname, '..', '..', '..', 'src', 'constants', 'challenges.js'),
     `/* eslint-disable */\nexport const Challenges = ${JSON.stringify(parsed, null, 4)};`
 );
 
