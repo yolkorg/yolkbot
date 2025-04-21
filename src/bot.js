@@ -290,7 +290,7 @@ export class Bot {
     }
 
     async #processLoginData(loginData) {
-        if (typeof loginData == 'string') {
+        if (typeof loginData !== 'object') {
             this.emit('authFail', loginData);
             return false;
         }
