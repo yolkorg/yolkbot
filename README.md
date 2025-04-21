@@ -26,3 +26,11 @@
   this codebase was written by <a href='https://github.com/villainsrule'>1ust</a> with large contributions from <a href='https://github.com/enbyte'>hijinks</a> :trollface: <br>
   special thanks to BWD for leaking the source, which made development 100x easier ❤️
 </p>
+
+<h3 align='center'>important: dmca</h3>
+
+<p align='center'>
+  parts of this repository are JSON files that come from data contained in Shell Shockers. <br>
+  per <a href='https://www.copyright.gov/reports/studies/dmca/sec-104-report-vol-1.pdf'>section 117 of the DMCA</a>, this repository exists for archival purposes and should not be subject to any takedowns. <br>
+  a false DMCA is considered illegal.
+</p>
