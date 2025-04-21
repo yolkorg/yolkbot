@@ -1,4 +1,4 @@
-name: Sync Data
+name: Scrape Data
 
 on:
   push:
@@ -33,5 +33,5 @@ jobs:
           git config --global user.name "yolkbot"
           git config --global user.email "octocat@nowhere.com"
           git add .
-          git commit -m "update maps & items" -m "this is an automatic commit that updates shell shockers data"
+          git commit -m "update & sync data" -m "this is an automatic commit that updates shell shockers game data"
           git push origin main
