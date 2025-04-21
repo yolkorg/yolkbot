@@ -1913,12 +1913,14 @@ export class Bot {
     }
 
     quit(noCleanup = false, finishDispatches = false) {
+        if (this.state.quit) return;
+
         if (this.intents.includes(this.Intents.PLAYER_HEALTH))
             clearInterval(this.healthIntervalId);
 
         clearInterval(this.updateIntervalId);
 
-        if (this.game.socket) this.game.socket.close();
+        if (this.game?.socket) this.game.socket.close();
         if (this.matchmaker) this.matchmaker.close();
 
         if (!finishDispatches) this._dispatches = [];
