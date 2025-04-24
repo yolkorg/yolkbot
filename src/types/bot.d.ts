@@ -61,6 +61,29 @@ export interface Stats {
     };
 }
 
+export interface Challenges {
+    raw: {
+        challengeInfo: Challenge;
+        challengeData: {
+            period: number;
+            challengeId: number;
+            reset: number;
+            claimed: number;
+            completed: number;
+            data: number;
+        }
+    }
+    id: number;
+    name: string;
+    desc: string;
+    rewardEggs: number;
+    isRerolled: boolean;
+    isClaimed: boolean;
+    isCompleted: boolean;
+    progressNum: number;
+    goalNum: number;
+}
+
 export interface Account {
     id: number;
     firebaseId: string;
@@ -90,28 +113,7 @@ export interface Account {
         lifetime: Stats;
         monthly: Stats;
     }
-    challenges: {
-        raw: {
-            challengeInfo: Challenge;
-            challengeData: {
-                period: number;
-                challengeId: number;
-                reset: number;
-                claimed: number;
-                completed: number;
-                data: number;
-            }
-        }
-        id: number;
-        name: string;
-        desc: string;
-        rewardEggs: number;
-        isRerolled: boolean;
-        isClaimed: boolean;
-        isCompleted: boolean;
-        progressNum: number;
-        goalNum: number;
-    }[];
+    challenges: Challenges[];
     rawLoginData: any; // i ain't typing allat
 }
 
@@ -301,6 +303,10 @@ export class Bot {
     checkChiknWinner(): Promise<ChiknWinnerStatus>;
     playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | string>;
     resetChiknWinner(): Promise<ChiknWinnerStatus>;
+
+    refreshChallenges(): Promise<Challenges[]>;
+    claimChallenge(challengeId: number): Promise<{ eggReward: number, updatedChallenges: Challenges[] }>;
+    rerollChallenge(challengeId: number): Promise<Challenges[]>;
 
     refreshBalance(): Promise<number>;
     redeemCode(code: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;

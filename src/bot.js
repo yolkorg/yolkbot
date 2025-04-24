@@ -1840,6 +1840,45 @@ export class Bot {
         return targetPlayer;
     }
 
+    async refreshChallenges() {
+        const result = await queryServices({
+            cmd: 'challengeGetDaily',
+            sessionId: this.account.sessionId,
+            playerId: this.account.id
+        }, this.proxy, this.instance);
+
+        this.#importChallenges(result);
+
+        return this.account.challenges;
+    }
+
+    async rerollChallenge(challengeId) {
+        const result = await queryServices({
+            cmd: 'challengeRerollSlot',
+            sessionId: this.account.sessionId,
+            slotId: challengeId
+        }, this.proxy, this.instance);
+
+        this.#importChallenges(result);
+
+        return this.account.challenges;
+    }
+
+    async claimChallenge(challengeId) {
+        const result = await queryServices({
+            cmd: 'challengeClaimReward',
+            sessionId: this.account.sessionId,
+            slotId: challengeId
+        }, this.proxy, this.instance);
+
+        this.#importChallenges(result.challenges);
+
+        return {
+            eggReward: result.reward,
+            updatedChallenges: this.account.challenges
+        }
+    }
+
     async refreshBalance() {
         const result = await queryServices({
             cmd: 'checkBalance',
