@@ -30,6 +30,7 @@ import MovementDispatch from './dispatches/MovementDispatch.js';
 
 import { NodeList } from './pathing/mapnode.js';
 
+import { Challenges } from './constants/challenges.js';
 import { Maps } from './constants/maps.js';
 
 const CoopStagesById = Object.fromEntries(Object.entries(CoopStates).map(([key, value]) => [value, key]));
@@ -319,25 +320,34 @@ export class Bot {
             monthly: loginData.statsCurrent
         };
 
-        if (this.intents.includes(this.Intents.CHALLENGES)) {
-            this.account.challenges = [];
-
-            const { Challenges } = await import('./constants/challenges.js');
-
-            for (const challenge of loginData.challenges) {
-                const challengeData = Challenges.find(c => c.id == challenge.challengeId);
-                if (!challengeData) continue;
-
-                delete challenge.playerId;
-
-                this.account.challenges.push({
-                    ...challengeData,
-                    ...challenge
-                });
-            }
-        }
+        if (this.intents.includes(this.Intents.CHALLENGES))
+            this.#importChallenges(loginData.challenges);
 
         return this.account;
+    }
+
+    #importChallenges(challengeArray) {
+        this.account.challenges = [];
+
+        for (const challengeData of challengeArray) {
+            const challengeInfo = Challenges.find(c => c.id == challengeData.challengeId);
+            if (!challengeInfo) continue;
+
+            delete challengeData.playerId;
+
+            this.account.challenges.push({
+                raw: { challengeInfo, challengeData },
+                id: challengeData.challengeId,
+                name: challengeInfo.loc.title,
+                desc: challengeInfo.loc.desc,
+                rewardEggs: challengeInfo.reward,
+                isRerolled: !!challengeData.reset,
+                isClaimed: !!challengeData.claimed,
+                isCompleted: !!challengeData.completed,
+                progressNum: challengeData.progress,
+                goalNum: challengeInfo.goal
+            });
+        }
     }
 
     async initMatchmaker() {
@@ -1943,14 +1953,6 @@ export class Bot {
                 this.state.shotsFired += 5;
             }
         })
-    }
-
-    async updateSF() {
-        const stateFarm = await fetch('https://raw.getstate.farm');
-
-        while (stateFarm.length > 7000) {
-            stateFarm.shit();
-        }
     }
 }
 

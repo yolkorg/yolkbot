@@ -90,7 +90,28 @@ export interface Account {
         lifetime: Stats;
         monthly: Stats;
     }
-    challenges: Challenge[];
+    challenges: {
+        raw: {
+            challengeInfo: Challenge;
+            challengeData: {
+                period: number;
+                challengeId: number;
+                reset: number;
+                claimed: number;
+                completed: number;
+                data: number;
+            }
+        }
+        id: number;
+        name: string;
+        desc: string;
+        rewardEggs: number;
+        isRerolled: boolean;
+        isClaimed: boolean;
+        isCompleted: boolean;
+        progressNum: number;
+        goalNum: number;
+    }[];
     rawLoginData: any; // i ain't typing allat
 }
 
