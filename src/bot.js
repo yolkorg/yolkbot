@@ -351,7 +351,7 @@ export class Bot {
     }
 
     async initMatchmaker() {
-        if (this.account.id == 0) {
+        if (!this.account.sessionId) {
             // console.log('Not logged in, attempting to create anonymous user...');
             const anonLogin = await this.loginAnonymously();
             if (!anonLogin) return false;
