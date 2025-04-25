@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "0.1.3",
+    "version": "0.1.4-alpha.2",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -22,62 +22,62 @@
     "files": [
         "browser/build/*.js",
         "data/*.*",
-        "src/**/*",
+        "dist/**/*",
         "package.json",
         "README.md"
     ],
     "exports": {
         "./package.json": "./package.json",
-        ".": "./src/index.js",
+        ".": "./dist/index.js",
         "./api": {
-            "import": "./src/api.js",
-            "types": "./src/types/api.d.ts"
+            "import": "./dist/api.js",
+            "types": "./dist/types/api.d.ts"
         },
         "./browser": "./browser/build/module.js",
         "./browser/*": "./browser/build/*.js",
         "./browser/*.js": "./browser/build/*.js",
-        "./comm": "./src/comm/index.js",
+        "./comm": "./dist/comm/index.js",
         "./matchmaker": {
-            "import": "./src/matchmaker.js",
-            "types": "./src/types/matchmaker.d.ts"
+            "import": "./dist/matchmaker.js",
+            "types": "./dist/types/matchmaker.d.ts"
         },
-        "./pathing/*": "./src/pathing/*.js",
-        "./pathing/*.js": "./src/pathing/*.js",
+        "./pathing/*": "./dist/pathing/*.js",
+        "./pathing/*.js": "./dist/pathing/*.js",
         "./bot": {
-            "import": "./src/bot.js",
-            "types": "./src/types/bot.d.ts"
+            "import": "./dist/bot.js",
+            "types": "./dist/types/bot.d.ts"
         },
         "./bot/*": {
-            "import": "./src/bot/*.js",
-            "types": "./src/types/bot/*.d.ts"
+            "import": "./dist/bot/*.js",
+            "types": "./dist/types/bot/*.d.ts"
         },
         "./bot/*.js": {
-            "import": "./src/bot/*.js",
-            "types": "./src/types/bot/*.d.ts"
+            "import": "./dist/bot/*.js",
+            "types": "./dist/types/bot/*.d.ts"
         },
         "./constants": {
-            "import": "./src/constants/index.js",
-            "types": "./src/types/constants/index.d.ts"
+            "import": "./dist/constants/index.js",
+            "types": "./dist/types/constants/index.d.ts"
         },
         "./constants/*": {
-            "import": "./src/constants/*.js",
-            "types": "./src/types/constants/*.d.ts"
+            "import": "./dist/constants/*.js",
+            "types": "./dist/types/constants/*.d.ts"
         },
         "./constants/*.js": {
-            "import": "./src/constants/*.js",
-            "types": "./src/types/constants/*.d.ts"
+            "import": "./dist/constants/*.js",
+            "types": "./dist/types/constants/*.d.ts"
         },
         "./dispatch": {
-            "import": "./src/dispatches/index.js",
-            "types": "./src/types/dispatches.d.ts"
+            "import": "./dist/dispatches/index.js",
+            "types": "./dist/types/dispatches.d.ts"
         },
         "./dispatch/*": {
-            "import": "./src/dispatches/*.js",
-            "types": "./src/types/dispatches/*.d.ts"
+            "import": "./dist/dispatches/*.js",
+            "types": "./dist/types/dispatches/*.d.ts"
         },
         "./dispatch/*.js": {
-            "import": "./src/dispatches/*.js",
-            "types": "./src/types/dispatches/*.d.ts"
+            "import": "./dist/dispatches/*.js",
+            "types": "./dist/types/dispatches/*.d.ts"
         }
     },
     "dependencies": {
