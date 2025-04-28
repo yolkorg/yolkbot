@@ -109,4 +109,4 @@ export declare const Teams: {
 
 export declare const URLRewards: string[];
 
-export declare const UserAgent: string | undefined;
+export declare const UserAgent: string;

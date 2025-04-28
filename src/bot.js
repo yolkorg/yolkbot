@@ -1013,12 +1013,10 @@ export class Bot {
     #processSyncMePacket() {
         const id = CommIn.unPackInt8U();
         const player = this.players[id];
-        if (!player) return;
 
         CommIn.unPackInt8U(); // stateIdx
 
         const serverStateIdx = CommIn.unPackInt8U();
-        player.serverStateIdx = serverStateIdx;
 
         const newX = CommIn.unPackFloat();
         const newY = CommIn.unPackFloat();
@@ -1027,6 +1025,10 @@ export class Bot {
         CommIn.unPackInt8U();
         CommIn.unPackInt8U();
         CommIn.unPackInt8U();
+
+        if (!player) return;
+
+        player.serverStateIdx = serverStateIdx;
 
         const oldX = player.position.x;
         const oldY = player.position.y;
