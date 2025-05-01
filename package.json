@@ -10,14 +10,12 @@
     ],
     "homepage": "https://github.com/yolkorg/yolkbot#readme",
     "bugs": {
-        "url": "https://github.com/yolkorg/yolkbot/issues"
+        "url": "https://github.com/yolkorg/yolkbot/issues",
+        "email": "hello@villainsrule.xyz"
     },
     "author": "1ust",
     "contributors": ["hijinks"],
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/yolkorg/yolkbot.git"
-    },
+    "repository": "github:yolkorg/yolkbot",
     "type": "module",
     "files": [
         "browser/build/*.js",
