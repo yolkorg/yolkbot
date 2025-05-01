@@ -1,3 +1,5 @@
+// this is a generic binary heap implementation
+
 class BinaryHeap {
     constructor(scoreFunction) {
         this.content = [];

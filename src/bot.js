@@ -500,7 +500,7 @@ export class Bot {
     #processPathfinding() {
         const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
 
-        if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr()) {
+        if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr) {
             // console.log('Completed path to', this.pathing.activePath[this.pathing.activePath.length - 1].position);
             this.pathing.followingPath = false;
             this.pathing.activePath = null;
@@ -526,7 +526,6 @@ export class Bot {
                         break;
                     }
                 }
-                // console.log('activeNode is ', this.pathing.activeNode.flatRadialDistance(this.me.position), 'away');
             }
 
             if (!(this.controlKeys & Movements.FORWARD)) this.dispatch(new MovementDispatch(Movements.FORWARD));

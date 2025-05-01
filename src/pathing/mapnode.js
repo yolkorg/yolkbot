@@ -1,38 +1,25 @@
 /* eslint-disable stylistic/max-len */
 
 class NodeList {
+    list = [];
+
     constructor(raw) {
-        this.list = [];
         const addedPositions = {};
 
-        for (const meshName of Object.keys(raw.data)) {
+        for (const meshName of Object.keys(raw.data))
             for (const nodeData of raw.data[meshName]) {
-                addedPositions[(
-                    (nodeData.x << 16) |
-                    (nodeData.y << 8) |
-                    (nodeData.z))] = true;
+                addedPositions[((nodeData.x << 16) | (nodeData.y << 8) | (nodeData.z))] = true;
                 this.list.push(new MapNode(meshName, nodeData));
             }
-        }
 
-        for (let x = 0; x < raw.width; x++) {
-            for (let y = 0; y < raw.height; y++) {
-                for (let z = 0; z < raw.depth; z++) {
-                    if (!addedPositions[(
-                        (x << 16) |
-                        (y << 8) |
-                        (z)
-                    )]) {
+        for (let x = 0; x < raw.width; x++)
+            for (let y = 0; y < raw.height; y++)
+                for (let z = 0; z < raw.depth; z++)
+                    if (!addedPositions[((x << 16) | (y << 8) | (z))])
                         this.list.push(new MapNode('SPECIAL.air.none', { x: x, y: y, z: z }));
-                    }
-                }
-            }
-        }
 
         const nodeMap = new Map();
-        for (const node of this.list) {
-            nodeMap.set(node.positionStr(), node);
-        }
+        for (const node of this.list) nodeMap.set(node.positionStr, node);
 
         for (const node of this.list) {
             const neighbors = [
@@ -47,9 +34,7 @@ class NodeList {
             for (const neighborPos of neighbors) {
                 const neighborKey = `${neighborPos.x},${neighborPos.y},${neighborPos.z}`;
                 const neighborNode = nodeMap.get(neighborKey);
-                if (neighborNode && node.canLink(neighborNode, this)) {
-                    node.addLink(neighborNode);
-                }
+                if (neighborNode && node.canLink(neighborNode, this)) node.links.push(neighborNode);
             }
         }
     }
@@ -57,6 +42,7 @@ class NodeList {
     at(x, y, z) {
         if (!this.nodeMap) {
             this.nodeMap = new Map();
+
             for (const node of this.list) {
                 const key = `${node.x},${node.y},${node.z}`;
                 this.nodeMap.set(key, node);
@@ -111,6 +97,8 @@ class MapNode {
         this.y = data.y;
         this.z = data.z;
 
+        this.positionStr = `${this.x},${this.y},${this.z}`;
+
         this.position = { x: this.x, y: this.y, z: this.z };
         this.meshType = meshType.split('.').pop();
 
@@ -124,16 +112,9 @@ class MapNode {
         this.links = [];
 
         if (this.isStair()) {
-            if (data.ry) {
-                this.ry = data.ry;
-            } else {
-                this.ry = 0;
-            }
+            if (data.ry) this.ry = data.ry;
+            else this.ry = 0;
         }
-    }
-
-    addLink(node) {
-        this.links.push(node);
     }
 
     isSolid() {
@@ -169,9 +150,7 @@ class MapNode {
         const dy = Math.abs(dy0);
         const dz = Math.abs(dz0);
 
-        if (dx + dy + dz === 0 || dx + dz > 1 || this.isSolid() || node.isSolid()) {
-            return false;
-        }
+        if (dx + dy + dz === 0 || dx + dz > 1 || this.isSolid() || node.isSolid()) return false;
 
         const belowMe = list.at(this.x, this.y - 1, this.z);
         const belowOther = list.at(node.x, node.y - 1, node.z);
@@ -222,15 +201,7 @@ class MapNode {
         const pos = this.flatCenter();
         return Math.hypot(pos.x - position.x, pos.z - position.z);
     }
-
-    positionStr() {
-        return `${this.x},${this.y},${this.z}`;
-    }
 }
 
 export default MapNode;
-
-export {
-    MapNode,
-    NodeList
-};
+export { MapNode, NodeList };

@@ -23,9 +23,11 @@
 <h3 align='center'>credits</h3>
 
 <p align='center'>
-  this codebase was written by <a href='https://github.com/villainsrule'>1ust</a> with large contributions from <a href='https://github.com/enbyte'>hijinks</a> :trollface: <br>
-  special thanks to BWD for leaking the source, which made development 100x easier ❤️
+  this codebase is written and maintained by <a href='https://github.com/villainsrule'>1ust</a><br>
+  special thanks to <a href='https://zastix.club'>zastix</a> for emotional support (you are amazing!)
 </p>
+
+<br>
 
 <h3 align='center'>important: dmca</h3>
 

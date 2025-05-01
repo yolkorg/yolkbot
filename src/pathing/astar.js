@@ -1,3 +1,5 @@
+// this is a generic A* pathfinding algorithm implementation
+
 import { BinaryHeap } from './binaryheap.js';
 
 export default class AStar {
