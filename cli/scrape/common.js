@@ -6,7 +6,7 @@ let js = '';
 export const getJS = async () => {
     if (js) return js;
 
-    const data = await fetch('https://js.getstate.farm/js/latest.js', {
+    const data = await fetch('https://archive.getstate.farm/js/latest.js', {
         headers: {
             'User-Agent': UserAgent
         }

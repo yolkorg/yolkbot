@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const data = await fetch('https://js.getstate.farm/commcodes/latest.json');
+const data = await fetch('https://archive.getstate.farm/commcodes/latest.json');
 
 const { codes } = await data.json();
 
