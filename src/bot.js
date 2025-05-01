@@ -326,6 +326,8 @@ export class Bot {
         if (this.intents.includes(this.Intents.CHALLENGES))
             this.#importChallenges(loginData.challenges);
 
+        this.emit('authSuccess', this.account);
+
         return this.account;
     }
 
@@ -399,7 +401,7 @@ export class Bot {
                 id: code,
                 observe: false,
                 sessionId: this.account.sessionId
-            })
+            });
         });
     }
 
@@ -593,7 +595,7 @@ export class Bot {
     }
 
     // these are auth-related codes (liveCallbacks doesn't run during auth)
-    #mustBeInstant = ['authFail', 'banned'];
+    #mustBeInstant = ['authSuccess', 'authFail', 'banned', 'gameReady', 'importMap', 'quit'];
 
     emit(event, ...args) {
         if (this.state.quit) return;
@@ -628,15 +630,16 @@ export class Bot {
             if (existsSync(mapFile))
                 return JSON.parse(readFileSync(mapFile, 'utf-8'));
 
-            // console.log('map not in cache, IMPORT!!', name, hash);
-
             const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();
+
+            this.emit('importMap', name, data);
 
             writeFileSync(mapFile, JSON.stringify(data, null, 4), { flag: 'w+' });
 
             return data;
         } else {
             const data = await (await fetch(`https://esm.sh/gh/yolkorg/maps/maps/${name}.json`)).json();
+            this.emit('importMap', name, data);
             return data;
         }
     }
@@ -1496,6 +1499,8 @@ export class Bot {
                 out.send(this.game.socket);
             }
         }
+
+        this.emit('gameReady');
     }
 
     processPacket(packet) {
@@ -1938,6 +1943,8 @@ export class Bot {
         }
 
         this.state.quit = true;
+
+        this.emit('quit');
     }
 }
 
