@@ -14,8 +14,10 @@
         "email": "hello@villainsrule.xyz"
     },
     "author": "1ust",
-    "contributors": ["hijinks"],
-    "repository": "github:yolkorg/yolkbot",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yolkorg/axios.git"
+    },
     "type": "module",
     "files": [
         "browser/build/*.js",
