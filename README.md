@@ -33,6 +33,6 @@
 
 <p align='center'>
   parts of this repository are JSON files that come from data contained in Shell Shockers. <br>
-  per <a href='https://www.copyright.gov/reports/studies/dmca/sec-104-report-vol-1.pdf'>section 117 of the DMCA</a>, this repository exists for archival purposes and should not be subject to any takedowns. <br>
+  per <a href='https://www.copyright.gov/reports/studies/dmca/sec-104-report-vol-1.pdf'>section 117 of the DMCA</a>, this repository is an archive and should not be subject to takedown. <br>
   a false DMCA is considered illegal.
 </p>
