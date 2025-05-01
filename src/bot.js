@@ -266,7 +266,7 @@ export class Bot {
         this.account.password = pass;
 
         const loginData = await createAccount(email, pass, this.proxy, this.instance);
-        return await this.#processLoginData(loginData.playerOutput);
+        return await this.#processLoginData(loginData);
     }
 
     async login(email, pass) {
@@ -274,12 +274,12 @@ export class Bot {
         this.account.password = pass;
 
         const loginData = await loginWithCredentials(email, pass, this.proxy, this.instance);
-        return await this.#processLoginData(loginData.playerOutput);
+        return await this.#processLoginData(loginData);
     }
 
     async loginWithRefreshToken(refreshToken) {
         const loginData = await loginWithRefreshToken(refreshToken, this.proxy, this.instance);
-        return await this.#processLoginData(loginData.playerOutput);
+        return await this.#processLoginData(loginData);
     }
 
     async loginAnonymously() {
@@ -287,7 +287,7 @@ export class Bot {
         delete this.account.password;
 
         const loginData = await loginAnonymously(this.proxy, this.instance);
-        return await this.#processLoginData(loginData.playerOutput);
+        return await this.#processLoginData(loginData);
     }
 
     async #processLoginData(loginData) {
@@ -300,6 +300,13 @@ export class Bot {
             this.emit('banned', loginData.banRemaining);
             return false;
         }
+
+        if (!loginData.playerOutput) {
+            this.emit('authFail', loginData);
+            return false;
+        }
+
+        loginData = loginData.playerOutput;
 
         this.account.rawLoginData = loginData;
 

@@ -1,3 +1,5 @@
+bun cli/build.js
+
 rm -rf ./build/
 mkdir build
 
