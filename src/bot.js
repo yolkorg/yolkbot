@@ -52,6 +52,13 @@ export class Bot {
     static Intents = intents;
     Intents = intents;
 
+    #dispatches = [];
+    #packetQueue = [];
+
+    #hooks = {};
+    #globalHooks = [];
+    #liveCallbacks = [];
+
     constructor(params = {}) {
         if (params.proxy && !ProxiesEnabled)
             throw new Error('proxies do not work and hence are not supported in the browser');
@@ -64,11 +71,6 @@ export class Bot {
         this.autoUpdate = params.doUpdate || true;
         this.updateInterval = params.updateInterval || 16.5;
 
-        this._hooks = {};
-        this._globalHooks = [];
-        this._liveCallbacks = [];
-
-        // private information NOT FOR OTHER PLAYERS!!
         this.state = {
             // kept for specifying various params
             name: '',
@@ -218,9 +220,6 @@ export class Bot {
             rawLoginData: {}
         };
 
-        this._dispatches = [];
-        this._packetQueue = [];
-
         this.matchmaker = null;
 
         this.ping = 0;
@@ -247,18 +246,15 @@ export class Bot {
                 if (player.playing && player.hp > 0) {
                     const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
 
-                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) {
-                        player.hp = Math.max(100, player.hp - regenSpeed);
-                    } else {
-                        player.hp = Math.min(100, player.hp + regenSpeed);
-                    }
+                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) player.hp = Math.max(100, player.hp - regenSpeed);
+                    else player.hp = Math.min(100, player.hp + regenSpeed);
                 }
             }
         }, 33);
     }
 
     dispatch(disp) {
-        this._dispatches.push(disp);
+        this.#dispatches.push(disp);
     }
 
     async createAccount(email, pass) {
@@ -359,13 +355,11 @@ export class Bot {
 
     async initMatchmaker() {
         if (!this.account.sessionId) {
-            // console.log('Not logged in, attempting to create anonymous user...');
             const anonLogin = await this.loginAnonymously();
             if (!anonLogin) return false;
         }
 
         if (!this.matchmaker) {
-            // console.log('No matchmaker, creating instance')
             this.matchmaker = new Matchmaker({
                 sessionId: this.account.sessionId,
                 proxy: this.proxy,
@@ -462,23 +456,16 @@ export class Bot {
 
         if (typeof data == 'string') {
             if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
-            // this is a string code that we can pass and get the needed info from
             await this.#joinGameWithCode(data);
         } else if (typeof data == 'object') {
-            if (this.account.id == 0) {
-                // console.log('passed an object but you still need to be logged in!!')
-                await this.loginAnonymously();
-            }
+            if (this.account.id == 0) await this.loginAnonymously();
 
-            // this is a game object that we can pass and get the needed info from
             this.game.raw = data;
             this.game.code = this.game.raw.id;
         }
 
         if (!this.game.raw.id || !this.game.raw.subdomain)
             throw new Error('invalid game data passed to <bot>.join');
-
-        // console.log(`Joining ${this.game.raw.id} using proxy ${this.proxy || 'none'}`);
 
         const attempt = async () => {
             try {
@@ -498,10 +485,7 @@ export class Bot {
 
         this.game.socket.binaryType = 'arraybuffer';
 
-        this.game.socket.onopen = () => {
-            this.game.socket.onerror = null;
-        }
-
+        this.game.socket.onopen = () => this.game.socket.onerror = null;
         this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
         this.game.socket.onclose = (e) => {
@@ -538,36 +522,13 @@ export class Bot {
                         this.pathing.activeNodeIdx = this.pathing.activePath.indexOf(node) + 1;
                         this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
                         break;
-                    } else {
-                        // console.log('Close to node that\'s before, idx:', 
-                        //    this.pathing.activePath.indexOf(node), 'current:', this.pathing.activeNodeIdx);
                     }
-                } else {
-                    // console.log('Node at', node.position, 'is', node.flatRadialDistance(this.me.position), 'away.')
                 }
                 // console.log('activeNode is ', this.pathing.activeNode.flatRadialDistance(this.me.position), 'away');
             }
 
-            if (!(this.controlKeys & Movements.FORWARD)) {
-                this.dispatch(new MovementDispatch(Movements.FORWARD));
-            }
+            if (!(this.controlKeys & Movements.FORWARD)) this.dispatch(new MovementDispatch(Movements.FORWARD));
         }
-
-        /*let onPath = false;
-        for (const node of this.pathing.activePath) {
-            if (node.positionStr() == myPositionStr) {
-                onPath = true;
-                break;
-            }
-        }
-        if (!onPath) {
-            console.log('Got off-path somehow');
-            this.dispatch(new PathfindDispatch(this.pathing.activePath[this.pathing.activePath.length - 1]));
-            this.pathing.followingPath = false;
-            this.pathing.activePath = null;
-            this.pathing.activeNode = null;
-            this.pathing.activeNodeIdx = 0;
-        }*/
     }
 
     update() {
@@ -578,15 +539,15 @@ export class Bot {
         if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING)) this.#processPathfinding();
 
         // process incoming packets
-        while (this._packetQueue.length > 0) this.processPacket(this._packetQueue.shift());
+        while (this.#packetQueue.length > 0) this.processPacket(this.#packetQueue.shift());
 
         // process dispatches
-        if (this._dispatches.length > 0) {
-            for (let i = 0; i < this._dispatches.length; i++) {
-                const disp = this._dispatches[i];
+        if (this.#dispatches.length > 0) {
+            for (let i = 0; i < this.#dispatches.length; i++) {
+                const disp = this.#dispatches[i];
                 if (disp.check(this)) {
                     disp.execute(this);
-                    this._dispatches.splice(i, 1);
+                    this.#dispatches.splice(i, 1);
                     break; // only 1 dispatch per update
                 }
             }
@@ -616,19 +577,19 @@ export class Bot {
             this.state.shotsFired = 0;
         }
 
-        while (this._liveCallbacks.length > 0) {
-            const cb = this._liveCallbacks.shift();
+        while (this.#liveCallbacks.length > 0) {
+            const cb = this.#liveCallbacks.shift();
             cb();
         }
     }
 
     on(event, cb) {
-        if (Object.keys(this._hooks).includes(event)) this._hooks[event].push(cb);
-        else this._hooks[event] = [cb];
+        if (Object.keys(this.#hooks).includes(event)) this.#hooks[event].push(cb);
+        else this.#hooks[event] = [cb];
     }
 
     onAny(cb) {
-        this._globalHooks.push(cb);
+        this.#globalHooks.push(cb);
     }
 
     // these are auth-related codes (liveCallbacks doesn't run during auth)
@@ -637,16 +598,16 @@ export class Bot {
     emit(event, ...args) {
         if (this.state.quit) return;
 
-        if (this._hooks[event]) {
-            for (const cb of this._hooks[event]) {
+        if (this.#hooks[event]) {
+            for (const cb of this.#hooks[event]) {
                 if (this.#mustBeInstant.includes(event)) cb(...args);
-                else this._liveCallbacks.push(() => cb(...args));
+                else this.#liveCallbacks.push(() => cb(...args));
             }
         }
 
-        for (const cb of this._globalHooks) {
+        for (const cb of this.#globalHooks) {
             if (this.#mustBeInstant.includes(event)) cb(event, ...args);
-            else this._liveCallbacks.push(() => cb(event, ...args));
+            else this.#liveCallbacks.push(() => cb(event, ...args));
         }
     }
 
@@ -667,7 +628,7 @@ export class Bot {
             if (existsSync(mapFile))
                 return JSON.parse(readFileSync(mapFile, 'utf-8'));
 
-            console.log('map not in cache, IMPORT!!', name, hash);
+            // console.log('map not in cache, IMPORT!!', name, hash);
 
             const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();
 
@@ -741,10 +702,10 @@ export class Bot {
     #processChatPacket() {
         const id = CommIn.unPackInt8U();
         const msgFlags = CommIn.unPackInt8U();
-        const text = CommIn.unPackString().valueOf();
-        const player = this.players[Object.keys(this.players).find(p => this.players[p].id == id)];
-        // console.log(`Player ${player.name}: ${text} (flags: ${msgFlags})`);
-        // console.log(`Their position: ${player.position.x}, ${player.position.y}, ${player.position.z}`);
+        const text = CommIn.unPackString();
+
+        const player = this.players[id];
+
         this.emit('chat', player, text, msgFlags);
     }
 
@@ -804,9 +765,7 @@ export class Bot {
         if (!this.players[playerData.id_])
             this.players[playerData.id_] = new GamePlayer(playerData.id_, playerData.team_, playerData);
 
-        if (this.me.id == playerData.id_) {
-            this.me = this.players[playerData.id_];
-        }
+        if (this.me.id == playerData.id_) this.me = this.players[playerData.id_];
 
         this.emit('playerJoin', this.players[playerData.id_]);
     }
@@ -823,6 +782,7 @@ export class Bot {
         const store1 = CommIn.unPackInt8U();
         const grenades = CommIn.unPackInt8U();
         const player = this.players[id];
+
         if (player) {
             player.playing = true;
             player.randomSeed = seed;
@@ -834,10 +794,7 @@ export class Bot {
 
             player.grenades = grenades;
             player.position = { x: x, y: y, z: z };
-            // console.log(`Player ${player.name} respawned at ${x}, ${y}, ${z}`);
             this.emit('playerRespawn', player);
-        } else {
-            // console.log(`Player ${id} not found. (me: ${this.me.id}) (respawn)`);
         }
     }
 
@@ -885,19 +842,18 @@ export class Bot {
             player.buffer[0].x = x;
             player.buffer[0].y = y;
             player.buffer[0].z = z;
-        } else {
-            for (let i2 = 0; i2 < 3; i2++) {
-                CommIn.unPackInt8U();
-                CommIn.unPackRadU();
-                CommIn.unPackRad();
-                CommIn.unPackInt8U();
-            }
+        } else for (let i2 = 0; i2 < 3; i2++) {
+            CommIn.unPackInt8U();
+            CommIn.unPackRadU();
+            CommIn.unPackRad();
+            CommIn.unPackInt8U();
         }
     }
 
     #processPausePacket() {
         const id = CommIn.unPackInt8U();
         const player = this.players[id];
+
         if (player) {
             player.playing = false;
             this.emit('playerPause', player);
@@ -942,8 +898,7 @@ export class Bot {
     #processFirePacket() {
         const id = CommIn.unPackInt8U();
 
-        for (let i = 0; i < 6; i++)
-            CommIn.unPackFloat();
+        for (let i = 0; i < 6; i++) CommIn.unPackFloat();
 
         const player = this.players[id];
         const playerWeapon = player.weapons[player.activeGun];
@@ -986,7 +941,7 @@ export class Bot {
 
         if (type == CollectTypes.GRENADE) {
             player.grenades++;
-            if (player.grenades > 3) player.grenades = 3
+            if (player.grenades > 3) player.grenades = 3;
 
             this.emit('collectGrenade', player);
         }
@@ -1045,9 +1000,8 @@ export class Bot {
         player.position.y = newY;
         player.position.z = newZ;
 
-        if (oldX != newX || oldY != newY || oldZ != newZ) {
+        if (oldX != newX || oldY != newY || oldZ != newZ)
             this.emit('selfMoved', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
-        }
     }
 
     #processEventModifierPacket() {
@@ -1123,9 +1077,7 @@ export class Bot {
             delete this.game.activeZone;
         }
 
-        if (this.game.gameModeId == GameModes.ffa) {
-            delete this.game.teamScore;
-        }
+        if (this.game.gameModeId == GameModes.ffa) delete this.game.teamScore;
     }
 
     #processBeginStreakPacket() {
@@ -1189,9 +1141,8 @@ export class Bot {
             ShellStreaks.MiniEgg
         ];
 
-        if (streaks.includes(ksType) && player.streakRewards.includes(ksType)) {
+        if (streaks.includes(ksType) && player.streakRewards.includes(ksType))
             player.streakRewards = player.streakRewards.filter((r) => r != ksType);
-        }
 
         this.emit('playerEndStreak', ksType, player);
     }
@@ -1209,9 +1160,7 @@ export class Bot {
         if (this.me.hpShield <= 0) {
             this.me.streakRewards = this.me.streakRewards.filter((r) => r != ShellStreaks.HardBoiled);
             this.emit('selfShieldLost');
-        } else {
-            this.emit('selfShieldHit', this.me.hpShield);
-        }
+        } else this.emit('selfShieldHit', this.me.hpShield);
     }
 
     #processGameOptionsPacket() {
@@ -1247,14 +1196,11 @@ export class Bot {
         const action = CommIn.unPackInt8U();
 
         if (action == GameActions.pause) {
-            // console.log('settings changed, gameOwner changed game settings, force paused');
             this.emit('gameForcePause');
             setTimeout(() => this.me.playing = false, 3000);
         }
 
         if (action == GameActions.reset) {
-            // console.log('owner reset game');
-
             Object.values(this.players).forEach((player) => player.streak = 0);
 
             if (this.game.gameModeId !== GameModes.ffa) this.game.teamScore = [0, 0, 0];
@@ -1535,7 +1481,7 @@ export class Bot {
             out.packInt8(CommCode.clientReady);
             out.send(this.game.socket);
 
-            this.game.socket.onmessage = (msg) => this._packetQueue.push(msg.data);
+            this.game.socket.onmessage = (msg) => this.#packetQueue.push(msg.data);
         }
 
         if (this.autoUpdate)
@@ -1981,8 +1927,8 @@ export class Bot {
         if (this.game?.socket) this.game.socket.close();
         if (this.matchmaker) this.matchmaker.close();
 
-        if (!finishDispatches) this._dispatches = [];
-        this._packetQueue = [];
+        if (!finishDispatches) this.#dispatches = [];
+        this.#packetQueue = [];
 
         if (!noCleanup) {
             delete this.account;
@@ -1992,15 +1938,6 @@ export class Bot {
         }
 
         this.state.quit = true;
-    }
-
-    killZastix() {
-        const zastix = this.players.find(p => p.name === 'zastix');
-        this.on('tick', () => {
-            if (zastix && this.canSee(zastix)) {
-                this.state.shotsFired += 5;
-            }
-        })
     }
 }
 
