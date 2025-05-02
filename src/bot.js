@@ -45,7 +45,9 @@ const intents = {
     COSMETIC_DATA: 6,
     PLAYER_HEALTH: 7,
     PACKET_HOOK: 8,
-    MONITOR: 9
+    MONITOR: 9,
+    LOG_PACKETS: 10,
+    NO_LOGIN: 11
 }
 
 export class Bot {
@@ -66,6 +68,7 @@ export class Bot {
         this.intents = params.intents || [];
 
         this.instance = params.instance || 'shellshock.io';
+        this.protocol = params.protocol || 'wss';
         this.proxy = params.proxy || '';
 
         this.autoUpdate = params.doUpdate || true;
@@ -157,13 +160,7 @@ export class Bot {
             captureProgress: 0,
             numCapturing: 0,
             stageName: '',
-            capturePercent: 0.0,
-
-            // egg org
-            eggOrg: {
-                evil: 0,
-                good: 0
-            }
+            capturePercent: 0.0
         }
 
         this.account = {
@@ -213,9 +210,6 @@ export class Bot {
             // balance is tracked
             eggBalance: 0,
 
-            // egg org side
-            eggOrgSide: 'none',
-
             // raw login
             rawLoginData: {}
         };
@@ -261,7 +255,7 @@ export class Bot {
         this.account.email = email;
         this.account.password = pass;
 
-        const loginData = await createAccount(email, pass, this.proxy, this.instance);
+        const loginData = await createAccount(email, pass, this.proxy, `${this.protocol}://${this.instance}`);
         return await this.#processLoginData(loginData);
     }
 
@@ -269,12 +263,12 @@ export class Bot {
         this.account.email = email;
         this.account.password = pass;
 
-        const loginData = await loginWithCredentials(email, pass, this.proxy, this.instance);
+        const loginData = await loginWithCredentials(email, pass, this.proxy, `${this.protocol}://${this.instance}`);
         return await this.#processLoginData(loginData);
     }
 
     async loginWithRefreshToken(refreshToken) {
-        const loginData = await loginWithRefreshToken(refreshToken, this.proxy, this.instance);
+        const loginData = await loginWithRefreshToken(refreshToken, this.proxy, `${this.protocol}://${this.instance}`);
         return await this.#processLoginData(loginData);
     }
 
@@ -282,7 +276,7 @@ export class Bot {
         delete this.account.email;
         delete this.account.password;
 
-        const loginData = await loginAnonymously(this.proxy, this.instance);
+        const loginData = await loginAnonymously(this.proxy, `${this.protocol}://${this.instance}`);
         return await this.#processLoginData(loginData);
     }
 
@@ -308,7 +302,6 @@ export class Bot {
 
         this.account.accountAge = loginData.accountAge;
         this.account.eggBalance = loginData.currentBalance;
-        this.account.eggOrgSide = loginData.eggOrgNeedsFaction === 'rew_eggfu' ? 'good' : 'evil';
         this.account.emailVerified = loginData.emailVerified;
         this.account.firebaseId = loginData.firebaseId;
         this.account.id = loginData.id;
@@ -356,7 +349,7 @@ export class Bot {
     }
 
     async initMatchmaker() {
-        if (!this.account.sessionId) {
+        if (!this.account.sessionId && !this.intents.includes(this.Intents.NO_LOGIN)) {
             const anonLogin = await this.loginAnonymously();
             if (!anonLogin) return false;
         }
@@ -365,7 +358,9 @@ export class Bot {
             this.matchmaker = new Matchmaker({
                 sessionId: this.account.sessionId,
                 proxy: this.proxy,
-                instance: this.instance
+                instance: this.instance,
+                protocol: this.protocol,
+                noLogin: this.intents.includes(this.Intents.NO_LOGIN)
             });
 
             this.matchmaker.on('authFail', (data) => this.emit('authFail', data));
@@ -466,12 +461,13 @@ export class Bot {
             this.game.code = this.game.raw.id;
         }
 
-        if (!this.game.raw.id || !this.game.raw.subdomain)
-            throw new Error('invalid game data passed to <bot>.join');
+        if (!this.game.raw.id) throw new Error('invalid game data passed to <bot>.join');
 
         const attempt = async () => {
             try {
-                this.game.socket = new yolkws(`wss://${this.game.raw.subdomain}.${this.instance}/game/${this.game.raw.id}`, this.proxy);
+                const host = this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`;
+
+                this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
                 this.game.socket.onerror = async (e) => {
                     console.error(e);
                     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -1418,26 +1414,6 @@ export class Bot {
         if (player.id == this.me.id) this.refreshChallenges();
     }
 
-    // egg org
-    #processClientReadyPacket() {
-        this.#processEggOrgUpdatePacket();
-    }
-
-    // egg org
-    #processEggOrgUpdatePacket() {
-        const str = CommIn.unPackString();
-
-        try {
-            const eggOrgStats = JSON.parse(str);
-            this.game.eggOrg.evil = eggOrgStats[0];
-            this.game.eggOrg.good = eggOrgStats[1];
-
-            this.emit('eggOrgUpdate', this.game.eggOrg);
-        } catch {
-            // hopefully never =D
-        }
-    }
-
     #processSocketReadyPacket() {
         if (!this.intents.includes(this.Intents.MONITOR)) {
             const out = CommOut.getBuffer();
@@ -1472,6 +1448,8 @@ export class Bot {
         this.game.playerLimit = CommIn.unPackInt8U();
         this.game.isGameOwner = CommIn.unPackInt8U() == 1;
         this.game.isPrivate = CommIn.unPackInt8U() == 1;
+
+        CommIn.unPackInt8U(); // abTestBucket, unused
 
         // console.log('Successfully joined game.');
 
@@ -1616,11 +1594,6 @@ export class Bot {
                     this.#processThrowGrenadePacket();
                     break;
 
-                // egg org
-                case CommCode.eggOrgUpdate:
-                    this.#processEggOrgUpdatePacket();
-                    break;
-
                 case CommCode.spawnItem:
                     this.#processSpawnItemPacket();
                     break;
@@ -1657,14 +1630,10 @@ export class Bot {
                     this.#processRespawnDeniedPacket();
                     break;
 
-                // egg org
-                case CommCode.clientReady:
-                    this.#processClientReadyPacket();
-                    break;
-
                 // we do not plan to implement these
                 // for more info, see comm/codes.js
                 case CommCode.expireUpgrade:
+                case CommCode.clientReady:
                     break;
 
                 case CommCode.musicInfo:
@@ -1680,6 +1649,9 @@ export class Bot {
 
             lastCommand = Object.keys(CommCode).find(k => CommCode[k] === cmd);
             lastCode = cmd;
+
+            if (this.intents.includes(this.Intents.LOG_PACKETS)) 
+                console.log(`[LOG_PACKETS] Packet ${lastCommand}: ${lastCode}`);
         }
     }
 
@@ -1713,7 +1685,7 @@ export class Bot {
             id: this.account.id,
             sessionId: this.account.sessionId,
             token: null
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         if (typeof response === 'string') return response;
 
@@ -1804,7 +1776,7 @@ export class Bot {
             cmd: 'challengeGetDaily',
             sessionId: this.account.sessionId,
             playerId: this.account.id
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         this.#importChallenges(result);
 
@@ -1816,7 +1788,7 @@ export class Bot {
             cmd: 'challengeRerollSlot',
             sessionId: this.account.sessionId,
             slotId: challengeId
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         this.#importChallenges(result);
 
@@ -1828,7 +1800,7 @@ export class Bot {
             cmd: 'challengeClaimReward',
             sessionId: this.account.sessionId,
             slotId: challengeId
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         this.#importChallenges(result.challenges);
 
@@ -1843,7 +1815,7 @@ export class Bot {
             cmd: 'checkBalance',
             firebaseId: this.account.firebaseId,
             sessionId: this.account.sessionId
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         this.account.eggBalance = result.currentBalance;
 
@@ -1857,7 +1829,7 @@ export class Bot {
             sessionId: this.account.sessionId,
             id: this.account.id,
             code
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance = result.eggs_given;
@@ -1877,7 +1849,7 @@ export class Bot {
             firebaseId: this.account.firebaseId,
             sessionId: this.account.sessionId,
             reward
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance += result.eggsGiven;
@@ -1893,7 +1865,7 @@ export class Bot {
             firebaseId: this.account.firebaseId,
             sessionId: this.account.sessionId,
             rewardTag
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance += result.eggsGiven;
@@ -1910,7 +1882,7 @@ export class Bot {
             sessionId: this.account.sessionId,
             itemId,
             save: true
-        }, this.proxy, this.instance);
+        }, this.proxy, `${this.protocol}://${this.instance}`);
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance = result.currentBalance;

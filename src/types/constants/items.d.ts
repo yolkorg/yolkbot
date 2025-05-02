@@ -18,4 +18,4 @@ export interface Item {
     };
 }
 
-export type Items = Item[];
+export const Items: Item[];

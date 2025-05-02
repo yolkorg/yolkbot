@@ -1,4 +1,4 @@
-bun cli/build.js
+bun cli/build.js --no-minify
 
 rm -rf ./build/
 mkdir build

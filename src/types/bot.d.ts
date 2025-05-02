@@ -14,6 +14,7 @@ export interface BotParams {
     updateInterval?: number;
     proxy?: string;
     instance?: string;
+    protocol?: string;
 }
 
 export interface ChiknWinnerStatus {
@@ -218,7 +219,9 @@ type intents = {
     COSMETIC_DATA: 6,
     PLAYER_HEALTH: 7,
     PACKET_HOOK: 8,
-    MONITOR: 9
+    MONITOR: 9,
+    LOG_PACKETS: 10,
+    NO_LOGIN: 11
 }
 
 export class Bot {
@@ -230,6 +233,7 @@ export class Bot {
     disablePathing: boolean;
     updateInterval: number;
     instance: string;
+    protocol: string;
     state: BotState;
     players: Record<string, GamePlayer>;
     me: GamePlayer;

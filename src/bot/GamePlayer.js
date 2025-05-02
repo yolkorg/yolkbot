@@ -44,12 +44,10 @@ export class GamePlayer {
         }
 
         this.activeGun = playerData.weaponIdx_;
-        this.selectedGun = 0;
+        this.selectedGun = playerData.charClass_;
         this.weapons = [{}, {}];
 
         if (this.character.primaryGun) {
-            this.selectedGun = playerData.charClass_;
-
             this.weapons[0] = new GunList[this.selectedGun]();
             this.weapons[1] = new Cluck9mm();
         }

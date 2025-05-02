@@ -16,4 +16,4 @@ export interface Challenge {
     }
 }
 
-export type Challenges = Challenge[];
+export const Challenges: Challenge[];

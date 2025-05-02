@@ -12,4 +12,4 @@ export interface Map {
     numPlayers: string;
 }
 
-export type Maps = Map[];
+export const Maps: Map[];

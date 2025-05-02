@@ -3,12 +3,12 @@ import yolkws from './socket.js';
 
 import { FirebaseKey, UserAgent } from './constants/index.js';
 
-const queryServices = async (request, proxy = '', instance = 'shellshock.io') => {
+const queryServices = async (request, proxy = '', instance = 'wss://shellshock.io') => {
     let ws;
 
     const attempt = async () => {
         try {
-            ws = new yolkws(`wss://${instance}/services/`, proxy);
+            ws = new yolkws(`${instance}/services/`, proxy);
             ws.onerror = async (e) => {
                 console.error(e);
                 await new Promise((resolve) => setTimeout(resolve, 100));
@@ -53,11 +53,11 @@ const queryServices = async (request, proxy = '', instance = 'shellshock.io') =>
     });
 }
 
-async function createAccount(email, password, proxy = '', instance = 'shellshock.io') {
+async function createAccount(email, password, proxy = '', instance = 'wss://shellshock.io') {
     return await loginWithCredentials(email, password, proxy, instance, true);
 }
 
-async function loginWithCredentials(email, password, proxy = '', instance = 'shellshock.io', _useRegisterEndpoint) {
+async function loginWithCredentials(email, password, proxy = '', instance = 'wss://shellshock.io', _useRegisterEndpoint) {
     if (!email || !password) return 'firebase_no_credentials';
 
     /*
@@ -136,7 +136,7 @@ async function loginWithCredentials(email, password, proxy = '', instance = 'she
     return response;
 }
 
-async function loginWithRefreshToken(refreshToken, proxy = '', instance = 'shellshock.io') {
+async function loginWithRefreshToken(refreshToken, proxy = '', instance = 'wss://shellshock.io') {
     if (!refreshToken) return 'firebase_no_credentials';
 
     const formData = new URLSearchParams();
@@ -194,7 +194,7 @@ async function loginWithRefreshToken(refreshToken, proxy = '', instance = 'shell
     return response;
 }
 
-async function loginAnonymously(proxy = '', instance = 'shellshock.io') {
+async function loginAnonymously(proxy = '', instance = 'wss://shellshock.io') {
     const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
         method: 'POST',
         body: JSON.stringify({

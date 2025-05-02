@@ -3,8 +3,10 @@ import yolkws from './socket.js';
 
 type MatchmakerParams = {
     instance?: string;
+    protocol?: string;
     proxy?: string;
     sessionId?: string;
+    noLogin?: boolean;
 };
 
 type Region = {

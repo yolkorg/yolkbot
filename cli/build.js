@@ -15,7 +15,7 @@ function copyAndMinify(src, dest) {
         const code = fs.readFileSync(src, 'utf8');
 
         esbuild.transform(code, {
-            minify: true,
+            minify: process.argv[2] !== '--no-minify',
             loader: 'js',
             format: 'esm',
             target: 'esnext',

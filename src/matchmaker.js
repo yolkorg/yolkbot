@@ -17,20 +17,21 @@ export class Matchmaker {
 
     constructor(params = {}) {
         if (!params.instance) params.instance = 'shellshock.io';
+        if (!params.protocol) params.protocol = 'wss';
 
-        if (params.sessionId) this.sessionId = params.sessionId;
+        if (params.sessionId || params.noLogin) this.sessionId = params.sessionId;
         else this.#createSessionId(params.instance);
 
         if (params.proxy && !ProxiesEnabled) throw new Error('proxies do not work and hence are not supported in the browser');
         else if (params.proxy) this.proxy = params.proxy;
 
-        this.#createSocket(params.instance);
+        this.#createSocket(params.instance, params.protocol, params.noLogin);
     }
 
-    async #createSocket(instance) {
+    async #createSocket(instance, protocol, noLogin) {
         const attempt = async () => {
             try {
-                this.ws = new yolkws(`wss://${instance}/matchmaker/`, this.proxy);
+                this.ws = new yolkws(`${protocol}://${instance}/matchmaker/`, this.proxy);
                 this.ws.onerror = async (e) => {
                     console.error(e);
                     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -48,9 +49,8 @@ export class Matchmaker {
             this.connected = true;
             this.ws.onerror = null;
 
-            if (this.sessionId) {
+            if (this.sessionId || noLogin)
                 this.onceConnected.forEach(func => func());
-            }
         };
 
         this.ws.onmessage = (e) => {
