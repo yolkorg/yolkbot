@@ -1723,6 +1723,8 @@ export class Bot {
 
         this.#importChallenges(result.challenges);
 
+        if (result.reward > 0) this.account.eggBalance += result.reward;
+
         return {
             eggReward: result.reward,
             updatedChallenges: this.account.challenges
