@@ -17,7 +17,6 @@ import {
     GameModes,
     GameOptionFlags,
     GunList,
-    IsBrowser,
     ItemTypes,
     Movements,
     PlayTypes,
@@ -29,6 +28,8 @@ import LookAtPosDispatch from './dispatches/LookAtPosDispatch.js';
 import MovementDispatch from './dispatches/MovementDispatch.js';
 
 import { NodeList } from './pathing/mapnode.js';
+
+import { fetchMap, initKotcZones } from './util.js';
 
 import { Challenges } from './constants/challenges.js';
 import { Maps } from './constants/maps.js';
@@ -590,7 +591,7 @@ export class Bot {
     }
 
     // these are auth-related codes (liveCallbacks doesn't run during auth)
-    #mustBeInstant = ['authSuccess', 'authFail', 'banned', 'gameReady', 'importMap', 'quit'];
+    #mustBeInstant = ['authSuccess', 'authFail', 'banned', 'gameReady', 'quit'];
 
     emit(event, ...args) {
         if (this.state.quit) return;
@@ -608,99 +609,10 @@ export class Bot {
         }
     }
 
-    async #fetchMap(name, hash) {
-        if (!IsBrowser) {
-            const { existsSync, mkdirSync, readFileSync, writeFileSync } = await import('node:fs');
-            const { join } = await import('node:path');
-            const { homedir } = await import('node:os');
-
-            const yolkbotCache = join(homedir(), '.yolkbot');
-            const mapCache = join(yolkbotCache, 'maps');
-
-            if (!existsSync(yolkbotCache)) mkdirSync(yolkbotCache);
-            if (!existsSync(mapCache)) mkdirSync(mapCache);
-
-            const mapFile = join(mapCache, `${name}-${hash}.json`);
-
-            if (existsSync(mapFile))
-                return JSON.parse(readFileSync(mapFile, 'utf-8'));
-
-            const data = await (await fetch(`https://${this.instance}/maps/${name}.json?${hash}`)).json();
-
-            this.emit('importMap', name, data);
-
-            writeFileSync(mapFile, JSON.stringify(data, null, 4), { flag: 'w+' });
-
-            return data;
-        } else {
-            const data = await (await fetch(`https://esm.sh/gh/yolkorg/maps/maps/${name}.json`)).json();
-            this.emit('importMap', name, data);
-            return data;
-        }
-    }
-
-    #initKotcZones() {
-        const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
-        if (!meshData) return delete this.game.map.zones;
-
-        let numCaptureZones = 0;
-        const mapData = {};
-        const zones = [];
-
-        for (const cell of meshData) {
-            if (!mapData[cell.x]) mapData[cell.x] = {};
-            if (!mapData[cell.x][cell.y]) mapData[cell.x][cell.y] = {};
-            mapData[cell.x][cell.y][cell.z] = { zone: null };
-        }
-
-        const offsets = [
-            { x: -1, z: 0 },
-            { x: 1, z: 0 },
-            { x: 0, z: -1 },
-            { x: 0, z: 1 }
-        ];
-
-        function getMapCellAt(x, y, z) {
-            return mapData[x] && mapData[x][y] && mapData[x][y][z] ? mapData[x][y][z] : null;
-        }
-
-        for (const cellA of meshData) {
-            if (!mapData[cellA.x][cellA.y][cellA.z].zone) {
-                cellA.zone = ++numCaptureZones;
-                mapData[cellA.x][cellA.y][cellA.z].zone = cellA.zone;
-
-                const currentZone = [cellA];
-                let hits;
-
-                do {
-                    hits = 0;
-                    for (const cellB of meshData) {
-                        if (!mapData[cellB.x][cellB.y][cellB.z].zone) {
-                            for (const o of offsets) {
-                                const cell = getMapCellAt(cellB.x + o.x, cellB.y, cellB.z + o.z);
-                                if (cell && cell.zone == cellA.zone) {
-                                    hits++;
-                                    cellB.zone = cellA.zone;
-                                    mapData[cellB.x][cellB.y][cellB.z].zone = cellA.zone;
-                                    currentZone.push(cellB);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                } while (hits > 0);
-
-                zones.push(currentZone);
-            }
-        }
-
-        this.game.map.zones = zones;
-    }
-
     #processChatPacket() {
         const id = CommIn.unPackInt8U();
         const msgFlags = CommIn.unPackInt8U();
-        const text = CommIn.unPackString();
+        const text = CommIn.unPackString().valueOf();
 
         const player = this.players[id];
 
@@ -861,8 +773,8 @@ export class Bot {
     #processSwapWeaponPacket() {
         const id = CommIn.unPackInt8U();
         const newWeaponId = CommIn.unPackInt8U();
-
         const player = this.players[id];
+
         if (player) {
             player.activeGun = newWeaponId;
             this.emit('playerSwapWeapon', player, newWeaponId);
@@ -871,14 +783,14 @@ export class Bot {
 
     #processDeathPacket() {
         const killedId = CommIn.unPackInt8U();
-        const byId = CommIn.unPackInt8U();
+        const killerId = CommIn.unPackInt8U();
 
-        CommIn.unPackInt8U();
-        CommIn.unPackInt8U();
-        CommIn.unPackInt8U();
+        CommIn.unPackInt8U(); // respawnTime
+        CommIn.unPackInt8U(); // killerLastDmg
+        CommIn.unPackInt8U(); // killedLastDmg
 
         const killed = this.players[killedId];
-        const killer = this.players[byId];
+        const killer = this.players[killerId];
 
         if (killed) {
             killed.playing = false;
@@ -1440,11 +1352,18 @@ export class Bot {
         this.game.gameMode = GameModesById[this.game.gameModeId];
         this.game.mapIdx = CommIn.unPackInt8U();
         this.game.map = Maps[this.game.mapIdx];
+
         if (this.intents.includes(this.Intents.PATHFINDING)) {
-            this.game.map.raw = await this.#fetchMap(this.game.map.filename, this.game.map.hash);
+            this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
             this.pathing.nodeList = new NodeList(this.game.map.raw);
-            if (this.game.gameModeId === GameModes.kotc) this.#initKotcZones();
+
+            if (this.game.gameModeId === GameModes.kotc) {
+                const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
+                if (meshData) this.game.map.zones = initKotcZones(meshData);
+                else delete this.game.map.zones;
+            }
         }
+
         this.game.playerLimit = CommIn.unPackInt8U();
         this.game.isGameOwner = CommIn.unPackInt8U() == 1;
         this.game.isPrivate = CommIn.unPackInt8U() == 1;
@@ -1650,7 +1569,7 @@ export class Bot {
             lastCommand = Object.keys(CommCode).find(k => CommCode[k] === cmd);
             lastCode = cmd;
 
-            if (this.intents.includes(this.Intents.LOG_PACKETS)) 
+            if (this.intents.includes(this.Intents.LOG_PACKETS))
                 console.log(`[LOG_PACKETS] Packet ${lastCommand}: ${lastCode}`);
         }
     }

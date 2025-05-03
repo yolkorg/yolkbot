@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "0.1.4-alpha.28",
+    "version": "0.1.4-alpha.30",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -43,6 +43,10 @@
         "./matchmaker": {
             "import": "./dist/matchmaker.js",
             "types": "./dist/types/matchmaker.d.ts"
+        },
+        "./util": {
+            "import": "./dist/util.js",
+            "types": "./dist/types/util.d.ts"
         },
         "./pathing/*": "./dist/pathing/*.js",
         "./pathing/*.js": "./dist/pathing/*.js",
