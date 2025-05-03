@@ -11,12 +11,12 @@
     "homepage": "https://github.com/yolkorg/yolkbot#readme",
     "bugs": {
         "url": "https://github.com/yolkorg/yolkbot/issues",
-        "email": "hello@villainsrule.xyz"
+        "email": "bugs@villainsrule.xyz"
     },
     "author": "1ust",
     "repository": {
         "type": "git",
-        "url": "https://github.com/yolkorg/axios.git"
+        "url": "https://github.com/yolkorg/yolkbot.git"
     },
     "type": "module",
     "files": [
