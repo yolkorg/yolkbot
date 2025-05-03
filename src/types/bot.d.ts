@@ -269,6 +269,7 @@ export class Bot {
     onAny(cb: Function): void;
 
     on(event: 'authFail', cb: (reason: string) => void): void;
+    on(event: 'authSuccess', cb: (account: Account) => void): void;
     on(event: 'balanceUpdate', cb: (oldBalance: number, newBalance: number) => void): void;
     on(event: 'banned', cb: (banRemaining: string) => void): void;
     on(event: 'chat', cb: (player: GamePlayer | undefined, message: string, flags: number) => void): void;
@@ -277,6 +278,7 @@ export class Bot {
     on(event: 'collectGrenade', cb: (player: GamePlayer) => void): void;
     on(event: 'gameForcePause', cb: () => void): void;
     on(event: 'gameOptionsChange', cb: (oldOptions: GameOptions, newOptions: GameOptions) => void): void;
+    on(event: 'gameReady', cb: () => void): void;
     on(event: 'gameReset', cb: () => void): void;
     on(event: 'gameStateChange', cb: (oldState: Game, newState: Game) => void): void;
     on(event: 'grenadeExploded', cb: (item: Item | number, pos: { x: number; y: number; z: number }, damage: number, radius: number) => void): void;
@@ -295,6 +297,7 @@ export class Bot {
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
+    on(event: 'quit', cb: () => void): void;
     on(event: 'rocketHit', cb: (pos: { x: number; y: number; z: number }, damage: number, radius: number) => void): void;
     on(event: 'selfDamaged', cb: (oldHp: number, newHp: number) => void): void;
     on(event: 'selfMoved', cb: (oldPos: { x: number; y: number; z: number }, newPos: { x: number; y: number; z: number }) => void): void;
