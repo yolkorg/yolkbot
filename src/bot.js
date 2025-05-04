@@ -13,6 +13,7 @@ import {
     CollectTypes,
     CoopStates,
     findItemById,
+    FramesBetweenSyncs,
     GameActions,
     GameModes,
     GameOptionFlags,
@@ -561,7 +562,7 @@ export class Bot {
                 out.packInt8(CommCode.syncMe);
                 out.packInt8(Math.random() * 128 | 0); // stateIdx
                 out.packInt8(this.me.serverStateIdx); // serverStateIdx
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < FramesBetweenSyncs; i++) {
                     out.packInt8(this.controlKeys); // controlkeys
                     out.packInt8(this.state.shotsFired); // shots fired
                     out.packRadU(this.me.view.yaw); // yaw
@@ -717,7 +718,7 @@ export class Bot {
 
         const player = this.players[id];
         if (!player || player.id == this.me.id) {
-            for (let i2 = 0; i2 < 3 /* FramesBetweenSyncs */; i2++) {
+            for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
                 CommIn.unPackInt8U();
                 CommIn.unPackRadU();
                 CommIn.unPackRad();
@@ -737,7 +738,7 @@ export class Bot {
         if (this.intents.includes(this.Intents.BUFFERS)) {
             if (!player.buffer) return;
 
-            for (let i2 = 0; i2 < 3; i2++) {
+            for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
                 player.buffer[i2].controlKeys = CommIn.unPackInt8U();
 
                 const yaw = CommIn.unPackRadU();
@@ -752,7 +753,7 @@ export class Bot {
             player.buffer[0].x = x;
             player.buffer[0].y = y;
             player.buffer[0].z = z;
-        } else for (let i2 = 0; i2 < 3; i2++) {
+        } else for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
             CommIn.unPackInt8U();
             CommIn.unPackRadU();
             CommIn.unPackRad();

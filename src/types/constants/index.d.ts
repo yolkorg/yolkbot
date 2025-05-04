@@ -29,6 +29,9 @@ export declare const CoopStates: {
 
 export declare const FirebaseKey: string;
 
+export declare const SyncRate: number;
+export declare const FramesBetweenSyncs: number;
+
 export declare const GameActions: {
     reset: number;
     pause: number;
