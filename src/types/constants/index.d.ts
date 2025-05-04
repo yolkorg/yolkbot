@@ -3,6 +3,12 @@ import { Item } from './items';
 
 export declare const findItemById: (id: number) => Item;
 
+export declare const ChatFlags: {
+    none: number;
+    pinned: number;
+    team: number;
+}
+
 export declare const ChiknWinnerDailyLimit: number;
 
 export declare const CollectTypes: {

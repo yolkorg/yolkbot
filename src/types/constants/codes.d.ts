@@ -1,10 +1,14 @@
 export declare const CommCode: {
     swapWeapon: number;
     joinGame: number;
-    observeGame: number;
+    refreshGameState: number;
     spawnItem: number;
+    observeGame: number;
     ping: number;
     bootPlayer: number;
+    banPlayer: number;
+    loginRequired: number;
+    gameLocked: number;
     reportPlayer: number;
     switchTeam: number;
     changeCharacter: number;
@@ -23,6 +27,7 @@ export declare const CommCode: {
     hitThem: number;
     hitMe: number;
     collectItem: number;
+    challengeResetInGame: number;
     chat: number;
     syncThem: number;
     die: number;
@@ -34,11 +39,14 @@ export declare const CommCode: {
     respawnDenied: number;
     clientReady: number;
     requestRespawn: number;
+    switchTeamFail: number;
+    expireUpgrade: number;
     metaGameState: number;
     syncMe: number;
     explode: number;
     keepAlive: number;
     musicInfo: number;
     hitMeHardBoiled: number;
+    playerInfo: number;
     challengeCompleted: number;
 };
