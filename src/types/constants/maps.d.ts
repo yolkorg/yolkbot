@@ -24,7 +24,7 @@ export interface MapData {
         rx?: number;
         ry?: number;
         rz?: number;
-    }
+    }[];
 }
 
 export interface MapSun {
