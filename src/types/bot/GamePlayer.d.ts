@@ -20,6 +20,10 @@ export interface Character {
     hat: Item | number;
     grenade: Item | number;
     melee: Item | number;
+    stampPos: {
+        x: number;
+        y: number;
+    }
 }
 
 export interface Buffer {
@@ -40,8 +44,8 @@ export interface PlayerData {
     shellColor_: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
     hatItem_: Item | number;
     stampItem_: Item | number;
-    _unused: number;
-    _unused2: number;
+    stampPosX_: number;
+    stampPosY_: number;
     grenadeItem_: Item | number;
     meleeItem_: Item | number;
     x_: number;

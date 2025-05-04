@@ -40,7 +40,11 @@ export class GamePlayer {
             stamp: playerData.stampItem_,
             hat: playerData.hatItem_,
             grenade: playerData.grenadeItem_,
-            melee: playerData.meleeItem_
+            melee: playerData.meleeItem_,
+            stampPos: {
+                x: playerData.stampPosX_,
+                y: playerData.stampPosY_
+            }
         }
 
         this.activeGun = playerData.weaponIdx_;
