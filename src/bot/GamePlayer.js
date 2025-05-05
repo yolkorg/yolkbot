@@ -65,11 +65,12 @@ export class GamePlayer {
         };
 
         this.streak = playerData.score_;
+        this.streakRewards = Object.values(ShellStreaks).filter(streak => playerData.activeShellStreaks_ & streak);
+
         this.hp = playerData.hp_;
-        this.shieldHp = 0;
+        this.hpShield = 0;
 
         this.spawnShield = playerData.shield_;
-        this.streakRewards = Object.values(ShellStreaks).filter(streak => playerData.activeShellStreaks_ & streak);
 
         this.randomSeed = 0;
         this.serverStateIdx = 0;
