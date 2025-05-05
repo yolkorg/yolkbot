@@ -16,15 +16,17 @@ export interface Map {
     numPlayers: string;
 }
 
+export interface MapCell {
+    x: number;
+    y: number;
+    z: number;
+    rx?: number;
+    ry?: number;
+    rz?: number;
+}
+
 export interface MapData {
-    [type: string]: {
-        x: number;
-        y: number;
-        z: number;
-        rx?: number;
-        ry?: number;
-        rz?: number;
-    }[];
+    [type: string]: MapCell[];
 }
 
 export interface MapSun {
