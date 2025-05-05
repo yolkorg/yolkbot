@@ -933,62 +933,64 @@ export class Bot {
     }
 
     #processGameStatePacket() {
-        if (this.game.gameModeId == GameModes.spatula) {
-            this.game.teamScore[1] = CommIn.unPackInt16U();
-            this.game.teamScore[2] = CommIn.unPackInt16U();
+        switch (this.game.gameModeId) {
+            case GameModes.spatula:
+                this.game.teamScore[1] = CommIn.unPackInt16U();
+                this.game.teamScore[2] = CommIn.unPackInt16U();
 
-            const spatulaCoords = {
-                x: CommIn.unPackFloat(),
-                y: CommIn.unPackFloat(),
-                z: CommIn.unPackFloat()
-            };
+                const spatulaCoords = {
+                    x: CommIn.unPackFloat(),
+                    y: CommIn.unPackFloat(),
+                    z: CommIn.unPackFloat()
+                };
 
-            const controlledBy = CommIn.unPackInt8U();
-            const controlledByTeam = CommIn.unPackInt8U();
+                const controlledBy = CommIn.unPackInt8U();
+                const controlledByTeam = CommIn.unPackInt8U();
 
-            this.game.spatula = {
-                coords: spatulaCoords,
-                controlledBy: controlledBy,
-                controlledByTeam: controlledByTeam
-            };
+                this.game.spatula = {
+                    coords: spatulaCoords,
+                    controlledBy: controlledBy,
+                    controlledByTeam: controlledByTeam
+                };
 
-            this.emit('gameStateChange', this.game);
-        } else if (this.game.gameModeId == GameModes.kotc) {
-            this.game.stage = CommIn.unPackInt8U(); // constants.CoopStates
-            this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
-            this.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
-            this.game.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
-            this.game.numCapturing = CommIn.unPackInt8U(); // number of players capturing - number/1000
-            this.game.teamScore[1] = CommIn.unPackInt8U(); // team 1 (blue) score
-            this.game.teamScore[2] = CommIn.unPackInt8U(); // team 2 (red) score
+                this.emit('gameStateChange', this.game);
+                break;
 
-            // not in shell, for utility purposes =D
-            this.game.stageName = CoopStagesById[this.game.stage]; // name of the stage ('start' / 'capturing' / 'etc')
-            this.game.capturePercent = this.game.captureProgress / 1000; // progress of the capture as a percentage
-            this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
+            case GameModes.kotc:
+                this.game.stage = CommIn.unPackInt8U(); // constants.CoopStates
+                this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
+                this.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
+                this.game.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
+                this.game.numCapturing = CommIn.unPackInt8U(); // number of players capturing - number/1000
+                this.game.teamScore[1] = CommIn.unPackInt8U(); // team 1 (blue) score
+                this.game.teamScore[2] = CommIn.unPackInt8U(); // team 2 (red) score
 
-            this.emit('gameStateChange', this.game);
-        } else if (this.game.gameModeId == GameModes.team) {
-            this.game.teamScore[1] = CommIn.unPackInt16U();
-            this.game.teamScore[2] = CommIn.unPackInt16U();
+                // not in shell, for utility purposes =D
+                this.game.stageName = CoopStagesById[this.game.stage]; // name of the stage ('start' / 'capturing' / 'etc')
+                this.game.capturePercent = this.game.captureProgress / 1000; // progress of the capture as a percentage
+                this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
+
+                this.emit('gameStateChange', this.game);
+                break;
+
+            case GameModes.team:
+                this.game.teamScore[1] = CommIn.unPackInt16U();
+                this.game.teamScore[2] = CommIn.unPackInt16U();
+                break;
+
+            default:
+                delete this.game.spatula;
+                delete this.game.stage;
+                delete this.game.zoneNumber;
+                delete this.game.capturing;
+                delete this.game.captureProgress;
+                delete this.game.numCapturing;
+                delete this.game.stageName;
+                delete this.game.numCapturing;
+                delete this.game.activeZone;
+                delete this.game.teamScore;
+                break;
         }
-
-        if (this.game.gameModeId !== GameModes.spatula) {
-            delete this.game.spatula;
-        }
-
-        if (this.game.gameModeId !== GameModes.kotc) {
-            delete this.game.stage;
-            delete this.game.zoneNumber;
-            delete this.game.capturing;
-            delete this.game.captureProgress;
-            delete this.game.numCapturing;
-            delete this.game.stageName;
-            delete this.game.numCapturing;
-            delete this.game.activeZone;
-        }
-
-        if (this.game.gameModeId == GameModes.ffa) delete this.game.teamScore;
     }
 
     #processBeginStreakPacket() {
