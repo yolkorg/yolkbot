@@ -245,6 +245,8 @@ export class Bot {
                     if (player.streakRewards.includes(ShellStreaks.OverHeal)) player.hp = Math.max(100, player.hp - regenSpeed);
                     else player.hp = Math.min(100, player.hp + regenSpeed);
                 }
+
+                if (player.spawnShield > 0) player.spawnShield -= 6;
             }
         }, 33);
     }
@@ -531,7 +533,6 @@ export class Bot {
     }
 
     update() {
-        if (!this.state.joinedGame) throw new Error('You cannot call update() if the bot is not in a game.');
         if (this.state.quit) return;
 
         // process pathfinding
@@ -705,6 +706,9 @@ export class Bot {
 
             player.grenades = grenades;
             player.position = { x: x, y: y, z: z };
+
+            player.spawnShield = 120;
+
             this.emit('playerRespawn', player);
         }
     }
@@ -798,7 +802,7 @@ export class Bot {
             killed.streak = 0;
             killed.lastDeathTime = Date.now();
             killed.hp = 100;
-            killed.hpShield = 0;
+            killed.spawnShield = 0;
         }
 
         if (killer) killer.streak++;
@@ -998,7 +1002,7 @@ export class Bot {
 
         switch (ksType) {
             case ShellStreaks.HardBoiled:
-                player.hpShield = 100;
+                if (id === this.me.id) this.me.shieldHp = 100;
                 player.streakRewards.push(ShellStreaks.HardBoiled);
                 break;
 
@@ -1065,13 +1069,13 @@ export class Bot {
         CommIn.unPackFloat();
         CommIn.unPackFloat();
 
-        this.me.hpShield = hb;
+        this.me.shieldHp = hb;
         this.me.hp = hp;
 
-        if (this.me.hpShield <= 0) {
+        if (this.me.shieldHp <= 0) {
             this.me.streakRewards = this.me.streakRewards.filter((r) => r != ShellStreaks.HardBoiled);
             this.emit('selfShieldLost');
-        } else this.emit('selfShieldHit', this.me.hpShield);
+        } else this.emit('selfShieldHit', this.me.shieldHp);
     }
 
     #processGameOptionsPacket() {

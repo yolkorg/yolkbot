@@ -66,24 +66,13 @@ export class GamePlayer {
 
         this.streak = playerData.score_;
         this.hp = playerData.hp_;
+        this.shieldHp = 0;
 
-        this.hpShield = playerData.shield_;
+        this.spawnShield = playerData.shield_;
         this.streakRewards = Object.values(ShellStreaks).filter(streak => playerData.activeShellStreaks_ & streak);
 
         this.randomSeed = 0;
         this.serverStateIdx = 0;
-    }
-
-    dispatch() {
-        throw new Error('you cannot call this function from a GamePlayer. call dispatch() on an instance of Bot instead.');
-    }
-
-    join() {
-        throw new Error('you cannot call this function from a GamePlayer. call join() on an instance of Bot instead.');
-    }
-
-    update() {
-        throw new Error('you cannot call this function from a GamePlayer. call update() on an instance of Bot instead.');
     }
 }
 

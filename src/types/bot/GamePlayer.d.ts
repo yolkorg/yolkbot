@@ -104,7 +104,7 @@ export class GamePlayer {
     buffer: Buffer;
     streak: number;
     hp: number;
-    hpShield: number;
+    spawnShield: number;
     streakRewards: number[];
     randomSeed: number;
     serverStateIdx: number;

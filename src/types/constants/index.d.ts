@@ -111,6 +111,8 @@ export declare const SocialRewards: {
     Twitch: string;
 }
 
+export declare const StateBufferSize: number;
+
 export declare const Teams: {
     blue: number;
     red: number;
