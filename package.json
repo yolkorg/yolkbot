@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "0.1.5-alpha.12",
+    "version": "0.1.5-alpha.13",
     "keywords": [
         "shell shockers",
         "shellshock.io",

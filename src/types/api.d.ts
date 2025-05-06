@@ -1,17 +1,9 @@
 export interface QueryRequest {
     cmd: string;
-    firebaseToken?: string;
+    [key: string]: any;
 }
 
 export interface QueryResponse {
-    id?: number;
-    firebaseId?: string;
-    sessionId?: string;
-    session?: number;
-    kills?: number;
-    deaths?: number;
-    currentBalance?: number;
-    // theres more that we don't use and don't type
     [key: string]: any;
 }
 
