@@ -26,12 +26,6 @@ export interface Character {
     }
 }
 
-export interface Buffer {
-    // not sure how buffers work
-    // users dont need to access anyways
-    [key: number]: any;
-}
-
 export interface PlayerData {
     id_: string;
     uniqueId_: string;
@@ -101,14 +95,12 @@ export class GamePlayer {
     selectedGun: number;
     weapons: AnyGun[];
     grenades: number;
-    buffer: Buffer;
     streak: number;
     hp: number;
     hpShield: number;
     spawnShield: number;
     streakRewards: number[];
     randomSeed: number;
-    serverStateIdx: number;
 
     constructor(id: string, team: string, playerData: PlayerData);
 }

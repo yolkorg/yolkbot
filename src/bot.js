@@ -22,7 +22,8 @@ import {
     Movements,
     PlayTypes,
     ProxiesEnabled,
-    ShellStreaks
+    ShellStreaks,
+    StateBufferSize
 } from './constants/index.js';
 
 import LookAtPosDispatch from './dispatches/LookAtPosDispatch.js';
@@ -42,15 +43,16 @@ const intents = {
     CHALLENGES: 1,
     STATS: 2,
     PATHFINDING: 3,
-    BUFFERS: 4,
     PING: 5,
     COSMETIC_DATA: 6,
     PLAYER_HEALTH: 7,
     PACKET_HOOK: 8,
-    MONITOR: 9,
     LOG_PACKETS: 10,
-    NO_LOGIN: 11
+    NO_LOGIN: 11,
+    DEBUG_BUFFER: 12
 }
+
+const mod = (n, m) => ((n % m) + m) % m;
 
 export class Bot {
     static Intents = intents;
@@ -73,9 +75,6 @@ export class Bot {
         this.protocol = params.protocol || 'wss';
         this.proxy = params.proxy || '';
 
-        this.autoUpdate = params.doUpdate || true;
-        this.updateInterval = params.updateInterval || 16.5;
-
         this.state = {
             // kept for specifying various params
             name: '',
@@ -86,8 +85,11 @@ export class Bot {
             swappingGun: false,
             usingMelee: false,
 
-            // shots fired ezzz
+            // syncMe related vars
+            stateIdx: 0,
+            serverStateIdx: 0,
             shotsFired: 0,
+            buffer: [],
 
             // holy glitch
             quit: false
@@ -214,7 +216,7 @@ export class Bot {
 
             // raw login
             rawLoginData: {}
-        };
+        }
 
         this.matchmaker = null;
 
@@ -223,7 +225,8 @@ export class Bot {
 
         this.lastDeathTime = -1;
         this.lastChatTime = -1;
-        this.lastUpdateTime = -1;
+
+        this.lastUpdateTick = 0;
 
         this.controlKeys = 0;
 
@@ -234,25 +237,11 @@ export class Bot {
             activeNode: null,
             activeNodeIdx: 0
         }
-
-        if (this.intents.includes(this.Intents.PLAYER_HEALTH)) this.healthIntervalId = setInterval(() => {
-            if (!this.players) return;
-
-            for (const player of Object.values(this.players)) {
-                if (player.playing && player.hp > 0) {
-                    const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
-
-                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) player.hp = Math.max(100, player.hp - regenSpeed);
-                    else player.hp = Math.min(100, player.hp + regenSpeed);
-                }
-
-                if (player.spawnShield > 0) player.spawnShield -= 6;
-            }
-        }, 33);
     }
 
-    dispatch(disp) {
-        this.#dispatches.push(disp);
+    dispatch(dispatch) {
+        if (dispatch.check(this)) dispatch.execute(this);
+        else this.#dispatches.push(dispatch);
     }
 
     async createAccount(email, pass) {
@@ -548,38 +537,78 @@ export class Bot {
                 if (disp.check(this)) {
                     disp.execute(this);
                     this.#dispatches.splice(i, 1);
-                    break; // only 1 dispatch per update
                 }
             }
+
+            if (this.#dispatches.length >= 50) console.warn('[WARNING] there are over 50 dispatches! #:', this.#dispatches.length);
         }
 
-        // process syncMe
-        const now = Date.now();
-        if (now - this.lastUpdateTime >= 50) {
-            this.emit('tick');
+        if (this.me.playing) {
+            const idx = this.state.stateIdx;
 
-            if (!this.intents.includes(this.Intents.MONITOR)) {
-                const out = CommOut.getBuffer();
-                out.packInt8(CommCode.syncMe);
-                out.packInt8(Math.random() * 128 | 0); // stateIdx
-                out.packInt8(this.me.serverStateIdx); // serverStateIdx
-                for (let i = 0; i < FramesBetweenSyncs; i++) {
-                    out.packInt8(this.controlKeys); // controlkeys
-                    out.packInt8(this.state.shotsFired); // shots fired
-                    out.packRadU(this.me.view.yaw); // yaw
-                    out.packRad(this.me.view.pitch); // pitch
-                    out.packInt8(100); // fixes commcode issues, does nothing
-                }
-                out.send(this.game.socket);
+            if (this.intents.includes(this.Intents.DEBUG_BUFFER))
+                console.log('setting buffer for idx', idx);
+
+            this.state.buffer[idx] = {
+                controlKeys: this.controlKeys,
+                yaw: this.me.view.yaw,
+                pitch: this.me.view.pitch,
+                shotsFired: this.state.shotsFired
             }
 
-            this.lastUpdateTime = now;
             this.state.shotsFired = 0;
+
+            if (this.lastUpdateTick >= 2) {
+                this.emit('tick');
+
+                const out = CommOut.getBuffer();
+
+                out.packInt8(CommCode.syncMe);
+
+                out.packInt8(this.state.stateIdx); // stateIdx
+                out.packInt8(this.state.serverStateIdx);
+
+                const startIdx = mod(this.state.stateIdx - FramesBetweenSyncs, StateBufferSize);
+                for (let i = 0; i < FramesBetweenSyncs; i++) {
+                    const idxOnFrame = mod(startIdx + i, StateBufferSize);
+
+                    if (this.intents.includes(this.Intents.DEBUG_BUFFER))
+                        console.log('going with', this.state.stateIdx, startIdx, idxOnFrame, this.state.buffer[idxOnFrame]);
+
+                    out.packInt8(this.state.buffer[idxOnFrame]?.controlKeys || 0);
+                    out.packInt8(this.state.buffer[idxOnFrame]?.shotsFired || 0);
+                    out.packRadU(this.state.buffer[idxOnFrame]?.yaw || this.me.view.yaw);
+                    out.packRad(this.state.buffer[idxOnFrame]?.pitch || this.me.view.pitch);
+                    out.packInt8(100); // fixes commcode issues, supposed to be scale or smth
+                }
+
+                out.send(this.game.socket);
+
+                this.state.shotsFired = 0;
+                this.state.buffer = [];
+
+                this.lastUpdateTick = 0;
+            } else this.lastUpdateTick++;
+
+            this.state.stateIdx = mod(this.state.stateIdx + 1, StateBufferSize);
         }
 
         while (this.#liveCallbacks.length > 0) {
             const cb = this.#liveCallbacks.shift();
             cb();
+        }
+
+        if (this.intents.includes(this.Intents.PLAYER_HEALTH)) {
+            for (const player of Object.values(this.players)) {
+                if (player.playing && player.hp > 0) {
+                    const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
+
+                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) player.hp = Math.max(100, player.hp - regenSpeed);
+                    else player.hp = Math.min(100, player.hp + regenSpeed);
+                }
+
+                if (player.spawnShield > 0) player.spawnShield -= 6;
+            }
         }
     }
 
@@ -739,25 +768,7 @@ export class Bot {
 
         if (player.climbing !== climbing) player.climbing = climbing;
 
-        if (this.intents.includes(this.Intents.BUFFERS)) {
-            if (!player.buffer) return;
-
-            for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
-                player.buffer[i2].controlKeys = CommIn.unPackInt8U();
-
-                const yaw = CommIn.unPackRadU();
-                if (!isNaN(yaw)) player.buffer[i2].yaw_ = yaw
-
-                const pitch = CommIn.unPackRad();
-                if (!isNaN(pitch)) player.buffer[i2].pitch_ = pitch
-
-                CommIn.unPackInt8U();
-            }
-
-            player.buffer[0].x = x;
-            player.buffer[0].y = y;
-            player.buffer[0].z = z;
-        } else for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
+        for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
             CommIn.unPackInt8U();
             CommIn.unPackRadU();
             CommIn.unPackRad();
@@ -905,7 +916,7 @@ export class Bot {
 
         if (!player) return;
 
-        player.serverStateIdx = serverStateIdx;
+        this.state.serverStateIdx = serverStateIdx;
 
         const oldX = player.position.x;
         const oldY = player.position.y;
@@ -920,11 +931,9 @@ export class Bot {
     }
 
     #processEventModifierPacket() {
-        if (!this.intents.includes(this.Intents.MONITOR)) {
-            const out = CommOut.getBuffer();
-            out.packInt8(CommCode.eventModifier);
-            out.send(this.game.socket);
-        }
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.eventModifier);
+        out.send(this.game.socket);
     }
 
     #processRemovePlayerPacket() {
@@ -1150,7 +1159,7 @@ export class Bot {
 
         this.emit('pingUpdate', oldPing, this.ping);
 
-        if (!this.intents.includes(this.Intents.MONITOR)) setTimeout(() => {
+        setTimeout(() => {
             const out = CommOut.getBuffer();
             out.packInt8(CommCode.ping);
             out.send(this.game.socket);
@@ -1260,26 +1269,24 @@ export class Bot {
     }
 
     #processGameRequestOptionsPacket() {
-        if (!this.intents.includes(this.Intents.MONITOR)) {
-            const out = CommOut.getBuffer();
-            out.packInt8(CommCode.gameOptions);
-            out.packInt8(this.game.options.gravity * 4);
-            out.packInt8(this.game.options.damage * 4);
-            out.packInt8(this.game.options.healthRegen * 4);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.gameOptions);
+        out.packInt8(this.game.options.gravity * 4);
+        out.packInt8(this.game.options.damage * 4);
+        out.packInt8(this.game.options.healthRegen * 4);
 
-            const flags =
-                (this.game.options.locked ? 1 : 0) |
-                (this.game.options.noTeamChange ? 2 : 0) |
-                (this.game.options.noTeamShuffle ? 4 : 0);
+        const flags =
+            (this.game.options.locked ? 1 : 0) |
+            (this.game.options.noTeamChange ? 2 : 0) |
+            (this.game.options.noTeamShuffle ? 4 : 0);
 
-            out.packInt8(flags);
+        out.packInt8(flags);
 
-            this.game.options.weaponsDisabled.forEach((v) => {
-                out.packInt8(v ? 1 : 0);
-            });
+        this.game.options.weaponsDisabled.forEach((v) => {
+            out.packInt8(v ? 1 : 0);
+        });
 
-            out.send(this.game.socket);
-        }
+        out.send(this.game.socket);
     }
 
     #processExplodePacket() {
@@ -1332,22 +1339,20 @@ export class Bot {
     }
 
     #processSocketReadyPacket() {
-        if (!this.intents.includes(this.Intents.MONITOR)) {
-            const out = CommOut.getBuffer();
-            out.packInt8(CommCode.joinGame);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.joinGame);
 
-            out.packString(this.state.name);
-            out.packString(this.game.raw.uuid);
+        out.packString(this.state.name);
+        out.packString(this.game.raw.uuid);
 
-            out.packInt8(0); // hidebadge
-            out.packInt8(this.state.weaponIdx || 0); // weapon idx
+        out.packInt8(0); // hidebadge
+        out.packInt8(this.state.weaponIdx || this.account?.loadout?.classIdx || 0);
 
-            out.packInt32(this.account.session);
-            out.packString(this.account.firebaseId);
-            out.packString(this.account.sessionId);
+        out.packInt32(this.account.session);
+        out.packString(this.account.firebaseId);
+        out.packString(this.account.sessionId);
 
-            out.send(this.game.socket);
-        }
+        out.send(this.game.socket);
     }
 
     async #processGameJoinedPacket() {
@@ -1380,25 +1385,20 @@ export class Bot {
         this.state.joinedGame = true;
         this.lastDeathTime = Date.now();
 
-        if (!this.intents.includes(this.Intents.MONITOR)) {
-            const out = CommOut.getBuffer();
-            out.packInt8(CommCode.clientReady);
-            out.send(this.game.socket);
+        const out = CommOut.getBuffer();
+        out.packInt8(CommCode.clientReady);
+        out.send(this.game.socket);
 
-            this.game.socket.onmessage = (msg) => this.#packetQueue.push(msg.data);
-        }
+        this.game.socket.onmessage = (msg) => this.#packetQueue.push(msg.data);
 
-        if (this.autoUpdate)
-            this.updateIntervalId = setInterval(() => this.update(), this.updateInterval);
+        this.updateIntervalId = setInterval(() => this.update(), 100 / 3);
 
         if (this.intents.includes(this.Intents.PING)) {
             this.lastPingTime = Date.now();
 
-            if (!this.intents.includes(this.Intents.MONITOR)) {
-                const out = CommOut.getBuffer();
-                out.packInt8(CommCode.ping);
-                out.send(this.game.socket);
-            }
+            const out = CommOut.getBuffer();
+            out.packInt8(CommCode.ping);
+            out.send(this.game.socket);
         }
 
         this.emit('gameReady');

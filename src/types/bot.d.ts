@@ -1,3 +1,16 @@
+type intents = {
+    CHALLENGES: 1,
+    STATS: 2,
+    PATHFINDING: 3,
+    PING: 5,
+    COSMETIC_DATA: 6,
+    PLAYER_HEALTH: 7,
+    PACKET_HOOK: 8,
+    LOG_PACKETS: 10,
+    NO_LOGIN: 11,
+    DEBUG_BUFFER: 12
+}
+
 import { NodeList } from '../pathing/mapnode.js';
 
 import { Character, GamePlayer } from './bot/GamePlayer';
@@ -208,20 +221,6 @@ export interface ChiknWinnerResponse {
     eggsGiven: number;
     itemIds: number[];
     rewardTier: number;
-}
-
-type intents = {
-    CHALLENGES: 1,
-    STATS: 2,
-    PATHFINDING: 3,
-    BUFFERS: 4,
-    PING: 5,
-    COSMETIC_DATA: 6,
-    PLAYER_HEALTH: 7,
-    PACKET_HOOK: 8,
-    MONITOR: 9,
-    LOG_PACKETS: 10,
-    NO_LOGIN: 11
 }
 
 export class Bot {

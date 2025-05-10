@@ -58,12 +58,6 @@ export class GamePlayer {
 
         this.grenades = 1;
 
-        this.buffer = {
-            0: {},
-            1: {},
-            2: {}
-        };
-
         this.streak = playerData.score_;
         this.streakRewards = Object.values(ShellStreaks).filter(streak => playerData.activeShellStreaks_ & streak);
 
@@ -73,7 +67,6 @@ export class GamePlayer {
         this.spawnShield = playerData.shield_;
 
         this.randomSeed = 0;
-        this.serverStateIdx = 0;
     }
 }
 
