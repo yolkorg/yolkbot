@@ -1,4 +1,4 @@
-import { AnyGun } from '../constants/guns';
+import { AnyGun, Cluck9mm } from '../constants/guns';
 import { Item } from '../constants/items';
 
 export interface Position {
@@ -26,47 +26,57 @@ export interface Character {
     }
 }
 
+export interface PlayerStats {
+    killsInGame: number;
+    deathsInGame: number;
+    streak: number;
+    totalKills: number;
+    totalDeaths: number;
+    bestGameStreak: number;
+    bestOverallStreak: number;
+}
+
 export interface PlayerData {
-    id_: string;
-    uniqueId_: string;
-    name_: string;
-    safename_: string;
-    charClass_: number;
-    team_: 0 | 1 | 2;
-    primaryWeaponItem_: Item | number;
-    secondaryWeaponItem_: Item | number;
-    shellColor_: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
-    hatItem_: Item | number;
-    stampItem_: Item | number;
-    stampPosX_: number;
-    stampPosY_: number;
-    grenadeItem_: Item | number;
-    meleeItem_: Item | number;
-    x_: number;
-    y_: number;
-    z_: number;
-    dx_: number;
-    dy_: number;
-    dz_: number;
-    yaw_: number;
-    pitch_: number;
-    score_: number;
-    kills_: number;
-    deaths_: number;
-    streak_: number;
-    totalKills_: number;
-    totalDeaths_: number;
-    bestGameStreak_: number;
-    bestOverallStreak_: number;
-    shield_: number;
-    hp_: number;
-    playing_: boolean;
-    weaponIdx_: number;
-    controlKeys_: number;
-    upgradeProductId_: number;
-    activeShellStreaks_: number;
-    social_: string;
-    hideBadge_: boolean;
+    id: string;
+    uniqueId: string;
+    name: string;
+    safename: string;
+    charClass: number;
+    team: 0 | 1 | 2;
+    primaryWeaponItem: Item | number;
+    secondaryWeaponItem: Item | number;
+    shellColor: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+    hatItem: Item | number;
+    stampItem: Item | number;
+    stampPosX: number;
+    stampPosY: number;
+    grenadeItem: Item | number;
+    meleeItem: Item | number;
+    x: number;
+    y: number;
+    z: number;
+    $dx: number;
+    $dy: number;
+    $dz: number;
+    yaw: number;
+    pitch: number;
+    score: number;
+    kills: number;
+    deaths: number;
+    streak: number;
+    totalKills: number;
+    totalDeaths: number;
+    bestGameStreak: number;
+    bestOverallStreak: number;
+    shield: number;
+    hp: number;
+    playing: boolean;
+    weaponIdx: number;
+    $controlKeys: number;
+    upgradeProductId: number;
+    activeShellStreaks: number;
+    social: string;
+    hideBadge: boolean;
 }
 
 export interface Social {
@@ -91,9 +101,10 @@ export class GamePlayer {
     climbing: boolean;
     view: View;
     character: Character;
+    stats: PlayerStats;
     activeGun: number;
     selectedGun: number;
-    weapons: AnyGun[];
+    weapons: [AnyGun, Cluck9mm];
     grenades: number;
     streak: number;
     hp: number;
@@ -102,7 +113,7 @@ export class GamePlayer {
     streakRewards: number[];
     randomSeed: number;
 
-    constructor(id: string, team: string, playerData: PlayerData);
+    constructor(playerData: PlayerData);
 }
 
 export default GamePlayer;

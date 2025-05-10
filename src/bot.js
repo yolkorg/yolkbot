@@ -97,7 +97,7 @@ export class Bot {
         }
 
         this.players = {}
-        this.me = new GamePlayer(this.id, 0, {})
+        this.me = new GamePlayer({})
 
         this.game = {
             raw: {}, // matchmaker response
@@ -540,8 +540,6 @@ export class Bot {
                     this.#dispatches.splice(i, 1);
                 }
             }
-
-            if (this.#dispatches.length >= 50) console.warn('[WARNING] there are over 50 dispatches! #:', this.#dispatches.length);
         }
 
         if (this.me.playing) {
@@ -652,64 +650,62 @@ export class Bot {
     }
 
     #processAddPlayerPacket() {
-        const id_ = CommIn.unPackInt8U();
+        const id = CommIn.unPackInt8U();
         const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
+
         const playerData = {
-            id_: id_,
-            uniqueId_: CommIn.unPackString(),
-            name_: CommIn.unPackString(),
-            safename_: CommIn.unPackString(),
-            charClass_: CommIn.unPackInt8U(),
-            team_: CommIn.unPackInt8U(),
-            primaryWeaponItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            secondaryWeaponItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            shellColor_: CommIn.unPackInt8U(),
-            hatItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            stampItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            stampPosX_: CommIn.unPackInt8(),
-            stampPosY_: CommIn.unPackInt8(),
-            grenadeItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            meleeItem_: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            x_: CommIn.unPackFloat(),
-            y_: CommIn.unPackFloat(),
-            z_: CommIn.unPackFloat(),
-            dx_: CommIn.unPackFloat(),
-            dy_: CommIn.unPackFloat(),
-            dz_: CommIn.unPackFloat(),
-            yaw_: CommIn.unPackRadU(),
-            pitch_: CommIn.unPackRad(),
-            score_: CommIn.unPackInt32U(),
+            id: id,
+            uniqueId: CommIn.unPackString(),
+            name: CommIn.unPackString(),
+            safename: CommIn.unPackString(),
+            charClass: CommIn.unPackInt8U(),
+            team: CommIn.unPackInt8U(),
+            primaryWeaponItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
+            secondaryWeaponItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
+            shellColor: CommIn.unPackInt8U(),
+            hatItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
+            stampItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
+            stampPosX: CommIn.unPackInt8(),
+            stampPosY: CommIn.unPackInt8(),
+            grenadeItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
+            meleeItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
+            x: CommIn.unPackFloat(),
+            y: CommIn.unPackFloat(),
+            z: CommIn.unPackFloat(),
+            $dx: CommIn.unPackFloat(),
+            $dy: CommIn.unPackFloat(),
+            $dz: CommIn.unPackFloat(),
+            yaw: CommIn.unPackRadU(),
+            pitch: CommIn.unPackRad(),
+            score: CommIn.unPackInt32U(),
             // the following are all stats
-            kills_: CommIn.unPackInt16U(),
-            deaths_: CommIn.unPackInt16U(),
-            streak_: CommIn.unPackInt16U(),
-            totalKills_: CommIn.unPackInt32U(),
-            totalDeaths_: CommIn.unPackInt32U(),
-            bestGameStreak_: CommIn.unPackInt16U(),
-            bestOverallStreak_: CommIn.unPackInt16U(),
+            kills: CommIn.unPackInt16U(),
+            deaths: CommIn.unPackInt16U(),
+            streak: CommIn.unPackInt16U(),
+            totalKills: CommIn.unPackInt32U(),
+            totalDeaths: CommIn.unPackInt32U(),
+            bestGameStreak: CommIn.unPackInt16U(),
+            bestOverallStreak: CommIn.unPackInt16U(),
             // end stats
-            shield_: CommIn.unPackInt8U(),
-            hp_: CommIn.unPackInt8U(),
-            playing_: CommIn.unPackInt8U(),
-            weaponIdx_: CommIn.unPackInt8U(),
-            controlKeys_: CommIn.unPackInt8U(),
-            upgradeProductId_: CommIn.unPackInt8U(),
-            activeShellStreaks_: CommIn.unPackInt8U(),
-            social_: CommIn.unPackLongString(),
-            hideBadge_: CommIn.unPackInt8U()
+            shield: CommIn.unPackInt8U(),
+            hp: CommIn.unPackInt8U(),
+            playing: CommIn.unPackInt8U(),
+            weaponIdx: CommIn.unPackInt8U(),
+            $controlKeys: CommIn.unPackInt8U(),
+            upgradeProductId: CommIn.unPackInt8U(),
+            activeShellStreaks: CommIn.unPackInt8U(),
+            social: CommIn.unPackLongString(),
+            hideBadge: CommIn.unPackInt8U()
         };
 
-        playerData.gameData_ = {};
-        playerData.gameData_.mapIdx = CommIn.unPackInt8U();
-        playerData.gameData_.private = CommIn.unPackInt8U();
-        playerData.gameData_.gameType = CommIn.unPackInt8U();
+        CommIn.unPackInt8U(); // mapIdx
+        CommIn.unPackInt8U(); // private (bool)
+        CommIn.unPackInt8U(); // gametype
 
-        if (!this.players[playerData.id_])
-            this.players[playerData.id_] = new GamePlayer(playerData.id_, playerData.team_, playerData);
+        if (!this.players[playerData.id]) this.players[playerData.id] = new GamePlayer(playerData);
+        if (this.me.id == playerData.id) this.me = this.players[playerData.id];
 
-        if (this.me.id == playerData.id_) this.me = this.players[playerData.id_];
-
-        this.emit('playerJoin', this.players[playerData.id_]);
+        this.emit('playerJoin', this.players[playerData.id]);
     }
 
     #processRespawnPacket() {

@@ -2,54 +2,62 @@ import { GunList, ShellStreaks, SocialMedias } from '../constants/index.js';
 import { Cluck9mm } from '../constants/guns.js';
 
 export class GamePlayer {
-    constructor(id = -1, team = 0, playerData) {
-        this.id = id;
-        this.team = team;
+    constructor(playerData) {
+        this.id = playerData.id;
+        this.name = playerData.name;
+        this.uniqueId = playerData.uniqueId;
 
-        this.raw = playerData;
+        this.team = playerData.team;
 
-        this.name = playerData.name_;
-        this.uniqueId = playerData.uniqueId_;
+        this.playing = playerData.playing;
 
-        this.playing = playerData.playing_;
-
-        this.socials = playerData.social_ && JSON.parse(playerData.social_);
+        this.socials = playerData.social && JSON.parse(playerData.social);
         if (this.socials) this.socials.forEach((social) => social.type = SocialMedias[social.id]);
 
-        this.isVip = playerData.upgradeProductId_ > 0;
-        this.showBadge = !playerData.hideBadge_ || false;
+        this.isVip = playerData.upgradeProductId > 0;
+        this.showBadge = !playerData.hideBadge || false;
 
         this.position = {
-            x: playerData.x_,
-            y: playerData.y_,
-            z: playerData.z_
+            x: playerData.x,
+            y: playerData.y,
+            z: playerData.z
         };
 
         this.jumping = false;
         this.climbing = false;
 
         this.view = {
-            yaw: playerData.yaw_,
-            pitch: playerData.pitch_
+            yaw: playerData.yaw,
+            pitch: playerData.pitch
         };
 
         this.character = {
-            eggColor: playerData.shellColor_,
-            primaryGun: playerData.primaryWeaponItem_,
-            secondaryGun: playerData.secondaryWeaponItem_,
-            stamp: playerData.stampItem_,
-            hat: playerData.hatItem_,
-            grenade: playerData.grenadeItem_,
-            melee: playerData.meleeItem_,
+            eggColor: playerData.shellColor,
+            primaryGun: playerData.primaryWeaponItem,
+            secondaryGun: playerData.secondaryWeaponItem,
+            stamp: playerData.stampItem,
+            hat: playerData.hatItem,
+            grenade: playerData.grenadeItem,
+            melee: playerData.meleeItem,
             stampPos: {
-                x: playerData.stampPosX_,
-                y: playerData.stampPosY_
+                x: playerData.stampPosX,
+                y: playerData.stampPosY
             }
         }
 
-        this.activeGun = playerData.weaponIdx_;
-        this.selectedGun = playerData.charClass_;
-        this.weapons = [{}, {}];
+        this.stats = {
+            killsInGame: playerData.kills,
+            deathsInGame: playerData.deaths,
+            streak: playerData.streak,
+            totalKills: playerData.totalKills,
+            totalDeaths: playerData.totalDeaths,
+            bestGameStreak: playerData.bestGameStreak,
+            bestOverallStreak: playerData.bestOverallStreak
+        }
+
+        this.activeGun = playerData.weaponIdx;
+        this.selectedGun = playerData.charClass;
+        this.weapons = [];
 
         if (this.character.primaryGun) {
             this.weapons[0] = new GunList[this.selectedGun]();
@@ -58,13 +66,13 @@ export class GamePlayer {
 
         this.grenades = 1;
 
-        this.streak = playerData.score_;
-        this.streakRewards = Object.values(ShellStreaks).filter(streak => playerData.activeShellStreaks_ & streak);
+        this.streak = playerData.score;
+        this.streakRewards = Object.values(ShellStreaks).filter(streak => playerData.activeShellStreaks & streak);
 
-        this.hp = playerData.hp_;
+        this.hp = playerData.hp;
         this.hpShield = 0;
 
-        this.spawnShield = playerData.shield_;
+        this.spawnShield = playerData.shield;
 
         this.randomSeed = 0;
     }
