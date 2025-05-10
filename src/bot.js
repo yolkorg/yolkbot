@@ -50,6 +50,7 @@ const intents = {
     LOG_PACKETS: 10,
     NO_LOGIN: 11,
     DEBUG_BUFFER: 12
+    // next #: 14
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
