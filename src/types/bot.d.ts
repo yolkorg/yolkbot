@@ -128,7 +128,7 @@ export interface Account {
         monthly: Stats;
     }
     challenges: Challenges[];
-    rawLoginData: any; // i ain't typing allat
+    rawLoginData: any; // someday i'll type it
 }
 
 export interface GameOptions {
@@ -266,6 +266,7 @@ export class Bot {
     getBestTarget(customFilter?: (player: GamePlayer) => boolean): GamePlayer | undefined;
 
     onAny(cb: Function): void;
+    off(event: string, cb: Function): void;
 
     on(event: 'authFail', cb: (reason: string) => void): void;
     on(event: 'authSuccess', cb: (account: Account) => void): void;
@@ -281,6 +282,8 @@ export class Bot {
     on(event: 'gameReset', cb: () => void): void;
     on(event: 'gameStateChange', cb: (oldState: Game, newState: Game) => void): void;
     on(event: 'grenadeExploded', cb: (item: Item | number, pos: { x: number; y: number; z: number }, damage: number, radius: number) => void): void;
+    on(event: 'leave', cb: () => void): void;
+    on(event: 'packet', cb: (packet: ArrayBuffer) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streak: number) => void): void;
     on(event: 'playerChangeCharacter', cb: (player: GamePlayer, oldCharacter: Character, newCharacter: Character) => void): void;
@@ -320,6 +323,7 @@ export class Bot {
     claimSocialReward(rewardTag: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
     buyItem(itemId: number): Promise<{ result: string; currentBalance: number; itemId: number; }>;
 
+    leave(code?: number): void;
     quit(noCleanup?: boolean): void;
 }
 

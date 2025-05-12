@@ -7,7 +7,6 @@ type Position = {
 }
 
 export declare class LookAtPosDispatch {
-    idOrName: any;
     pos: Position;
 
     constructor(pos: Position);

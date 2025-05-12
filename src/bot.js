@@ -2,6 +2,7 @@ import { createAccount, loginAnonymously, loginWithCredentials, loginWithRefresh
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
+import { CloseCode } from './comm/Codes.js';
 import { CommCode } from './constants/codes.js';
 
 import GamePlayer from './bot/GamePlayer.js';
@@ -66,6 +67,8 @@ export class Bot {
     #globalHooks = [];
     #liveCallbacks = [];
 
+    #initialGame;
+
     constructor(params = {}) {
         if (params.proxy && !ProxiesEnabled)
             throw new Error('proxies do not work and hence are not supported in the browser');
@@ -78,7 +81,7 @@ export class Bot {
 
         this.state = {
             // kept for specifying various params
-            name: '',
+            name: 'yolkbot',
             weaponIdx: 0,
 
             // tracking for dispatch checks
@@ -167,6 +170,8 @@ export class Bot {
             stageName: '',
             capturePercent: 0.0
         }
+
+        this.#initialGame = this.game;
 
         this.account = {
             // used for auth
@@ -481,7 +486,7 @@ export class Bot {
         this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
         this.game.socket.onclose = (e) => {
-            // console.log('Game socket closed:', e.code, Object.entries(CloseCode).filter(([, v]) => v == e.code));
+            // console.log('Game socket closed:', e.code);
             this.emit('close', e.code);
             this.quit(true, true);
         }
@@ -620,8 +625,12 @@ export class Bot {
         this.#globalHooks.push(cb);
     }
 
+    off(event, cb) {
+        this.#hooks[event] = this.#hooks[event].filter((hook) => hook !== cb);
+    }
+
     // these are auth-related codes (liveCallbacks doesn't run during auth)
-    #mustBeInstant = ['authSuccess', 'authFail', 'banned', 'gameReady', 'quit'];
+    #mustBeInstant = ['authSuccess', 'authFail', 'banned', 'close', 'gameReady', 'leave', 'quit'];
 
     emit(event, ...args) {
         if (this.state.quit) return;
@@ -1815,19 +1824,60 @@ export class Bot {
         return result;
     }
 
-    quit(noCleanup = false, finishDispatches = false) {
+    leave(code = CloseCode.mainMenu) {
         if (this.state.quit) return;
 
-        if (this.intents.includes(this.Intents.PLAYER_HEALTH))
-            clearInterval(this.healthIntervalId);
+        this.game.socket.close(code);
 
         clearInterval(this.updateIntervalId);
 
-        if (this.game?.socket) this.game.socket.close();
-        if (this.matchmaker) this.matchmaker.close();
-
-        if (!finishDispatches) this.#dispatches = [];
         this.#packetQueue = [];
+        this.#dispatches = [];
+
+        this.state.reloading = false;
+        this.state.swappingGun = false;
+        this.state.usingMelee = false;
+
+        this.state.stateIdx = 0;
+        this.state.serverStateIdx = 0;
+        this.state.shotsFired = 0;
+        this.state.buffer = [];
+
+        this.players = {}
+        this.me = new GamePlayer({})
+
+        this.game = this.#initialGame;
+
+        this.ping = 0;
+        this.lastPingTime = -1;
+
+        this.lastDeathTime = -1;
+        this.lastChatTime = -1;
+
+        this.lastUpdateTick = 0;
+
+        this.controlKeys = 0;
+
+        this.pathing = {
+            nodeList: null,
+            followingPath: false,
+            activePath: null,
+            activeNode: null,
+            activeNodeIdx: 0
+        }
+
+        this.emit('leave', code);
+    }
+
+    quit(noCleanup = false) {
+        if (this.state.quit) return;
+
+        this.leave();
+
+        if (this.matchmaker) {
+            this.matchmaker.close();
+            this.matchmaker = null;
+        }
 
         if (!noCleanup) {
             delete this.account;
