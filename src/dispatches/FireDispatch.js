@@ -5,7 +5,7 @@ export class FireDispatch {
 
     check(bot) {
         return bot.me.playing &&
-            !bot.state.reloading &
+            !bot.state.reloading &&
             !bot.state.swappingGun &&
             !bot.state.usingMelee &&
             this.amount >= 1 &&

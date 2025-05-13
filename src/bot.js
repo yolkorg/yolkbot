@@ -50,8 +50,8 @@ const intents = {
     PACKET_HOOK: 8,
     LOG_PACKETS: 10,
     NO_LOGIN: 11,
-    DEBUG_BUFFER: 12
-    // next #: 14
+    DEBUG_BUFFER: 12,
+    DEBUG_BEST_TARGET: 14
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -61,11 +61,9 @@ export class Bot {
     Intents = intents;
 
     #dispatches = [];
-    #packetQueue = [];
 
     #hooks = {};
     #globalHooks = [];
-    #liveCallbacks = [];
 
     #initialGame;
 
@@ -95,7 +93,8 @@ export class Bot {
             shotsFired: 0,
             buffer: [],
 
-            // holy glitch
+            // various booleans for checks
+            left: false,
             quit: false
         }
 
@@ -486,9 +485,11 @@ export class Bot {
         this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
         this.game.socket.onclose = (e) => {
-            // console.log('Game socket closed:', e.code);
-            this.emit('close', e.code);
-            this.quit(true, true);
+            if (this.state.left) this.state.left = false;
+            else {
+                this.emit('close', e.code);
+                this.leave(-1);
+            }
         }
     }
 
@@ -530,13 +531,9 @@ export class Bot {
     update() {
         if (this.state.quit) return;
 
-        // process pathfinding
-        if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING)) this.#processPathfinding();
+        if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING))
+            this.#processPathfinding();
 
-        // process incoming packets
-        while (this.#packetQueue.length > 0) this.processPacket(this.#packetQueue.shift());
-
-        // process dispatches
         if (this.#dispatches.length > 0) {
             for (let i = 0; i < this.#dispatches.length; i++) {
                 const disp = this.#dispatches[i];
@@ -550,8 +547,10 @@ export class Bot {
         if (this.me.playing) {
             const idx = this.state.stateIdx;
 
-            if (this.intents.includes(this.Intents.DEBUG_BUFFER))
+            if (this.intents.includes(this.Intents.DEBUG_BUFFER)) {
                 console.log('setting buffer for idx', idx);
+                console.log('checking...shotsFired', this.state.shotsFired);
+            }
 
             this.state.buffer[idx] = {
                 controlKeys: this.controlKeys,
@@ -572,7 +571,7 @@ export class Bot {
                 out.packInt8(this.state.stateIdx); // stateIdx
                 out.packInt8(this.state.serverStateIdx);
 
-                const startIdx = mod(this.state.stateIdx - FramesBetweenSyncs, StateBufferSize);
+                const startIdx = mod((this.state.stateIdx - FramesBetweenSyncs) + 1, StateBufferSize);
                 for (let i = 0; i < FramesBetweenSyncs; i++) {
                     const idxOnFrame = mod(startIdx + i, StateBufferSize);
 
@@ -588,18 +587,12 @@ export class Bot {
 
                 out.send(this.game.socket);
 
-                this.state.shotsFired = 0;
                 this.state.buffer = [];
 
                 this.lastUpdateTick = 0;
             } else this.lastUpdateTick++;
 
             this.state.stateIdx = mod(this.state.stateIdx + 1, StateBufferSize);
-        }
-
-        while (this.#liveCallbacks.length > 0) {
-            const cb = this.#liveCallbacks.shift();
-            cb();
         }
 
         if (this.intents.includes(this.Intents.PLAYER_HEALTH)) {
@@ -629,23 +622,11 @@ export class Bot {
         this.#hooks[event] = this.#hooks[event].filter((hook) => hook !== cb);
     }
 
-    // these are auth-related codes (liveCallbacks doesn't run during auth)
-    #mustBeInstant = ['authSuccess', 'authFail', 'banned', 'close', 'gameReady', 'leave', 'quit'];
-
     emit(event, ...args) {
         if (this.state.quit) return;
 
-        if (this.#hooks[event]) {
-            for (const cb of this.#hooks[event]) {
-                if (this.#mustBeInstant.includes(event)) cb(...args);
-                else this.#liveCallbacks.push(() => cb(...args));
-            }
-        }
-
-        for (const cb of this.#globalHooks) {
-            if (this.#mustBeInstant.includes(event)) cb(event, ...args);
-            else this.#liveCallbacks.push(() => cb(event, ...args));
-        }
+        if (this.#hooks[event]) for (const cb of this.#hooks[event]) cb(...args);
+        for (const cb of this.#globalHooks) cb(event, ...args);
     }
 
     #processChatPacket() {
@@ -1395,7 +1376,7 @@ export class Bot {
         out.packInt8(CommCode.clientReady);
         out.send(this.game.socket);
 
-        this.game.socket.onmessage = (msg) => this.#packetQueue.push(msg.data);
+        this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
         this.updateIntervalId = setInterval(() => this.update(), 100 / 3);
 
@@ -1673,32 +1654,39 @@ export class Bot {
 
     getBestTarget(customFilter = () => true) {
         const options = Object.values(this.players)
-            .filter((player) => player)
-            .filter((player) => player !== this.me)
-            .filter((player) => player.playing)
+            .filter((player) => player?.playing)
             .filter((player) => player.hp > 0)
-            .filter((player) => player.name !== this.me.name)
+            .filter((player) => player.id !== this.me.id)
             .filter((player) => this.me.team === 0 || player.team !== this.me.team)
-            .filter((player) => this.canSee(player))
             .filter((player) => !!customFilter(player));
 
-        let minDistance = 200;
-        let targetPlayer = null;
+        const distancePlayers = options.map(player => ({
+            player,
+            distance: Math.sqrt(
+                Math.pow(player.position.x - this.me.position.x, 2) +
+                Math.pow(player.position.y - this.me.position.y, 2) +
+                Math.pow(player.position.z - this.me.position.z, 2)
+            )
+        })).sort((a, b) => a.distance - b.distance);
 
-        for (const player of options) {
-            const dx = player.position.x - this.me.position.x;
-            const dy = player.position.y - this.me.position.y;
-            const dz = player.position.z - this.me.position.z;
-
-            const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                targetPlayer = player;
-            }
+        if (!distancePlayers.length) {
+            if (this.intents.includes(this.Intents.DEBUG_BEST_TARGET)) console.log('no targets found');
+            return null;
         }
 
-        return targetPlayer;
+        const closestLoSPlayer = distancePlayers.find(player => this.canSee(player.player));
+
+        if (this.intents.includes(this.Intents.DEBUG_BEST_TARGET)) {
+            console.log('detected ', distancePlayers.length, 'targets');
+            console.log('closest target: ', distancePlayers[0].player.name);
+            console.log('all targets (ordered): ', distancePlayers.map(a => a.player.name));
+            console.log('found LoS player?', !!closestLoSPlayer);
+            if (closestLoSPlayer) console.log('closest LoS player: ', closestLoSPlayer.player.name);
+        }
+
+        if (closestLoSPlayer) return { player: closestLoSPlayer.player, inLoS: true };
+
+        return { player: distancePlayers[0].player, inLoS: false };
     }
 
     async refreshChallenges() {
@@ -1827,11 +1815,14 @@ export class Bot {
     leave(code = CloseCode.mainMenu) {
         if (this.state.quit) return;
 
-        this.game.socket.close(code);
+        if (code > -1) {
+            this.game?.socket?.close(code);
+            this.state.left = true;
+            this.emit('leave');
+        }
 
         clearInterval(this.updateIntervalId);
 
-        this.#packetQueue = [];
         this.#dispatches = [];
 
         this.state.reloading = false;
@@ -1865,8 +1856,6 @@ export class Bot {
             activeNode: null,
             activeNodeIdx: 0
         }
-
-        this.emit('leave', code);
     }
 
     quit(noCleanup = false) {

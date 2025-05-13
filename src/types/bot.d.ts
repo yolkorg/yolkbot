@@ -8,7 +8,8 @@ type intents = {
     PACKET_HOOK: 8,
     LOG_PACKETS: 10,
     NO_LOGIN: 11,
-    DEBUG_BUFFER: 12
+    DEBUG_BUFFER: 12,
+    DEBUG_BEST_TARGET: 14
 }
 
 import { NodeList } from '../pathing/mapnode.js';
@@ -263,7 +264,7 @@ export class Bot {
     update(): void;
 
     canSee(player: GamePlayer): boolean;
-    getBestTarget(customFilter?: (player: GamePlayer) => boolean): GamePlayer | undefined;
+    getBestTarget(customFilter?: (player: GamePlayer) => boolean): { player: GamePlayer, inLoS: boolean } | undefined;
 
     onAny(cb: Function): void;
     off(event: string, cb: Function): void;
