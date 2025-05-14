@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "0.1.5-alpha.63",
+    "version": "0.0.0-2",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -16,7 +16,7 @@
     "author": "1ust",
     "repository": {
         "type": "git",
-        "url": "https://github.com/yolkorg/yolkbot.git"
+        "url": "git+https://github.com/yolkorg/yolkbot.git"
     },
     "type": "module",
     "files": [
