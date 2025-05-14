@@ -292,7 +292,7 @@ export class Bot {
     on(event: 'gameReady', cb: () => void): void;
     on(event: 'gameReset', cb: () => void): void;
     on(event: 'gameStateChange', cb: (oldState: Game, newState: Game) => void): void;
-    on(event: 'grenadeExploded', cb: (item: Item | number, pos: PositionAlignSetting, damage: number, radius: number) => void): void;
+    on(event: 'grenadeExploded', cb: (item: Item | number, pos: Position, damage: number, radius: number) => void): void;
     on(event: 'leave', cb: () => void): void;
     on(event: 'packet', cb: (packet: ArrayBuffer) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
