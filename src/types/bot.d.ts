@@ -14,7 +14,7 @@ type intents = {
 
 import { NodeList } from '../pathing/mapnode.js';
 
-import { Character, GamePlayer } from './bot/GamePlayer';
+import { Character, GamePlayer, Position } from './bot/GamePlayer';
 import { Challenge } from './constants/challenges';
 import { AnyGun } from './constants/guns';
 import { Map } from './constants/maps';
@@ -38,24 +38,26 @@ export interface ChiknWinnerStatus {
     canPlayAgain: number;
 }
 
+export interface StatDamageTypes {
+    pistol: number;
+    grenade: number;
+    rpegg: number;
+    eggk: number;
+    scrambler: number;
+    ranger: number;
+    whpper: number;
+    crackshot: number;
+    trihard: number;
+    melee: number;
+}
+
 export interface StatKD {
     total: number;
     mode: {
         public: number;
         private: number;
     };
-    dmgType: {
-        pistol: number;
-        grenade: number;
-        rpegg: number;
-        eggk: number;
-        scrambler: number;
-        ranger: number;
-        whpper: number;
-        crackshot: number;
-        trihard: number;
-        melee: number;
-    };
+    dmgType: StatDamageTypes;
     gameType: {
         kotc: number;
         spatula: number;
@@ -76,18 +78,20 @@ export interface Stats {
     };
 }
 
-export interface Challenges {
-    raw: {
-        challengeInfo: Challenge;
-        challengeData: {
-            period: number;
-            challengeId: number;
-            reset: number;
-            claimed: number;
-            completed: number;
-            data: number;
-        }
+export interface RawChallenge {
+    challengeInfo: Challenge;
+    challengeData: {
+        period: number;
+        challengeId: number;
+        reset: number;
+        claimed: number;
+        completed: number;
+        data: number;
     }
+}
+
+export interface Challenges {
+    raw: RawChallenge;
     id: number;
     name: string;
     desc: string;
@@ -99,6 +103,19 @@ export interface Challenges {
     goalNum: number;
 }
 
+export interface AccountLoadout {
+    hatId: number | null;
+    meleeId: number;
+    stampId: number | null;
+    classIdx: number;
+    colorIdx: number;
+    grenadeId: number;
+    primaryId: number[];
+    secondaryId: number[];
+    stampPositionX: number;
+    stampPositionY: number;
+}
+
 export interface Account {
     id: number;
     firebaseId: string;
@@ -107,18 +124,7 @@ export interface Account {
     email: string;
     password: string;
     cw: ChiknWinnerStatus;
-    loadout: {
-        hatId: number | null;
-        meleeId: number;
-        stampId: number | null;
-        classIdx: number;
-        colorIdx: number;
-        grenadeId: number;
-        primaryId: number[];
-        secondaryId: number[];
-        stampPositionX: number;
-        stampPositionY: number;
-    };
+    loadout: AccountLoadout;
     ownedItemIds: number[];
     vip: boolean;
     accountAge: number;
@@ -157,38 +163,42 @@ export interface Zone {
     zone: number;
 }
 
+export interface GameMap {
+    filename: string;
+    hash: string;
+    name: string;
+    modes: {
+        FFA: boolean;
+        Teams: boolean;
+        Spatula: boolean;
+        King: boolean;
+    };
+    availability: string;
+    numPlayers: string;
+    raw: Map;
+    zones: Zone[][];
+}
+
+export interface GameSpatula {
+    coords: Position;
+    controlledBy: number;
+    controlledByTeam: number;
+}
+
 export interface Game {
     raw: RawGameData;
     code: string;
     gameModeId: number;
     gameMode: string;
     mapIdx: number;
-    map: {
-        filename: string;
-        hash: string;
-        name: string;
-        modes: {
-            FFA: boolean;
-            Teams: boolean;
-            Spatula: boolean;
-            King: boolean;
-        };
-        availability: string;
-        numPlayers: string;
-        raw: Map;
-        zones: Zone[][];
-    };
+    map: GameMap;
     playerLimit: number;
     isGameOwner: boolean;
     isPrivate: boolean;
     options: GameOptions;
     collectables: Collectable[][];
     teamScore: number[];
-    spatula: {
-        coords: { x: number; y: number; z: number };
-        controlledBy: number;
-        controlledByTeam: number;
-    };
+    spatula: GameSpatula;
     stage: number;
     zoneNumber: number;
     activeZone: Zone[];
@@ -282,7 +292,7 @@ export class Bot {
     on(event: 'gameReady', cb: () => void): void;
     on(event: 'gameReset', cb: () => void): void;
     on(event: 'gameStateChange', cb: (oldState: Game, newState: Game) => void): void;
-    on(event: 'grenadeExploded', cb: (item: Item | number, pos: { x: number; y: number; z: number }, damage: number, radius: number) => void): void;
+    on(event: 'grenadeExploded', cb: (item: Item | number, pos: PositionAlignSetting, damage: number, radius: number) => void): void;
     on(event: 'leave', cb: () => void): void;
     on(event: 'packet', cb: (packet: ArrayBuffer) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
@@ -301,13 +311,13 @@ export class Bot {
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
     on(event: 'quit', cb: () => void): void;
-    on(event: 'rocketHit', cb: (pos: { x: number; y: number; z: number }, damage: number, radius: number) => void): void;
+    on(event: 'rocketHit', cb: (pos: Position, damage: number, radius: number) => void): void;
     on(event: 'selfDamaged', cb: (oldHp: number, newHp: number) => void): void;
-    on(event: 'selfMoved', cb: (oldPos: { x: number; y: number; z: number }, newPos: { x: number; y: number; z: number }) => void): void;
+    on(event: 'selfMoved', cb: (oldPos: Position, newPos: Position) => void): void;
     on(event: 'selfRespawnFail', cb: () => void): void;
     on(event: 'selfShieldHit', cb: (oldShield: number, newShield: number) => void): void;
     on(event: 'selfShieldLost', cb: () => void): void;
-    on(event: 'spawnItem', cb: (type: number, _id: number, pos: { x: number; y: number; z: number }) => void): void;
+    on(event: 'spawnItem', cb: (type: number, itemId: number, pos: Position) => void): void;
     on(event: 'tick', cb: () => void): void;
 
     checkChiknWinner(): Promise<ChiknWinnerStatus>;

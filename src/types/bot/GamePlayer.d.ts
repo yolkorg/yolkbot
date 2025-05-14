@@ -36,16 +36,19 @@ export interface PlayerStats {
     bestOverallStreak: number;
 }
 
+export type PlayerTeam = 0 | 1 | 2;
+export type ShellColor = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+
 export interface PlayerData {
     id: string;
     uniqueId: string;
     name: string;
     safename: string;
     charClass: number;
-    team: 0 | 1 | 2;
+    team: PlayerTeam;
     primaryWeaponItem: Item | number;
     secondaryWeaponItem: Item | number;
-    shellColor: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+    shellColor: ShellColor;
     hatItem: Item | number;
     stampItem: Item | number;
     stampPosX: number;
@@ -86,9 +89,11 @@ export interface Social {
     active: boolean;
 }
 
+export type PlayerWeapons = [AnyGun, Cluck9mm];
+
 export class GamePlayer {
     id: string;
-    team: 0 | 1 | 2;
+    team: PlayerTeam;
     raw: PlayerData;
     name: string;
     uniqueId: string;
@@ -104,7 +109,7 @@ export class GamePlayer {
     stats: PlayerStats;
     activeGun: number;
     selectedGun: number;
-    weapons: [AnyGun, Cluck9mm];
+    weapons: PlayerWeapons;
     grenades: number;
     streak: number;
     hp: number;

@@ -18,15 +18,17 @@ declare class Gun {
     reloadTimeMod: number;
 }
 
+export interface GunAmmo {
+    rounds: number;
+    capacity: number;
+    reload: number;
+    store: number;
+    storeMax: number;
+    pickup: number;
+}
+
 declare class Eggk47 extends Gun {
-    ammo: {
-        rounds: number;
-        capacity: number;
-        reload: number;
-        store: number;
-        storeMax: number;
-        pickup: number;
-    };
+    ammo: GunAmmo;
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
@@ -43,14 +45,7 @@ declare class Eggk47 extends Gun {
 }
 
 declare class DozenGauge extends Gun {
-    ammo: {
-        rounds: number;
-        capacity: number;
-        reload: number;
-        store: number;
-        storeMax: number;
-        pickup: number;
-    };
+    ammo: GunAmmo;
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
@@ -69,14 +64,7 @@ declare class DozenGauge extends Gun {
 }
 
 declare class CSG1 extends Gun {
-    ammo: {
-        rounds: number;
-        capacity: number;
-        reload: number;
-        store: number;
-        storeMax: number;
-        pickup: number;
-    };
+    ammo: GunAmmo;
     hasScope: boolean;
     longReloadTime: number;
     shortReloadTime: number;
@@ -95,14 +83,7 @@ declare class CSG1 extends Gun {
 }
 
 declare class Cluck9mm extends Gun {
-    ammo: {
-        rounds: number;
-        capacity: number;
-        reload: number;
-        store: number;
-        storeMax: number;
-        pickup: number;
-    };
+    ammo: GunAmmo;
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
@@ -121,14 +102,7 @@ declare class Cluck9mm extends Gun {
 }
 
 declare class RPEGG extends Gun {
-    ammo: {
-        rounds: number;
-        capacity: number;
-        reload: number;
-        store: number;
-        storeMax: number;
-        pickup: number;
-    };
+    ammo: GunAmmo;
     hasScope: boolean;
     longReloadTime: number;
     shortReloadTime: number;
@@ -152,14 +126,7 @@ declare class RPEGG extends Gun {
 }
 
 declare class SMG extends Gun {
-    ammo: {
-        rounds: number;
-        capacity: number;
-        reload: number;
-        store: number;
-        storeMax: number;
-        pickup: number;
-    };
+    ammo: GunAmmo;
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;
@@ -178,14 +145,7 @@ declare class SMG extends Gun {
 }
 
 declare class M24 extends Gun {
-    ammo: {
-        rounds: number;
-        capacity: number;
-        reload: number;
-        store: number;
-        storeMax: number;
-        pickup: number;
-    };
+    ammo: GunAmmo;
     hasScope: boolean;
     longReloadTime: number;
     shortReloadTime: number;
@@ -206,14 +166,7 @@ declare class M24 extends Gun {
 }
 
 declare class AUG extends Gun {
-    ammo: {
-        rounds: number;
-        capacity: number;
-        reload: number;
-        store: number;
-        storeMax: number;
-        pickup: number;
-    };
+    ammo: GunAmmo;
     longReloadTime: number;
     shortReloadTime: number;
     weaponName: string;

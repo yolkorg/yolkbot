@@ -1,10 +1,5 @@
 import Bot from '../bot';
-
-type Position = {
-    x: number;
-    y: number;
-    z: number;
-}
+import { Position } from '../bot/GamePlayer';
 
 export declare class LookAtPosDispatch {
     pos: Position;

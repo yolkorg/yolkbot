@@ -1,3 +1,5 @@
+import { Position } from '../bot/GamePlayer';
+
 export interface MapModes {
     FFA: boolean;
     Teams: boolean;
@@ -30,11 +32,7 @@ export interface MapData {
 }
 
 export interface MapSun {
-    direction: {
-        x: number;
-        y: number;
-        z: number;
-    }
+    direction: Position;
     color: string;
 }
 
@@ -72,14 +70,16 @@ export interface MapExtents {
     depth: number;
 }
 
+export interface MapFog {
+    density: string;
+    color: string;
+}
+
 export interface MapJSON {
     fileVersion: number;
     sun: MapSun;
     ambient: string;
-    fog: {
-        density: string;
-        color: string;
-    }
+    fog: MapFog;
     data: MapData;
     palette: string[];
     render: MapRender;
