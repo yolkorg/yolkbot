@@ -817,6 +817,8 @@ export class Bot {
         for (let i = 0; i < 6; i++) CommIn.unPackFloat();
 
         const player = this.players[id];
+        if (!player) return;
+
         const playerWeapon = player.weapons[player.activeGun];
 
         if (playerWeapon && playerWeapon.ammo) {
