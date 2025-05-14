@@ -7,7 +7,7 @@ new_version="0.0.0-$new_version"
 
 echo "publishing $new_version"
 
-sed -i '' "s/$latest_version/$new_version/g" package.json
+sed -i '' "s/$current_version/$new_version/g" package.json
 
 bun cli/build.js
 bun browser/compile.js

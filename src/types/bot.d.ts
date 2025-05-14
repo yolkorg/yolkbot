@@ -325,6 +325,7 @@ export class Bot {
     buyItem(itemId: number): Promise<{ result: string; currentBalance: number; itemId: number; }>;
 
     leave(code?: number): void;
+    logout(): void;
     quit(noCleanup?: boolean): void;
 }
 

@@ -65,6 +65,7 @@ export class Bot {
     #hooks = {};
     #globalHooks = [];
 
+    #initialAccount;
     #initialGame;
 
     constructor(params = {}) {
@@ -222,6 +223,8 @@ export class Bot {
             // raw login
             rawLoginData: {}
         }
+
+        this.#initialAccount = this.account;
 
         this.matchmaker = null;
 
@@ -1856,6 +1859,10 @@ export class Bot {
             activeNode: null,
             activeNodeIdx: 0
         }
+    }
+
+    logout() {
+        this.account = this.#initialAccount;
     }
 
     quit(noCleanup = false) {
