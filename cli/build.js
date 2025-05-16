@@ -14,13 +14,14 @@ function copyAndMinify(src, dest) {
     } else if (src.endsWith('.js')) {
         const code = fs.readFileSync(src, 'utf8');
 
-        esbuild.transform(code, {
+        if (!src.includes('findItemById')) esbuild.transform(code, {
             minify: process.argv[2] !== '--no-minify',
             loader: 'js',
             format: 'esm',
             target: 'esnext',
             banner: '/* eslint-disable */\n'
         }).then(result => fs.writeFileSync(dest, result.code));
+        else fs.cpSync(src, dest);
     } else fs.copyFileSync(src, dest);
 }
 

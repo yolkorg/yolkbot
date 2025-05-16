@@ -8,7 +8,7 @@ export class SwapWeaponDispatch {
 
     execute(bot) {
         bot.me.activeGun = +!bot.me.activeGun;
-        
+
         const out = CommOut.getBuffer();
         out.packInt8(CommCode.swapWeapon);
         out.packInt8(bot.me.activeGun);
