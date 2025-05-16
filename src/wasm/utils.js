@@ -1,4 +1,4 @@
-import { getWasm } from "./index.js";
+import { getWasm } from './wrapper.js';
 
 export const getStringFromWasm = (ptr, len) => {
     ptr = ptr >>> 0;
