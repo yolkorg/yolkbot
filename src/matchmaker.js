@@ -1,5 +1,6 @@
 import { loginAnonymously } from './api.js';
 import { GameModes, PlayTypes, ProxiesEnabled } from './constants/index.js';
+import { validate } from './wasm/wrapper.js';
 
 import yolkws from './socket.js';
 
@@ -55,6 +56,10 @@ export class Matchmaker {
 
         this.ws.onmessage = (e) => {
             const data = JSON.parse(e.data);
+
+            if (data.command === 'validateUUID')
+                this.ws.send(JSON.stringify({ command: 'validateUUID', hash: validate(data.uuid) }));
+
             this.#emit('msg', data);
         }
 
