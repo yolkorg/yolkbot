@@ -74,6 +74,11 @@ export class Bot {
 
         this.intents = params.intents || [];
 
+        if (this.intents.includes(this.Intents.COSMETIC_DATA)) {
+            const ballCap = findItemById(1001);
+            if (!ballCap) throw new Error('you cannot use the COSMETIC_DATA intent inside of the singlefile browser bundles');
+        }
+
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
         this.proxy = params.proxy || '';

@@ -10,5 +10,4 @@ export * as Comm from '../../src/comm/index.js';
 
 export * as Constants from '../../src/constants/index.js';
 export * as Guns from '../../src/constants/guns.js';
-export { Items } from '../../src/constants/items.js';
 export { Maps } from '../../src/constants/maps.js';

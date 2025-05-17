@@ -10,7 +10,6 @@ import * as Comm from '../../src/comm/index.js';
 
 import * as Constants from '../../src/constants/index.js';
 import * as Guns from '../../src/constants/guns.js';
-import { Items } from '../../src/constants/items.js';
 import { Maps } from '../../src/constants/maps.js';
 
 const yolkbot = {
@@ -22,7 +21,6 @@ const yolkbot = {
     Comm,
     Constants,
     Guns,
-    Items,
     Maps
 };
 

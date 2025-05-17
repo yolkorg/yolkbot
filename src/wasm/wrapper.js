@@ -1,7 +1,8 @@
-import { readFile } from 'node:fs/promises';
-
 import { imports } from './imports.js';
 import { getStringFromWasm, passStringToWasm } from './utils.js';
+
+/*
+import { readFile } from 'node:fs/promises';
 
 import { IsBrowser } from '../constants/index.js';
 
@@ -10,6 +11,9 @@ if (IsBrowser) {
     const response = await fetch(new URL('./wasm_loader.wasm', import.meta.url).href);
     wasmBytes = await response.arrayBuffer();
 } else wasmBytes = await readFile(new URL('./wasm_loader.wasm', import.meta.url));
+ */
+
+import { wasmBytes } from './bytes.js';
 
 const wasm = await WebAssembly.instantiate(wasmBytes, imports);
 const exports = wasm.instance.exports;
