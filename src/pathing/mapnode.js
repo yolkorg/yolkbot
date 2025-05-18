@@ -1,96 +1,5 @@
 /* eslint-disable stylistic/max-len */
 
-class NodeList {
-    list = [];
-
-    constructor(raw) {
-        const addedPositions = {};
-
-        for (const meshName of Object.keys(raw.data))
-            for (const nodeData of raw.data[meshName]) {
-                addedPositions[((nodeData.x << 16) | (nodeData.y << 8) | (nodeData.z))] = true;
-                this.list.push(new MapNode(meshName, nodeData));
-            }
-
-        for (let x = 0; x < raw.width; x++)
-            for (let y = 0; y < raw.height; y++)
-                for (let z = 0; z < raw.depth; z++)
-                    if (!addedPositions[((x << 16) | (y << 8) | (z))])
-                        this.list.push(new MapNode('SPECIAL.air.none', { x: x, y: y, z: z }));
-
-        const nodeMap = new Map();
-        for (const node of this.list) nodeMap.set(node.positionStr, node);
-
-        for (const node of this.list) {
-            const neighbors = [
-                { x: node.x + 1, y: node.y, z: node.z },
-                { x: node.x - 1, y: node.y, z: node.z },
-                { x: node.x, y: node.y + 1, z: node.z },
-                { x: node.x, y: node.y - 1, z: node.z },
-                { x: node.x, y: node.y, z: node.z + 1 },
-                { x: node.x, y: node.y, z: node.z - 1 }
-            ];
-
-            for (const neighborPos of neighbors) {
-                const neighborKey = `${neighborPos.x},${neighborPos.y},${neighborPos.z}`;
-                const neighborNode = nodeMap.get(neighborKey);
-                if (neighborNode && node.canLink(neighborNode, this)) node.links.push(neighborNode);
-            }
-        }
-    }
-
-    at(x, y, z) {
-        if (!this.nodeMap) {
-            this.nodeMap = new Map();
-
-            for (const node of this.list) {
-                const key = `${node.x},${node.y},${node.z}`;
-                this.nodeMap.set(key, node);
-            }
-        }
-
-        const key = `${x},${y},${z}`;
-        return this.nodeMap.get(key);
-    }
-
-    clean() {
-        for (const node of this.list) {
-            node.f = 0;
-            node.g = 0;
-            node.h = 0;
-            node.visited = undefined;
-            node.parent = undefined;
-            node.closed = undefined;
-        }
-    }
-
-    hasLineOfSight(bot, target) {
-        const dx = target.x - bot.x;
-        const dy = target.y - bot.y;
-        const dz = target.z - bot.z;
-
-        const steps = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
-
-        const xStep = dx / steps;
-        const yStep = dy / steps;
-        const zStep = dz / steps;
-
-        let x = bot.x;
-        let y = bot.y;
-        let z = bot.z;
-
-        for (let i = 0; i <= steps; i++) {
-            const node = this.at(Math.round(x), Math.round(y), Math.round(z));
-            if (node && node.isSolid()) return false;
-            x += xStep;
-            y += yStep;
-            z += zStep;
-        }
-
-        return true;
-    }
-}
-
 class MapNode {
     constructor(meshType, data) {
         this.x = data.x;
@@ -105,10 +14,9 @@ class MapNode {
         this.f = 0;
         this.g = 0;
         this.h = 0;
-
-        this.visited = undefined;
-        this.parent = undefined;
-        this.closed = undefined;
+        this.visited = null;
+        this.parent = null;
+        this.closed = null;
         this.links = [];
 
         if (this.isStair()) {
@@ -117,28 +25,28 @@ class MapNode {
         }
     }
 
-    isSolid() {
-        return this.meshType == 'full';
+    isFull() {
+        return this.meshType === 'full';
     }
 
     canWalkThrough() {
-        return this.meshType == 'none' || this.meshType == 'ladder';
+        return this.meshType === 'none' || this.meshType === 'ladder';
     }
 
     canWalkOn() {
-        return this.meshType == 'full';
+        return this.meshType === 'full';
     }
 
     isLadder() {
-        return this.meshType == 'ladder';
+        return this.meshType === 'ladder';
     }
 
     isStair() {
-        return this.meshType == 'wedge';
+        return this.meshType === 'wedge';
     }
 
     isAir() {
-        return this.meshType == 'none';
+        return this.meshType === 'none';
     }
 
     canLink(node, list) {
@@ -150,7 +58,7 @@ class MapNode {
         const dy = Math.abs(dy0);
         const dz = Math.abs(dz0);
 
-        if (dx + dy + dz === 0 || dx + dz > 1 || this.isSolid() || node.isSolid()) return false;
+        if (dx + dy + dz === 0 || dx + dz > 1 || this.isFull() || node.isFull()) return false;
 
         const belowMe = list.at(this.x, this.y - 1, this.z);
         const belowOther = list.at(node.x, node.y - 1, node.z);
@@ -200,6 +108,97 @@ class MapNode {
     flatRadialDistance(position) {
         const pos = this.flatCenter();
         return Math.hypot(pos.x - position.x, pos.z - position.z);
+    }
+}
+
+class NodeList {
+    list = [];
+
+    constructor(raw) {
+        const addedPositions = {};
+
+        for (const meshName of Object.keys(raw.data))
+            for (const nodeData of raw.data[meshName]) {
+                addedPositions[((nodeData.x << 16) | (nodeData.y << 8) | (nodeData.z))] = true;
+                this.list.push(new MapNode(meshName, nodeData));
+            }
+
+        for (let x = 0; x < raw.width; x++)
+            for (let y = 0; y < raw.height; y++)
+                for (let z = 0; z < raw.depth; z++)
+                    if (!addedPositions[((x << 16) | (y << 8) | (z))])
+                        this.list.push(new MapNode('SPECIAL.air.none', { x, y, z }));
+
+        const nodeMap = new Map();
+        for (const node of this.list) nodeMap.set(node.positionStr, node);
+
+        for (const node of this.list) {
+            const neighbors = [
+                { x: node.x + 1, y: node.y, z: node.z },
+                { x: node.x - 1, y: node.y, z: node.z },
+                { x: node.x, y: node.y + 1, z: node.z },
+                { x: node.x, y: node.y - 1, z: node.z },
+                { x: node.x, y: node.y, z: node.z + 1 },
+                { x: node.x, y: node.y, z: node.z - 1 }
+            ];
+
+            for (const neighborPos of neighbors) {
+                const neighborKey = `${neighborPos.x},${neighborPos.y},${neighborPos.z}`;
+                const neighborNode = nodeMap.get(neighborKey);
+                if (neighborNode && node.canLink(neighborNode, this)) node.links.push(neighborNode);
+            }
+        }
+    }
+
+    at(x, y, z) {
+        if (!this.nodeMap) {
+            this.nodeMap = new Map();
+
+            for (const node of this.list) {
+                const key = `${node.x},${node.y},${node.z}`;
+                this.nodeMap.set(key, node);
+            }
+        }
+
+        const key = `${x},${y},${z}`;
+        return this.nodeMap.get(key);
+    }
+
+    clean() {
+        for (const node of this.list) {
+            node.f = 0;
+            node.g = 0;
+            node.h = 0;
+            node.visited = null;
+            node.parent = null;
+            node.closed = null;
+        }
+    }
+
+    hasLineOfSight(bot, target) {
+        const dx = target.x - bot.x;
+        const dy = target.y - bot.y;
+        const dz = target.z - bot.z;
+
+        const steps = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
+
+        const xStep = dx / steps;
+        const yStep = dy / steps;
+        const zStep = dz / steps;
+
+        let x = bot.x;
+        let y = bot.y;
+        let z = bot.z;
+
+        for (let i = 0; i <= steps; i++) {
+            const node = this.at(Math.round(x), Math.round(y), Math.round(z));
+            if (node && node.isFull()) return false;
+            x += xStep;
+            y += yStep;
+            z += zStep;
+        }
+
+        return true;
     }
 }
 

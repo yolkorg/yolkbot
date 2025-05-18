@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+
 import { imports } from './imports.js';
 import { getStringFromWasm, passStringToWasm } from './utils.js';
 
@@ -18,9 +20,7 @@ import { wasmBytes } from './bytes.js';
 const wasm = await WebAssembly.instantiate(wasmBytes, imports);
 const exports = wasm.instance.exports;
 
-export const getWasm = () => {
-    return exports;
-}
+export const getWasm = () => exports;
 
 const validate = (input) => {
     let retPtr;

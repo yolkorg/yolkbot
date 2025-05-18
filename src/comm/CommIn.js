@@ -72,7 +72,7 @@ class CommIn {
     static unPackStringHelper(len) {
         const remainder = this.isMoreDataAvailable();
         if (remainder < len) return 0;
-        let str = new String();
+        let str = '';
         for (let i2 = 0; i2 < len; i2++) {
             const c = this.unPackInt16U();
             if (c > 0) str += String.fromCodePoint(c);

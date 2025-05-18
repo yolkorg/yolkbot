@@ -35,7 +35,7 @@ export default class AStar {
 
         heap.push(start);
 
-        while (heap.size() != 0) {
+        while (heap.size() !== 0) {
             const current = heap.pop();
 
             if (current === end) {

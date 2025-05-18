@@ -1,10 +1,7 @@
 export class MovementDispatch {
     constructor(controlKeys) {
-        if (typeof controlKeys == typeof 0) {
-            this.controlKeys = controlKeys;
-        } else if (typeof controlKeys == typeof []) {
-            this.controlKeys = controlKeys.reduce((a, b) => a | b, 0);
-        }
+        if (typeof controlKeys === typeof 0) this.controlKeys = controlKeys;
+        else if (typeof controlKeys === typeof []) this.controlKeys = controlKeys.reduce((a, b) => a | b, 0);
     }
 
     check(bot) {

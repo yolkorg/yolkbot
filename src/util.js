@@ -1,6 +1,6 @@
 import { IsBrowser } from './constants/index.js';
 
-export async function fetchMap(name, hash) {
+export const fetchMap = async (name, hash) => {
     if (!IsBrowser) {
         const { existsSync, mkdirSync, readFileSync, writeFileSync } = await import('node:fs');
         const { join } = await import('node:path');
@@ -28,7 +28,7 @@ export async function fetchMap(name, hash) {
     }
 }
 
-export function initKotcZones(meshData) {
+export const initKotcZones = (meshData) => {
     let numCaptureZones = 0;
     const mapData = {};
     const zones = [];
@@ -46,9 +46,7 @@ export function initKotcZones(meshData) {
         { x: 0, z: 1 }
     ];
 
-    function getMapCellAt(x, y, z) {
-        return mapData[x] && mapData[x][y] && mapData[x][y][z] ? mapData[x][y][z] : null;
-    }
+    const getMapCellAt = (x, y, z) => mapData[x] && mapData[x][y] && mapData[x][y][z] ? mapData[x][y][z] : null;
 
     for (const cellA of meshData) {
         if (!mapData[cellA.x][cellA.y][cellA.z].zone) {
@@ -64,7 +62,7 @@ export function initKotcZones(meshData) {
                     if (!mapData[cellB.x][cellB.y][cellB.z].zone) {
                         for (const o of offsets) {
                             const cell = getMapCellAt(cellB.x + o.x, cellB.y, cellB.z + o.z);
-                            if (cell && cell.zone == cellA.zone) {
+                            if (cell && cell.zone === cellA.zone) {
                                 hits++;
                                 cellB.zone = cellA.zone;
                                 mapData[cellB.x][cellB.y][cellB.z].zone = cellA.zone;

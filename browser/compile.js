@@ -16,12 +16,10 @@ const replaceItemImport = {
 
         build.onLoad({
             filter: new RegExp(specialFilePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$')
-        }, async () => {
-            return {
-                contents: 'export const findItemById = () => null',
-                loader: 'js'
-            };
-        });
+        }, () => ({
+            contents: 'export const findItemById = () => null',
+            loader: 'js'
+        }));
     }
 };
 
@@ -39,11 +37,10 @@ const build = async (module) => {
         external: ['smallsocks', 'ws', 'undici', 'node:fs', 'node:os', 'node:path']
     });
 
-    let build = fs.readFileSync(path.join(buildDir, `${module}.js`), 'utf-8');
+    const output = fs.readFileSync(path.join(buildDir, `${module}.js`), 'utf-8');
+    const modifiedOutput = output.replace(/await import\("[a-zA-Z:]+"\)/g, '{}');
 
-    build = build.replace(/await import\("[a-zA-Z:]+"\)/g, '{}');
-
-    fs.writeFileSync(path.join(buildDir, `${module}.js`), build);
+    fs.writeFileSync(path.join(buildDir, `${module}.js`), modifiedOutput);
 
     console.log(`completed ${module} build!`);
 }

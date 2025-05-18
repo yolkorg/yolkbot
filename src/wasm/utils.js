@@ -1,7 +1,9 @@
+/* eslint-disable no-underscore-dangle */
+
 import { getWasm } from './wrapper.js';
 
 export const getStringFromWasm = (ptr, len) => {
-    ptr = ptr >>> 0;
+    ptr >>>= 0;
     return (new TextDecoder()).decode((new Uint8Array(getWasm().memory.buffer)).subarray(ptr, ptr + len));
 }
 

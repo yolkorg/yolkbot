@@ -12,23 +12,23 @@ type intents = {
     DEBUG_BEST_TARGET: 14
 }
 
-import { NodeList } from '../pathing/mapnode.js';
-
 import { Character, GamePlayer, Position } from './bot/GamePlayer';
 import { Challenge } from './constants/challenges';
 import { AnyGun } from './constants/guns';
 import { Map } from './constants/maps';
 import { ADispatch } from './dispatches/index';
+import { NodeList } from './pathing/mapnode';
+import { API } from './api';
 import { Matchmaker, RawGameData } from './matchmaker';
 import yolkws from './socket';
 
 export interface BotParams {
     intents?: number[];
-    doUpdate?: boolean;
-    updateInterval?: number;
     proxy?: string;
+    httpProxy?: string;
     instance?: string;
     protocol?: string;
+    apiMaxRetries?: number;
 }
 
 export interface ChiknWinnerStatus {
@@ -218,13 +218,23 @@ export interface Pathing {
     activeNodeIdx: number;
 }
 
+export interface BufferFrame {
+    controlKeys: number;
+    yaw: number;
+    pitch: number;
+    shotsFired: number;
+}
+
 export interface BotState {
     name: string;
     weaponIdx: number;
     reloading: boolean;
     swappingGun: boolean;
     usingMelee: boolean;
+    stateIdx: number;
+    serverStateIdx: number;
     shotsFired: number;
+    buffer: BufferFrame[];
     quit: boolean;
 }
 
@@ -237,25 +247,26 @@ export interface ChiknWinnerResponse {
 export class Bot {
     static Intents: intents;
     Intents: intents;
+    intents: number[];
 
     proxy: string;
-    autoUpdate: boolean;
-    disablePathing: boolean;
-    updateInterval: number;
+    httpProxy: string;
     instance: string;
     protocol: string;
+
     state: BotState;
     players: Record<string, GamePlayer>;
     me: GamePlayer;
     game: Game;
     account: Account;
+
     ping: number;
     lastPingTime: number;
     lastDeathTime: number;
     lastChatTime: number;
-    lastUpdateTime: number;
-    controlKeys: number;
     pathing: Pathing;
+
+    api: API;
     matchmaker: Matchmaker | null;
 
     constructor(params?: BotParams);

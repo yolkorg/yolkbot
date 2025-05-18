@@ -7,8 +7,29 @@ export interface QueryResponse {
     [key: string]: any;
 }
 
-export function queryServices(request: QueryRequest, proxy?: string, instance?: string): Promise<QueryResponse | string>;
-export function loginWithCredentials(email: string, password: string, proxy?: string, instance?: string): Promise<QueryResponse | string>;
-export function loginWithRefreshToken(refreshToken: string, proxy?: string, instance?: string): Promise<QueryResponse | string>;
-export function loginAnonymously(proxy?: string, instance?: string): Promise<QueryResponse | string>;
-export function createAccount(email: string, password: string, proxy?: string, instance?: string): Promise<QueryResponse | string>;
+interface APIParams {
+    instance?: string;
+    protocol?: string;
+    httpProxy?: string;
+    socksProxy?: string;
+    maxRetries?: number;
+}
+
+export class API {
+    instance: string;
+    protocol: string;
+
+    httpProxy: string;
+    socksProxy: string;
+
+    maxRetries: number;
+
+    constructor(params?: APIParams);
+
+    queryServices(request: QueryRequest): Promise<QueryResponse | string>;
+
+    loginWithCredentials(email: string, password: string): Promise<QueryResponse | string>;
+    loginWithRefreshToken(refreshToken: string): Promise<QueryResponse | string>;
+    loginAnonymously(): Promise<QueryResponse | string>;
+    createAccount(email: string, password: string): Promise<QueryResponse | string>;
+}
