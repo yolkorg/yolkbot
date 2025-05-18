@@ -4,7 +4,9 @@
 /* eslint-disable no-undefined */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable stylistic/max-len */
+
 // thx to https://github.com/zastlx/shell-wasm-node <3
+// zastix is very amazing <3
 
 import { getWasm } from './wrapper.js';
 import { addToExternrefTable, passStringToWasm, getStringFromWasm } from './utils.js';
@@ -129,6 +131,6 @@ export const imports = {
         },
         __wbindgen_throw: () => {
             // console.trace('__wbindgen_throw', args);
-        },
+        }
     }
 }
