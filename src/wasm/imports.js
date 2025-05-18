@@ -1,4 +1,8 @@
+/* eslint-disable arrow-body-style */
 /* eslint-disable camelcase */
+/* eslint-disable no-empty-function */
+/* eslint-disable no-undefined */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable stylistic/max-len */
 
 import { getWasm } from './wrapper.js';
@@ -184,7 +188,7 @@ export const imports = {
         __wbindgen_cb_drop: (...args) => {
             // console.log('__wbindgen_cb_drop');
             const obj = args[0].original;
-            if (obj.cnt-- == 1) {
+            if (obj.cnt-- === 1) {
                 obj.a = 0;
                 return true;
             }
@@ -193,14 +197,14 @@ export const imports = {
         },
         __wbindgen_closure_wrapper281: (...args) => {
             // console.log('__wbindgen_closure_wrapper281');
-            return makeMutClosure(args[0], args[1], 22, (...args) => {
-                getWasm()._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h573d6777e73915f0(args[0], args[1]);
+            return makeMutClosure(args[0], args[1], 22, (...args2) => {
+                getWasm()._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h573d6777e73915f0(args2[0], args2[1]);
             }, getWasm());
         },
-        __wbindgen_closure_wrapper295: (...args) => {
+        __wbindgen_closure_wrapper295: (...args3) => {
             // console.log('__wbindgen_closure_wrapper295');
-            return makeMutClosure(args[0], args[1], 29, (...args) => {
-                getWasm().closure28_externref_shim(args[0], args[1], args[2]);
+            return makeMutClosure(args3[0], args3[1], 29, (...args4) => {
+                getWasm().closure28_externref_shim(args4[0], args4[1], args4[2]);
             }, getWasm());
         },
         __wbindgen_debug_string: () => {

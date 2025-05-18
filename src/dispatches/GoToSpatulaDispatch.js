@@ -20,8 +20,8 @@ export class GoToSpatulaDispatch {
 
         bot.pathing.activePath = this.pather.path(myNode, targetNode);
 
-        if (!bot.pathing.activePath) return console.error('no path found');
-        if (bot.pathing.activePath.length < 2) return console.error('path too short');
+        if (!bot.pathing.activePath) return bot.processError('no path found');
+        if (bot.pathing.activePath.length < 2) return bot.processError('path too short');
 
         bot.pathing.followingPath = true;
         bot.pathing.activeNode = bot.pathing.activePath[1];

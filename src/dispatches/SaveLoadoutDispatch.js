@@ -1,13 +1,12 @@
 /* eslint-disable stylistic/max-len */
 
-import { queryServices } from '../api.js';
 import { findItemById, GunList, ItemTypes } from '../constants/index.js';
 
 import CommOut from '../comm/CommOut.js';
 import { CommCode } from '../constants/codes.js';
 
-const isDefault = (itemId) => findItemById(itemId) && findItemById(itemId).unlock == 'default';
-const isType = (itemId, type) => findItemById(itemId) && findItemById(itemId).item_type_id == type;
+const isDefault = (itemId) => findItemById(itemId) && findItemById(itemId).unlock === 'default';
+const isType = (itemId, type) => findItemById(itemId) && findItemById(itemId).item_type_id === type;
 
 export class SaveLoadoutDispatch {
     constructor(opts) {
@@ -23,7 +22,7 @@ export class SaveLoadoutDispatch {
         };
 
         // filter out undefined
-        this.changes = Object.fromEntries(Object.entries(this.changes).filter(([, v]) => v !== undefined));
+        this.changes = Object.fromEntries(Object.entries(this.changes).filter(([, v]) => !!v));
     }
 
     check(bot) {
@@ -31,8 +30,8 @@ export class SaveLoadoutDispatch {
 
         const load = this.changes;
 
-        if (load.colorIdx !== undefined && load.colorIdx >= 7 && !bot.account.vip) return false; // trying to use VIP color
-        if (load.colorIdx !== undefined && load.colorIdx >= 14) return false; // trying to use color that doesn't exist
+        if (load.colorIdx && load.colorIdx >= 7 && !bot.account.vip) return false; // trying to use VIP color
+        if (load.colorIdx && load.colorIdx >= 14) return false; // trying to use color that doesn't exist
 
         // validate that you own all of the items you're trying to use
         if (isType(load.hatId, ItemTypes.Hat) && !isDefault(load.hatId) && !bot.account.ownedItemIds.includes(load.hatId)) return false;
@@ -41,7 +40,7 @@ export class SaveLoadoutDispatch {
         if (isType(load.meleeId, ItemTypes.Melee) && !isDefault(load.meleeId) && !bot.account.ownedItemIds.includes(load.meleeId)) return false;
 
         // invalid classidx param
-        if (typeof load.classIdx == 'number' && load.classIdx > 6 || load.classIdx < 0) return false;
+        if (typeof load.classIdx === 'number' && load.classIdx > 6 || load.classIdx < 0) return false;
 
         // validate that you own the primary guns you're trying to use
         if (this.changes.primaryId) {
@@ -81,13 +80,13 @@ export class SaveLoadoutDispatch {
             ...this.changes
         }
 
-        const saveLoadout = queryServices({
+        const saveLoadout = bot.api.queryServices({
             cmd: 'saveLoadout',
             save: true,
             firebaseId: bot.account.firebaseId,
             sessionId: bot.account.sessionId,
             loadout
-        }, bot.proxy, `${bot.protocol}://${bot.instance}`);
+        });
 
         bot.account.loadout = loadout;
 

@@ -3,233 +3,189 @@ import yolkws from './socket.js';
 
 import { FirebaseKey, UserAgent } from './constants/index.js';
 
-const queryServices = async (request, proxy = '', instance = 'wss://shellshock.io') => {
-    let ws;
+const baseHeaders = {
+    'origin': 'https://shellshock.io',
+    'user-agent': UserAgent,
+    'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
+    'x-firebase-locale': 'en'
+}
 
-    const attempt = async () => {
-        try {
-            ws = new yolkws(`${instance}/services/`, proxy);
-            ws.onerror = async (e) => {
-                console.error(e);
-                await new Promise((resolve) => setTimeout(resolve, 100));
-                return await attempt();
-            }
-        } catch {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-            await attempt();
-        }
+export class API {
+    constructor(params = {}) {
+        this.instance = params.instance || 'shellshock.io';
+        this.protocol = params.protocol || 'wss';
+
+        this.httpProxy = params.httpProxy || params.proxy?.replace(/socks([4|5|4a|5h]+):\/\//g, 'https') || '';
+        this.socksProxy = params.proxy;
+
+        this.maxRetries = params.maxRetries || 5;
     }
 
-    await attempt();
+    queryServices = async (request) => {
+        let ws;
+        let tries = 0;
 
-    return new Promise((resolve) => {
-        ws.onopen = () => {
-            ws.onerror = null;
-            ws.send(JSON.stringify(request));
+        const attempt = async () => {
+            try {
+                ws = new yolkws(`${protocol}://${instance}/services/`, this.socksProxy);
+                ws.onerror = async (e) => {
+                    tries++;
+                    console.error(e);
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                    return await attempt();
+                }
+            } catch {
+                if (tries > this.maxRetries) return 'max_retries_exceeded';
+                await new Promise((resolve) => setTimeout(resolve, 100));
+                await attempt();
+            }
         }
 
-        let resolved = false;
+        await attempt();
 
-        ws.onmessage = (mes) => {
-            resolved = true;
-
-            try {
-                const resp = JSON.parse(mes.data);
-                resolve(resp);
-            } catch {
-                console.error('queryServices: Bad API JSON response with call: ' + request.cmd + ' and data:', JSON.stringify(request));
-                console.error('queryServices: Full data sent: ', JSON.stringify(request));
-                // console.log('Full data received: ', mes);
-                // console.log('Full error: ', e);
-
-                resolve('bad_json');
+        return new Promise((resolve) => {
+            ws.onopen = () => {
+                ws.onerror = null;
+                ws.send(JSON.stringify(request));
             }
 
-            ws.close();
-        };
+            let resolved = false;
 
-        ws.onerror = () => !resolved && resolve('unknown_socket_error');
-        ws.onclose = () => !resolved && resolve('services_closed_early');
-    });
-}
+            ws.onmessage = (mes) => {
+                resolved = true;
 
-async function createAccount(email, password, proxy = '', instance = 'wss://shellshock.io') {
-    return await loginWithCredentials(email, password, proxy, instance, true);
-}
+                try {
+                    const resp = JSON.parse(mes.data);
+                    resolve(resp);
+                } catch {
+                    console.error('queryServices: Bad API JSON response with call: ' + request.cmd + ' and data:', JSON.stringify(request));
+                    console.error('queryServices: Full data sent: ', JSON.stringify(request));
 
-async function loginWithCredentials(email, password, proxy = '', instance = 'wss://shellshock.io', _useRegisterEndpoint) {
-    if (!email || !password) return 'firebase_no_credentials';
+                    resolve('bad_json');
+                }
 
-    /*
-    Response looks something like:
-        {
-            id: <int>
-            firebaseId: <string>
-            sessionId: <string>
-            session: <int>
+                ws.close();
+            };
 
-            ... <irrelevant data>
+            ws.onerror = () => !resolved && resolve('unknown_socket_error');
+            ws.onclose = () => !resolved && resolve('services_closed_early');
+        });
+    }
 
-            kills: <int>
-            deaths: <int>
-            currentBalance: <int>
-        }
-    */
+    #authWithEmailPass = async (email, password, endpoint) => {
+        if (!email || !password) return 'firebase_no_credentials';
 
-    const endpoint = _useRegisterEndpoint ? 'signUp' : 'signInWithPassword';
+        let body, firebaseToken;
 
-    let SUCCESS = false;
-    let request, body, token;
-    let k = 0;
-
-    while (!SUCCESS) {
         try {
-            request = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
+            const request = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    email: email,
-                    password: password,
+                    email,
+                    password,
                     returnSecureToken: true
                 }),
                 headers: {
-                    'content-type': 'application/json',
-                    'origin': 'https://shellshock.io',
-                    'user-agent': UserAgent,
-                    'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
-                    'x-firebase-locale': 'en'
+                    ...baseHeaders,
+                    'content-type': 'application/json'
                 },
-                dispatcher: proxy ? new globals.ProxyAgent(proxy.replace(/socks([4|5|4a|5h]+)/g, 'https')) : undefined
+                dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
             });
 
             body = await request.json();
-            token = body.idToken;
-            SUCCESS = true;
+            firebaseToken = body.idToken;
         } catch (error) {
-            ++k;
-            if (error.code == 'auth/network-request-failed') {
-                console.error('loginWithCredentials: Network req failed (auth/network-request-failed), retrying, k =', k);
-            } else if (error.code == 'auth/missing-email') {
+            if (error.code === 'auth/network-request-failed') {
+                console.error('loginWithCredentials: Network req failed (auth/network-request-failed)');
+                return 'firebase_network_failed';
+            } else if (error.code === 'auth/missing-email') {
                 return 'firebase_no_credentials';
-            } else if (error.code == 'ERR_BAD_REQUEST') {
+            } else if (error.code === 'ERR_BAD_REQUEST') {
                 console.error('loginWithCredentials: Error:', email, password);
-                console.error('loginWithCredentials: Error:', error.response?.data || error, 'k =', k);
+                console.error('loginWithCredentials: Error:', error.response?.data || error);
+                return 'firebase_bad_request';
             } else {
                 console.error('loginWithCredentials: Error:', email, password);
-                console.error('loginWithCredentials: Error:', error, 'k =', k);
+                return 'firebase_unknown_error';
             }
+        }
 
-            if (k > 5) return 'firebase_too_many_retries';
-            else await new Promise((resolve) => setTimeout(resolve, 100));
+        if (firebaseToken) return await this.queryServices({ cmd: 'auth', firebaseToken });
+        else {
+            console.error('loginWithCredentials: the game sent no idToken', body);
+            return 'firebase_no_token';
         }
     }
 
-    if (!token) {
-        console.error('loginWithCredentials: the game sent no idToken', body);
-        return 'firebase_no_token';
-    }
+    createAccount = async (email, password) =>
+        await this.#authWithEmailPass(email, password, 'signUp');
 
-    const response = await queryServices({
-        cmd: 'auth',
-        firebaseToken: token
-    }, proxy, instance);
+    loginWithCredentials = async (email, password) =>
+        await this.#authWithEmailPass(email, password, 'signInWithPassword');
 
-    return response;
-}
+    loginWithRefreshToken = async (refreshToken) => {
+        if (!refreshToken) return 'firebase_no_credentials';
 
-async function loginWithRefreshToken(refreshToken, proxy = '', instance = 'wss://shellshock.io') {
-    if (!refreshToken) return 'firebase_no_credentials';
+        const formData = new URLSearchParams();
+        formData.append('grant_type', 'refresh_token');
+        formData.append('refresh_token', refreshToken);
 
-    const formData = new URLSearchParams();
-    formData.append('grant_type', 'refresh_token');
-    formData.append('refresh_token', refreshToken);
+        let body, token;
 
-    let SUCCESS = false;
-    let request, body, token;
-    let k = 0;
-
-    while (!SUCCESS) {
         try {
-            request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
+            const request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'content-type': 'application/x-www-form-urlencoded',
-                    'origin': 'https://shellshock.io',
-                    'user-agent': UserAgent,
-                    'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
-                    'x-firebase-locale': 'en'
+                    ...baseHeaders,
+                    'content-type': 'application/x-www-form-urlencoded'
                 },
-                dispatcher: proxy ? new globals.ProxyAgent(proxy.replace(/socks([4|5|4a|5h]+)/g, 'https')) : undefined
+                dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
             });
 
             body = await request.json();
             token = body.id_token;
-            SUCCESS = true;
         } catch (error) {
-            ++k;
-            if (error.code == 'auth/network-request-failed') {
-                console.error('loginWithRefreshToken: Network req failed (auth/network-request-failed), retrying, k =', k);
-            } else if (error.code == 'auth/missing-email') {
+            if (error.code === 'auth/network-request-failed') {
+                console.error('loginWithRefreshToken: Network req failed (auth/network-request-failed)');
+                return 'firebase_network_failed';
+            } else if (error.code === 'auth/missing-email') {
                 return 'firebase_no_credentials';
             } else {
-                console.error('loginWithRefreshToken: Error:', refreshToken);
-                console.error('loginWithRefreshToken: Error:', error, 'k =', k);
+                console.error('loginWithRefreshToken: Error:', error, refreshToken);
+                return 'firebase_unknown_error';
             }
+        }
 
-            if (k > 5) return 'firebase_too_many_retries';
-            else await new Promise((resolve) => setTimeout(resolve, 100));
+        if (!token) {
+            console.error('loginWithRefreshToken: the game sent no idToken', body);
+            return 'firebase_no_token';
+        }
+
+        const response = await this.queryServices({ cmd: 'auth', firebaseToken: token });
+        return response;
+    }
+
+    loginAnonymously = async () => {
+        const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
+            method: 'POST',
+            body: JSON.stringify({ returnSecureToken: true }),
+            headers: {
+                ...baseHeaders,
+                'content-type': 'application/json'
+            },
+            dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
+        });
+
+        const body = await req.json();
+        const firebaseToken = body.idToken;
+
+        if (firebaseToken) return await this.queryServices({ cmd: 'auth', firebaseToken });
+        else {
+            console.error('loginAnonymously: the game sent no idToken', body);
+            return 'firebase_no_token';
         }
     }
-
-    if (!token) {
-        console.error('loginWithRefreshToken: the game sent no idToken', body);
-        return 'firebase_no_token';
-    }
-
-    const response = await queryServices({
-        cmd: 'auth',
-        firebaseToken: token
-    }, proxy, instance);
-
-    return response;
 }
 
-async function loginAnonymously(proxy = '', instance = 'wss://shellshock.io') {
-    const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
-        method: 'POST',
-        body: JSON.stringify({
-            returnSecureToken: true
-        }),
-        headers: {
-            'content-type': 'application/json',
-            'origin': 'https://shellshock.io',
-            'user-agent': UserAgent,
-            'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
-            'x-firebase-locale': 'en'
-        },
-        dispatcher: proxy ? new globals.ProxyAgent(proxy.replace(/socks([4|5|4a|5h]+)/g, 'https')) : undefined
-    });
-
-    const body = await req.json();
-    const token = body.idToken;
-
-    if (!token) {
-        console.error('loginAnonymously: the game sent no idToken', body);
-        return 'firebase_no_token';
-    }
-
-    const response = await queryServices({
-        cmd: 'auth',
-        firebaseToken: token
-    }, proxy, instance);
-
-    return response;
-}
-
-export {
-    createAccount,
-    loginAnonymously,
-    loginWithCredentials,
-    loginWithRefreshToken,
-    queryServices
-}
+export default API;

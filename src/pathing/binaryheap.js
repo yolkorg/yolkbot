@@ -36,13 +36,13 @@ class BinaryHeap {
         // To remove a value, we must search through the array to find
         // it.
         for (let i = 0; i < length; i++) {
-            if (this.content[i] != node) continue;
+            if (this.content[i] !== node) continue;
             // When it is found, the process seen in 'pop' is repeated
             // to fill up the hole.
             const end = this.content.pop();
             // If the element we popped was the one we needed to remove,
             // we're done.
-            if (i == length - 1) break;
+            if (i === length - 1) break;
             // Otherwise, we replace the removed element with the popped
             // one, and allow it to float up or sink down as appropriate.
             this.content[i] = end;
@@ -101,11 +101,11 @@ class BinaryHeap {
             // Do the same checks for the other child.
             if (child2N < length) {
                 const child2 = this.content[child2N], child2Score = this.scoreFunction(child2);
-                if (child2Score < (swap == null ? elemScore : child1Score)) swap = child2N;
+                if (child2Score < (swap === null ? elemScore : child1Score)) swap = child2N;
             }
 
             // No need to swap further, we are done.
-            if (swap == null) break;
+            if (swap === null) break;
 
             // Otherwise, swap and continue.
             this.content[n] = this.content[swap];

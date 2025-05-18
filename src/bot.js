@@ -1,4 +1,4 @@
-import { createAccount, loginAnonymously, loginWithCredentials, loginWithRefreshToken, queryServices } from './api.js';
+import API from './api.js';
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
@@ -69,19 +69,19 @@ export class Bot {
     #initialGame;
 
     constructor(params = {}) {
-        if (params.proxy && !ProxiesEnabled)
-            throw new Error('proxies do not work and hence are not supported in the browser');
+        if (params.proxy && !ProxiesEnabled) this.processError('proxies do not work and hence are not supported in the browser');
 
         this.intents = params.intents || [];
 
         if (this.intents.includes(this.Intents.COSMETIC_DATA)) {
             const ballCap = findItemById(1001);
-            if (!ballCap) throw new Error('you cannot use the COSMETIC_DATA intent inside of the singlefile browser bundles');
+            if (!ballCap) this.processError('you cannot use the COSMETIC_DATA intent inside of the singlefile browser bundles');
         }
 
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
         this.proxy = params.proxy || '';
+        this.httpProxy = params.httpProxy || '';
 
         this.state = {
             // kept for specifying various params
@@ -233,6 +233,14 @@ export class Bot {
 
         this.matchmaker = null;
 
+        this.api = new API({
+            instance: this.instance,
+            protocol: this.protocol,
+            proxy: this.proxy,
+            httpProxy: this.httpProxy,
+            maxRetries: params?.apiMaxRetries
+        });
+
         this.ping = 0;
         this.lastPingTime = -1;
 
@@ -261,32 +269,32 @@ export class Bot {
         this.account.email = email;
         this.account.password = pass;
 
-        const loginData = await createAccount(email, pass, this.proxy, `${this.protocol}://${this.instance}`);
-        return await this.#processLoginData(loginData);
+        const loginData = await this.api.createAccount(email, pass);
+        return this.#processLoginData(loginData);
     }
 
     async login(email, pass) {
         this.account.email = email;
         this.account.password = pass;
 
-        const loginData = await loginWithCredentials(email, pass, this.proxy, `${this.protocol}://${this.instance}`);
-        return await this.#processLoginData(loginData);
+        const loginData = await this.api.loginWithCredentials(email, pass);
+        return this.#processLoginData(loginData);
     }
 
     async loginWithRefreshToken(refreshToken) {
-        const loginData = await loginWithRefreshToken(refreshToken, this.proxy, `${this.protocol}://${this.instance}`);
-        return await this.#processLoginData(loginData);
+        const loginData = await this.api.loginWithRefreshToken(refreshToken);
+        return this.#processLoginData(loginData);
     }
 
     async loginAnonymously() {
         delete this.account.email;
         delete this.account.password;
 
-        const loginData = await loginAnonymously(this.proxy, `${this.protocol}://${this.instance}`);
-        return await this.#processLoginData(loginData);
+        const loginData = await this.api.loginAnonymously();
+        return this.#processLoginData(loginData);
     }
 
-    async #processLoginData(loginData) {
+    #processLoginData(loginData) {
         if (typeof loginData !== 'object') {
             this.emit('authFail', loginData);
             return false;
@@ -334,7 +342,7 @@ export class Bot {
         this.account.challenges = [];
 
         for (const challengeData of challengeArray) {
-            const challengeInfo = Challenges.find(c => c.id == challengeData.challengeId);
+            const challengeInfo = Challenges.find(c => c.id === challengeData.challengeId);
             if (!challengeInfo) continue;
 
             delete challengeData.playerId;
@@ -366,10 +374,12 @@ export class Bot {
                 proxy: this.proxy,
                 instance: this.instance,
                 protocol: this.protocol,
-                noLogin: this.intents.includes(this.Intents.NO_LOGIN)
+                noLogin: this.intents.includes(this.Intents.NO_LOGIN),
+                api: this.api
             });
 
             this.matchmaker.on('authFail', (data) => this.emit('authFail', data));
+            this.matchmaker.on('error', (data) => this.processError(data));
 
             await this.matchmaker.getRegions();
         }
@@ -382,7 +392,7 @@ export class Bot {
 
         return await new Promise((resolve) => {
             const listener = (mes) => {
-                if (mes.command == 'gameFound') {
+                if (mes.command === 'gameFound') {
                     this.matchmaker.off('msg', listener);
 
                     this.game.raw = mes;
@@ -391,8 +401,10 @@ export class Bot {
                     resolve();
                 }
 
-                if (mes.error && mes.error == 'gameNotFound')
-                    throw new Error(`Game ${code} not found (likely expired).`)
+                if (mes.error && mes.error === 'gameNotFound') {
+                    this.processError(`Game ${code} not found (likely expired).`)
+                    this.leave();
+                }
             };
 
             this.matchmaker.on('msg', listener);
@@ -412,23 +424,24 @@ export class Bot {
     async createPrivateGame(opts = {}) {
         if (!await this.initMatchmaker()) return false;
 
-        if (!opts.region) throw new Error('pass a region: createPrivateGame({ region: "useast", ... })')
-        if (!this.matchmaker.regionList.find(r => r.id == opts.region))
-            throw new Error('invalid region, see <bot>.matchmaker.regionList for a region list (pass an "id")')
+        if (!opts.region && !this.matchmaker.regionList)
+            return this.processError('pass a region to createPrivateGame or call getRegions() for a random one');
 
-        if (!opts.mode) throw new Error('pass a mode: createPrivateGame({ mode: "ffa", ... })')
-        if (GameModes[opts.mode] == undefined) throw new Error('invalid mode, see GameModes for a list')
+        if (!opts.region) opts.region = this.matchmaker.getRandomRegion();
 
-        if (!opts.map) throw new Error('pass a map: createPrivateGame({ map: "downfall", ... })')
+        if (!opts.mode) return this.processError('pass a mode to createPrivateGame')
+        if (!GameModes[opts.mode]) return this.processError('invalid mode passed to createPrivateGame, see GameModes for a list')
 
-        const map = Maps.find(m => m.name.toLowerCase() == opts.map.toLowerCase());
+        if (!opts.map) opts.map = Maps[Maps.length * Math.random() | 0].name;
+
+        const map = Maps.find(m => m.name.toLowerCase() === opts.map.toLowerCase());
         const mapIdx = Maps.indexOf(map);
 
-        if (mapIdx == -1) throw new Error('invalid map, see the Maps constant for a list')
+        if (mapIdx === -1) return this.processError('invalid map, see the Maps constant for a list')
 
         await new Promise((resolve) => {
             const listener = (msg) => {
-                if (msg.command == 'gameFound') {
+                if (msg.command === 'gameFound') {
                     this.matchmaker.off('msg', listener);
 
                     this.game.raw = msg;
@@ -457,17 +470,17 @@ export class Bot {
     async join(name, data) {
         this.state.name = name || 'yolkbot';
 
-        if (typeof data == 'string') {
+        if (typeof data === 'string') {
             if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
             await this.#joinGameWithCode(data);
-        } else if (typeof data == 'object') {
-            if (this.account.id == 0) await this.loginAnonymously();
+        } else if (typeof data === 'object') {
+            if (this.account.id === 0) await this.loginAnonymously();
 
             this.game.raw = data;
             this.game.code = this.game.raw.id;
         }
 
-        if (!this.game.raw.id) throw new Error('invalid game data passed to <bot>.join');
+        if (!this.game.raw.id) return this.processError('invalid game data passed to <bot>.join');
 
         const attempt = async () => {
             try {
@@ -475,7 +488,7 @@ export class Bot {
 
                 this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
                 this.game.socket.onerror = async (e) => {
-                    console.error(e);
+                    this.processError(e);
                     await new Promise((resolve) => setTimeout(resolve, 100));
                     return await attempt();
                 }
@@ -504,8 +517,7 @@ export class Bot {
     #processPathfinding() {
         const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
 
-        if (myPositionStr == this.pathing.activePath[this.pathing.activePath.length - 1].positionStr) {
-            // console.log('Completed path to', this.pathing.activePath[this.pathing.activePath.length - 1].position);
+        if (myPositionStr === this.pathing.activePath[this.pathing.activePath.length - 1].positionStr) {
             this.pathing.followingPath = false;
             this.pathing.activePath = null;
             this.pathing.activeNode = null;
@@ -523,7 +535,7 @@ export class Bot {
             }
 
             for (const node of this.pathing.activePath) {
-                if (node.flatRadialDistance(this.me.position) < 0.1 && node.position.y == Math.floor(this.me.position.y)) {
+                if (node.flatRadialDistance(this.me.position) < 0.1 && node.position.y === Math.floor(this.me.position.y)) {
                     if (this.pathing.activePath.indexOf(node) >= this.pathing.activeNodeIdx) {
                         this.pathing.activeNodeIdx = this.pathing.activePath.indexOf(node) + 1;
                         this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
@@ -652,7 +664,7 @@ export class Bot {
         const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
 
         const playerData = {
-            id: id,
+            id,
             uniqueId: CommIn.unPackString(),
             name: CommIn.unPackString(),
             safename: CommIn.unPackString(),
@@ -701,7 +713,7 @@ export class Bot {
         CommIn.unPackInt8U(); // gametype
 
         if (!this.players[playerData.id]) this.players[playerData.id] = new GamePlayer(playerData);
-        if (this.me.id == playerData.id) this.me = this.players[playerData.id];
+        if (this.me.id === playerData.id) this.me = this.players[playerData.id];
 
         this.emit('playerJoin', this.players[playerData.id]);
     }
@@ -729,7 +741,7 @@ export class Bot {
             if (player.weapons[1] && player.weapons[1].ammo) player.weapons[1].ammo.store = store1;
 
             player.grenades = grenades;
-            player.position = { x: x, y: y, z: z };
+            player.position = { x, y, z };
 
             player.spawnShield = 120;
 
@@ -745,7 +757,7 @@ export class Bot {
         const climbing = CommIn.unPackInt8U();
 
         const player = this.players[id];
-        if (!player || player.id == this.me.id) {
+        if (!player || player.id === this.me.id) {
             for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
                 CommIn.unPackInt8U();
                 CommIn.unPackRadU();
@@ -852,9 +864,9 @@ export class Bot {
 
         const player = this.players[playerId];
 
-        this.game.collectables[type] = this.game.collectables[type].filter(c => c.id != id);
+        this.game.collectables[type] = this.game.collectables[type].filter(c => c.id !== id);
 
-        if (type == CollectTypes.AMMO) {
+        if (type === CollectTypes.AMMO) {
             const playerWeapon = player.weapons[applyToWeaponIdx];
             if (playerWeapon && playerWeapon.ammo) {
                 playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
@@ -862,7 +874,7 @@ export class Bot {
             }
         }
 
-        if (type == CollectTypes.GRENADE) {
+        if (type === CollectTypes.GRENADE) {
             player.grenades++;
             if (player.grenades > 3) player.grenades = 3;
 
@@ -923,7 +935,7 @@ export class Bot {
         player.position.y = newY;
         player.position.z = newZ;
 
-        if (oldX != newX || oldY != newY || oldZ != newZ)
+        if (oldX !== newX || oldY !== newY || oldZ !== newZ)
             this.emit('selfMoved', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
     }
 
@@ -943,11 +955,11 @@ export class Bot {
     }
 
     #processGameStatePacket() {
-        if (this.game.gameModeId == GameModes.spatula) {
+        if (this.game.gameModeId === GameModes.spatula) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
 
-            const spatulaCoords = {
+            const coords = {
                 x: CommIn.unPackFloat(),
                 y: CommIn.unPackFloat(),
                 z: CommIn.unPackFloat()
@@ -956,14 +968,10 @@ export class Bot {
             const controlledBy = CommIn.unPackInt8U();
             const controlledByTeam = CommIn.unPackInt8U();
 
-            this.game.spatula = {
-                coords: spatulaCoords,
-                controlledBy: controlledBy,
-                controlledByTeam: controlledByTeam
-            };
+            this.game.spatula = { coords, controlledBy, controlledByTeam };
 
             this.emit('gameStateChange', this.game);
-        } else if (this.game.gameModeId == GameModes.kotc) {
+        } else if (this.game.gameModeId === GameModes.kotc) {
             this.game.stage = CommIn.unPackInt8U(); // constants.CoopStates
             this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
             this.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
@@ -978,7 +986,7 @@ export class Bot {
             this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
 
             this.emit('gameStateChange', this.game);
-        } else if (this.game.gameModeId == GameModes.team) {
+        } else if (this.game.gameModeId === GameModes.team) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
         }
@@ -998,7 +1006,7 @@ export class Bot {
             delete this.game.activeZone;
         }
 
-        if (this.game.gameModeId == GameModes.ffa) delete this.game.teamScore;
+        if (this.game.gameModeId === GameModes.ffa) delete this.game.teamScore;
     }
 
     #processBeginStreakPacket() {
@@ -1063,7 +1071,7 @@ export class Bot {
         ];
 
         if (streaks.includes(ksType) && player.streakRewards.includes(ksType))
-            player.streakRewards = player.streakRewards.filter((r) => r != ksType);
+            player.streakRewards = player.streakRewards.filter((r) => r !== ksType);
 
         this.emit('playerEndStreak', ksType, player);
     }
@@ -1079,7 +1087,7 @@ export class Bot {
         this.me.hp = hp;
 
         if (this.me.shieldHp <= 0) {
-            this.me.streakRewards = this.me.streakRewards.filter((r) => r != ShellStreaks.HardBoiled);
+            this.me.streakRewards = this.me.streakRewards.filter((r) => r !== ShellStreaks.HardBoiled);
             this.emit('selfShieldLost');
         } else this.emit('selfShieldHit', this.me.shieldHp);
     }
@@ -1116,12 +1124,12 @@ export class Bot {
     #processGameActionPacket() {
         const action = CommIn.unPackInt8U();
 
-        if (action == GameActions.pause) {
+        if (action === GameActions.pause) {
             this.emit('gameForcePause');
             setTimeout(() => this.me.playing = false, 3000);
         }
 
-        if (action == GameActions.reset) {
+        if (action === GameActions.reset) {
             Object.values(this.players).forEach((player) => player.streak = 0);
 
             if (this.game.gameModeId !== GameModes.ffa) this.game.teamScore = [0, 0, 0];
@@ -1298,7 +1306,7 @@ export class Bot {
         if (this.intents.includes(this.Intents.COSMETIC_DATA))
             item = findItemById(item);
 
-        if (itemType == ItemTypes.Grenade) this.emit('grenadeExploded', item, { x, y, z }, damage, radius);
+        if (itemType === ItemTypes.Grenade) this.emit('grenadeExploded', item, { x, y, z }, damage, radius);
         else this.emit('rocketHit', { x, y, z }, damage, radius);
     }
 
@@ -1329,10 +1337,10 @@ export class Bot {
         if (!this.intents.includes(this.Intents.CHALLENGES))
             return this.emit('challengeComplete', player, challengeId);
 
-        const challenge = this.account.challenges.find(c => c.id == challengeId);
+        const challenge = this.account.challenges.find(c => c.id === challengeId);
         this.emit('challengeComplete', player, challenge);
 
-        if (player.id == this.me.id) this.refreshChallenges();
+        if (player.id === this.me.id) this.refreshChallenges();
     }
 
     #processSocketReadyPacket() {
@@ -1372,12 +1380,10 @@ export class Bot {
         }
 
         this.game.playerLimit = CommIn.unPackInt8U();
-        this.game.isGameOwner = CommIn.unPackInt8U() == 1;
-        this.game.isPrivate = CommIn.unPackInt8U() == 1;
+        this.game.isGameOwner = CommIn.unPackInt8U() === 1;
+        this.game.isPrivate = CommIn.unPackInt8U() === 1;
 
         CommIn.unPackInt8U(); // abTestBucket, unused
-
-        // console.log('Successfully joined game.');
 
         this.state.joinedGame = true;
         this.lastDeathTime = Date.now();
@@ -1393,9 +1399,9 @@ export class Bot {
         if (this.intents.includes(this.Intents.PING)) {
             this.lastPingTime = Date.now();
 
-            const out = CommOut.getBuffer();
-            out.packInt8(CommCode.ping);
-            out.send(this.game.socket);
+            const out2 = CommOut.getBuffer();
+            out2.packInt8(CommCode.ping);
+            out2.send(this.game.socket);
         }
 
         this.emit('gameReady');
@@ -1562,8 +1568,8 @@ export class Bot {
                     break;
 
                 default:
-                    console.error(`handlePacket: I got but did not handle a: ${Object.keys(CommCode).find(k => CommCode[k] === cmd)} ${cmd}`);
-                    if (lastCommand) console.error(`handlePacket: It may be a result of the ${lastCommand} command (${lastCode}).`);
+                    console.error(`processPacket: I got but couldn't identify a: ${Object.keys(CommCode).find(k => CommCode[k] === cmd)} ${cmd}`);
+                    if (lastCommand) console.error(`processPacket: It may be a result of the ${lastCommand} command (${lastCode}).`);
                     abort = true
                     break;
             }
@@ -1577,7 +1583,7 @@ export class Bot {
     }
 
     async checkChiknWinner() {
-        const response = await queryServices({
+        const response = await this.api.queryServices({
             cmd: 'chicknWinnerReady',
             id: this.account.id,
             sessionId: this.account.sessionId
@@ -1600,24 +1606,24 @@ export class Bot {
         if (this.account.cw.atLimit || this.account.cw.limit > ChiknWinnerDailyLimit) return 'hit_daily_limit';
         if ((this.account.cw.canPlayAgain > Date.now()) && doPrematureCooldownCheck) return 'on_cooldown';
 
-        const response = await queryServices({
+        const response = await this.api.queryServices({
             cmd: 'incentivizedVideoReward',
             firebaseId: this.account.firebaseId,
             id: this.account.id,
             sessionId: this.account.sessionId,
             token: null
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         if (typeof response === 'string') return response;
 
         if (response.error) {
-            if (response.error == 'RATELIMITED' || response.error == 'RATELMITED') {
+            if (response.error === 'RATELIMITED' || response.error === 'RATELMITED') {
                 await this.checkChiknWinner();
                 return 'on_cooldown';
-            } else if (response.error == 'SESSION_EXPIRED') {
+            } else if (response.error === 'SESSION_EXPIRED') {
                 return 'session_expired';
             } else {
-                console.error('Unknown Chikn Winner response', response);
+                console.error('Unknown Chikn Winner response, report this on Github:', response);
                 return 'unknown_error';
             }
         }
@@ -1631,7 +1637,7 @@ export class Bot {
             return response.reward;
         }
 
-        console.error('Unknown Chikn Winner response', response);
+        console.error('Unknown Chikn Winner response, report this on Github:', response);
         return 'unknown_error';
     }
 
@@ -1639,7 +1645,7 @@ export class Bot {
         if (this.account.eggBalance < 200) return 'not_enough_eggs';
         if (!this.account.cw.atLimit) return 'not_at_limit';
 
-        const response = await queryServices({
+        const response = await this.api.queryServices({
             cmd: 'chwReset',
             sessionId: this.account.sessionId
         });
@@ -1647,7 +1653,7 @@ export class Bot {
         if (typeof response === 'string') return response;
 
         if (response.result !== 'SUCCESS') {
-            console.error('Unknown Chikn Winner reset response', response);
+            console.error('Unknown Chikn Winner reset response, report this on Github:', response);
             return 'unknown_error';
         }
 
@@ -1658,7 +1664,7 @@ export class Bot {
     }
 
     canSee(target) {
-        if (!this.intents.includes(this.Intents.PATHFINDING)) throw new Error('You must have the PATHFINDING intent to use this method.');
+        if (!this.intents.includes(this.Intents.PATHFINDING)) return this.processError('You must have the PATHFINDING intent to use this method.');
         return this.pathing.nodeList.hasLineOfSight(this.me.position, target.position);
     }
 
@@ -1700,11 +1706,11 @@ export class Bot {
     }
 
     async refreshChallenges() {
-        const result = await queryServices({
+        const result = await this.api.queryServices({
             cmd: 'challengeGetDaily',
             sessionId: this.account.sessionId,
             playerId: this.account.id
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         this.#importChallenges(result);
 
@@ -1712,11 +1718,11 @@ export class Bot {
     }
 
     async rerollChallenge(challengeId) {
-        const result = await queryServices({
+        const result = await this.api.queryServices({
             cmd: 'challengeRerollSlot',
             sessionId: this.account.sessionId,
             slotId: challengeId
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         this.#importChallenges(result);
 
@@ -1724,11 +1730,11 @@ export class Bot {
     }
 
     async claimChallenge(challengeId) {
-        const result = await queryServices({
+        const result = await this.api.queryServices({
             cmd: 'challengeClaimReward',
             sessionId: this.account.sessionId,
             slotId: challengeId
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         this.#importChallenges(result.challenges);
 
@@ -1741,11 +1747,11 @@ export class Bot {
     }
 
     async refreshBalance() {
-        const result = await queryServices({
+        const result = await this.api.queryServices({
             cmd: 'checkBalance',
             firebaseId: this.account.firebaseId,
             sessionId: this.account.sessionId
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         this.account.eggBalance = result.currentBalance;
 
@@ -1753,13 +1759,13 @@ export class Bot {
     }
 
     async redeemCode(code) {
-        const result = await queryServices({
+        const result = await this.api.queryServices({
             cmd: 'redeem',
             firebaseId: this.account.firebaseId,
             sessionId: this.account.sessionId,
             id: this.account.id,
             code
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance = result.eggs_given;
@@ -1774,12 +1780,12 @@ export class Bot {
     }
 
     async claimURLReward(reward) {
-        const result = await queryServices({
+        const result = await this.api.queryServices({
             cmd: 'urlRewardParams',
             firebaseId: this.account.firebaseId,
             sessionId: this.account.sessionId,
             reward
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance += result.eggsGiven;
@@ -1790,12 +1796,12 @@ export class Bot {
     }
 
     async claimSocialReward(rewardTag) {
-        const result = await queryServices({
+        const result = await this.api.queryServices({
             cmd: 'reward',
             firebaseId: this.account.firebaseId,
             sessionId: this.account.sessionId,
             rewardTag
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance += result.eggsGiven;
@@ -1806,13 +1812,13 @@ export class Bot {
     }
 
     async buyItem(itemId) {
-        const result = await queryServices({
+        const result = await this.api.queryServices({
             cmd: 'buy',
             firebaseId: this.account.firebaseId,
             sessionId: this.account.sessionId,
             itemId,
             save: true
-        }, this.proxy, `${this.protocol}://${this.instance}`);
+        });
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance = result.currentBalance;
@@ -1820,6 +1826,12 @@ export class Bot {
         }
 
         return result;
+    }
+
+    processError(error) {
+        if (this.#hooks.error) this.emit('error', error);
+        // eslint-disable-next-line custom/no-throw
+        else throw error;
     }
 
     leave(code = CloseCode.mainMenu) {

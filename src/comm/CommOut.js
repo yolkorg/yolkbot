@@ -3,9 +3,7 @@ import Pool from './Pool.js';
 
 class CommOut {
     static buffer = null;
-    static bufferPool = new Pool(() => {
-        return new OutBuffer(16384);
-    }, 2);
+    static bufferPool = new Pool(() => new OutBuffer(16384), 2);
     static getBuffer() {
         const b2 = this.bufferPool.retrieve();
         b2.idx = 0;

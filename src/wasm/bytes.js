@@ -1,11 +1,7 @@
 /* eslint-disable stylistic/max-len */
 
-function charCodeAt(c) {
-    return c.charCodeAt(0)
-}
-
-function toUint8Array(s) {
-    if (typeof atob === 'function') return new Uint8Array(atob(s).split('').map(charCodeAt))
+const toUint8Array = (s) => {
+    if (typeof atob === 'function') return new Uint8Array(atob(s).split('').map((c) => c.charCodeAt(0)))
     return Buffer.from(s, 'base64')
 }
 

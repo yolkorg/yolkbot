@@ -5,7 +5,7 @@ import path from 'node:path';
 const srcDir = path.join(import.meta.dirname, '..', 'src');
 const distDir = path.join(import.meta.dirname, '..', 'dist');
 
-function copyAndMinify(src, dest) {
+const copyAndMinify = (src, dest) => {
     const stat = fs.statSync(src);
     if (stat.isDirectory()) {
         fs.mkdirSync(dest, { recursive: true });

@@ -1,5 +1,6 @@
-import { GameModes, PlayTypes } from './constants/index.js';
-import yolkws from './socket.js';
+import { API } from './api';
+import { GameModes } from './constants/index';
+import yolkws from './socket';
 
 type MatchmakerParams = {
     instance?: string;
@@ -7,6 +8,7 @@ type MatchmakerParams = {
     proxy?: string;
     sessionId?: string;
     noLogin?: boolean;
+    api?: API;
 };
 
 type Region = {
@@ -17,11 +19,6 @@ type Region = {
 type FindGameParams = {
     region: string;
     mode: keyof typeof GameModes;
-};
-
-type RegionListResponse = {
-    command: 'regionList';
-    regionList: Region[];
 };
 
 export interface RawGameData {
@@ -42,6 +39,8 @@ type CommandSend = {
 export declare class Matchmaker {
     connected: boolean;
     onceConnected: Function[];
+
+    api: API;
 
     proxy: string | null;
     sessionId: string;

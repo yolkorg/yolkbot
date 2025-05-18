@@ -1,4 +1,4 @@
-import { loginAnonymously } from './api.js';
+import API from './api.js';
 import { GameModes, PlayTypes, ProxiesEnabled } from './constants/index.js';
 import { validate } from './wasm/wrapper.js';
 
@@ -20,10 +20,13 @@ export class Matchmaker {
         if (!params.instance) params.instance = 'shellshock.io';
         if (!params.protocol) params.protocol = 'wss';
 
-        if (params.sessionId || params.noLogin) this.sessionId = params.sessionId;
-        else this.#createSessionId(params.instance);
+        if (!params.api) this.api = new API({ instance: params.instance, protocol: params.protocol, proxy: params.proxy });
+        else this.api = params.api;
 
-        if (params.proxy && !ProxiesEnabled) throw new Error('proxies do not work and hence are not supported in the browser');
+        if (params.sessionId || params.noLogin) this.sessionId = params.sessionId;
+        else this.#createSessionId();
+
+        if (params.proxy && !ProxiesEnabled) this.#processError('proxies do not work and hence are not supported in the browser');
         else if (params.proxy) this.proxy = params.proxy;
 
         this.#createSocket(params.instance, params.protocol, params.noLogin);
@@ -34,7 +37,7 @@ export class Matchmaker {
             try {
                 this.ws = new yolkws(`${protocol}://${instance}/matchmaker/`, this.proxy);
                 this.ws.onerror = async (e) => {
-                    console.error(e);
+                    this.#processError(e);
                     await new Promise((resolve) => setTimeout(resolve, 100));
                     return await attempt();
                 }
@@ -71,9 +74,9 @@ export class Matchmaker {
         }
     }
 
-    async #createSessionId(instance) {
-        const anonLogin = await loginAnonymously(this.proxy, instance);
-        if (!anonLogin || typeof anonLogin == 'string') this.#emit('authFail', anonLogin);
+    async #createSessionId() {
+        const anonLogin = await this.api.loginAnonymously();
+        if (!anonLogin || typeof anonLogin === 'string') this.#emit('authFail', anonLogin);
 
         this.sessionId = anonLogin.sessionId;
         if (this.connected) this.onceConnected.forEach(func => func());
@@ -96,9 +99,11 @@ export class Matchmaker {
     async getRegions() {
         await this.waitForConnect();
 
+        const that = this;
+
         return new Promise((res) => {
             const listener = (data2) => {
-                if (data2.command == 'regionList') {
+                if (data2.command === 'regionList') {
                     this.regionList = data2.regionList;
                     this.off('msg', listener);
                     res(data2.regionList);
@@ -107,9 +112,7 @@ export class Matchmaker {
 
             this.on('msg', listener);
 
-            this.ws.onerror = (e2) => {
-                throw new Error('failed to get regions', e2);
-            }
+            this.ws.onerror = (e2) => that.#processError('failed to get regions', e2);
 
             this.ws.send(JSON.stringify({ command: 'regionList' }));
         });
@@ -118,18 +121,16 @@ export class Matchmaker {
     async findPublicGame(params = {}) {
         await this.waitForConnect();
 
-        // params.region
-        // params.mode -> params.gameType
-        // params.isPublic -> params.playType
-        if (!params.region) throw new Error('did not specify a region in findGame, use <Matchmaker>.getRegions() for a list')
+        if (!params.region && !this.regionList)
+            return this.#processError('pass a region to createPrivateGame or call getRegions() for a random one');
 
-        if (this.regionList) {
-            const region = this.regionList.find(r => r.id == params.region);
-            if (!region) throw new Error('did not find region in regionList, if you are attempting to force a region, avoid calling getRegions()')
-        } // else { console.log('regionList not found, not validating findGame region, use <Matchmaker>.regionList() to check region') }
+        if (!params.region) opts.region = this.getRandomRegion();
 
-        if (!params.mode) throw new Error('did not specify a mode in findGame')
-        if (GameModes[params.mode] === undefined) throw new Error('invalid mode in findGame, see GameModes for a list')
+        if (this.regionList && !this.regionList.find(r => r.id === params.region))
+            return this.#processError('did not find region in regionList');
+
+        if (!params.mode) return this.#processError('pass a mode to findPublicGame')
+        if (!GameModes[params.mode]) return this.#processError('invalid mode passed to findPublicGame, see GameModes for a list')
 
         return new Promise((res) => {
             const opts = {
@@ -141,7 +142,7 @@ export class Matchmaker {
             };
 
             const listener = (data2) => {
-                if (data2.command == 'gameFound') {
+                if (data2.command === 'gameFound') {
                     this.off('msg', listener);
                     res(data2);
                 }
@@ -154,10 +155,8 @@ export class Matchmaker {
     }
 
     getRandomRegion() {
-        if (!this.regionList) {
-            throw new Error('called getRandomRegion() without region list cached, use <Matchmaker>.getRegions() before getRandomRegion()');
-        }
-        return this.regionList[Math.floor(Math.random() * this.regionList.length)].id;
+        if (!this.regionList) this.#processError('use <Matchmaker>.getRegions() before getRandomRegion()');
+        else return this.regionList[Math.floor(Math.random() * this.regionList.length)].id;
     }
 
     getRandomGameMode() {
@@ -205,6 +204,12 @@ export class Matchmaker {
             this.onceListeners.get(event).forEach(func => func(...args));
             this.onceListeners.delete(event);
         }
+    }
+
+    #processError(error) {
+        if (this.onListeners.has('error')) this.#emit('error', error);
+        // eslint-disable-next-line custom/no-throw
+        else throw error;
     }
 }
 

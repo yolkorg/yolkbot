@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "1.0.6",
+    "version": "0.0.0-11",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -85,6 +85,10 @@
         "./dispatch/*.js": {
             "import": "./dist/dispatches/*.js",
             "types": "./dist/types/dispatches/*.d.ts"
+        },
+        "./wasm": {
+            "import": "./dist/wasm/wrapper.js",
+            "types": "./dist/types/wasm/wrapper.d.ts"
         }
     },
     "dependencies": {
@@ -93,10 +97,9 @@
         "ws": "^8.18.2"
     },
     "devDependencies": {
-        "@eslint/js": "^9.26.0",
         "@stylistic/eslint-plugin": "^4.2.0",
         "esbuild": "^0.25.4",
-        "eslint": "^9.26.0",
+        "eslint": "^9.27.0",
         "globals": "^15.15.0"
     }
 }
