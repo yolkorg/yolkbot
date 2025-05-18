@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+    echo "Error: No file specified"
+    echo "Usage: $0 <file.wasm>"
+    exit 1
+fi
+
+file="$1"
+
+if [ ! -f "$file" ]; then
+    echo "Error: File '$file' does not exist"
+    exit 1
+fi
+
+if [[ "$file" != *.wasm ]]; then
+    echo "Error: File '$file' is not a .wasm file"
+    exit 1
+fi
+
+base64 -i "$file" -o bytes.txt
+
+echo "WASM encoded, you can now replace the base64 string in src/wasm/bytes.js with the one in bytes.txt"

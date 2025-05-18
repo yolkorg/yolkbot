@@ -5,10 +5,11 @@ node_modules
 *.lock
 package-lock.json
 
-# packaging
+# output
 build
 dist
 .env
+bytes.txt
 
 # mac cache
 .DS_Store

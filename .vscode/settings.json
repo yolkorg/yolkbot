@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "**/alpha": "shellscript",
+        "**/bytes": "shellscript",
         "**/prod": "shellscript",
         "**/test": "shellscript"
     }
