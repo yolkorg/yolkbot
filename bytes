@@ -18,6 +18,14 @@ if [[ "$file" != *.wasm ]]; then
     exit 1
 fi
 
-base64 -i "$file" -o bytes.txt
+os="$(uname)"
+
+if [ "$os" = "Linux" ]; then
+    base64 "$file" > bytes.txt
+elif [ "$os" = "Darwin" ]; then
+    base64 -i "$file" -o bytes.txt
+else
+    echo "Could not identify OS \"$os\""
+fi
 
 echo "WASM encoded, you can now replace the base64 string in src/wasm/bytes.js with the one in bytes.txt"
