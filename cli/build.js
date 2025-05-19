@@ -5,7 +5,7 @@ import path from 'node:path';
 const srcDir = path.join(import.meta.dirname, '..', 'src');
 const distDir = path.join(import.meta.dirname, '..', 'dist');
 
-const copyAndMinify = (src, dest) => {
+const copyAndMinify = async (src, dest) => {
     const stat = fs.statSync(src);
     if (stat.isDirectory()) {
         fs.mkdirSync(dest, { recursive: true });
@@ -14,14 +14,17 @@ const copyAndMinify = (src, dest) => {
     } else if (src.endsWith('.js')) {
         const code = fs.readFileSync(src, 'utf8');
 
-        if (!src.includes('findItemById')) esbuild.transform(code, {
-            minify: process.argv[2] !== '--no-minify',
-            loader: 'js',
-            format: 'esm',
-            target: 'esnext',
-            banner: '/* eslint-disable */\n'
-        }).then(result => fs.writeFileSync(dest, result.code));
-        else fs.cpSync(src, dest);
+        if (!src.includes('findItemById')) {
+            const esmResult = await esbuild.transform(code, {
+                minify: process.argv[2] !== '--no-minify',
+                loader: 'js',
+                format: 'esm',
+                target: 'esnext',
+                banner: '/* eslint-disable */\n'
+            });
+
+            fs.writeFileSync(dest, esmResult.code);
+        } else fs.cpSync(src, dest);
     } else fs.copyFileSync(src, dest);
 }
 

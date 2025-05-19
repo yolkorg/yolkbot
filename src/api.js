@@ -15,7 +15,7 @@ export class API {
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
 
-        this.httpProxy = params.httpProxy || params.proxy?.replace(/socks([4|5|4a|5h]+):\/\//g, 'https') || '';
+        this.httpProxy = params.httpProxy || params.proxy?.replace(/socks([4|5|4a|5h]+):\/\//g, 'https://') || '';
         this.socksProxy = params.proxy;
 
         this.maxRetries = params.maxRetries || 5;
@@ -27,7 +27,7 @@ export class API {
 
         const attempt = async () => {
             try {
-                ws = new yolkws(`${protocol}://${instance}/services/`, this.socksProxy);
+                ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.socksProxy);
                 ws.onerror = async (e) => {
                     tries++;
                     console.error(e);
@@ -105,7 +105,7 @@ export class API {
                 console.error('loginWithCredentials: Error:', error.response?.data || error);
                 return 'firebase_bad_request';
             } else {
-                console.error('loginWithCredentials: Error:', email, password);
+                console.error('loginWithCredentials: Error:', email, password, error);
                 return 'firebase_unknown_error';
             }
         }
