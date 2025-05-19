@@ -10,7 +10,7 @@ npm pack --pack-destination ./build/
 
 mv build/yolkbot-${version}.tgz build/yolkbot-${buildId}.tgz
 
-cd ../yolkdev || exit 1
+cd ../yolklab || exit 1
 
 bun rm yolkbot
 bun i file:../yolkbot/build/yolkbot-${buildId}.tgz
