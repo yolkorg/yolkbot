@@ -1,26 +1,20 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable camelcase */
 /* eslint-disable no-empty-function */
-/* eslint-disable no-undefined */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable stylistic/max-len */
 
 // thx to https://github.com/zastlx/shell-wasm-node <3
 // zastix is very amazing <3
 
 import { getWasm } from './wrapper.js';
-import { addToExternrefTable, passStringToWasm, getStringFromWasm } from './utils.js';
+import { addToExternrefTable, passStringToWasm } from './utils.js';
 
 const mockWindow = {
-    queueMicrotask: (fn) => {
-        // fn();
-    },
+    queueMicrotask: () => {},
     document: {
         body: {},
         currentScript: {}
     }
 }
-
 
 const element = {
     textContent: ''
@@ -55,7 +49,7 @@ export const imports = {
             // console.log('__wbg_get_e27dfaeb6f46bd45');
             return new Proxy({}, {
                 get: (target, prop) => {
-                    if (prop.toString().includes('toPrim')) {  // Symbol.toPrimitive
+                    if (prop.toString().includes('toPrim')) { // Symbol.toPrimitive
                         return (hint) => {
                             if (hint === 'number') return 1; // magic number seems to be required
                         }
@@ -79,7 +73,7 @@ export const imports = {
             // console.log('__wbg_instanceof_Window_def73ea0955fc569');
             return true;
         },
-        __wbg_length_49b2ba67f0897e97: (...args) => {
+        __wbg_length_49b2ba67f0897e97: () => {
             // console.log('__wbg_length_49b2ba67f0897e97', args);
             return 1; // have the loop fire the least amount of times as possible for best efficiency
         },
@@ -90,8 +84,8 @@ export const imports = {
             // console.log('__wbg_now_807e54c39636c349');
             return Date.now();
         },
-        __wbg_querySelectorAll_40998fd748f057ef: (...args) => {
-            const query = getStringFromWasm(args[1], args[2]);
+        __wbg_querySelectorAll_40998fd748f057ef: () => {
+            // const query = getStringFromWasm(args[1], args[2]);
             // console.log(`__wbg_querySelectorAll_40998fd748f057ef called with ${query}`);
             return [{}]
         },
@@ -111,7 +105,7 @@ export const imports = {
         __wbg_static_accessor_WINDOW_5de37043a91a9c40: () => {
             // console.trace('__wbg_static_accessor_WINDOW_5de37043a91a9c40', args);
         },
-        __wbg_textContent_215d0f87d539368a: (outPtr, targetElement) => {
+        __wbg_textContent_215d0f87d539368a: (outPtr) => {
             // console.log('__wbg_textContent_215d0f87d539368a', outPtr);
             const [ptr, len] = passStringToWasm('Shell Shockers and our partners');
 
