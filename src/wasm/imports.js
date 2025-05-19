@@ -1,12 +1,11 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable camelcase */
-/* eslint-disable no-empty-function */
 
 // thx to https://github.com/zastlx/shell-wasm-node <3
 // zastix is very amazing <3
 
 import { jsResolve } from './wrapper.js';
-import { addToExternrefTable, getStringFromWasm, passStringToWasm } from './utils.js';
+import { addToExternrefTable, getStringFromWasm } from './utils.js';
 
 const mockWindow = {
     document: {
