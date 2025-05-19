@@ -10,6 +10,22 @@ const exports = wasm.instance.exports;
 
 export const getWasm = () => exports;
 
+export let jsResolve;
+const process = async (str) => {
+    const promise = new Promise((resolve) => {
+        const r2 = (...args) => {
+            console.log('r2', args);
+            resolve(...args);
+        }
+        jsResolve = r2;
+    });
+
+    const [ptr, len] = passStringToWasm(str);
+    exports.process(ptr, len);
+
+    return promise;
+}
+
 const validate = (input) => {
     let retPtr;
     let retLen;
@@ -26,4 +42,4 @@ const validate = (input) => {
     }
 }
 
-export { validate };
+export { process, validate };

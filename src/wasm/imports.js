@@ -5,8 +5,8 @@
 // thx to https://github.com/zastlx/shell-wasm-node <3
 // zastix is very amazing <3
 
-import { getWasm } from './wrapper.js';
-import { addToExternrefTable, passStringToWasm } from './utils.js';
+import { getWasm, jsResolve } from './wrapper.js';
+import { addToExternrefTable, getStringFromWasm, passStringToWasm } from './utils.js';
 
 const mockWindow = {
     queueMicrotask: () => {},
@@ -89,8 +89,10 @@ export const imports = {
             // console.log(`__wbg_querySelectorAll_40998fd748f057ef called with ${query}`);
             return [{}]
         },
-        __wbg_settextContent_d29397f7b994d314: async () => {
+        __wbg_settextContent_d29397f7b994d314: async (...args) => {
             // console.log('__wbg_settextContent_d29397f7b994d314');
+            element.textContent = getStringFromWasm(args[1], args[2]);
+            jsResolve?.(element.textContent);
         },
         __wbg_static_accessor_GLOBAL_88a902d13a557d07: () => {
             // console.trace('__wbg_static_accessor_GLOBAL_88a902d13a557d07', args);
