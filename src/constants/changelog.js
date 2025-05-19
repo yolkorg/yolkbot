@@ -1,7 +1,7 @@
 /* eslint-disable */
 export const Changelog = [
     {
-        "version": "1.0.1",
+        "version": "1.0.2",
         "date": "May 1 2025",
         "content": [
             "Lock in & look out eggventurers, it's time for the Leggacy of the Sun update!",
