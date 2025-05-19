@@ -9,7 +9,7 @@ import { getWasm, jsResolve } from './wrapper.js';
 import { addToExternrefTable, getStringFromWasm, passStringToWasm } from './utils.js';
 
 const mockWindow = {
-    queueMicrotask: () => {},
+    queueMicrotask: () => { },
     document: {
         body: {},
         currentScript: {}
@@ -107,9 +107,9 @@ export const imports = {
         __wbg_static_accessor_WINDOW_5de37043a91a9c40: () => {
             // console.trace('__wbg_static_accessor_WINDOW_5de37043a91a9c40', args);
         },
-        __wbg_textContent_215d0f87d539368a: (outPtr) => {
+        __wbg_textContent_215d0f87d539368a: (outPtr, elm) => {
             // console.log('__wbg_textContent_215d0f87d539368a', outPtr);
-            const [ptr, len] = passStringToWasm('Shell Shockers and our partners');
+            const [ptr, len] = passStringToWasm(elm === element ? element.textContent : 'Shell Shockers and our partners');
 
             const dv = new DataView(getWasm().memory.buffer);
             dv.setInt32(outPtr + 4 * 1, len, true);
