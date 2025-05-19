@@ -13,11 +13,7 @@ export const getWasm = () => exports;
 export let jsResolve;
 const process = async (str) => {
     const promise = new Promise((resolve) => {
-        const r2 = (...args) => {
-            console.log('r2', args);
-            resolve(...args);
-        }
-        jsResolve = r2;
+        jsResolve = resolve;
     });
 
     const [ptr, len] = passStringToWasm(str);
