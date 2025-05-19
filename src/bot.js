@@ -418,6 +418,13 @@ export class Bot {
         });
     }
 
+    async findPublicGame(opts) {
+        if (!this.matchmaker) this.initMatchmaker();
+        if (!this.matchmaker) return false;
+
+        return await this.matchmaker.findPublicGame(opts);
+    }
+
     // region - a region id ('useast', 'germany', etc)
     // mode - a mode name that corresponds to a GameMode id
     // map - the name of a map
@@ -430,7 +437,7 @@ export class Bot {
         if (!opts.region) opts.region = this.matchmaker.getRandomRegion();
 
         if (!opts.mode) return this.processError('pass a mode to createPrivateGame')
-        if (!GameModes[opts.mode]) return this.processError('invalid mode passed to createPrivateGame, see GameModes for a list')
+        if (typeof GameModes[opts.mode] !== 'number') return this.processError('invalid mode passed to createPrivateGame, see GameModes for a list')
 
         if (!opts.map) opts.map = Maps[Maps.length * Math.random() | 0].name;
 
