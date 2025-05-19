@@ -130,7 +130,7 @@ export class Matchmaker {
             return this.#processError('did not find region in regionList');
 
         if (!params.mode) return this.#processError('pass a mode to findPublicGame')
-        if (!GameModes[params.mode]) return this.#processError('invalid mode passed to findPublicGame, see GameModes for a list')
+        if (typeof GameModes[params.mode] !== 'number') return this.#processError('invalid mode passed to findPublicGame, see GameModes for a list')
 
         return new Promise((res) => {
             const opts = {
