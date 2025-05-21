@@ -1,6 +1,6 @@
 import Bot from '../bot';
 
-type Changes = {
+export interface Changes {
     classIdx?: number;
     hatId?: number;
     stampId?: number;
@@ -11,7 +11,7 @@ type Changes = {
     secondaryId?: number[];
 }
 
-type Opts = {
+export interface Opts {
     gunId?: number;
     hatId?: number;
     stampId?: number;

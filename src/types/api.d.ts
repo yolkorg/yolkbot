@@ -32,4 +32,5 @@ export class API {
     loginWithRefreshToken(refreshToken: string): Promise<QueryResponse | string>;
     loginAnonymously(): Promise<QueryResponse | string>;
     createAccount(email: string, password: string): Promise<QueryResponse | string>;
+    sendEmailVerification(idToken?: string): Promise<string>;
 }

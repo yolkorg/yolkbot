@@ -2,7 +2,7 @@ import { API } from './api';
 import { GameModes } from './constants/index';
 import yolkws from './socket';
 
-type MatchmakerParams = {
+interface MatchmakerParams {
     instance?: string;
     protocol?: string;
     proxy?: string;
@@ -11,12 +11,12 @@ type MatchmakerParams = {
     api?: API;
 };
 
-type Region = {
+export interface Region {
     id: string;
     name: string;
 };
 
-type FindGameParams = {
+export interface FindGameParams {
     region: string;
     mode: keyof typeof GameModes;
 };
@@ -31,7 +31,7 @@ export interface RawGameData {
     noobLobby: boolean;
 }
 
-type CommandSend = {
+export interface MatchmakerCommand {
     command: string;
     [key: string]: any;
 }
@@ -52,7 +52,7 @@ export declare class Matchmaker {
 
     constructor(params?: MatchmakerParams);
 
-    send(msg: CommandSend): void;
+    send(msg: MatchmakerCommand): void;
 
     getRegions(): Promise<Region[]>;
     findPublicGame(params: FindGameParams): Promise<RawGameData>;

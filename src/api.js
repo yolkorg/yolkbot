@@ -110,11 +110,15 @@ export class API {
             }
         }
 
-        if (firebaseToken) return await this.queryServices({ cmd: 'auth', firebaseToken });
-        else {
+        if (!firebaseToken) {
             console.error('loginWithCredentials: the game sent no idToken', body);
             return 'firebase_no_token';
         }
+
+        this.idToken = firebaseToken;
+
+        const servicesQuery = await this.queryServices({ cmd: 'auth', firebaseToken });
+        return { firebase: body, ...servicesQuery };
     }
 
     createAccount = async (email, password) =>
@@ -162,8 +166,10 @@ export class API {
             return 'firebase_no_token';
         }
 
+        this.idToken = token;
+
         const response = await this.queryServices({ cmd: 'auth', firebaseToken: token });
-        return response;
+        return { firebase: body, ...response };
     }
 
     loginAnonymously = async () => {
@@ -180,11 +186,39 @@ export class API {
         const body = await req.json();
         const firebaseToken = body.idToken;
 
-        if (firebaseToken) return await this.queryServices({ cmd: 'auth', firebaseToken });
-        else {
+        if (!firebaseToken) {
             console.error('loginAnonymously: the game sent no idToken', body);
             return 'firebase_no_token';
         }
+
+        this.idToken = firebaseToken;
+
+        const query = await this.queryServices({ cmd: 'auth', firebaseToken });
+        return { firebase: body, ...query };
+    }
+
+    sendEmailVerification = async (idToken = this.idToken) => {
+        const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FirebaseKey, {
+            method: 'POST',
+            body: JSON.stringify({
+                requestType: 'VERIFY_EMAIL',
+                idToken
+            }),
+            headers: {
+                ...baseHeaders,
+                'content-type': 'application/json'
+            },
+            dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
+        });
+
+        const body = await req.json();
+
+        if (body.kind !== 'identitytoolkit#GetOobConfirmationCodeResponse') {
+            console.error('sendEmailVerification: the game sent an invalid response', body);
+            return 'firebase_invalid_response';
+        }
+
+        return body.email;
     }
 }
 
