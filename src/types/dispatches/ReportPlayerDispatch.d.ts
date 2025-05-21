@@ -1,6 +1,6 @@
 import Bot from '../bot';
 
-type CheatingReasons = {
+export interface CheatingReasons {
     cheating?: boolean;
     harassment?: boolean;
     offensive?: boolean;

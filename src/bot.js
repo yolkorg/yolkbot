@@ -390,6 +390,8 @@ export class Bot {
     async #joinGameWithCode(code) {
         if (!await this.initMatchmaker()) return false;
 
+        await this.matchmaker.waitForConnect();
+
         return await new Promise((resolve) => {
             const listener = (mes) => {
                 if (mes.command === 'gameFound') {
@@ -444,17 +446,15 @@ export class Bot {
         const map = Maps.find(m => m.name.toLowerCase() === opts.map.toLowerCase());
         const mapIdx = Maps.indexOf(map);
 
-        if (mapIdx === -1) return this.processError('invalid map, see the Maps constant for a list')
+        if (mapIdx === -1) return this.processError('invalid map, see the Maps constant for a list');
 
-        await new Promise((resolve) => {
+        await this.matchmaker.waitForConnect();
+
+        const game = await new Promise((resolve) => {
             const listener = (msg) => {
                 if (msg.command === 'gameFound') {
                     this.matchmaker.off('msg', listener);
-
-                    this.game.raw = msg;
-                    this.game.code = this.game.raw.id;
-
-                    resolve();
+                    resolve(msg);
                 }
             };
 
@@ -471,7 +471,7 @@ export class Bot {
             });
         });
 
-        return this.game.raw;
+        return game;
     }
 
     async join(name, data) {
@@ -1176,7 +1176,7 @@ export class Bot {
             out.packInt8(CommCode.ping);
             out.send(this.game.socket);
             this.lastPingTime = Date.now();
-        }, this.pingInterval);
+        }, 1000);
     }
 
     #processSwitchTeamPacket() {
@@ -1398,8 +1398,6 @@ export class Bot {
         const out = CommOut.getBuffer();
         out.packInt8(CommCode.clientReady);
         out.send(this.game.socket);
-
-        this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
         this.updateIntervalId = setInterval(() => this.update(), 100 / 3);
 
