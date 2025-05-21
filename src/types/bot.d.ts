@@ -19,7 +19,7 @@ import { Map } from './constants/maps';
 import { ADispatch } from './dispatches/index';
 import { NodeList } from './pathing/mapnode';
 import { API } from './api';
-import { Matchmaker, RawGameData } from './matchmaker';
+import { FindGameParams, Matchmaker, RawGameData } from './matchmaker';
 import yolkws from './socket';
 
 export interface BotParams {
@@ -278,6 +278,7 @@ export class Bot {
 
     initMatchmaker(): Promise<boolean>;
     createPrivateGame(opts: { region: string; mode: string; map: string }): Promise<RawGameData>;
+    findPublicGame(params: FindGameParams): Promise<RawGameData>;
     join(botName: string, data: string | RawGameData): Promise<void>;
 
     processPacket(data: number[]): void;
@@ -322,13 +323,13 @@ export class Bot {
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
     on(event: 'quit', cb: () => void): void;
-    on(event: 'rocketHit', cb: (pos: Position, damage: number, radius: number) => void): void;
-    on(event: 'selfDamaged', cb: (oldHp: number, newHp: number) => void): void;
-    on(event: 'selfMoved', cb: (oldPos: Position, newPos: Position) => void): void;
+    on(event: 'rocketHit', cb: (pos: Position, damage: number, blastRadius: number) => void): void;
+    on(event: 'selfDamaged', cb: (oldHealth: number, newHealth: number) => void): void;
+    on(event: 'selfMoved', cb: (oldPosition: Position, newPosition: Position) => void): void;
     on(event: 'selfRespawnFail', cb: () => void): void;
-    on(event: 'selfShieldHit', cb: (oldShield: number, newShield: number) => void): void;
+    on(event: 'selfShieldHit', cb: (oldShieldHealth: number, newShieldHealth: number) => void): void;
     on(event: 'selfShieldLost', cb: () => void): void;
-    on(event: 'spawnItem', cb: (type: number, itemId: number, pos: Position) => void): void;
+    on(event: 'spawnItem', cb: (itemType: number, uniqueItemId: number, itemPosition: Position) => void): void;
     on(event: 'tick', cb: () => void): void;
 
     checkChiknWinner(): Promise<ChiknWinnerStatus>;
