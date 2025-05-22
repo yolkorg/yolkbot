@@ -690,7 +690,7 @@ export const HousePromo = {
     ],
     "houseAdPercentChance": 100,
     "specialItemsTag": "May25",
-    "featuredSocialMedia": "Twitter",
+    "featuredSocialMedia": "Instagram",
     "premFeatured": "premFeatOne",
     "smHouseAds": [
         {
