@@ -8,6 +8,8 @@ export class Matchmaker {
     connected = false;
     onceConnected = [];
 
+    regionList = [];
+
     proxy = null;
     sessionId = '';
 
@@ -67,10 +69,8 @@ export class Matchmaker {
         }
 
         this.ws.onclose = () => {
-            if (this.#forceClose) return;
-
             this.connected = false;
-            this.#createSocket(instance);
+            if (!this.#forceClose) this.#createSocket(instance);
         }
     }
 
@@ -121,12 +121,12 @@ export class Matchmaker {
     async findPublicGame(params = {}) {
         await this.waitForConnect();
 
-        if (!params.region && !this.regionList)
+        if (!params.region && !this.regionList && !this.regionList.length)
             return this.#processError('pass a region to createPrivateGame or call getRegions() for a random one');
 
         if (!params.region) opts.region = this.getRandomRegion();
 
-        if (this.regionList && !this.regionList.find(r => r.id === params.region))
+        if (this.regionList.length && !this.regionList.find(r => r.id === params.region))
             return this.#processError('did not find region in regionList');
 
         if (!params.mode) return this.#processError('pass a mode to findPublicGame')
@@ -155,7 +155,7 @@ export class Matchmaker {
     }
 
     getRandomRegion() {
-        if (!this.regionList) this.#processError('use <Matchmaker>.getRegions() before getRandomRegion()');
+        if (!this.regionList && !this.regionList.length) this.#processError('use <Matchmaker>.getRegions() before getRandomRegion()');
         else return this.regionList[Math.floor(Math.random() * this.regionList.length)].id;
     }
 
@@ -166,6 +166,7 @@ export class Matchmaker {
 
     close() {
         this.#forceClose = true;
+        this.connected = false;
         this.ws.close();
     }
 

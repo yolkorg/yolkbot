@@ -47,7 +47,7 @@ export declare class Matchmaker {
     onListeners: Map<string, Function[]>;
     onceListeners: Map<string, Function[]>;
 
-    regionList: Region[] | null;
+    regionList: Region[];
     ws: yolkws;
 
     constructor(params?: MatchmakerParams);

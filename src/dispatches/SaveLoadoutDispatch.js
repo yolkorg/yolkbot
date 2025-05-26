@@ -91,7 +91,7 @@ export class SaveLoadoutDispatch {
         bot.account.loadout = loadout;
 
         if (bot.me) saveLoadout.then(() => {
-            if (bot.state.joinedGame) {
+            if (bot.state.inGame) {
                 const out = CommOut.getBuffer();
                 out.packInt8(CommCode.changeCharacter);
                 out.packInt8(this.changes?.classIdx || bot.me.selectedGun);

@@ -23,6 +23,7 @@ export class API {
     socksProxy: string;
 
     maxRetries: number;
+    suppressErrors: boolean;
 
     constructor(params?: APIParams);
 
