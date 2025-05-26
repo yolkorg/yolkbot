@@ -19,6 +19,7 @@ export class API {
         this.socksProxy = params.proxy;
 
         this.maxRetries = params.maxRetries || 5;
+        this.suppressErrors = params.suppressErrors || false;
     }
 
     queryServices = async (request) => {
@@ -58,8 +59,10 @@ export class API {
                     const resp = JSON.parse(mes.data);
                     resolve(resp);
                 } catch {
-                    console.error('queryServices: Bad API JSON response with call: ' + request.cmd + ' and data:', JSON.stringify(request));
-                    console.error('queryServices: Full data sent: ', JSON.stringify(request));
+                    if (!this.suppressErrors) {
+                        console.error('queryServices: Bad API JSON response with call: ' + request.cmd + ' and data:', JSON.stringify(request));
+                        console.error('queryServices: Full data sent: ', JSON.stringify(request));
+                    }
 
                     resolve('bad_json');
                 }
@@ -96,22 +99,22 @@ export class API {
             firebaseToken = body.idToken;
         } catch (error) {
             if (error.code === 'auth/network-request-failed') {
-                console.error('loginWithCredentials: Network req failed (auth/network-request-failed)');
+                if (!this.suppressErrors) console.error('loginWithCredentials: Network req failed (auth/network-request-failed)');
                 return 'firebase_network_failed';
             } else if (error.code === 'auth/missing-email') {
                 return 'firebase_no_credentials';
             } else if (error.code === 'ERR_BAD_REQUEST') {
-                console.error('loginWithCredentials: Error:', email, password);
-                console.error('loginWithCredentials: Error:', error.response?.data || error);
+                if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password);
+                if (!this.suppressErrors) console.error('loginWithCredentials: Error:', error.response?.data || error);
                 return 'firebase_bad_request';
             } else {
-                console.error('loginWithCredentials: Error:', email, password, error);
+                if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password, error);
                 return 'firebase_unknown_error';
             }
         }
 
         if (!firebaseToken) {
-            console.error('loginWithCredentials: the game sent no idToken', body);
+            if (!this.suppressErrors) console.error('loginWithCredentials: the game sent no idToken', body);
             return 'firebase_no_token';
         }
 
@@ -151,18 +154,18 @@ export class API {
             token = body.id_token;
         } catch (error) {
             if (error.code === 'auth/network-request-failed') {
-                console.error('loginWithRefreshToken: Network req failed (auth/network-request-failed)');
+                if (!this.suppressErrors) console.error('loginWithRefreshToken: Network req failed (auth/network-request-failed)');
                 return 'firebase_network_failed';
             } else if (error.code === 'auth/missing-email') {
                 return 'firebase_no_credentials';
             } else {
-                console.error('loginWithRefreshToken: Error:', error, refreshToken);
+                if (!this.suppressErrors) console.error('loginWithRefreshToken: Error:', error, refreshToken);
                 return 'firebase_unknown_error';
             }
         }
 
         if (!token) {
-            console.error('loginWithRefreshToken: the game sent no idToken', body);
+            if (!this.suppressErrors) console.error('loginWithRefreshToken: the game sent no idToken', body);
             return 'firebase_no_token';
         }
 
@@ -187,7 +190,7 @@ export class API {
         const firebaseToken = body.idToken;
 
         if (!firebaseToken) {
-            console.error('loginAnonymously: the game sent no idToken', body);
+            if (!this.suppressErrors) console.error('loginAnonymously: the game sent no idToken', body);
             return 'firebase_no_token';
         }
 
@@ -214,7 +217,7 @@ export class API {
         const body = await req.json();
 
         if (body.kind !== 'identitytoolkit#GetOobConfirmationCodeResponse') {
-            console.error('sendEmailVerification: the game sent an invalid response', body);
+            if (!this.suppressErrors) console.error('sendEmailVerification: the game sent an invalid response', body);
             return 'firebase_invalid_response';
         }
 

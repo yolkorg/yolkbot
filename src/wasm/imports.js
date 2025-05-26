@@ -4,7 +4,7 @@
 // thx to https://github.com/zastlx/shell-wasm-node <3
 // zastix is very amazing <3
 
-import { jsResolve } from './wrapper.js';
+import { jsResolve, dateToUse } from './wrapper.js';
 import { addToExternrefTable, getStringFromWasm } from './utils.js';
 
 const mockWindow = {
@@ -48,7 +48,7 @@ export const imports = {
         },
         __wbg_now_807e54c39636c349: () => {
             // console.log('__wbg_now_807e54c39636c349');
-            return Date.now();
+            return dateToUse || Date.now();
         },
         __wbg_settextContent_d29397f7b994d314: async (...args) => {
             // console.log('__wbg_settextContent_d29397f7b994d314');

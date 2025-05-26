@@ -16,6 +16,7 @@ import { Character, GamePlayer, Position } from './bot/GamePlayer';
 import { Challenge } from './constants/challenges';
 import { AnyGun } from './constants/guns';
 import { Map } from './constants/maps';
+import { Item } from './constants/items';
 import { ADispatch } from './dispatches/index';
 import { NodeList } from './pathing/mapnode';
 import { API } from './api';
@@ -228,6 +229,7 @@ export interface BufferFrame {
 export interface BotState {
     name: string;
     weaponIdx: number;
+    inGame: boolean;
     reloading: boolean;
     swappingGun: boolean;
     usingMelee: boolean;
@@ -295,6 +297,7 @@ export class Bot {
     on(event: 'authSuccess', cb: (account: Account) => void): void;
     on(event: 'balanceUpdate', cb: (oldBalance: number, newBalance: number) => void): void;
     on(event: 'banned', cb: (banRemaining: string) => void): void;
+    on(event: 'botJoined', cb: (botPlayer: GamePlayer) => void): void;
     on(event: 'chat', cb: (player: GamePlayer | undefined, message: string, flags: number) => void): void;
     on(event: 'close', cb: (code: number) => void): void;
     on(event: 'collectAmmo', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
@@ -305,7 +308,7 @@ export class Bot {
     on(event: 'gameReset', cb: () => void): void;
     on(event: 'gameStateChange', cb: (oldState: Game, newState: Game) => void): void;
     on(event: 'grenadeExploded', cb: (item: Item | number, pos: Position, damage: number, radius: number) => void): void;
-    on(event: 'leave', cb: () => void): void;
+    on(event: 'leave', cb: (closeCode: number) => void): void;
     on(event: 'packet', cb: (packet: ArrayBuffer) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streak: number) => void): void;
