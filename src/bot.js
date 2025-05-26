@@ -32,6 +32,7 @@ import MovementDispatch from './dispatches/MovementDispatch.js';
 
 import { NodeList } from './pathing/mapnode.js';
 
+import { coords } from './wasm/wrapper.js';
 import { fetchMap, initKotcZones } from './util.js';
 
 import { Challenges } from './constants/challenges.js';
@@ -612,8 +613,13 @@ export class Bot {
 
                     out.packInt8(this.state.buffer[idxOnFrame]?.controlKeys || 0);
                     out.packInt8(this.state.buffer[idxOnFrame]?.shotsFired || 0);
-                    out.packRadU(this.state.buffer[idxOnFrame]?.yaw || this.me.view.yaw);
-                    out.packRad(this.state.buffer[idxOnFrame]?.pitch || this.me.view.pitch);
+
+                    const targetYaw = this.state.buffer[idxOnFrame]?.yaw || this.me.view.yaw;
+                    const targetPitch = this.state.buffer[idxOnFrame]?.pitch || this.me.view.pitch;
+                    const resultingCoords = coords(targetYaw, targetPitch);
+
+                    out.packString(resultingCoords); // coords from the wasm :100:
+
                     out.packInt8(100); // fixes commcode issues, supposed to be scale or smth
                 }
 
@@ -790,11 +796,15 @@ export class Bot {
             CommIn.unPackInt8U();
         }
 
+        CommIn.unPackInt8U(); // last control keys
+
         const yaw = CommIn.unPackRadU();
         player.view.yaw = yaw;
 
         const pitch = CommIn.unPackRad();
         player.view.pitch = pitch;
+
+        CommIn.unPackInt8U();
 
         if (player.position.x !== x) player.position.x = x;
         if (player.position.z !== z) player.position.z = z;
@@ -981,7 +991,7 @@ export class Bot {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
 
-            const coords = {
+            const spatulaCoords = {
                 x: CommIn.unPackFloat(),
                 y: CommIn.unPackFloat(),
                 z: CommIn.unPackFloat()
@@ -990,7 +1000,7 @@ export class Bot {
             const controlledBy = CommIn.unPackInt8U();
             const controlledByTeam = CommIn.unPackInt8U();
 
-            this.game.spatula = { coords, controlledBy, controlledByTeam };
+            this.game.spatula = { coords: spatulaCoords, controlledBy, controlledByTeam };
 
             this.emit('gameStateChange', this.game);
         } else if (this.game.gameModeId === GameModes.kotc) {
