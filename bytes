@@ -1,12 +1,11 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-    echo "Error: No file specified"
-    echo "Usage: $0 <file.wasm>"
-    exit 1
-fi
-
 file="$1"
+
+if [ $# -eq 0 ]; then
+    file="./src/wasm/wasm_loader.wasm"
+    echo "No file specified, using default: $file"
+fi
 
 if [ ! -f "$file" ]; then
     echo "Error: File '$file' does not exist"
@@ -28,4 +27,7 @@ else
     echo "Could not identify OS \"$os\""
 fi
 
-echo "WASM encoded, you can now replace the base64 string in src/wasm/bytes.js with the one in bytes.txt"
+bytesContent=$(cat bytes.txt)
+sed -i '' "s|toUint8Array('.*')|toUint8Array('$bytesContent')|g" ./src/wasm/bytes.
+
+echo "Replaced bytes in ./src/wasm/bytes.ts with content from $file"
