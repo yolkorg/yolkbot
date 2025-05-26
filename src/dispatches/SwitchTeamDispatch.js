@@ -3,7 +3,7 @@ import { CommCode } from '../constants/codes.js';
 
 export class SwitchTeamDispatch {
     check(bot) {
-        if (!bot.state.joinedGame || bot.me.playing) return false; // you probably cant change team mid-game
+        if (!bot.state.inGame || bot.me.playing) return false; // you probably cant change team mid-game
         if (bot.game.gameModeId === 0) return false; // ffa
 
         if (bot.game.isPrivate) {

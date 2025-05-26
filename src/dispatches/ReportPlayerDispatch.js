@@ -22,7 +22,7 @@ export class ReportPlayerDispatch {
     }
 
     check(bot) {
-        if (!bot.state.joinedGame) return false;
+        if (!bot.state.inGame) return false;
 
         let target;
 

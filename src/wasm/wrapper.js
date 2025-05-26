@@ -11,7 +11,11 @@ const exports = wasm.instance.exports;
 export const getWasm = () => exports;
 
 export let jsResolve;
-const process = async (str) => {
+export let dateToUse;
+
+const process = async (str, dtu) => {
+    if (dtu) dateToUse = dtu;
+
     const promise = new Promise((resolve) => {
         jsResolve = resolve;
     });

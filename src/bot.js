@@ -88,6 +88,9 @@ export class Bot {
             name: 'yolkbot',
             weaponIdx: 0,
 
+            // wow!
+            inGame: false,
+
             // tracking for dispatch checks
             reloading: false,
             swappingGun: false,
@@ -258,6 +261,8 @@ export class Bot {
             activeNode: null,
             activeNodeIdx: 0
         }
+
+        this.hasQuit = false;
     }
 
     dispatch(dispatch) {
@@ -433,7 +438,7 @@ export class Bot {
     async createPrivateGame(opts = {}) {
         if (!await this.initMatchmaker()) return false;
 
-        if (!opts.region && !this.matchmaker.regionList)
+        if (!opts.region && !this.matchmaker.regionList && !this.matchmaker.regionList.length)
             return this.processError('pass a region to createPrivateGame or call getRegions() for a random one');
 
         if (!opts.region) opts.region = this.matchmaker.getRandomRegion();
@@ -556,7 +561,7 @@ export class Bot {
     }
 
     update() {
-        if (this.state.quit) return;
+        if (this.hasQuit) return;
 
         if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING))
             this.#processPathfinding();
@@ -646,11 +651,12 @@ export class Bot {
     }
 
     off(event, cb) {
-        this.#hooks[event] = this.#hooks[event].filter((hook) => hook !== cb);
+        if (cb) this.#hooks[event] = this.#hooks[event].filter((hook) => hook !== cb);
+        else this.#hooks[event] = [];
     }
 
     emit(event, ...args) {
-        if (this.state.quit) return;
+        if (this.hasQuit) return;
 
         if (this.#hooks[event]) for (const cb of this.#hooks[event]) cb(...args);
         for (const cb of this.#globalHooks) cb(event, ...args);
@@ -720,9 +726,12 @@ export class Bot {
         CommIn.unPackInt8U(); // gametype
 
         if (!this.players[playerData.id]) this.players[playerData.id] = new GamePlayer(playerData);
-        if (this.me.id === playerData.id) this.me = this.players[playerData.id];
-
         this.emit('playerJoin', this.players[playerData.id]);
+
+        if (this.me.id === playerData.id) {
+            this.me = this.players[playerData.id];
+            this.emit('botJoined', this.me);
+        }
     }
 
     #processRespawnPacket() {
@@ -774,6 +783,19 @@ export class Bot {
             return;
         }
 
+        for (let i2 = 0; i2 < FramesBetweenSyncs - 1; i2++) {
+            CommIn.unPackInt8U();
+            CommIn.unPackRadU();
+            CommIn.unPackRad();
+            CommIn.unPackInt8U();
+        }
+
+        const yaw = CommIn.unPackRadU();
+        player.view.yaw = yaw;
+
+        const pitch = CommIn.unPackRad();
+        player.view.pitch = pitch;
+
         if (player.position.x !== x) player.position.x = x;
         if (player.position.z !== z) player.position.z = z;
 
@@ -781,13 +803,6 @@ export class Bot {
             player.position.y = y;
 
         if (player.climbing !== climbing) player.climbing = climbing;
-
-        for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
-            CommIn.unPackInt8U();
-            CommIn.unPackRadU();
-            CommIn.unPackRad();
-            CommIn.unPackInt8U();
-        }
     }
 
     #processPausePacket() {
@@ -1392,7 +1407,7 @@ export class Bot {
 
         CommIn.unPackInt8U(); // abTestBucket, unused
 
-        this.state.joinedGame = true;
+        this.state.inGame = true;
         this.lastDeathTime = Date.now();
 
         const out = CommOut.getBuffer();
@@ -1834,18 +1849,18 @@ export class Bot {
     }
 
     processError(error) {
-        if (this.#hooks.error) this.emit('error', error);
+        if (this.#hooks.error && this.#hooks.error.length) this.emit('error', error);
         // eslint-disable-next-line custom/no-throw
         else throw error;
     }
 
     leave(code = CloseCode.mainMenu) {
-        if (this.state.quit) return;
+        if (this.hasQuit) return;
 
         if (code > -1) {
             this.game?.socket?.close(code);
             this.state.left = true;
-            this.emit('leave');
+            this.emit('leave', code);
         }
 
         clearInterval(this.updateIntervalId);
@@ -1890,25 +1905,25 @@ export class Bot {
     }
 
     quit(noCleanup = false) {
-        if (this.state.quit) return;
+        if (this.hasQuit) return;
 
         this.leave();
 
         if (this.matchmaker) {
             this.matchmaker.close();
-            this.matchmaker = null;
+            if (!noCleanup) this.matchmaker = null;
         }
 
         if (!noCleanup) {
             delete this.account;
+            delete this.api;
             delete this.game;
             delete this.me;
             delete this.players;
+            delete this.state;
         }
 
-        this.state.quit = true;
-
-        this.emit('quit');
+        this.hasQuit = true;
     }
 }
 
