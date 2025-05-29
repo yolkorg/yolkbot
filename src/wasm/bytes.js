@@ -1,5 +1,3 @@
-/* eslint-disable stylistic/max-len */
-
 const toUint8Array = (s) => {
     if (typeof atob === 'function') return new Uint8Array(atob(s).split('').map((c) => c.charCodeAt(0)))
     return Buffer.from(s, 'base64')

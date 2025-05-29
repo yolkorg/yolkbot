@@ -2,12 +2,19 @@ import CommOut from '../comm/CommOut.js';
 import { CommCode } from '../constants/codes.js';
 
 export class SwapWeaponDispatch {
+    constructor(manualWeapon) {
+        this.manualWeapon = manualWeapon;
+    }
+
     check(bot) {
         return bot.me.playing && !bot.state.reloading && !bot.state.swappingGun && !bot.state.usingMelee;
     }
 
     execute(bot) {
-        bot.me.activeGun = +!bot.me.activeGun;
+        let chosenWeapon = +!bot.me.activeGun;
+        if (typeof this.manualWeapon === 'number') chosenWeapon = this.manualWeapon;
+
+        bot.me.activeGun = chosenWeapon;
 
         const out = CommOut.getBuffer();
         out.packInt8(CommCode.swapWeapon);
