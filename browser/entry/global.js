@@ -25,3 +25,5 @@ const yolkbot = {
 };
 
 window.yolkbot = yolkbot;
+
+if (window.onYolkReady) window.onYolkReady();
