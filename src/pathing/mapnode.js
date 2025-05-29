@@ -1,5 +1,3 @@
-/* eslint-disable stylistic/max-len */
-
 class MapNode {
     constructor(meshType, data) {
         this.x = data.x;

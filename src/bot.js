@@ -92,6 +92,11 @@ export class Bot {
             // wow!
             inGame: false,
 
+            // view
+            yaw: 0,
+            pitch: 0,
+            controlKeys: 0,
+
             // tracking for dispatch checks
             reloading: false,
             swappingGun: false,
@@ -149,8 +154,7 @@ export class Bot {
                 locked: false,
                 noTeamChange: false,
                 noTeamShuffle: false,
-                // array of weapons from eggk to trihard
-                // false = alloed to use
+                // false = allowed to use
                 // true = cannot use
                 weaponsDisabled: Array(7).fill(false),
                 mustUseSecondary: false // if weaponsDisabled is ALL true
@@ -252,8 +256,6 @@ export class Bot {
         this.lastChatTime = -1;
 
         this.lastUpdateTick = 0;
-
-        this.controlKeys = 0;
 
         this.pathing = {
             nodeList: null,
@@ -557,7 +559,7 @@ export class Bot {
                 }
             }
 
-            if (!(this.controlKeys & Movements.FORWARD)) this.dispatch(new MovementDispatch(Movements.FORWARD));
+            if (!(this.state.controlKeys & Movements.FORWARD)) this.dispatch(new MovementDispatch(Movements.FORWARD));
         }
     }
 
@@ -586,9 +588,9 @@ export class Bot {
             }
 
             this.state.buffer[idx] = {
-                controlKeys: this.controlKeys,
-                yaw: this.me.view.yaw,
-                pitch: this.me.view.pitch,
+                controlKeys: this.state.controlKeys,
+                yaw: this.state.yaw,
+                pitch: this.state.pitch,
                 shotsFired: this.state.shotsFired
             }
 
@@ -614,8 +616,8 @@ export class Bot {
                     out.packInt8(this.state.buffer[idxOnFrame]?.controlKeys || 0);
                     out.packInt8(this.state.buffer[idxOnFrame]?.shotsFired || 0);
 
-                    const targetYaw = this.state.buffer[idxOnFrame]?.yaw || this.me.view.yaw;
-                    const targetPitch = this.state.buffer[idxOnFrame]?.pitch || this.me.view.pitch;
+                    const targetYaw = this.state.buffer[idxOnFrame]?.yaw || this.state.yaw;
+                    const targetPitch = this.state.buffer[idxOnFrame]?.pitch || this.state.pitch;
                     const resultingCoords = coords(targetYaw, targetPitch);
 
                     out.packString(resultingCoords); // coords from the wasm :100:
@@ -789,22 +791,12 @@ export class Bot {
             return;
         }
 
-        for (let i2 = 0; i2 < FramesBetweenSyncs - 1; i2++) {
+        for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
             CommIn.unPackInt8U();
-            CommIn.unPackRadU();
-            CommIn.unPackRad();
+            player.view.yaw = CommIn.unPackRadU();
+            player.view.pitch = CommIn.unPackRad();
             CommIn.unPackInt8U();
         }
-
-        CommIn.unPackInt8U(); // last control keys
-
-        const yaw = CommIn.unPackRadU();
-        player.view.yaw = yaw;
-
-        const pitch = CommIn.unPackRad();
-        player.view.pitch = pitch;
-
-        CommIn.unPackInt8U();
 
         if (player.position.x !== x) player.position.x = x;
         if (player.position.z !== z) player.position.z = z;
@@ -1305,7 +1297,7 @@ export class Bot {
         this.emit('playerReload', player, playerActiveWeapon);
     }
 
-    #processGameRequestOptionsPacket() {
+    updateGameOptions() {
         const out = CommOut.getBuffer();
         out.packInt8(CommCode.gameOptions);
         out.packInt8(this.game.options.gravity * 4);
@@ -1324,6 +1316,10 @@ export class Bot {
         });
 
         out.send(this.game.socket);
+    }
+
+    #processGameRequestOptionsPacket() {
+        this.updateGameOptions();
     }
 
     #processExplodePacket() {
@@ -1898,8 +1894,6 @@ export class Bot {
         this.lastChatTime = -1;
 
         this.lastUpdateTick = 0;
-
-        this.controlKeys = 0;
 
         this.pathing = {
             nodeList: null,

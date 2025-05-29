@@ -13,7 +13,7 @@ export class MeleeDispatch {
 
         bot.usingMelee = true;
 
-        // gameloop every 33.33 (repeating) ms, 17 ticks, so 566.61 is the closest you get
+        // gameloop every 33.33 (repeating) ms, 17 ticks
         setTimeout(() => {
             bot.usingMelee = false
             bot.swappingGun = true
@@ -21,7 +21,7 @@ export class MeleeDispatch {
             setTimeout(() => {
                 bot.swappingGun = false
             }, 0.5 * bot.me.weapons[0].equipTime)
-        }, 566.61);
+        }, (100 / 3) * 17);
     }
 }
 

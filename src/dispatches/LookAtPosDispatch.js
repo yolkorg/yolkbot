@@ -22,11 +22,11 @@ export class LookAtPosDispatch {
             z: this.pos.z - bot.me.position.z
         };
 
-        const yaw = calculateYaw(directionVector)
+        const yaw = calculateYaw(directionVector);
         const pitch = calculatePitch(directionVector);
 
-        bot.me.view.yaw = yaw;
-        bot.me.view.pitch = pitch;
+        bot.state.yaw = yaw;
+        bot.state.pitch = pitch;
     }
 }
 

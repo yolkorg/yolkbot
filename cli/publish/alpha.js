@@ -1,4 +1,3 @@
-/* eslint-disable stylistic/max-len */
 /* eslint-disable camelcase */
 
 const webhook = process.env.NPM_DEV_WEBHOOK;
