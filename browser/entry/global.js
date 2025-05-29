@@ -26,4 +26,4 @@ const yolkbot = {
 
 window.yolkbot = yolkbot;
 
-if (window.onYolkReady) window.onYolkReady();
+if (window.onYolkReady && typeof window.onYolkReady === 'function') window.onYolkReady();
