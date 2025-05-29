@@ -1,7 +1,7 @@
 import Bot from '../bot';
 
 export class MovementDispatch {
-    controlKeys: number;
+    inputKeys: number;
 
     constructor(controlKeys: number | number[]);
 

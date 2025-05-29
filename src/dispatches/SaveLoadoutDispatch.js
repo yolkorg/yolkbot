@@ -1,5 +1,3 @@
-/* eslint-disable stylistic/max-len */
-
 import { findItemById, GunList, ItemTypes } from '../constants/index.js';
 
 import CommOut from '../comm/CommOut.js';

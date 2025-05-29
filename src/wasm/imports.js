@@ -52,7 +52,7 @@ const element = {
     textContent: ''
 };
 
-let iter = 5;
+let iter = 2;
 
 // the mock implementation of all the imports passed to the wasm
 export const imports = {
@@ -209,12 +209,6 @@ export const imports = {
         __wbindgen_closure_wrapper99: (arg0, arg1) => {
             return makeMutClosure(arg0, arg1, 31, __wbg_adapter_22);
         },
-        /*imports.wbg.__wbindgen_number_get = function (arg0, arg1) {
-            const obj = arg1;
-            const ret = typeof (obj) === 'number' ? obj : undefined;
-            getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
-            getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
-        };*/
         __wbindgen_number_get: (arg0, arg1) => {
             const obj = arg1;
             const ret = typeof (obj) === 'number' ? obj : undefined;

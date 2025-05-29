@@ -159,10 +159,7 @@ export default [
             'stylistic/key-spacing': ['error', {
                 'beforeColon': false
             }],
-            'stylistic/max-len': ['error', {
-                'code': 150,
-                'tabWidth': 4
-            }],
+            // 'stylistic/max-len': ['error', { 'code': 150, 'tabWidth': 4 }],
             'stylistic/no-extra-semi': 'error',
             'stylistic/no-mixed-spaces-and-tabs': 'error',
             'stylistic/no-multi-spaces': 'error',

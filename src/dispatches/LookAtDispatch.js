@@ -10,26 +10,18 @@ export class LookAtDispatch {
     idOrName;
 
     constructor(idOrName) {
-        if (typeof idOrName === 'number') this.id = idOrName;
-        else if (typeof idOrName === 'string') this.name = idOrName;
+        this.idOrName = idOrName;
     }
 
     check(bot) {
         if (!bot.me.playing) return false;
 
-        let target;
-
-        if (this.id) target = bot.players[this.id.toString()];
-        else if (this.name) target = bot.players.find(player => player.name === this.name);
-
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
         return !!target;
     }
 
     execute(bot) {
-        let target;
-
-        if (this.id) target = bot.players[this.id.toString()];
-        else if (this.name) target = bot.players.find(player => player.name === this.name);
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
 
         const directionVector = {
             x: target.position.x - bot.me.position.x,
@@ -40,8 +32,8 @@ export class LookAtDispatch {
         const yaw = calculateYaw(directionVector);
         const pitch = calculatePitch(directionVector);
 
-        bot.me.view.yaw = yaw;
-        bot.me.view.pitch = pitch;
+        bot.state.yaw = yaw;
+        bot.state.pitch = pitch;
     }
 }
 

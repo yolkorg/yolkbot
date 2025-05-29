@@ -3,8 +3,7 @@ import { CommCode } from '../constants/codes.js';
 
 export class ReportPlayerDispatch {
     constructor(idOrName, reasons = {}) {
-        if (typeof idOrName === 'number') this.id = idOrName
-        else if (typeof idOrName === 'string') this.name = idOrName
+        this.idOrName = idOrName;
 
         this.reasons = [
             !!reasons.cheating,
@@ -24,19 +23,12 @@ export class ReportPlayerDispatch {
     check(bot) {
         if (!bot.state.inGame) return false;
 
-        let target;
-
-        if (this.id) target = bot.players[this.id.toString()];
-        else if (this.name) target = bot.players.find(player => player.name === this.name);
-
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
         return !!target;
     }
 
     execute(bot) {
-        let target;
-
-        if (this.id) target = bot.players[this.id.toString()];
-        else if (this.name) target = bot.players.find(player => player.name === this.name);
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
 
         const out = CommOut.getBuffer();
         out.packInt8(CommCode.reportPlayer);
