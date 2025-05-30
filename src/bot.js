@@ -587,6 +587,8 @@ export class Bot {
                 console.log('checking...shotsFired', this.state.shotsFired);
             }
 
+            this.me.jumping = !!(this.state.controlKeys & Movements.JUMP);
+
             this.state.buffer[idx] = {
                 controlKeys: this.state.controlKeys,
                 yaw: this.state.yaw,
@@ -792,7 +794,11 @@ export class Bot {
         }
 
         for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
-            CommIn.unPackInt8U();
+            const controlKeys = CommIn.unPackInt8U();
+
+            if (controlKeys & Movements.JUMP) player.jumping = true;
+            else player.jumping = false;
+
             player.view.yaw = CommIn.unPackRadU();
             player.view.pitch = CommIn.unPackRad();
             CommIn.unPackInt8U();
@@ -943,7 +949,8 @@ export class Bot {
         const newY = CommIn.unPackFloat();
         const newZ = CommIn.unPackFloat();
 
-        CommIn.unPackInt8U();
+        this.me.climbing = !!CommIn.unPackInt8U();
+
         CommIn.unPackInt8U();
         CommIn.unPackInt8U();
 
