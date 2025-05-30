@@ -11,6 +11,7 @@ const copyAndMinify = async (src, dest) => {
         fs.mkdirSync(dest, { recursive: true });
         for (const entry of fs.readdirSync(src))
             copyAndMinify(path.join(src, entry), path.join(dest, entry));
+        return;
     } else if (src.endsWith('.js')) {
         const code = fs.readFileSync(src, 'utf8');
 
@@ -23,9 +24,12 @@ const copyAndMinify = async (src, dest) => {
                 banner: '/* eslint-disable */\n'
             });
 
-            fs.writeFileSync(dest, esmResult.code);
-        } else fs.cpSync(src, dest);
-    } else fs.copyFileSync(src, dest);
+            return fs.writeFileSync(dest, esmResult.code);
+        } else return fs.cpSync(src, dest);
+    } else if (src.endsWith('.ts')) return fs.cpSync(src, dest);
+
+    const fileType = src.split('.').pop();
+    if (!['DS_Store', 'wasm'].includes(fileType)) console.log('unknown file type:', fileType);
 }
 
 if (fs.existsSync(distDir)) fs.rmSync(distDir, { recursive: true });
