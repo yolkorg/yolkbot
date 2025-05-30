@@ -801,6 +801,7 @@ export class Bot {
 
             player.view.yaw = CommIn.unPackRadU();
             player.view.pitch = CommIn.unPackRad();
+
             CommIn.unPackInt8U();
         }
 
