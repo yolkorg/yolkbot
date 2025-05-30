@@ -825,7 +825,6 @@ export class Bot {
             if (this.game.gameModeId === GameModes.kotc) {
                 const activeZone = this.game.activeZone;
                 if (!activeZone) {
-                    console.log(this.game);
                     if (player.inKotcZone) {
                         player.inKotcZone = false;
                         this.emit('playerLeaveZone', player, activeZone);

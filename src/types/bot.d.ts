@@ -299,7 +299,7 @@ export class Bot {
     on(event: 'balanceUpdate', cb: (oldBalance: number, newBalance: number) => void): void;
     on(event: 'banned', cb: (banRemaining: string) => void): void;
     on(event: 'botJoined', cb: (botPlayer: GamePlayer) => void): void;
-    on(event: 'challengeComplete', cb: (player: GamePlayer | undefined, challengeId: number) => void): void;
+    on(event: 'challengeComplete', cb: (player: GamePlayer, challengeId: number) => void): void;
     on(event: 'chat', cb: (player: GamePlayer | undefined, message: string, flags: number) => void): void;
     on(event: 'close', cb: (code: number) => void): void;
     on(event: 'collectAmmo', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
@@ -314,12 +314,12 @@ export class Bot {
     on(event: 'leave', cb: (closeCode: number) => void): void;
     on(event: 'packet', cb: (packet: ArrayBuffer) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
-    on(event: 'playerBeginStreak', cb: (player: GamePlayer, streak: number) => void): void;
+    on(event: 'playerBeginStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerChangeCharacter', cb: (player: GamePlayer, oldCharacter: Character, newCharacter: Character) => void): void;
     on(event: 'playerChangeGun', cb: (player: GamePlayer, oldGun: number, newGun: number) => void): void;
     on(event: 'playerDamaged', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
     on(event: 'playerDeath', cb: (player: GamePlayer, killer: GamePlayer) => void): void;
-    on(event: 'playerEndStreak', cb: (player: GamePlayer, killstreakType: number) => void): void;
+    on(event: 'playerEndStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerEnterZone', cb: (player: GamePlayer) => void): void;
     on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'playerJoin', cb: (player: GamePlayer) => void): void;
