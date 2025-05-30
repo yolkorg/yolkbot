@@ -8,12 +8,11 @@ export interface CheatingReasons {
 }
 
 export class ReportPlayerDispatch {
-    id?: number;
-    name?: string;
+    irOrName: string;
     reasons: boolean[];
     reasonInt: number;
 
-    constructor(idOrName: number | string, reasons?: CheatingReasons);
+    constructor(idOrName: string, reasons?: CheatingReasons);
 
     check(bot: Bot): boolean;
     execute(bot: Bot): void;

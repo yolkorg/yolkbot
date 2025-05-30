@@ -12,6 +12,9 @@ export default [
         }
     },
     {
+        ignores: ['browser/build']
+    },
+    {
         plugins: {
             custom: {
                 rules: {

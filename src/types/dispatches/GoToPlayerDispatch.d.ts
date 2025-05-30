@@ -1,8 +1,9 @@
 import Bot from '../bot';
-import GamePlayer from '../bot/GamePlayer';
 
 export declare class GoToPlayerDispatch {
-    constructor(target: GamePlayer);
+    idOrName: string;
+
+    constructor(idOrName: string);
 
     check(bot: Bot): boolean;
     execute(bot: Bot): void;

@@ -1,23 +1,34 @@
 import AStar from '../pathing/astar.js';
 
 export class GoToPlayerDispatch {
-    constructor(target) {
-        this.target = target;
+    idOrName;
+
+    constructor(idOrName) {
+        this.idOrName = idOrName;
+    }
+
+    validate(bot) {
+        if (!bot.intents.includes(bot.Intents.PATHFINDING)) return false;
+        if (!this.idOrName) return false;
+
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        return !!target;
     }
 
     check(bot) {
-        return bot.me.playing &&
-            this.target &&
-            this.target.playing &&
-            this.target.position &&
-            bot.intents.includes(bot.Intents.PATHFINDING);
+        if (!bot.me.playing) return false;
+
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        return target && target.playing && target.position && target.position.x;
     }
 
     execute(bot) {
         this.pather = new AStar(bot.pathing.nodeList);
 
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+
         const position = Object.entries(bot.me.position).map(entry => Math.floor(entry[1]));
-        const targetPos = Object.entries(this.target.position).map(entry => Math.floor(entry[1]));
+        const targetPos = Object.entries(target.position).map(entry => Math.floor(entry[1]));
 
         const myNode = bot.pathing.nodeList.at(...position);
         const targetNode = bot.pathing.nodeList.at(...targetPos);

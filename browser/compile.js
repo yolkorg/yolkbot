@@ -32,7 +32,7 @@ const build = async (module) => {
         bundle: true,
         target: 'esnext',
         format: 'esm',
-        banner: { js: `/* eslint-disable */\n${module === 'global' ? '\n(async()=>{' : ''}` },
+        banner: { js: `${module === 'global' ? '(async()=>{' : ''}` },
         footer: { js: module === 'global' ? '})();' : '' },
         plugins: [replaceItemImport],
         external: ['smallsocks', 'ws', 'undici', 'node:fs', 'node:os', 'node:path']

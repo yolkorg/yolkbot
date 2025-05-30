@@ -6,6 +6,10 @@ export class SwapWeaponDispatch {
         this.manualWeapon = manualWeapon;
     }
 
+    validate() {
+        return typeof this.manualWeapon === 'number' || this.manualWeapon === undefined;
+    }
+
     check(bot) {
         return bot.me.playing && !bot.state.reloading && !bot.state.swappingGun && !bot.state.usingMelee;
     }

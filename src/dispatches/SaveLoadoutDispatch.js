@@ -23,9 +23,7 @@ export class SaveLoadoutDispatch {
         this.changes = Object.fromEntries(Object.entries(this.changes).filter(([, v]) => !!v));
     }
 
-    check(bot) {
-        if (bot.me.playing) return false;
-
+    validate(bot) {
         const load = this.changes;
 
         if (load.colorIdx && load.colorIdx >= 7 && !bot.account.vip) return false; // trying to use VIP color
@@ -64,6 +62,10 @@ export class SaveLoadoutDispatch {
 
         // you PROBABLY own everything and we can let the packet pass
         return true;
+    }
+
+    check(bot) {
+        return !bot.me.playing;
     }
 
     execute(bot) {

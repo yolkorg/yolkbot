@@ -38,9 +38,7 @@ export class GameOptionsDispatch {
         return output;
     }
 
-    check(bot) {
-        if (!bot.game.isGameOwner) return false;
-
+    validate(bot) {
         const wouldBe = this.#constructFinalOutput(bot);
 
         if (!gravityScale.includes(wouldBe.gravity)) return false;
@@ -56,6 +54,10 @@ export class GameOptionsDispatch {
         if (wouldBe.weaponsDisabled.some((weapon) => typeof weapon !== 'boolean')) return false;
 
         return true;
+    }
+
+    check(bot) {
+        return bot.game.isGameOwner;
     }
 
     execute(bot) {

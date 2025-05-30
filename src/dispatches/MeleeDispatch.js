@@ -2,6 +2,10 @@ import CommOut from '../comm/CommOut.js';
 import { CommCode } from '../constants/codes.js';
 
 export class MeleeDispatch {
+    validate() {
+        return true;
+    }
+
     check(bot) {
         return bot.me.playing && !bot.state.reloading && !bot.state.swappingGun && !bot.state.usingMelee;
     }
