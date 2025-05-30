@@ -1,5 +1,9 @@
 <div align='center'>
-  <h1>yolkbot</h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-light.png">
+    <img src="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-dark.png" width="60%">
+  </picture>
   <h3>creating bots in 10 lines since 2025</h3>
   <p>
     <a href='https://github.com/yolkorg/yolkbot'>github</a> | 
@@ -29,7 +33,7 @@
 
 <br>
 
-<h3 align='center'>important: dmca</h3>
+<h3 align='center'>dmca disclaimer</h3>
 
 <p align='center'>
   parts of this repository are JSON files that come from data contained in Shell Shockers. <br>
