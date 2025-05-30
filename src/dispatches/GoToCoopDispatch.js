@@ -1,8 +1,12 @@
 import AStar from '../pathing/astar.js';
 
 export class GoToCoopDispatch {
+    validate(bot) {
+        return bot.intents.includes(bot.Intents.PATHFINDING);
+    }
+
     check(bot) {
-        return bot.me.playing && bot.game.zoneNumber && bot.game.activeZone && bot.intents.includes(bot.Intents.PATHFINDING);
+        return bot.me.playing && bot.game.zoneNumber && bot.game.activeZone;
     }
 
     execute(bot) {

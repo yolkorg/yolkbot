@@ -6,13 +6,12 @@ export class ThrowGrenadeDispatch {
         this.power = power;
     }
 
+    validate() {
+        return typeof this.power === 'number' && this.power >= 0 && this.power <= 1;
+    }
+
     check(bot) {
-        return bot.me.playing &&
-            !bot.state.reloading &&
-            !bot.state.swappingGun &&
-            !bot.state.usingMelee &&
-            this.power >= 0 &&
-            this.power <= 1;
+        return bot.me.playing && !bot.state.reloading && !bot.state.swappingGun && !bot.state.usingMelee;
     }
 
     execute(bot) {

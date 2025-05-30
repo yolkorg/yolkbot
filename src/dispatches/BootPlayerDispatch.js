@@ -6,10 +6,14 @@ export class BootPlayerDispatch {
         this.uniqueId = uniqueId;
     }
 
-    check(bot) {
+    validate(bot) {
         return typeof this.uniqueId === 'string' &&
             bot.game.isGameOwner &&
             Object.values(bot.players).find((player) => player.uniqueId === this.uniqueId);
+    }
+
+    check() {
+        return true;
     }
 
     execute(bot) {

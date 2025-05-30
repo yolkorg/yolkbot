@@ -13,11 +13,16 @@ export class LookAtDispatch {
         this.idOrName = idOrName;
     }
 
+    validate(bot) {
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        return !!target;
+    }
+
     check(bot) {
         if (!bot.me.playing) return false;
 
         const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
-        return !!target;
+        return target && target.playing && target.position && target.position.x;
     }
 
     execute(bot) {

@@ -1,8 +1,12 @@
 import AStar from '../pathing/astar.js';
 
 export class GoToGrenadeDispatch {
+    validate(bot) {
+        return bot.intents.includes(bot.Intents.PATHFINDING);
+    }
+
     check(bot) {
-        return bot.me.playing && bot.game.collectables[1].length && bot.intents.includes(bot.Intents.PATHFINDING);
+        return bot.me.playing && bot.game.collectables[1].length;
     }
 
     execute(bot) {

@@ -1,19 +1,22 @@
 import AStar from '../pathing/astar.js';
 
 export class GoToSpatulaDispatch {
+    validate(bot) {
+        return bot.intents.includes(bot.Intents.PATHFINDING);
+    }
+
     check(bot) {
         return bot.me.playing &&
             bot.game.spatula &&
             bot.game.spatula.coords &&
-            bot.game.spatula.coords.x &&
-            bot.intents.includes(bot.Intents.PATHFINDING);
+            bot.game.spatula.coords.x;
     }
 
     execute(bot) {
         this.pather = new AStar(bot.pathing.nodeList);
 
         const position = Object.entries(bot.me.position).map(entry => Math.floor(entry[1]));
-        const targetPos = Object.entries(this.game.spatula.coords).map(entry => Math.floor(entry[1]));
+        const targetPos = Object.entries(bot.game.spatula.coords).map(entry => Math.floor(entry[1]));
 
         const myNode = bot.pathing.nodeList.at(...position);
         const targetNode = bot.pathing.nodeList.at(...targetPos);

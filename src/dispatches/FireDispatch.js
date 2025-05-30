@@ -3,12 +3,15 @@ export class FireDispatch {
         this.amount = amount || 1;
     }
 
+    validate() {
+        return this.amount >= 1;
+    }
+
     check(bot) {
         return bot.me.playing &&
             !bot.state.reloading &&
             !bot.state.swappingGun &&
             !bot.state.usingMelee &&
-            this.amount >= 1 &&
             bot.me.weapons[bot.me.activeGun].ammo.rounds >= this.amount;
     }
 

@@ -9,7 +9,8 @@ type intents = {
     LOG_PACKETS: 10,
     NO_LOGIN: 11,
     DEBUG_BUFFER: 12,
-    DEBUG_BEST_TARGET: 14
+    DEBUG_BEST_TARGET: 14,
+    KOTC_ZONES: 15
 }
 
 import { Character, GamePlayer, Position } from './bot/GamePlayer';
@@ -284,7 +285,7 @@ export class Bot {
     join(botName: string, data: string | RawGameData): Promise<void>;
 
     processPacket(data: number[]): void;
-    dispatch(disp: ADispatch): void;
+    dispatch(disp: ADispatch): boolean;
     update(): void;
 
     canSee(player: GamePlayer): boolean;
@@ -298,10 +299,12 @@ export class Bot {
     on(event: 'balanceUpdate', cb: (oldBalance: number, newBalance: number) => void): void;
     on(event: 'banned', cb: (banRemaining: string) => void): void;
     on(event: 'botJoined', cb: (botPlayer: GamePlayer) => void): void;
+    on(event: 'challengeComplete', cb: (player: GamePlayer | undefined, challengeId: number) => void): void;
     on(event: 'chat', cb: (player: GamePlayer | undefined, message: string, flags: number) => void): void;
     on(event: 'close', cb: (code: number) => void): void;
     on(event: 'collectAmmo', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'collectGrenade', cb: (player: GamePlayer) => void): void;
+    on(event: 'error', cb: (error: string) => void): void;
     on(event: 'gameForcePause', cb: () => void): void;
     on(event: 'gameOptionsChange', cb: (oldOptions: GameOptions, newOptions: GameOptions) => void): void;
     on(event: 'gameReady', cb: () => void): void;
@@ -316,16 +319,19 @@ export class Bot {
     on(event: 'playerChangeGun', cb: (player: GamePlayer, oldGun: number, newGun: number) => void): void;
     on(event: 'playerDamaged', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
     on(event: 'playerDeath', cb: (player: GamePlayer, killer: GamePlayer) => void): void;
+    on(event: 'playerEndStreak', cb: (player: GamePlayer, killstreakType: number) => void): void;
+    on(event: 'playerEnterZone', cb: (player: GamePlayer) => void): void;
     on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'playerJoin', cb: (player: GamePlayer) => void): void;
     on(event: 'playerLeave', cb: (player: GamePlayer) => void): void;
+    on(event: 'playerLeaveZone', cb: (player: GamePlayer) => void): void;
     on(event: 'playerMelee', cb: (player: GamePlayer) => void): void;
+    on(event: 'playerMove', cb: (player: GamePlayer, position: Position) => void): void;
     on(event: 'playerPause', cb: (player: GamePlayer) => void): void;
     on(event: 'playerReload', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
-    on(event: 'quit', cb: () => void): void;
     on(event: 'rocketHit', cb: (pos: Position, damage: number, blastRadius: number) => void): void;
     on(event: 'selfDamaged', cb: (oldHealth: number, newHealth: number) => void): void;
     on(event: 'selfMoved', cb: (oldPosition: Position, newPosition: Position) => void): void;
