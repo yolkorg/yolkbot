@@ -11,8 +11,12 @@ export class LookAtPosDispatch {
         this.pos = pos;
     }
 
+    validate() {
+        return this.pos && this.pos.x && this.pos.y && this.pos.z;
+    }
+
     check(bot) {
-        return bot.me.playing && this.pos && this.pos.x && this.pos.y && this.pos.z;
+        return bot.me.playing;
     }
 
     execute(bot) {

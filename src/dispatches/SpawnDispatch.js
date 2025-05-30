@@ -2,6 +2,10 @@ import CommOut from '../comm/CommOut.js';
 import { CommCode } from '../constants/codes.js';
 
 export class SpawnDispatch {
+    validate() {
+        return true;
+    }
+
     check(bot) {
         if (!bot.me.playing && (bot.lastDeathTime + 6000) < Date.now()) return true;
         return false;

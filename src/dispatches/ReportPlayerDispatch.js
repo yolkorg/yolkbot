@@ -20,6 +20,15 @@ export class ReportPlayerDispatch {
                 this.reasonInt |= (1 << i);
     }
 
+    validate() {
+        if (this.reasons.every(reason => reason === false)) return false;
+
+        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        if (!target) return false;
+
+        return true;
+    }
+
     check(bot) {
         if (!bot.state.inGame) return false;
 

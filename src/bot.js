@@ -52,7 +52,8 @@ const intents = {
     LOG_PACKETS: 10,
     NO_LOGIN: 11,
     DEBUG_BUFFER: 12,
-    DEBUG_BEST_TARGET: 14
+    DEBUG_BEST_TARGET: 14,
+    KOTC_ZONES: 15
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -269,8 +270,11 @@ export class Bot {
     }
 
     dispatch(dispatch) {
-        if (dispatch.check(this)) dispatch.execute(this);
-        else this.#dispatches.push(dispatch);
+        if (dispatch.validate(this)) {
+            if (dispatch.check(this)) dispatch.execute(this);
+            else this.#dispatches.push(dispatch);
+            return true;
+        } else return false;
     }
 
     async createAccount(email, pass) {
@@ -805,6 +809,8 @@ export class Bot {
             CommIn.unPackInt8U();
         }
 
+        const didChange = player.position.x !== x || player.position.y !== y || player.position.z !== z || player.climbing !== climbing;
+
         if (player.position.x !== x) player.position.x = x;
         if (player.position.z !== z) player.position.z = z;
 
@@ -812,6 +818,36 @@ export class Bot {
             player.position.y = y;
 
         if (player.climbing !== climbing) player.climbing = climbing;
+
+        if (didChange) {
+            this.emit('playerMove', player, player.position);
+
+            if (this.game.gameModeId === GameModes.kotc) {
+                const activeZone = this.game.activeZone;
+                if (!activeZone) {
+                    console.log(this.game);
+                    if (player.inKotcZone) {
+                        player.inKotcZone = false;
+                        this.emit('playerLeaveZone', player, activeZone);
+                    }
+                    return;
+                }
+
+                const fx = Math.round(x);
+                const fy = Math.floor(y);
+                const fz = Math.round(z);
+
+                const isInZone = activeZone.some((coordSets) => coordSets.x === fx && coordSets.y === fy && coordSets.z === fz);
+
+                if (player.inKotcZone && !isInZone) {
+                    player.inKotcZone = false;
+                    this.emit('playerLeaveZone', player);
+                } else if (!player.inKotcZone && isInZone) {
+                    player.inKotcZone = true;
+                    this.emit('playerEnterZone', player);
+                }
+            }
+        }
     }
 
     #processPausePacket() {
@@ -1105,7 +1141,7 @@ export class Bot {
         if (streaks.includes(ksType) && player.streakRewards.includes(ksType))
             player.streakRewards = player.streakRewards.filter((r) => r !== ksType);
 
-        this.emit('playerEndStreak', ksType, player);
+        this.emit('playerEndStreak', player, ksType);
     }
 
     #processHitShieldPacket() {
@@ -1404,15 +1440,17 @@ export class Bot {
         this.game.mapIdx = CommIn.unPackInt8U();
         this.game.map = Maps[this.game.mapIdx];
 
-        if (this.intents.includes(this.Intents.PATHFINDING)) {
+        if (this.intents.includes(this.Intents.KOTC_ZONES) || this.intents.includes(this.Intents.PATHFINDING)) {
             this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
-            this.pathing.nodeList = new NodeList(this.game.map.raw);
 
             if (this.game.gameModeId === GameModes.kotc) {
                 const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
                 if (meshData) this.game.map.zones = initKotcZones(meshData);
                 else delete this.game.map.zones;
             }
+
+            if (this.intents.includes(this.Intents.PATHFINDING))
+                this.pathing.nodeList = new NodeList(this.game.map.raw);
         }
 
         this.game.playerLimit = CommIn.unPackInt8U();

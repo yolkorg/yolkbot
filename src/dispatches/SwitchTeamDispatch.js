@@ -2,6 +2,10 @@ import CommOut from '../comm/CommOut.js';
 import { CommCode } from '../constants/codes.js';
 
 export class SwitchTeamDispatch {
+    validate() {
+        return true;
+    }
+
     check(bot) {
         if (!bot.state.inGame || bot.me.playing) return false; // you probably cant change team mid-game
         if (bot.game.gameModeId === 0) return false; // ffa

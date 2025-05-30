@@ -31,6 +31,8 @@ export class GamePlayer {
             pitch: playerData.pitch
         };
 
+        this.inKotcZone = false;
+
         this.character = {
             eggColor: playerData.shellColor,
             primaryGun: playerData.primaryWeaponItem,
