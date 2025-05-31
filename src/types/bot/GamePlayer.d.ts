@@ -12,8 +12,10 @@ export interface View {
     pitch: number;
 }
 
+export type ShellColor = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+
 export interface Character {
-    eggColor: string;
+    eggColor: ShellColor;
     primaryGun: Item | number;
     secondaryGun: Item | number;
     stamp: Item | number;
@@ -37,14 +39,14 @@ export interface PlayerStats {
 }
 
 export type PlayerTeam = 0 | 1 | 2;
-export type ShellColor = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+export type GunId = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface PlayerData {
     id: string;
     uniqueId: string;
     name: string;
-    safename: string;
-    charClass: number;
+    safeName: string;
+    charClass: GunId;
     team: PlayerTeam;
     primaryWeaponItem: Item | number;
     secondaryWeaponItem: Item | number;
@@ -93,10 +95,10 @@ export type PlayerWeapons = [AnyGun, Cluck9mm];
 
 export class GamePlayer {
     id: string;
-    team: PlayerTeam;
-    raw: PlayerData;
-    name: string;
     uniqueId: string;
+    name: string;
+    safeName: string;
+    team: PlayerTeam;
     playing: boolean;
     socials: Social[];
     isVip: boolean;
@@ -105,17 +107,18 @@ export class GamePlayer {
     jumping: boolean;
     climbing: boolean;
     view: View;
+    inKotcZone: boolean;
     character: Character;
     stats: PlayerStats;
-    activeGun: number;
-    selectedGun: number;
+    activeGun: 0 | 1;
+    selectedGun: GunId;
     weapons: PlayerWeapons;
     grenades: number;
     streak: number;
+    streakRewards: number[];
     hp: number;
     hpShield: number;
     spawnShield: number;
-    streakRewards: number[];
     randomSeed: number;
 
     constructor(playerData: PlayerData);

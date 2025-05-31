@@ -37,10 +37,10 @@ export const GameActions = {
 }
 
 export const GameModes = {
-    'ffa': 0,
-    'team': 1,
-    'spatula': 2,
-    'kotc': 3
+    ffa: 0,
+    team: 1,
+    spatula: 2,
+    kotc: 3
 }
 
 export const GameOptionFlags = {

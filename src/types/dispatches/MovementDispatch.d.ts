@@ -5,6 +5,7 @@ export class MovementDispatch {
 
     constructor(controlKeys: number | number[]);
 
+    validate(bot: Bot): boolean;
     check(bot: Bot): boolean;
     execute(bot: Bot): void;
 }

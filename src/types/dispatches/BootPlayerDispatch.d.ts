@@ -5,6 +5,7 @@ export declare class BootPlayerDispatch {
 
     constructor(uniqueId: string);
 
+    validate(bot: Bot): boolean;
     check(bot: Bot): boolean;
     execute(bot: Bot): void;
 }

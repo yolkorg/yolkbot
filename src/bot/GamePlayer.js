@@ -1,11 +1,13 @@
-import { GunList, ShellStreaks, SocialMedias } from '../constants/index.js';
+import { GunList, Movements, ShellStreaks, SocialMedias } from '../constants/index.js';
 import { Cluck9mm } from '../constants/guns.js';
 
 export class GamePlayer {
-    constructor(playerData) {
+    constructor(playerData, activeZone = null) {
         this.id = playerData.id;
-        this.name = playerData.name;
         this.uniqueId = playerData.uniqueId;
+
+        this.name = playerData.name;
+        this.safeName = playerData.safeName;
 
         this.team = playerData.team;
 
@@ -23,7 +25,7 @@ export class GamePlayer {
             z: playerData.z
         };
 
-        this.jumping = false;
+        this.jumping = playerData.$controlKeys & Movements.JUMP;
         this.climbing = false;
 
         this.view = {
@@ -31,7 +33,13 @@ export class GamePlayer {
             pitch: playerData.pitch
         };
 
-        this.inKotcZone = false;
+        if (activeZone) {
+            const fx = Math.round(playerData.x);
+            const fy = Math.floor(playerData.y);
+            const fz = Math.round(playerData.z);
+
+            this.inKotcZone = activeZone.some((coordSets) => coordSets.x === fx && coordSets.y === fy && coordSets.z === fz);
+        }
 
         this.character = {
             eggColor: playerData.shellColor,

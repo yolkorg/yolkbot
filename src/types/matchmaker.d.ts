@@ -44,6 +44,7 @@ export declare class Matchmaker {
 
     proxy: string | null;
     sessionId: string;
+
     onListeners: Map<string, Function[]>;
     onceListeners: Map<string, Function[]>;
 
