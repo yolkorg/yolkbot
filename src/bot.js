@@ -400,24 +400,25 @@ export class Bot {
     }
 
     async #joinGameWithCode(code) {
-        if (!await this.initMatchmaker()) return false;
+        if (!await this.initMatchmaker()) return 'matchmakerInitFail';
 
         await this.matchmaker.waitForConnect();
 
         return await new Promise((resolve) => {
-            const listener = (mes) => {
-                if (mes.command === 'gameFound') {
+            const listener = (message) => {
+                if (message.command === 'gameFound') {
                     this.matchmaker.off('msg', listener);
 
-                    this.game.raw = mes;
-                    this.game.code = mes.id;
+                    this.game.raw = message;
+                    this.game.code = message.id;
 
-                    resolve();
+                    resolve(message.id);
                 }
 
-                if (mes.error && mes.error === 'gameNotFound') {
+                if (message.error && message.error === 'gameNotFound') {
                     this.processError(`Game ${code} not found (likely expired).`)
                     this.leave();
+                    return 'gameNotFound';
                 }
             };
 
@@ -491,15 +492,24 @@ export class Bot {
 
         if (typeof data === 'string') {
             if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
-            await this.#joinGameWithCode(data);
-        } else if (typeof data === 'object') {
+
+            const joinResult = await this.#joinGameWithCode(data);
+
+            if (joinResult === 'matchmakerInitFail') return this.processError('failed to create matchmaker, you may be ratelimited (try a vpn?)');
+            if (joinResult === 'gameNotFound') return this.processError('game not found, it may have expired or been deleted');
+            if (!this.game.raw.id) return this.processError('an internal error occured while joining the game, please report this to developers');
+        }
+
+        if (typeof data === 'object') {
             if (this.account.id === 0) await this.loginAnonymously();
 
             this.game.raw = data;
             this.game.code = this.game.raw.id;
-        }
 
-        if (!this.game.raw.id) return this.processError('invalid game data passed to <bot>.join');
+            if (!this.game.raw.id) return this.processError('invalid game object passed to join (missing id)');
+            if (!this.game.raw.subdomain) return this.processError('invalid game object passed to join (missing subdomain)');
+            if (!this.game.raw.uuid) return this.processError('invalid game object passed to join (missing uuid)');
+        }
 
         const attempt = async () => {
             try {
