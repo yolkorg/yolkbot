@@ -4,7 +4,7 @@ import { CommCode } from '../constants/codes.js';
 export class ChatDispatch {
     constructor(msg, noLimit = false) {
         this.msg = msg;
-        this.noLimit = noLimit;
+        this.noLimit = noLimit || false;
     }
 
     validate() {

@@ -20,7 +20,11 @@ export interface GameOptionChanges {
 }
 
 export declare class GameOptionsDispatch {
+    changes: GameOptionChanges;
+
     constructor(changes: GameOptionChanges);
+
+    validate(bot: Bot): boolean;
     check(bot: Bot): boolean;
     execute(bot: Bot): void;
 }

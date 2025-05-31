@@ -13,6 +13,7 @@ interface APIParams {
     httpProxy?: string;
     socksProxy?: string;
     maxRetries?: number;
+    suppressErrors?: boolean;
 }
 
 export class API {

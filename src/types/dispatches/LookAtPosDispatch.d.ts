@@ -6,6 +6,7 @@ export declare class LookAtPosDispatch {
 
     constructor(pos: Position);
 
+    validate(bot: Bot): boolean;
     check(bot: Bot): boolean;
     execute(bot: Bot): void;
 }

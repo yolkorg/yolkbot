@@ -1,8 +1,11 @@
 import Bot from '../bot';
 
 export declare class FireDispatch {
-    constructor(amount: number);
+    amount: number;
 
+    constructor(amount?: number);
+
+    validate(bot: Bot): boolean;
     check(bot: Bot): boolean;
     execute(bot: Bot): void;
 }

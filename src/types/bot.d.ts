@@ -190,6 +190,7 @@ export interface GameSpatula {
 export interface Game {
     raw: RawGameData;
     code: string;
+    socket: yolkws | null;
     gameModeId: number;
     gameMode: string;
     mapIdx: number;
@@ -209,7 +210,6 @@ export interface Game {
     numCapturing: number;
     stageName: string;
     capturePercent: number;
-    socket: yolkws | null;
 }
 
 export interface Pathing {
@@ -231,6 +231,9 @@ export interface BotState {
     name: string;
     weaponIdx: number;
     inGame: boolean;
+    yaw: number;
+    pitch: number;
+    controlKeys: number;
     reloading: boolean;
     swappingGun: boolean;
     usingMelee: boolean;
@@ -238,7 +241,6 @@ export interface BotState {
     serverStateIdx: number;
     shotsFired: number;
     buffer: BufferFrame[];
-    quit: boolean;
 }
 
 export interface ChiknWinnerResponse {
@@ -252,10 +254,10 @@ export class Bot {
     Intents: intents;
     intents: number[];
 
-    proxy: string;
-    httpProxy: string;
     instance: string;
     protocol: string;
+    proxy: string;
+    httpProxy: string;
 
     state: BotState;
     players: Record<string, GamePlayer>;
@@ -264,10 +266,13 @@ export class Bot {
     account: Account;
 
     ping: number;
+    pathing: Pathing;
+
     lastPingTime: number;
     lastDeathTime: number;
     lastChatTime: number;
-    pathing: Pathing;
+
+    hasQuit: boolean;
 
     api: API;
     matchmaker: Matchmaker | null;
