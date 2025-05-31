@@ -86,6 +86,18 @@
             "import": "./dist/dispatches/*.js",
             "types": "./dist/types/dispatches/*.d.ts"
         },
+        "./dispatches": {
+            "import": "./dist/dispatches/index.js",
+            "types": "./dist/types/dispatches.d.ts"
+        },
+        "./dispatches/*": {
+            "import": "./dist/dispatches/*.js",
+            "types": "./dist/types/dispatches/*.d.ts"
+        },
+        "./dispatches/*.js": {
+            "import": "./dist/dispatches/*.js",
+            "types": "./dist/types/dispatches/*.d.ts"
+        },
         "./wasm": {
             "import": "./dist/wasm/wrapper.js",
             "types": "./dist/types/wasm/wrapper.d.ts"
