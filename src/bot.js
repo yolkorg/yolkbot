@@ -109,9 +109,8 @@ export class Bot {
             shotsFired: 0,
             buffer: [],
 
-            // various booleans for checks
-            left: false,
-            quit: false
+            // for checks
+            left: false
         }
 
         this.players = {}
@@ -704,7 +703,7 @@ export class Bot {
             id,
             uniqueId: CommIn.unPackString(),
             name: CommIn.unPackString(),
-            safename: CommIn.unPackString(),
+            safeName: CommIn.unPackString(),
             charClass: CommIn.unPackInt8U(),
             team: CommIn.unPackInt8U(),
             primaryWeaponItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
@@ -749,11 +748,13 @@ export class Bot {
         CommIn.unPackInt8U(); // private (bool)
         CommIn.unPackInt8U(); // gametype
 
-        if (!this.players[playerData.id]) this.players[playerData.id] = new GamePlayer(playerData);
-        this.emit('playerJoin', this.players[playerData.id]);
+        const player = new GamePlayer(playerData, this.game.gameMode === GameModes.kotc ? this.game.activeZone : null);
+        if (!this.players[playerData.id]) this.players[playerData.id] = player;
+
+        this.emit('playerJoin', player);
 
         if (this.me.id === playerData.id) {
-            this.me = this.players[playerData.id];
+            this.me = player;
             this.emit('botJoined', this.me);
         }
     }
@@ -897,9 +898,19 @@ export class Bot {
             killed.lastDeathTime = Date.now();
             killed.hp = 100;
             killed.spawnShield = 0;
+            killed.stats.deathsInGame++;
+            killed.stats.totalDeaths++;
         }
 
-        if (killer) killer.streak++;
+        if (killer) {
+            killer.streak++;
+            killer.stats.killsInGame++;
+            killer.stats.totalKills++;
+            killer.stats.streak = killer.streak;
+
+            if (killer.streak > killer.stats.bestGameStreak) killer.stats.bestGameStreak = killer.streak;
+            if (killer.streak > killer.stats.bestOverallStreak) killer.stats.bestOverallStreak = killer.streak;
+        }
 
         this.emit('playerDeath', killed, killer);
     }

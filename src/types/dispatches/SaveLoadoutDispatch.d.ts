@@ -27,6 +27,7 @@ export class SaveLoadoutDispatch {
 
     constructor(opts: Opts);
 
+    validate(bot: Bot): boolean;
     check(bot: Bot): boolean;
     execute(bot: Bot): void;
 }

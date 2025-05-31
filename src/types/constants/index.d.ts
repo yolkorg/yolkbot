@@ -1,7 +1,6 @@
 import { AUG, CSG1, DozenGauge, Eggk47, M24, RPEGG, SMG } from './guns';
-import { Item } from './items';
 
-export declare const findItemById: (id: number) => Item;
+export { findItemById } from './findItemById';
 
 export declare const ChatFlags: {
     none: number;
