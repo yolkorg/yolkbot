@@ -2,9 +2,8 @@ import CommOut from '../comm/CommOut.js';
 import { CommCode } from '../constants/codes.js';
 
 export class ChatDispatch {
-    constructor(msg, noLimit = false) {
+    constructor(msg) {
         this.msg = msg;
-        this.noLimit = noLimit || false;
     }
 
     validate() {
@@ -16,19 +15,19 @@ export class ChatDispatch {
 
     check(bot) {
         if (!bot.state.inGame) return false;
-        if ((bot.lastChatTime + 3000) > Date.now() && !this.noLimit) return false;
-        if (!bot.game.isPrivate && !bot.account.emailVerified && bot.account.accountAge < (1e3 * 60 * 60 * 12)) return false;
+        if (bot.state.chatLines >= 2) return false;
+        if (!bot.game.isPrivate && !bot.account.emailVerified && !bot.account.isAged) return false;
 
         return true;
     }
 
     execute(bot) {
+        bot.state.chatLines++;
+
         const out = CommOut.getBuffer();
         out.packInt8(CommCode.chat);
         out.packString(this.msg);
         out.send(bot.game.socket);
-
-        bot.lastChatTime = Date.now();
     }
 }
 
