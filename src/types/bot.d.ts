@@ -129,7 +129,7 @@ export interface Account {
     loadout: AccountLoadout;
     ownedItemIds: number[];
     vip: boolean;
-    accountAge: number;
+    isAged: boolean;
     emailVerified: boolean;
     eggBalance: number;
     stats: {
@@ -231,6 +231,7 @@ export interface BotState {
     name: string;
     weaponIdx: number;
     inGame: boolean;
+    chatLines: number;
     yaw: number;
     pitch: number;
     controlKeys: number;
@@ -270,7 +271,6 @@ export class Bot {
 
     lastPingTime: number;
     lastDeathTime: number;
-    lastChatTime: number;
 
     hasQuit: boolean;
 

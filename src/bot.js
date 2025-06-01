@@ -92,6 +92,7 @@ export class Bot {
 
             // wow!
             inGame: false,
+            chatLines: 0,
 
             // view
             yaw: 0,
@@ -227,8 +228,8 @@ export class Bot {
             vip: false,
 
             // used for chat checking
-            accountAge: 0,
             emailVerified: false,
+            isAged: false,
 
             // balance is tracked
             eggBalance: 0,
@@ -250,11 +251,9 @@ export class Bot {
         });
 
         this.ping = 0;
+
         this.lastPingTime = -1;
-
         this.lastDeathTime = -1;
-        this.lastChatTime = -1;
-
         this.lastUpdateTick = 0;
 
         this.pathing = {
@@ -325,11 +324,11 @@ export class Bot {
 
         this.account.rawLoginData = loginData;
 
-        this.account.accountAge = loginData.accountAge;
         this.account.eggBalance = loginData.currentBalance;
         this.account.emailVerified = loginData.emailVerified;
         this.account.firebaseId = loginData.firebaseId;
         this.account.id = loginData.id;
+        this.account.isAged = new Date(loginData.dateCreated).getTime() < 17145468e5;
         this.account.loadout = loginData.loadout;
         this.account.ownedItemIds = loginData.ownedItemIds;
         this.account.session = loginData.session;
@@ -591,6 +590,8 @@ export class Bot {
                 }
             }
         }
+
+        this.state.chatLines = Math.max(0, this.state.chatLines - 1 / (30 * 4));
 
         if (this.me.playing) {
             const idx = this.state.stateIdx;
@@ -1939,6 +1940,9 @@ export class Bot {
 
         this.#dispatches = [];
 
+        this.state.inGame = false;
+        this.state.chatLines = 0;
+
         this.state.reloading = false;
         this.state.swappingGun = false;
         this.state.usingMelee = false;
@@ -1954,11 +1958,9 @@ export class Bot {
         this.game = this.#initialGame;
 
         this.ping = 0;
+
         this.lastPingTime = -1;
-
         this.lastDeathTime = -1;
-        this.lastChatTime = -1;
-
         this.lastUpdateTick = 0;
 
         this.pathing = {
