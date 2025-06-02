@@ -13,7 +13,7 @@ interface MatchmakerParams {
 
 export interface Region {
     id: string;
-    name: string;
+    sub: string;
 };
 
 export interface FindGameParams {
