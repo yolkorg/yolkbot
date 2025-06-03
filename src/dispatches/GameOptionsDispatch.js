@@ -2,6 +2,8 @@ const gravityScale = Array.from({ length: 4 }, (_, i) => (i + 1) * 0.25);
 const damageScale = Array.from({ length: 9 }, (_, i) => i * 0.25);
 const regenScale = Array.from({ length: 17 }, (_, i) => i * 0.25);
 
+const whichever = (arg1, arg2) => typeof arg1 !== 'undefined' ? arg1 : arg2;
+
 export class GameOptionsDispatch {
     constructor(changes) {
         this.changes = changes;
@@ -10,21 +12,21 @@ export class GameOptionsDispatch {
     #constructFinalOutput(bot) {
         const output = {};
 
-        output.gravity = this.changes.gravity || bot.game.options.gravity;
-        output.damage = this.changes.damage || bot.game.options.damage;
-        output.healthRegen = this.changes.healthRegen || bot.game.options.healthRegen;
-        output.locked = this.changes.locked !== undefined ? this.changes.locked : bot.game.options.locked;
-        output.noTeamChange = this.changes.noTeamChange !== undefined ? this.changes.noTeamChange : bot.game.options.noTeamChange;
-        output.noTeamShuffle = this.changes.noTeamShuffle !== undefined ? this.changes.noTeamShuffle : bot.game.options.noTeamShuffle;
+        output.gravity = whichever(this.changes.gravity, bot.game.options.gravity);
+        output.damage = whichever(this.changes.damage, bot.game.options.damage);
+        output.healthRegen = whichever(this.changes.healthRegen, bot.game.options.healthRegen);
+        output.locked = whichever(this.changes.locked, bot.game.options.locked);
+        output.noTeamChange = whichever(this.changes.noTeamChange, bot.game.options.noTeamChange);
+        output.noTeamShuffle = whichever(this.changes.noTeamShuffle, bot.game.options.noTeamShuffle);
 
         output.weaponsDisabled = [
-            typeof this.changes.disableEggk !== 'undefined' ? this.changes.disableEggk : bot.game.options.weaponsDisabled[0],
-            typeof this.changes.disableScrambler !== 'undefined' ? this.changes.disableScrambler : bot.game.options.weaponsDisabled[1],
-            typeof this.changes.disableFreeRanger !== 'undefined' ? this.changes.disableFreeRanger : bot.game.options.weaponsDisabled[2],
-            typeof this.changes.disableRPG !== 'undefined' ? this.changes.disableRPG : bot.game.options.weaponsDisabled[3],
-            typeof this.changes.disableWhipper !== 'undefined' ? this.changes.disableWhipper : bot.game.options.weaponsDisabled[4],
-            typeof this.changes.disableCrackshot !== 'undefined' ? this.changes.disableCrackshot : bot.game.options.weaponsDisabled[5],
-            typeof this.changes.disableTriHard !== 'undefined' ? this.changes.disableTriHard : bot.game.options.weaponsDisabled[6]
+            whichever(this.changes.disableEggk, bot.game.options.weaponsDisabled[0]),
+            whichever(this.changes.disableScrambler, bot.game.options.weaponsDisabled[1]),
+            whichever(this.changes.disableFreeRanger, bot.game.options.weaponsDisabled[2]),
+            whichever(this.changes.disableRPG, bot.game.options.weaponsDisabled[3]),
+            whichever(this.changes.disableWhipper, bot.game.options.weaponsDisabled[4]),
+            whichever(this.changes.disableCrackshot, bot.game.options.weaponsDisabled[5]),
+            whichever(this.changes.disableTriHard, bot.game.options.weaponsDisabled[6])
         ];
 
         if (this.changes.toDisable && Array.isArray(this.changes.toDisable)) this.changes.toDisable.forEach((idx) => output.weaponsDisabled[idx] = true);

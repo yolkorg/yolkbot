@@ -1,8 +1,5 @@
 declare class Gun {
-    dmgTypeId: number;
     highPrecision: boolean;
-    equipTime: number;
-    stowWeaponTime: number;
     accuracy: number;
     shootingAccuracy: number;
     movementAccuracy: number;
@@ -11,7 +8,6 @@ declare class Gun {
     accuracyLoss: number;
     accuracyRecover: number;
     tracer: number;
-    burstQueue: number;
     adsMod: number;
     movementAccuracyMod: number;
     reloadBloom: boolean;

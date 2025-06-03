@@ -2,41 +2,49 @@ import { AUG, CSG1, DozenGauge, Eggk47, M24, RPEGG, SMG } from './guns';
 
 export { findItemById } from './findItemById';
 
-export declare const ChatFlags: {
-    none: number;
-    pinned: number;
-    team: number;
+export declare const ChatFlag: {
+    None: number;
+    Pinned: number;
+    Team: number;
+    Mod: number;
+    Server: number;
 }
 
 export declare const ChiknWinnerDailyLimit: number;
 
-export declare const CollectTypes: {
-    AMMO: number;
-    GRENADE: number;
+export declare const CollectType: {
+    Ammo: number;
+    Grenade: number;
 };
 
 export declare const CoopStates: {
-    start: number;
-    score: number;
-    win: number;
-    capturing: number;
-    contested: number;
-    takeover: number;
-    abandoned: number;
-    unclaimed: number;
+    Start: number;
+    Score: number;
+    Win: number;
+    Capturing: number;
+    Contested: number;
+    Takeover: number;
+    Abandoned: number;
+    Unclaimed: number;
 };
 
 export declare const FirebaseKey: string;
 
-export declare const SyncRate: number;
 export declare const FramesBetweenSyncs: number;
 
-export declare const GameActions: {
-    reset: number;
-    pause: number;
+export declare const GameAction: {
+    Reset: number;
+    Pause: number;
 };
 
-export declare const GameModes: {
+export declare const GameMode: {
+    FFA: number;
+    Team: number;
+    Spatula: number;
+    KOTC: number;
+};
+
+export declare const RawGameModes: {
     ffa: number;
     team: number;
     spatula: number;
@@ -44,16 +52,18 @@ export declare const GameModes: {
 };
 
 export declare const GameOptionFlags: {
-    locked: number;
-    noTeamChange: number;
-    noTeamShuffle: number;
+    Locked: number;
+    NoTeamChange: number;
+    NoTeamShuffle: number;
 };
+
+export declare const GunEquipTime: number;
 
 export declare const GunList: Array<typeof Eggk47 | typeof DozenGauge | typeof CSG1 | typeof RPEGG | typeof SMG | typeof M24 | typeof AUG>;
 
 export declare const IsBrowser: boolean;
 
-export declare const ItemTypes: {
+export declare const ItemType: {
     Hat: number;
     Stamp: number;
     Primary: number;
@@ -62,15 +72,15 @@ export declare const ItemTypes: {
     Melee: number;
 };
 
-export declare const Movements: {
-    FORWARD: number;
-    BACK: number;
-    LEFT: number;
-    RIGHT: number;
-    JUMP: number;
-    FIRE: number;
-    MELEE: number;
-    SCOPE: number;
+export declare const Movement: {
+    Forward: number;
+    Backward: number;
+    Left: number;
+    Right: number;
+    Jump: number;
+    Fire: number;
+    Melee: number;
+    Scope: number;
 };
 
 export declare const PlayTypes: {
@@ -81,7 +91,7 @@ export declare const PlayTypes: {
 
 export declare const ProxiesEnabled: boolean;
 
-export declare const ShellStreaks: {
+export declare const ShellStreak: {
     HardBoiled: number;
     EggBreaker: number;
     Restock: number;

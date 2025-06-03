@@ -1,4 +1,4 @@
-import { GunList, Movements, ShellStreaks, SocialMedias } from '../constants/index.js';
+import { GunList, Movement, ReverseSocialMedia, ShellStreak } from '../constants/index.js';
 import { Cluck9mm } from '../constants/guns.js';
 
 export class GamePlayer {
@@ -14,7 +14,7 @@ export class GamePlayer {
         this.playing = playerData.playing;
 
         this.socials = playerData.social && JSON.parse(playerData.social);
-        if (this.socials) this.socials.forEach((social) => social.type = SocialMedias[social.id]);
+        if (this.socials) this.socials.forEach((social) => social.type = ReverseSocialMedia[social.id]);
 
         this.isVip = playerData.upgradeProductId > 0;
         this.showBadge = !playerData.hideBadge || false;
@@ -25,7 +25,7 @@ export class GamePlayer {
             z: playerData.z
         };
 
-        this.jumping = playerData.$controlKeys & Movements.JUMP;
+        this.jumping = playerData.$controlKeys & Movement.Jump;
         this.climbing = false;
 
         this.view = {
@@ -77,7 +77,7 @@ export class GamePlayer {
         this.grenades = 1;
 
         this.streak = playerData.score;
-        this.streakRewards = Object.values(ShellStreaks).filter(streak => playerData.activeShellStreaks & streak);
+        this.streakRewards = Object.values(ShellStreak).filter(streak => playerData.activeShellStreaks & streak);
 
         this.hp = playerData.hp;
         this.hpShield = 0;

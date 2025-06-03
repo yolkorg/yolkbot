@@ -1,5 +1,5 @@
 import API from './api.js';
-import { GameModes, PlayTypes, ProxiesEnabled } from './constants/index.js';
+import { PlayType, ProxiesEnabled, RawGameModes } from './constants/index.js';
 import { validate } from './wasm/wrapper.js';
 
 import yolkws from './socket.js';
@@ -130,14 +130,14 @@ export class Matchmaker {
             return this.#processError('did not find region in regionList');
 
         if (!params.mode) return this.#processError('pass a mode to findPublicGame')
-        if (typeof GameModes[params.mode] !== 'number') return this.#processError('invalid mode passed to findPublicGame, see GameModes for a list')
+        if (typeof RawGameModes[params.mode] !== 'number') return this.#processError('invalid mode passed to findPublicGame, see GameModes for a list')
 
         return new Promise((res) => {
             const opts = {
                 command: 'findGame',
                 region: params.region,
-                playType: PlayTypes.joinPublic,
-                gameType: GameModes[params.mode],
+                playType: PlayType.JoinPublic,
+                gameType: RawGameModes[params.mode],
                 sessionId: this.sessionId
             };
 
@@ -160,7 +160,7 @@ export class Matchmaker {
     }
 
     getRandomGameMode() {
-        const gameModeArray = Object.keys(GameModes);
+        const gameModeArray = Object.keys(RawGameModes);
         return gameModeArray[Math.floor(Math.random() * gameModeArray.length)];
     }
 

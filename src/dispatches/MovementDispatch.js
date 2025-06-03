@@ -1,4 +1,4 @@
-import { Movements } from '../constants/index.js';
+import { Movement } from '../constants/index.js';
 
 export class MovementDispatch {
     constructor(inputKeys) {
@@ -9,8 +9,8 @@ export class MovementDispatch {
     validate() {
         if (typeof this.inputKeys !== 'number') return false;
 
-        if (this.inputKeys & Movements.FORWARD && this.inputKeys & Movements.BACKWARD) return false;
-        if (this.inputKeys & Movements.LEFT && this.inputKeys & Movements.RIGHT) return false;
+        if (this.inputKeys & Movement.Forward && this.inputKeys & Movement.Backward) return false;
+        if (this.inputKeys & Movement.Left && this.inputKeys & Movement.Right) return false;
 
         return true;
     }
