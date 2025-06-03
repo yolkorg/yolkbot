@@ -1575,6 +1575,21 @@ export const ShopItems = [
     },
     {
         "itemIds": [
+            1445
+        ],
+        "sku": "item_hat_wbs",
+        "name": "The Grand Entrance W",
+        "price": 5,
+        "salePrice": null,
+        "flagText": "",
+        "type": "item",
+        "inStore": 0,
+        "currency": 0,
+        "isActive": true,
+        "id": 123
+    },
+    {
+        "itemIds": [
             4248
         ],
         "sku": "item_m24_fusion",
@@ -2058,20 +2073,65 @@ export const ShopItems = [
     },
     {
         "itemIds": [
-            1457,
-            2319,
-            3042,
-            15089
+            3026
         ],
-        "sku": "bun_jones",
-        "name": "Eggiana Jones Bundle",
-        "price": 6,
+        "sku": "item_9mm_ccwand",
+        "name": "Cubic Castles Cluck ",
+        "price": 4,
+        "salePrice": null,
+        "flagText": "",
+        "type": "item",
+        "inStore": 0,
+        "currency": 0,
+        "isActive": true,
+        "id": 209
+    },
+    {
+        "itemIds": [
+            16093
+        ],
+        "sku": "item_gre_banana",
+        "name": "Banana Grenade",
+        "price": 5,
+        "salePrice": null,
+        "flagText": "",
+        "type": "item",
+        "inStore": 1,
+        "currency": 0,
+        "isActive": true,
+        "id": 210
+    },
+    {
+        "itemIds": [
+            1597
+        ],
+        "sku": "item_hat_kartbros",
+        "name": "Bro Kart Sigma",
+        "price": 4,
+        "salePrice": null,
+        "flagText": "",
+        "type": "item",
+        "inStore": 1,
+        "currency": 0,
+        "isActive": true,
+        "id": 211
+    },
+    {
+        "itemIds": [
+            1480,
+            2635,
+            3437,
+            15090
+        ],
+        "sku": "bun_ridge",
+        "name": "Ridge Racer",
+        "price": 7,
         "salePrice": null,
         "flagText": "",
         "type": "bundle",
         "inStore": 1,
         "currency": 0,
         "isActive": true,
-        "id": 208
+        "id": 212
     }
 ];

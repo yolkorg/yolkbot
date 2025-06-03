@@ -2642,7 +2642,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.08867675721627499,
@@ -3344,10 +3344,12 @@ export const Items = [
                 "Eggwalker",
                 "Rainbow",
                 "Gold",
-                "Mar24"
+                "Mar24",
+                "Jun25",
+                "premFeatTwo"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.05234545439905691,
@@ -3535,8 +3537,7 @@ export const Items = [
                 "Mar23",
                 "Purple",
                 "Aug24",
-                "Apr25",
-                "premFeatTwo"
+                "Apr25"
             ]
         },
         "is_available": false,
@@ -7195,10 +7196,11 @@ export const Items = [
                 "Egg",
                 "Purple",
                 "Gold",
-                "JunM24"
+                "JunM24",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.03139999298521712,
@@ -9804,10 +9806,11 @@ export const Items = [
                 "Grey",
                 "Gray",
                 "Orange",
-                "Electrolytes"
+                "Electrolytes",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.09519071283078828,
@@ -10729,10 +10732,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Red",
-                "AugM24"
+                "AugM24",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": 0.021915916439513516,
@@ -10754,10 +10758,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Green",
-                "AugM24"
+                "AugM24",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": 0.0208010053824621,
@@ -10779,10 +10784,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Pink",
-                "AugM24"
+                "AugM24",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": 0.021915916439513516,
@@ -10804,10 +10810,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Yellow",
-                "AugM24"
+                "AugM24",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": 0.02370142462174929,
@@ -10830,10 +10837,11 @@ export const Items = [
                 "Aug23",
                 "Red",
                 "White",
-                "Green"
+                "Green",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": 0.0006045990621803554,
@@ -10855,10 +10863,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Blue",
-                "Chomp"
+                "Chomp",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.03449437859488835,
@@ -11120,7 +11129,7 @@ export const Items = [
     {
         "id": 1445,
         "name": "The Grand Entrance Wings",
-        "price": 2147483647,
+        "price": 5,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -11131,11 +11140,17 @@ export const Items = [
                 "SepM23",
                 "WBros",
                 "Red",
-                "Yellow"
+                "Yellow",
+                "Jun25",
+                "premFeatTwo"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_hat_wbs"
+        ],
         "align": {
             "x": -0.0572610207721147,
             "y": -0.2426137142559055,
@@ -11383,7 +11398,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.09525324482895936,
@@ -11412,7 +11427,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.04924187010309966,
@@ -11437,7 +11452,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.02506490018106522,
@@ -11465,7 +11480,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.10286629613972376,
@@ -11491,7 +11506,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.10069550360080193,
@@ -11519,7 +11534,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "manual",
         "align": {
             "x": -0.06364583554386138,
@@ -11547,7 +11562,7 @@ export const Items = [
                 "premFeatOne"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -14787,7 +14802,7 @@ export const Items = [
                 "Yellow"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.10602932412084898,
@@ -14813,7 +14828,7 @@ export const Items = [
                 "Brown"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.09475807861801155,
@@ -14839,7 +14854,7 @@ export const Items = [
                 "Grey"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.09475807861801155,
@@ -14865,7 +14880,7 @@ export const Items = [
                 "Brown"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.08686266749938598,
@@ -14891,7 +14906,7 @@ export const Items = [
                 "Spade"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -14901,6 +14916,86 @@ export const Items = [
             "x": -0.09003252940963913,
             "y": -0.19177304881571922,
             "z": -0.04119685742841103
+        }
+    },
+    {
+        "id": 1595,
+        "name": "Cow Racer",
+        "price": 1500,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_kartcow",
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "White",
+                "Black",
+                "Eyes"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase",
+        "align": {
+            "x": -0.13533271945095926,
+            "y": -0.3602916782544503,
+            "z": -0.06193604248259671
+        }
+    },
+    {
+        "id": 1596,
+        "name": "Velocity Raptor",
+        "price": 2500,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_velociraptor",
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Eyes",
+                "Face",
+                "Orange"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase",
+        "align": {
+            "x": -0.16291756742233354,
+            "y": -0.36748988947567973,
+            "z": -0.07455728579112153
+        }
+    },
+    {
+        "id": 1597,
+        "name": "The Green Machine",
+        "price": 4,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_kartbros",
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Green"
+            ]
+        },
+        "is_available": true,
+        "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_hat_kartbros"
+        ],
+        "align": {
+            "x": 0.013567821915410505,
+            "y": 0.1229279294691179,
+            "z": 0.0061995837427129
         }
     },
     {
@@ -20841,10 +20936,12 @@ export const Items = [
             "tags": [
                 "Breakfast",
                 "July23",
-                "MayM24"
+                "MayM24",
+                "Jun25",
+                "premFeatTwo"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23209,10 +23306,11 @@ export const Items = [
             "tags": [
                 "Aug23",
                 "Eggs",
-                "Kart"
+                "Kart",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23229,10 +23327,11 @@ export const Items = [
             "tags": [
                 "Aug23",
                 "Eggs",
-                "Kart"
+                "Kart",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23251,10 +23350,11 @@ export const Items = [
                 "Yellow",
                 "?",
                 "JanM24",
-                "Kart"
+                "Kart",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23272,10 +23372,11 @@ export const Items = [
                 "Aug23",
                 "Black",
                 "White",
-                "Kart"
+                "Kart",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23314,10 +23415,11 @@ export const Items = [
             "tags": [
                 "Aug23",
                 "White",
-                "Kart"
+                "Kart",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -24183,7 +24285,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24207,7 +24309,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24229,7 +24331,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24251,7 +24353,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24274,7 +24376,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24298,7 +24400,7 @@ export const Items = [
                 "premFeatOne"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24903,8 +25005,7 @@ export const Items = [
                 "Blue",
                 "Sbros",
                 "Ronaldo",
-                "Apr25",
-                "premFeatTwo"
+                "Apr25"
             ]
         },
         "is_available": false,
@@ -26724,7 +26825,8 @@ export const Items = [
             "tags": [
                 "AugM24",
                 "White",
-                "Kart"
+                "Kart",
+                "Jun25"
             ]
         },
         "is_available": false,
@@ -26746,10 +26848,11 @@ export const Items = [
                 "White",
                 "Kart",
                 "Text",
-                "Logo"
+                "Logo",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -27798,7 +27901,7 @@ export const Items = [
                 "Pink"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -27822,7 +27925,7 @@ export const Items = [
                 "Pink"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -27846,7 +27949,7 @@ export const Items = [
                 "Pink"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -27908,8 +28011,244 @@ export const Items = [
                 "Itza"
             ]
         },
+        "is_available": false,
+        "unlock": "manual"
+    },
+    {
+        "id": 2635,
+        "name": "Stressed Out Driver Stamp",
+        "price": 2147483647,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 17,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Face",
+                "Wheel"
+            ]
+        },
         "is_available": true,
         "unlock": "manual"
+    },
+    {
+        "id": 2636,
+        "name": "Invader Zip Stamp",
+        "price": 750,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 18,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Face",
+                "Alien",
+                "Green"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
+        "id": 2637,
+        "name": "Miss Meow Stamp",
+        "price": 750,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 19,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Face",
+                "Cat",
+                "Orange"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
+        "id": 2638,
+        "name": "Lightning Bolt Power-up",
+        "price": 1000,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 20,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Yellow",
+                "Orange"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
+        "id": 2639,
+        "name": "Tornado Power-up",
+        "price": 500,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 21,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Blue",
+                "Gray",
+                "Grey",
+                "Silver"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
+        "id": 2640,
+        "name": "Shield Power-up",
+        "price": 250,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 22,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Blue",
+                "Gray",
+                "Grey",
+                "Silver",
+                "Newsletter"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
+        "id": 2641,
+        "name": "Speed boost Power-up",
+        "price": 2147483647,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 23,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Blue",
+                "Orange"
+            ]
+        },
+        "is_available": false,
+        "unlock": "manual"
+    },
+    {
+        "id": 2642,
+        "name": "Rocket Power-up",
+        "price": 500,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 24,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Red"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
+        "id": 2643,
+        "name": "Kart Bros Logo",
+        "price": 200,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 25,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Orange",
+                "Blue",
+                "Text"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
+        "id": 2644,
+        "name": "Tuff Clan Stamp",
+        "price": 2147483647,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 26,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "SL",
+                "Community"
+            ]
+        },
+        "is_available": false,
+        "unlock": "manual"
+    },
+    {
+        "id": 2645,
+        "name": "Mark Andreggsen",
+        "price": 1000,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 27,
+            "y": 20,
+            "tags": [
+                "Jun25",
+                "Perm",
+                "Community"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
     },
     {
         "id": 3100,
@@ -28939,10 +29278,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Blue",
-                "Green"
+                "Green",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -29013,7 +29353,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -30299,10 +30639,11 @@ export const Items = [
                 "Aug23",
                 "Kart",
                 "Red",
-                "Blue"
+                "Blue",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -30366,7 +30707,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -31423,10 +31764,12 @@ export const Items = [
                 "Orange",
                 "Hoops",
                 "FebM24",
-                "JunM24"
+                "JunM24",
+                "Jun25",
+                "premFeatTwo"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -31793,8 +32136,7 @@ export const Items = [
                 "Yellow",
                 "Eyes",
                 "Apr24",
-                "Apr25",
-                "premFeatTwo"
+                "Apr25"
             ]
         },
         "is_available": false,
@@ -31869,10 +32211,11 @@ export const Items = [
                 "Aug23",
                 "Kart",
                 "Blue",
-                "Green"
+                "Green",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -31894,7 +32237,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -32715,7 +33058,7 @@ export const Items = [
     {
         "id": 3026,
         "name": "Cubic Castles Cluck 9mm",
-        "price": 2147483647,
+        "price": 4,
         "item_type_id": 4,
         "item_type_name": "Secondary",
         "category_name": "Shared Secondary Weapons",
@@ -32727,11 +33070,16 @@ export const Items = [
                 "White",
                 "Black",
                 "Red",
-                "Skull"
+                "Skull",
+                "Perm"
             ]
         },
-        "is_available": false,
-        "unlock": "premium"
+        "is_available": true,
+        "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_9mm_ccwand"
+        ]
     },
     {
         "id": 3027,
@@ -33403,10 +33751,11 @@ export const Items = [
                 "Aug23",
                 "Kart",
                 "Red",
-                "Blue"
+                "Blue",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -33503,7 +33852,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -34776,10 +35125,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Blue",
-                "Green"
+                "Green",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -34874,7 +35224,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -36176,10 +36526,11 @@ export const Items = [
                 "Pink",
                 "Yellow",
                 "Princess",
-                "Peach"
+                "Peach",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -36243,7 +36594,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -37475,10 +37826,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Red",
-                "Blue"
+                "Blue",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -37547,7 +37899,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -37683,8 +38035,7 @@ export const Items = [
                 "Robot",
                 "Grey",
                 "EGGORG",
-                "Apr25",
-                "premFeatTwo"
+                "Apr25"
             ]
         },
         "is_available": false,
@@ -38789,8 +39140,7 @@ export const Items = [
                 "Blue",
                 "Face",
                 "Apr24",
-                "Apr25",
-                "premFeatTwo"
+                "Apr25"
             ],
             "sound": "grenade_diablocannon",
             "cell": 12,
@@ -38915,14 +39265,16 @@ export const Items = [
                 "Red",
                 "JunM24",
                 "Fbros",
-                "SepM24"
+                "SepM24",
+                "Jun25",
+                "premFeatTwo"
             ],
             "sound": "grenade_football",
             "cell": 14,
             "smokeColors": "softblack",
             "fireColors": "default"
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -39245,10 +39597,11 @@ export const Items = [
                 "Kart",
                 "AprM23",
                 "Turtle",
-                "AugM24"
+                "AugM24",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -39266,10 +39619,11 @@ export const Items = [
                 "AprM23",
                 "Turtle",
                 "JanM24",
-                "AugM24"
+                "AugM24",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -39310,10 +39664,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Green",
-                "Eggs"
+                "Eggs",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -39403,7 +39758,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -39860,11 +40215,38 @@ export const Items = [
             "smokeColors": "default",
             "fireColors": "default"
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
             "item_gre_mayan"
+        ]
+    },
+    {
+        "id": 16093,
+        "name": "Banana Grenade",
+        "price": 5,
+        "item_type_id": 6,
+        "item_type_name": "Grenade",
+        "category_name": "Grenades",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "grenade_KartBanana",
+            "tags": [
+                "Jun25",
+                "Yellow",
+                "Kartbros"
+            ],
+            "sound": "grenade_KartBanana",
+            "cell": 28,
+            "smokeColors": "yellow",
+            "fireColors": "yellow"
+        },
+        "is_available": true,
+        "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_gre_banana"
         ]
     },
     {
@@ -40773,10 +41155,11 @@ export const Items = [
                 "Kart",
                 "Aug23",
                 "Green",
-                "Yellow"
+                "Yellow",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -40798,7 +41181,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -41563,7 +41946,7 @@ export const Items = [
                 "premFeatOne"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -41832,10 +42215,11 @@ export const Items = [
                 "Kart",
                 "Red",
                 "Blue",
-                "Whisk"
+                "Whisk",
+                "Jun25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -41980,7 +42364,7 @@ export const Items = [
                 "May25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -42003,7 +42387,7 @@ export const Items = [
                 "premFeatOne"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -42874,7 +43258,26 @@ export const Items = [
                 "Jones"
             ]
         },
-        "is_available": true,
+        "is_available": false,
+        "unlock": "premium"
+    },
+    {
+        "id": 15090,
+        "name": "F1 Racer Melee",
+        "price": 2147483647,
+        "item_type_id": 7,
+        "item_type_name": "Melee",
+        "category_name": "Melee",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "melee_kartbros",
+            "tags": [
+                "Jun25",
+                "Kartbros",
+                "Car"
+            ]
+        },
+        "is_available": false,
         "unlock": "premium"
     }
 ];

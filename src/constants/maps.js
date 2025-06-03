@@ -49,7 +49,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "12"
     },
     {
@@ -75,7 +75,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "14"
     },
     {
@@ -88,7 +88,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "14"
     },
     {
@@ -127,7 +127,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -166,7 +166,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -179,7 +179,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -192,7 +192,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "16"
     },
     {
@@ -244,7 +244,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -361,7 +361,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "16"
     },
     {
@@ -413,7 +413,7 @@ export const Maps = [
             "Spatula": true,
             "King": false
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "10"
     },
     {
@@ -426,7 +426,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -465,7 +465,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -543,7 +543,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -582,7 +582,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -608,7 +608,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -621,7 +621,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "14"
     },
     {
@@ -660,7 +660,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "12"
     },
     {
@@ -673,7 +673,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "14"
     },
     {
@@ -712,7 +712,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -725,7 +725,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "16"
     },
     {
@@ -777,7 +777,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "14"
     },
     {
@@ -790,7 +790,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -803,7 +803,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "18"
     },
     {
@@ -829,7 +829,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "16"
     },
     {
@@ -842,7 +842,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -868,7 +868,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "both",
+        "availability": "private",
         "numPlayers": "10"
     },
     {
@@ -894,7 +894,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -933,7 +933,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "18"
     },
     {
@@ -1050,7 +1050,7 @@ export const Maps = [
             "Spatula": true,
             "King": true
         },
-        "availability": "private",
+        "availability": "both",
         "numPlayers": "12"
     },
     {
@@ -1103,6 +1103,19 @@ export const Maps = [
             "King": true
         },
         "availability": "private",
+        "numPlayers": "18"
+    },
+    {
+        "filename": "zoomies",
+        "hash": "3vitx32ce8",
+        "name": "Zoomies",
+        "modes": {
+            "FFA": true,
+            "Teams": true,
+            "Spatula": true,
+            "King": true
+        },
+        "availability": "both",
         "numPlayers": "18"
     }
 ];

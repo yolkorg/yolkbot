@@ -1,16 +1,17 @@
 /* eslint-disable */
 export const Changelog = [
     {
-        "version": "1.0.6",
-        "date": "May 1 2025",
+        "version": "1.0.7",
+        "date": "May 3 2025",
         "content": [
-            "Lock in & look out eggventurers, it's time for the Leggacy of the Sun update!",
-            "Congrats to the winners of the EGG ORG takeover - all players have been awarded an Eggsassin Stamp!",
-            "We liked random killstreak bonuses so much we decided to keep them!",
-            "Eggiana Jones has arrived - the newest item bundle featuring a cracking new melee!",
-            "Throw Throw Apocalypto! Try the latest Premium Mayan Grenade - in-store & free for VIPs ",
-            "We got a hot one! Try the latest map Greenhouse in public & private lobbies",
-            "The Public Map pool has been overhauled! The Egg Org Maps are gone, replaced by a range of Mayan maps & old favorites!"
+            "Hit the gas with the latest Shell Shockers update introducing our smash new game - Kartbros.io.",
+            "Enjoy the new Kart Bros items, plus some of the other faves from the Kart and Bros sets in-store now.",
+            "Start your engines - a new VIP item has entered the store - Try the Premium Banana Grenade!",
+            "The Ridge Racer Bundle features The slick F1 racer Melee - wipe out your frenemies!",
+            "So we kinda broke controllers a little bit - fixed for all the joystick jockeys.",
+            "Another range of bug fixes, optimizations, ratchet tightening and squeegeeing has taken place behind the scenes.",
+            "Buckle up for the eggsciting new map: Zoomies - in public & private lobbies.",
+            "The Public Map pool has been switched and now contains 15 of your favorite Shell Shockers Maps."
         ]
     }
 ];
