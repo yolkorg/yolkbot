@@ -182,7 +182,7 @@ export const HousePromo = {
                 "https://freegames.io/game/football-bros?utm_source=shell_shockers_houseads&utm_medium=referral"
             ],
             "label": "Football Bros",
-            "active": true,
+            "active": false,
             "weighted": true,
             "hideOnCG": true,
             "imageExt": ".png",
@@ -190,7 +190,7 @@ export const HousePromo = {
             "linksTo": "link"
         },
         {
-            "active": true,
+            "active": false,
             "imageExt": ".jpg",
             "link": [
                 "https://freegames.io/game/basket-bros?utm_source=shell_shockers_houseads&utm_medium=referral",
@@ -211,6 +211,18 @@ export const HousePromo = {
             "weighted": false,
             "hideOnCG": false,
             "linksTo": "linksToVipStore"
+        },
+        {
+            "imageExt": ".jpg",
+            "active": true,
+            "label": "Kart Bros",
+            "link": [
+                "https://kartbros.io/"
+            ],
+            "id": "mbgzmt107",
+            "weighted": true,
+            "hideOnCG": true,
+            "linksTo": "link"
         },
         {
             "label": "Twitch Drops 7",
@@ -256,18 +268,6 @@ export const HousePromo = {
             "hideOnCG": false,
             "linksTo": "linksToCreateGame",
             "linksToCreateGame": "1"
-        },
-        {
-            "imageExt": ".jpg",
-            "active": false,
-            "label": "Shell Survey",
-            "link": [
-                "https://www.surveymonkey.com/r/septshell23"
-            ],
-            "id": "lofzjd42w",
-            "weighted": false,
-            "hideOnCG": false,
-            "linksTo": "link"
         },
         {
             "link": [
