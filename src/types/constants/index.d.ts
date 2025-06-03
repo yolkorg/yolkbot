@@ -100,7 +100,17 @@ export declare const ShellStreak: {
     MiniEgg: number;
 };
 
-export declare const SocialMedias: {
+export declare const SocialMedia: {
+    Facebook: number;
+    Instagram: number;
+    Tiktok: number;
+    Discord: number;
+    Youtube: number;
+    Twitter: number;
+    Twitch: number;
+};
+
+export declare const ReverseSocialMedia: {
     0: string;
     1: string;
     2: string;
@@ -110,7 +120,7 @@ export declare const SocialMedias: {
     6: string;
 };
 
-export declare const SocialRewards: {
+export declare const SocialReward: {
     Discord: string;
     Tiktok: string;
     Instagram: string;
@@ -122,9 +132,9 @@ export declare const SocialRewards: {
 
 export declare const StateBufferSize: number;
 
-export declare const Teams: {
-    blue: number;
-    red: number;
+export declare const Team: {
+    Blue: number;
+    Red: number;
 };
 
 export declare const URLRewards: string[];
