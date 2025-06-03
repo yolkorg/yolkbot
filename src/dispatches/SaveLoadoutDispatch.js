@@ -1,4 +1,4 @@
-import { findItemById, GunList, ItemTypes } from '../constants/index.js';
+import { findItemById, GunList, ItemType } from '../constants/index.js';
 
 import CommOut from '../comm/CommOut.js';
 import { CommCode } from '../constants/codes.js';
@@ -30,10 +30,10 @@ export class SaveLoadoutDispatch {
         if (load.colorIdx && load.colorIdx >= 14) return false; // trying to use color that doesn't exist
 
         // validate that you own all of the items you're trying to use
-        if (isType(load.hatId, ItemTypes.Hat) && !isDefault(load.hatId) && !bot.account.ownedItemIds.includes(load.hatId)) return false;
-        if (isType(load.stampId, ItemTypes.Stamp) && !isDefault(load.stampId) && !bot.account.ownedItemIds.includes(load.stampId)) return false;
-        if (isType(load.grenadeId, ItemTypes.Grenade) && !isDefault(load.grenadeId) && !bot.account.ownedItemIds.includes(load.grenadeId)) return false;
-        if (isType(load.meleeId, ItemTypes.Melee) && !isDefault(load.meleeId) && !bot.account.ownedItemIds.includes(load.meleeId)) return false;
+        if (isType(load.hatId, ItemType.Hat) && !isDefault(load.hatId) && !bot.account.ownedItemIds.includes(load.hatId)) return false;
+        if (isType(load.stampId, ItemType.Stamp) && !isDefault(load.stampId) && !bot.account.ownedItemIds.includes(load.stampId)) return false;
+        if (isType(load.grenadeId, ItemType.Grenade) && !isDefault(load.grenadeId) && !bot.account.ownedItemIds.includes(load.grenadeId)) return false;
+        if (isType(load.meleeId, ItemType.Melee) && !isDefault(load.meleeId) && !bot.account.ownedItemIds.includes(load.meleeId)) return false;
 
         // invalid classidx param
         if (typeof load.classIdx === 'number' && load.classIdx > 6 || load.classIdx < 0) return false;

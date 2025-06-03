@@ -11,19 +11,20 @@ import yolkws from './socket.js';
 
 import {
     ChiknWinnerDailyLimit,
-    CollectTypes,
-    CoopStates,
+    CollectType,
+    CoopState,
     findItemById,
     FramesBetweenSyncs,
-    GameActions,
-    GameModes,
-    GameOptionFlags,
+    GameAction,
+    GameMode,
     GunList,
-    ItemTypes,
-    Movements,
-    PlayTypes,
+    ItemType,
+    Movement,
+    PlayType,
     ProxiesEnabled,
-    ShellStreaks,
+    RawGameModes,
+    RawGameOptionFlags,
+    ShellStreak,
     StateBufferSize
 } from './constants/index.js';
 
@@ -38,8 +39,8 @@ import { fetchMap, initKotcZones } from './util.js';
 import { Challenges } from './constants/challenges.js';
 import { Maps } from './constants/maps.js';
 
-const CoopStagesById = Object.fromEntries(Object.entries(CoopStates).map(([key, value]) => [value, key]));
-const GameModesById = Object.fromEntries(Object.entries(GameModes).map(([key, value]) => [value, key]));
+const CoopStagesById = Object.fromEntries(Object.entries(CoopState).map(([key, value]) => [value, key.toLowerCase()]));
+const GameModeById = Object.fromEntries(Object.entries(GameMode).map(([key, value]) => [value, key]));
 
 const intents = {
     CHALLENGES: 1,
@@ -124,7 +125,7 @@ export class Bot {
 
             // data given on sign in
             gameModeId: 0, // assume ffa
-            gameMode: GameModesById[0], // assume ffa
+            gameMode: GameModeById[0], // assume ffa
             mapIdx: 0,
             map: {
                 filename: '',
@@ -175,7 +176,7 @@ export class Bot {
             },
 
             // data from kotc
-            stage: CoopStates.capturing,
+            stage: CoopState.Capturing, // this is shell default
             zoneNumber: 0,
             activeZone: [],
             capturing: 0,
@@ -450,7 +451,7 @@ export class Bot {
         if (!opts.region) opts.region = this.matchmaker.getRandomRegion();
 
         if (!opts.mode) return this.processError('pass a mode to createPrivateGame')
-        if (typeof GameModes[opts.mode] !== 'number') return this.processError('invalid mode passed to createPrivateGame, see GameModes for a list')
+        if (typeof RawGameModes[opts.mode] !== 'number') return this.processError('invalid mode passed to createPrivateGame')
 
         if (!opts.map) opts.map = Maps[Maps.length * Math.random() | 0].name;
 
@@ -474,8 +475,8 @@ export class Bot {
             this.matchmaker.send({
                 command: 'findGame',
                 region: opts.region,
-                playType: PlayTypes.createPrivate,
-                gameType: GameModes[opts.mode],
+                playType: PlayType.CreatePrivate,
+                gameType: RawGameModes[opts.mode],
                 sessionId: this.account.sessionId,
                 noobLobby: false,
                 map: mapIdx
@@ -571,7 +572,7 @@ export class Bot {
                 }
             }
 
-            if (!(this.state.controlKeys & Movements.FORWARD)) this.dispatch(new MovementDispatch(Movements.FORWARD));
+            if (!(this.state.controlKeys & Movement.Forward)) this.dispatch(new MovementDispatch(Movement.Forward));
         }
     }
 
@@ -601,7 +602,7 @@ export class Bot {
                 console.log('checking...shotsFired', this.state.shotsFired);
             }
 
-            this.me.jumping = !!(this.state.controlKeys & Movements.JUMP);
+            this.me.jumping = !!(this.state.controlKeys & Movement.Jump);
 
             this.state.buffer[idx] = {
                 controlKeys: this.state.controlKeys,
@@ -656,7 +657,7 @@ export class Bot {
                 if (player.playing && player.hp > 0) {
                     const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
 
-                    if (player.streakRewards.includes(ShellStreaks.OverHeal)) player.hp = Math.max(100, player.hp - regenSpeed);
+                    if (player.streakRewards.includes(ShellStreak.OverHeal)) player.hp = Math.max(100, player.hp - regenSpeed);
                     else player.hp = Math.min(100, player.hp + regenSpeed);
                 }
 
@@ -749,7 +750,7 @@ export class Bot {
         CommIn.unPackInt8U(); // private (bool)
         CommIn.unPackInt8U(); // gametype
 
-        const player = new GamePlayer(playerData, this.game.gameMode === GameModes.kotc ? this.game.activeZone : null);
+        const player = new GamePlayer(playerData, this.game.gameMode === GameMode.KOTC ? this.game.activeZone : null);
         if (!this.players[playerData.id]) this.players[playerData.id] = player;
 
         this.emit('playerJoin', player);
@@ -812,7 +813,7 @@ export class Bot {
         for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
             const controlKeys = CommIn.unPackInt8U();
 
-            if (controlKeys & Movements.JUMP) player.jumping = true;
+            if (controlKeys & Movement.Jump) player.jumping = true;
             else player.jumping = false;
 
             player.view.yaw = CommIn.unPackRadU();
@@ -834,7 +835,7 @@ export class Bot {
         if (didChange) {
             this.emit('playerMove', player, player.position);
 
-            if (this.game.gameModeId === GameModes.kotc) {
+            if (this.game.gameModeId === GameMode.KOTC) {
                 const activeZone = this.game.activeZone;
                 if (!activeZone) {
                     if (player.inKotcZone) {
@@ -954,7 +955,7 @@ export class Bot {
 
         this.game.collectables[type] = this.game.collectables[type].filter(c => c.id !== id);
 
-        if (type === CollectTypes.AMMO) {
+        if (type === CollectType.Ammo) {
             const playerWeapon = player.weapons[applyToWeaponIdx];
             if (playerWeapon && playerWeapon.ammo) {
                 playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
@@ -962,7 +963,7 @@ export class Bot {
             }
         }
 
-        if (type === CollectTypes.GRENADE) {
+        if (type === CollectType.Grenade) {
             player.grenades++;
             if (player.grenades > 3) player.grenades = 3;
 
@@ -1044,7 +1045,7 @@ export class Bot {
     }
 
     #processGameStatePacket() {
-        if (this.game.gameModeId === GameModes.spatula) {
+        if (this.game.gameModeId === GameMode.Spatula) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
 
@@ -1060,8 +1061,8 @@ export class Bot {
             this.game.spatula = { coords: spatulaCoords, controlledBy, controlledByTeam };
 
             this.emit('gameStateChange', this.game);
-        } else if (this.game.gameModeId === GameModes.kotc) {
-            this.game.stage = CommIn.unPackInt8U(); // constants.CoopStates
+        } else if (this.game.gameModeId === GameMode.KOTC) {
+            this.game.stage = CommIn.unPackInt8U(); // constants.CoopState
             this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
             this.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
             this.game.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
@@ -1075,16 +1076,16 @@ export class Bot {
             this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
 
             this.emit('gameStateChange', this.game);
-        } else if (this.game.gameModeId === GameModes.team) {
+        } else if (this.game.gameModeId === GameMode.Team) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
         }
 
-        if (this.game.gameModeId !== GameModes.spatula) {
+        if (this.game.gameModeId !== GameMode.Spatula) {
             delete this.game.spatula;
         }
 
-        if (this.game.gameModeId !== GameModes.kotc) {
+        if (this.game.gameModeId !== GameMode.KOTC) {
             delete this.game.stage;
             delete this.game.zoneNumber;
             delete this.game.capturing;
@@ -1095,7 +1096,7 @@ export class Bot {
             delete this.game.activeZone;
         }
 
-        if (this.game.gameModeId === GameModes.ffa) delete this.game.teamScore;
+        if (this.game.gameModeId === GameMode.FFA) delete this.game.teamScore;
     }
 
     #processBeginStreakPacket() {
@@ -1104,16 +1105,16 @@ export class Bot {
         const player = this.players[id];
 
         switch (ksType) {
-            case ShellStreaks.HardBoiled:
+            case ShellStreak.HardBoiled:
                 if (id === this.me.id) this.me.shieldHp = 100;
-                player.streakRewards.push(ShellStreaks.HardBoiled);
+                player.streakRewards.push(ShellStreak.HardBoiled);
                 break;
 
-            case ShellStreaks.EggBreaker:
-                player.streakRewards.push(ShellStreaks.EggBreaker);
+            case ShellStreak.EggBreaker:
+                player.streakRewards.push(ShellStreak.EggBreaker);
                 break;
 
-            case ShellStreaks.Restock: {
+            case ShellStreak.Restock: {
                 player.grenades = 3;
 
                 // main weapon
@@ -1130,17 +1131,17 @@ export class Bot {
                 break;
             }
 
-            case ShellStreaks.OverHeal:
+            case ShellStreak.OverHeal:
                 player.hp = Math.min(200, player.hp + 100);
-                player.streakRewards.push(ShellStreaks.OverHeal);
+                player.streakRewards.push(ShellStreak.OverHeal);
                 break;
 
-            case ShellStreaks.DoubleEggs:
-                player.streakRewards.push(ShellStreaks.DoubleEggs);
+            case ShellStreak.DoubleEggs:
+                player.streakRewards.push(ShellStreak.DoubleEggs);
                 break;
 
-            case ShellStreaks.MiniEgg:
-                player.streakRewards.push(ShellStreaks.MiniEgg);
+            case ShellStreak.MiniEgg:
+                player.streakRewards.push(ShellStreak.MiniEgg);
                 break;
         }
 
@@ -1153,10 +1154,10 @@ export class Bot {
         const player = this.players[id];
 
         const streaks = [
-            ShellStreaks.EggBreaker,
-            ShellStreaks.OverHeal,
-            ShellStreaks.DoubleEggs,
-            ShellStreaks.MiniEgg
+            ShellStreak.EggBreaker,
+            ShellStreak.OverHeal,
+            ShellStreak.DoubleEggs,
+            ShellStreak.MiniEgg
         ];
 
         if (streaks.includes(ksType) && player.streakRewards.includes(ksType))
@@ -1176,7 +1177,7 @@ export class Bot {
         this.me.hp = hp;
 
         if (this.me.shieldHp <= 0) {
-            this.me.streakRewards = this.me.streakRewards.filter((r) => r !== ShellStreaks.HardBoiled);
+            this.me.streakRewards = this.me.streakRewards.filter((r) => r !== ShellStreak.HardBoiled);
             this.emit('selfShieldLost');
         } else this.emit('selfShieldHit', this.me.shieldHp);
     }
@@ -1198,8 +1199,8 @@ export class Bot {
 
         const rawFlags = CommIn.unPackInt8U();
 
-        Object.keys(GameOptionFlags).forEach((optionFlagName) => {
-            const value = rawFlags & GameOptionFlags[optionFlagName] ? 1 : 0;
+        Object.keys(RawGameOptionFlags).forEach((optionFlagName) => {
+            const value = rawFlags & RawGameOptionFlags[optionFlagName] ? 1 : 0;
             this.game.options[optionFlagName] = value;
         });
 
@@ -1213,30 +1214,30 @@ export class Bot {
     #processGameActionPacket() {
         const action = CommIn.unPackInt8U();
 
-        if (action === GameActions.pause) {
+        if (action === GameAction.Pause) {
             this.emit('gameForcePause');
             setTimeout(() => this.me.playing = false, 3000);
         }
 
-        if (action === GameActions.reset) {
+        if (action === GameAction.Reset) {
             Object.values(this.players).forEach((player) => player.streak = 0);
 
-            if (this.game.gameModeId !== GameModes.ffa) this.game.teamScore = [0, 0, 0];
+            if (this.game.gameModeId !== GameMode.FFA) this.game.teamScore = [0, 0, 0];
 
-            if (this.game.gameModeId === GameModes.spatula) {
+            if (this.game.gameModeId === GameMode.Spatula) {
                 this.game.spatula.controlledBy = 0;
                 this.game.spatula.controlledByTeam = 0;
                 this.game.spatula.coords = { x: 0, y: 0, z: 0 };
             }
 
-            if (this.game.gameModeId === GameModes.kotc) {
-                this.game.stage = CoopStates.capturing;
+            if (this.game.gameModeId === GameMode.KOTC) {
+                this.game.stage = CoopState.Capturing;
                 this.game.zoneNumber = 0;
                 this.game.activeZone = null;
                 this.game.capturing = 0;
                 this.game.captureProgress = 0;
                 this.game.numCapturing = 0;
-                this.game.stageName = CoopStagesById[CoopStates.capturing];
+                this.game.stageName = CoopStagesById[CoopState.Capturing];
                 this.game.capturePercent = 0.0;
             }
 
@@ -1399,7 +1400,7 @@ export class Bot {
         if (this.intents.includes(this.Intents.COSMETIC_DATA))
             item = findItemById(item);
 
-        if (itemType === ItemTypes.Grenade) this.emit('grenadeExploded', item, { x, y, z }, damage, radius);
+        if (itemType === ItemType.Grenade) this.emit('grenadeExploded', item, { x, y, z }, damage, radius);
         else this.emit('rocketHit', { x, y, z }, damage, radius);
     }
 
@@ -1457,14 +1458,14 @@ export class Bot {
         this.me.id = CommIn.unPackInt8U();
         this.me.team = CommIn.unPackInt8U();
         this.game.gameModeId = CommIn.unPackInt8U(); // aka gameType
-        this.game.gameMode = GameModesById[this.game.gameModeId];
+        this.game.gameMode = GameModeById[this.game.gameModeId];
         this.game.mapIdx = CommIn.unPackInt8U();
         this.game.map = Maps[this.game.mapIdx];
 
         if (this.intents.includes(this.Intents.KOTC_ZONES) || this.intents.includes(this.Intents.PATHFINDING)) {
             this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
 
-            if (this.game.gameModeId === GameModes.kotc) {
+            if (this.game.gameModeId === GameMode.KOTC) {
                 const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
                 if (meshData) this.game.map.zones = initKotcZones(meshData);
                 else delete this.game.map.zones;
