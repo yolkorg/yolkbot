@@ -2,58 +2,74 @@ import { AUG, CSG1, DozenGauge, Eggk47, M24, RPEGG, SMG } from './guns.js';
 
 export { findItemById } from './findItemById.js';
 
-export const ChatFlags = {
-    none: 0,
-    pinned: 2,
-    team: 4
+export const ChatFlag = {
+    None: 0,
+    Pinned: 2,
+    Team: 4,
+    Mod: 254,
+    Server: 255
 };
 
 export const ChiknWinnerDailyLimit = 3;
 
-export const CollectTypes = {
-    AMMO: 0,
-    GRENADE: 1
+export const CollectType = {
+    Ammo: 0,
+    Grenade: 1
 }
 
-export const CoopStates = {
-    start: 0,
-    score: 1,
-    win: 2,
-    capturing: 3,
-    contested: 4,
-    takeover: 5,
-    abandoned: 6,
-    unclaimed: 7
+export const CoopState = {
+    Start: 0,
+    Score: 1,
+    Win: 2,
+    Capturing: 3,
+    Contested: 4,
+    Takeover: 5,
+    Abandoned: 6,
+    Unclaimed: 7
 }
 
 export const FirebaseKey = 'AIzaSyDP4SIjKaw6A4c-zvfYxICpbEjn1rRnN50';
 
-export const SyncRate = 10;
-export const FramesBetweenSyncs = Math.ceil(30 / SyncRate);
+export const FramesBetweenSyncs = 3;
 
-export const GameActions = {
-    reset: 1,
-    pause: 2
+export const GameAction = {
+    Reset: 1,
+    Pause: 2
 }
 
-export const GameModes = {
+export const GameMode = {
+    FFA: 0,
+    Team: 1,
+    Spatula: 2,
+    KOTC: 3
+}
+
+export const RawGameModes = {
     ffa: 0,
     team: 1,
     spatula: 2,
     kotc: 3
 }
 
-export const GameOptionFlags = {
+export const GameOptionFlag = {
+    Locked: 1,
+    NoTeamChange: 2,
+    NoTeamShuffle: 4
+}
+
+export const RawGameOptionFlags = {
     locked: 1,
     noTeamChange: 2,
     noTeamShuffle: 4
 }
 
+export const GunEquipTime = 13;
+
 export const GunList = [Eggk47, DozenGauge, CSG1, RPEGG, SMG, M24, AUG];
 
 export const IsBrowser = typeof window !== 'undefined';
 
-export const ItemTypes = {
+export const ItemType = {
     Hat: 1,
     Stamp: 2,
     Primary: 3,
@@ -62,26 +78,26 @@ export const ItemTypes = {
     Melee: 7
 };
 
-export const Movements = {
-    FORWARD: 1,
-    BACK: 2,
-    LEFT: 4,
-    RIGHT: 8,
-    JUMP: 16,
-    FIRE: 32, // useless
-    MELEE: 64, // useless
-    SCOPE: 128 // useless
+export const Movement = {
+    Forward: 1,
+    Backward: 2,
+    Left: 4,
+    Right: 8,
+    Jump: 16,
+    Fire: 32, // useless
+    Melee: 64, // useless
+    Scope: 128 // useless
 }
 
-export const PlayTypes = {
-    joinPublic: 0,
-    createPrivate: 1,
-    joinPrivate: 2
+export const PlayType = {
+    JoinPublic: 0,
+    CreatePrivate: 1,
+    JoinPrivate: 2
 }
 
 export const ProxiesEnabled = !IsBrowser && typeof Bun === 'undefined';
 
-export const ShellStreaks = {
+export const ShellStreak = {
     HardBoiled: 1,
     EggBreaker: 2,
     Restock: 4,
@@ -90,17 +106,27 @@ export const ShellStreaks = {
     MiniEgg: 32
 }
 
-export const SocialMedias = {
-    0: 'Facebook',
-    1: 'Instagram',
-    2: 'Tiktok',
-    3: 'Discord',
-    4: 'Youtube',
-    5: 'Twitter',
-    6: 'Twitch'
+export const SocialMedia = {
+    Facebook: 0,
+    Instagram: 1,
+    Tiktok: 2,
+    Discord: 3,
+    Youtube: 4,
+    Twitter: 5,
+    Twitch: 6
 }
 
-export const SocialRewards = {
+export const ReverseSocialMedia = {
+    0: 'facebook',
+    1: 'instagram',
+    2: 'tiktok',
+    3: 'discord',
+    4: 'youtube',
+    5: 'twitter',
+    6: 'twitch'
+}
+
+export const SocialReward = {
     Discord: 'rew_1200',
     Tiktok: 'rew_1208',
     Instagram: 'rew_1219',
@@ -112,9 +138,9 @@ export const SocialRewards = {
 
 export const StateBufferSize = 256;
 
-export const Teams = {
-    blue: 1,
-    red: 2
+export const Team = {
+    Blue: 1,
+    Red: 2
 }
 
 export const URLRewards = [

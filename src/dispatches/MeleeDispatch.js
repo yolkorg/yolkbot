@@ -1,4 +1,6 @@
 import CommOut from '../comm/CommOut.js';
+
+import { GunEquipTime } from '../constants/index.js';
 import { CommCode } from '../constants/codes.js';
 
 export class MeleeDispatch {
@@ -24,7 +26,7 @@ export class MeleeDispatch {
 
             setTimeout(() => {
                 bot.swappingGun = false
-            }, 0.5 * bot.me.weapons[0].equipTime)
+            }, 0.5 * GunEquipTime)
         }, (100 / 3) * 17);
     }
 }
