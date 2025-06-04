@@ -16,7 +16,7 @@ type intents = {
 import { Character, GamePlayer, Position } from './bot/GamePlayer';
 import { Challenge } from './constants/challenges';
 import { AnyGun } from './constants/guns';
-import { Map } from './constants/maps';
+import { MapJSON } from './constants/maps';
 import { Item } from './constants/items';
 import { ADispatch } from './dispatches/index';
 import { NodeList } from './pathing/mapnode';
@@ -177,7 +177,7 @@ export interface GameMap {
     };
     availability: string;
     numPlayers: string;
-    raw: Map;
+    raw: MapJSON;
     zones: Zone[][];
 }
 
@@ -317,6 +317,7 @@ export class Bot {
     on(event: 'gameStateChange', cb: (oldState: Game, newState: Game) => void): void;
     on(event: 'grenadeExploded', cb: (item: Item | number, pos: Position, damage: number, radius: number) => void): void;
     on(event: 'leave', cb: (closeCode: number) => void): void;
+    on(event: 'mapLoaded', cb: (map: MapJSON) => void): void;
     on(event: 'packet', cb: (packet: ArrayBuffer) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streakType: number) => void): void;

@@ -1463,18 +1463,22 @@ export class Bot {
         this.game.mapIdx = CommIn.unPackInt8U();
         this.game.map = Maps[this.game.mapIdx];
 
-        if (this.intents.includes(this.Intents.KOTC_ZONES) || this.intents.includes(this.Intents.PATHFINDING)) {
-            this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
+        (async () => {
+            if (this.intents.includes(this.Intents.KOTC_ZONES) || this.intents.includes(this.Intents.PATHFINDING)) {
+                this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
 
-            if (this.game.gameModeId === GameMode.KOTC) {
-                const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
-                if (meshData) this.game.map.zones = initKotcZones(meshData);
-                else delete this.game.map.zones;
+                this.emit('mapLoaded', this.game.map.raw);
+
+                if (this.game.gameModeId === GameMode.KOTC) {
+                    const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
+                    if (meshData) this.game.map.zones = initKotcZones(meshData);
+                    else delete this.game.map.zones;
+                }
+
+                if (this.intents.includes(this.Intents.PATHFINDING))
+                    this.pathing.nodeList = new NodeList(this.game.map.raw);
             }
-
-            if (this.intents.includes(this.Intents.PATHFINDING))
-                this.pathing.nodeList = new NodeList(this.game.map.raw);
-        }
+        })();
 
         this.game.playerLimit = CommIn.unPackInt8U();
         this.game.isGameOwner = CommIn.unPackInt8U() === 1;
