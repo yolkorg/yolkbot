@@ -1,26 +1,31 @@
 /* eslint-disable no-underscore-dangle */
 
-import { canvasListeners, imports } from './imports.js';
+import { canvasListeners, getImports } from './imports.js';
 import { getStringFromWasm, passStringToWasm } from './utils.js';
 
 import { wasmBytes } from './bytes.js';
 
-const wasm = await WebAssembly.instantiate(wasmBytes, imports);
-const exports = wasm.instance.exports;
+const values = {
+    processListeners: [],
+    processDate: null
+}
 
-export const getWasm = () => exports;
+const importObj = {};
 
-export let jsResolve;
-export let dateToUse;
+// eslint-disable-next-line prefer-const
+let exports;
 
-const process = async (str, dtu) => {
-    if (dtu) dateToUse = dtu;
+Object.assign(importObj, getImports(() => exports, values));
 
-    const promise = new Promise((resolve) => {
-        jsResolve = resolve;
-    });
+const wasm = await WebAssembly.instantiate(wasmBytes, importObj);
+exports = wasm.instance.exports;
 
-    const [ptr, len] = passStringToWasm(str);
+const process = async (str, date) => {
+    if (date) values.processDate = date;
+
+    const promise = new Promise((resolve) => values.processListeners.push(resolve));
+
+    const [ptr, len] = passStringToWasm(exports, str);
     exports.process(ptr, len);
 
     return promise;
@@ -31,12 +36,13 @@ const validate = (input) => {
     let retLen;
 
     try {
-        const [ptr, len] = passStringToWasm(input);
+        const [ptr, len] = passStringToWasm(exports, input);
         const ret = exports.validate(ptr, len);
 
         retPtr = ret[0];
         retLen = ret[1];
-        return getStringFromWasm(retPtr, retLen);
+
+        return getStringFromWasm(exports, retPtr, retLen);
     } finally {
         exports.__wbindgen_free(retPtr, retLen, 1);
     }
@@ -72,7 +78,7 @@ const coords = (yaw, pitch) => {
     if (!canvasListeners.pointermove) {
         exports.start();
 
-        const [ptr, len] = passStringToWasm([...Array(14)].map(() => Math.random().toString(36)[2]).join(''));
+        const [ptr, len] = passStringToWasm(exports, [...Array(14)].map(() => Math.random().toString(36)[2]).join(''));
         exports.set_mouse_params(50, 1, 0.9, false, ptr, len);
     }
 

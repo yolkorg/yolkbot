@@ -1,21 +1,19 @@
 /* eslint-disable no-underscore-dangle */
 
-import { getWasm } from './wrapper.js';
-
-export const getStringFromWasm = (ptr, len) => {
+export const getStringFromWasm = (wasm, ptr, len) => {
     ptr >>>= 0;
-    return (new TextDecoder()).decode((new Uint8Array(getWasm().memory.buffer)).subarray(ptr, ptr + len));
+    return (new TextDecoder()).decode((new Uint8Array(wasm.memory.buffer)).subarray(ptr, ptr + len));
 }
 
-export const passStringToWasm = (str) => {
+export const passStringToWasm = (wasm, str) => {
     const buf = (new TextEncoder()).encode(str);
-    const ptr = getWasm().__wbindgen_malloc(buf.length, 1) >>> 0;
-    (new Uint8Array(getWasm().memory.buffer)).subarray(ptr, ptr + buf.length).set(buf);
+    const ptr = wasm.__wbindgen_malloc(buf.length, 1) >>> 0;
+    (new Uint8Array(wasm.memory.buffer)).subarray(ptr, ptr + buf.length).set(buf);
     return [ptr, buf.length];
 }
 
-export const addToExternrefTable = (obj) => {
-    const idx = getWasm().__externref_table_alloc();
-    getWasm().__wbindgen_export_2.set(idx, obj);
+export const addToExternrefTable = (wasm, obj) => {
+    const idx = wasm.__externref_table_alloc();
+    wasm.__wbindgen_export_2.set(idx, obj);
     return idx;
 }
