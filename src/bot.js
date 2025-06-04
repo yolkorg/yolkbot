@@ -1385,6 +1385,7 @@ export class Bot {
     }
 
     #processGameRequestOptionsPacket() {
+        this.game.isPrivate = true;
         this.updateGameOptions();
     }
 
@@ -1477,7 +1478,7 @@ export class Bot {
 
         this.game.playerLimit = CommIn.unPackInt8U();
         this.game.isGameOwner = CommIn.unPackInt8U() === 1;
-        this.game.isPrivate = CommIn.unPackInt8U() === 1;
+        this.game.isPrivate = CommIn.unPackInt8U() === 1 || this.game.isGameOwner;
 
         CommIn.unPackInt8U(); // abTestBucket, unused
 
