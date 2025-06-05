@@ -840,21 +840,19 @@ export class Bot {
                 if (!activeZone) {
                     if (player.inKotcZone) {
                         player.inKotcZone = false;
-                        this.emit('playerLeaveZone', player, activeZone);
+                        this.emit('playerLeaveZone', player);
                     }
                     return;
                 }
 
-                const fx = Math.round(x);
-                const fy = Math.floor(y);
-                const fz = Math.round(z);
+                const wasInZone = !!player.inKotcZone;
 
-                const isInZone = activeZone.some((coordSets) => coordSets.x === fx && coordSets.y === fy && coordSets.z === fz);
+                player.updateKotcZone(activeZone);
 
-                if (player.inKotcZone && !isInZone) {
+                if (!player.inKotcZone && wasInZone) {
                     player.inKotcZone = false;
                     this.emit('playerLeaveZone', player);
-                } else if (!player.inKotcZone && isInZone) {
+                } else if (player.inKotcZone && !wasInZone) {
                     player.inKotcZone = true;
                     this.emit('playerEnterZone', player);
                 }
@@ -868,7 +866,14 @@ export class Bot {
 
         if (player) {
             player.playing = false;
+            if (player.streakRewards) player.streakRewards = [];
+
             this.emit('playerPause', player);
+
+            if (player.inKotcZone) {
+                player.inKotcZone = false;
+                this.emit('playerLeaveZone', player);
+            }
         }
     }
 
@@ -895,13 +900,18 @@ export class Bot {
         const killer = this.players[killerId];
 
         if (killed) {
+            if (killed.id === this.me.id) this.lastDeathTime = Date.now();
+
             killed.playing = false;
             killed.streak = 0;
-            killed.lastDeathTime = Date.now();
             killed.hp = 100;
             killed.spawnShield = 0;
+
             killed.stats.deathsInGame++;
             killed.stats.totalDeaths++;
+
+            killed.inKotcZone = false;
+            this.emit('playerLeaveZone', killed);
         }
 
         if (killer) {
@@ -1046,6 +1056,8 @@ export class Bot {
 
     #processGameStatePacket() {
         if (this.game.gameModeId === GameMode.Spatula) {
+            const oldGame = { ...this.game };
+
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
 
@@ -1060,8 +1072,10 @@ export class Bot {
 
             this.game.spatula = { coords: spatulaCoords, controlledBy, controlledByTeam };
 
-            this.emit('gameStateChange', this.game);
+            this.emit('gameStateChange', oldGame, this.game);
         } else if (this.game.gameModeId === GameMode.KOTC) {
+            const oldGame = { ...this.game };
+
             this.game.stage = CommIn.unPackInt8U(); // constants.CoopState
             this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
             this.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
@@ -1075,7 +1089,14 @@ export class Bot {
             this.game.capturePercent = this.game.captureProgress / 1000; // progress of the capture as a percentage
             this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
 
-            this.emit('gameStateChange', this.game);
+            if (this.game.activeZone) Object.values(this.players).forEach((player) => player.updateKotcZone(this.game.activeZone));
+
+            if (this.game.numCapturing <= 0) Object.values(this.players).forEach((player) => {
+                player.inKotcZone = false;
+                this.emit('playerLeaveZone', player);
+            });
+
+            this.emit('gameStateChange', oldGame, this.game);
         } else if (this.game.gameModeId === GameMode.Team) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
@@ -1463,28 +1484,28 @@ export class Bot {
         this.game.mapIdx = CommIn.unPackInt8U();
         this.game.map = Maps[this.game.mapIdx];
 
-        (async () => {
-            if (this.intents.includes(this.Intents.KOTC_ZONES) || this.intents.includes(this.Intents.PATHFINDING)) {
-                this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
-
-                this.emit('mapLoaded', this.game.map.raw);
-
-                if (this.game.gameModeId === GameMode.KOTC) {
-                    const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
-                    if (meshData) this.game.map.zones = initKotcZones(meshData);
-                    else delete this.game.map.zones;
-                }
-
-                if (this.intents.includes(this.Intents.PATHFINDING))
-                    this.pathing.nodeList = new NodeList(this.game.map.raw);
-            }
-        })();
-
         this.game.playerLimit = CommIn.unPackInt8U();
         this.game.isGameOwner = CommIn.unPackInt8U() === 1;
         this.game.isPrivate = CommIn.unPackInt8U() === 1 || this.game.isGameOwner;
 
         CommIn.unPackInt8U(); // abTestBucket, unused
+
+        if (this.intents.includes(this.Intents.KOTC_ZONES) || this.intents.includes(this.Intents.PATHFINDING)) {
+            this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
+
+            this.emit('mapLoaded', this.game.map.raw);
+
+            if (this.game.gameModeId === GameMode.KOTC) {
+                const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
+                if (meshData) {
+                    this.game.map.zones = initKotcZones(meshData);
+                    if (!this.game.activeZone) this.game.activeZone = this.game.map.zones[this.game.zoneNumber - 1];
+                } else delete this.game.map.zones;
+            }
+
+            if (this.intents.includes(this.Intents.PATHFINDING))
+                this.pathing.nodeList = new NodeList(this.game.map.raw);
+        }
 
         this.state.inGame = true;
         this.lastDeathTime = Date.now();
