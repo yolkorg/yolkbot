@@ -54,7 +54,8 @@ const intents = {
     NO_LOGIN: 11,
     DEBUG_BUFFER: 12,
     DEBUG_BEST_TARGET: 14,
-    KOTC_ZONES: 15
+    KOTC_ZONES: 15,
+    NO_AFK_KICK: 16
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -266,6 +267,9 @@ export class Bot {
         }
 
         this.hasQuit = false;
+
+        if (this.intents.includes(this.Intents.NO_AFK_KICK))
+            this.afkKickInterval = 0;
     }
 
     dispatch(dispatch) {
@@ -1525,6 +1529,14 @@ export class Bot {
             out2.send(this.game.socket);
         }
 
+        this.afkKickInterval = setInterval(() => {
+            if (this.state.inGame && !this.me.playing && (Date.now() - this.lastDeathTime) >= 15000) {
+                const out3 = CommOut.getBuffer();
+                out3.packInt8(CommCode.keepAlive);
+                out3.send(this.game.socket);
+            }
+        }, 15000);
+
         this.emit('gameReady');
     }
 
@@ -2022,6 +2034,8 @@ export class Bot {
             delete this.players;
             delete this.state;
         }
+
+        clearInterval(this.afkKickInterval);
 
         this.hasQuit = true;
     }
