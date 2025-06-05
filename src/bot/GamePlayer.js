@@ -33,13 +33,7 @@ export class GamePlayer {
             pitch: playerData.pitch
         };
 
-        if (activeZone) {
-            const fx = Math.round(playerData.x);
-            const fy = Math.floor(playerData.y);
-            const fz = Math.round(playerData.z);
-
-            this.inKotcZone = activeZone.some((coordSets) => coordSets.x === fx && coordSets.y === fy && coordSets.z === fz);
-        }
+        this.updateKotcZone(activeZone);
 
         this.character = {
             eggColor: playerData.shellColor,
@@ -85,6 +79,16 @@ export class GamePlayer {
         this.spawnShield = playerData.shield;
 
         this.randomSeed = 0;
+    }
+
+    updateKotcZone(activeZone) {
+        if (!activeZone) return this.inKotcZone = false;
+
+        const fx = Math.floor(this.position.x);
+        const fy = Math.floor(this.position.y);
+        const fz = Math.floor(this.position.z);
+
+        this.inKotcZone = activeZone.some((coordSets) => coordSets.x === fx && coordSets.y === fy && coordSets.z === fz) && this.playing;
     }
 }
 
