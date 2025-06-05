@@ -251,6 +251,15 @@ export interface ChiknWinnerResponse {
     rewardTier: number;
 }
 
+export interface FireBullet {
+    posX: number;
+    posY: number;
+    posZ: number;
+    dirX: number;
+    dirY: number;
+    dirZ: number;
+}
+
 export class Bot {
     static Intents: intents;
     Intents: intents;
@@ -323,17 +332,17 @@ export class Bot {
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerChangeCharacter', cb: (player: GamePlayer, oldCharacter: Character, newCharacter: Character) => void): void;
-    on(event: 'playerChangeGun', cb: (player: GamePlayer, oldGun: number, newGun: number) => void): void;
+    on(event: 'playerChangeGun', cb: (player: GamePlayer, oldGunId: number, newGunId: number) => void): void;
     on(event: 'playerDamage', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
-    on(event: 'playerDeath', cb: (player: GamePlayer, killer: GamePlayer) => void): void;
+    on(event: 'playerDeath', cb: (killed: GamePlayer, killer: GamePlayer) => void): void;
     on(event: 'playerEndStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerEnterZone', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
+    on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun, bullet: FireBullet) => void): void;
     on(event: 'playerJoin', cb: (player: GamePlayer) => void): void;
     on(event: 'playerLeave', cb: (player: GamePlayer) => void): void;
     on(event: 'playerLeaveZone', cb: (player: GamePlayer) => void): void;
     on(event: 'playerMelee', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerMove', cb: (player: GamePlayer, position: Position) => void): void;
+    on(event: 'playerMove', cb: (player: GamePlayer, oldPosition: Position, newPosition: Position) => void): void;
     on(event: 'playerPause', cb: (player: GamePlayer) => void): void;
     on(event: 'playerReload', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
@@ -341,9 +350,9 @@ export class Bot {
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
     on(event: 'respawnDenied', cb: () => void): void;
     on(event: 'rocketHit', cb: (pos: Position, damage: number, blastRadius: number) => void): void;
-    on(event: 'selfShieldHit', cb: (oldShieldHealth: number, newShieldHealth: number) => void): void;
-    on(event: 'selfShieldLost', cb: () => void): void;
-    on(event: 'spawnItem', cb: (itemType: number, uniqueItemId: number, itemPosition: Position) => void): void;
+    on(event: 'selfShieldHit', cb: (newShieldHealth: number, newPlayerHealth: number, dir: { dx: number, dz: number }) => void): void;
+    on(event: 'selfShieldLost', cb: (newPlayerHealth: number, dir: { dx: number, dz: number }) => void): void;
+    on(event: 'spawnItem', cb: (itemType: number, itemPosition: Position) => void): void;
     on(event: 'tick', cb: () => void): void;
 
     checkChiknWinner(): Promise<ChiknWinnerStatus>;

@@ -750,9 +750,9 @@ export class Bot {
             hideBadge: CommIn.unPackInt8U()
         };
 
-        CommIn.unPackInt8U(); // mapIdx
-        CommIn.unPackInt8U(); // private (bool)
-        CommIn.unPackInt8U(); // gametype
+        this.game.mapIdx = CommIn.unPackInt8U(); // mapIdx
+        this.game.isPrivate = CommIn.unPackInt8U() === 1; // private (bool)
+        this.game.gameModeId = CommIn.unPackInt8U(); // gametype
 
         const player = new GamePlayer(playerData, this.game.gameMode === GameMode.KOTC ? this.game.activeZone : null);
         if (!this.players[playerData.id]) this.players[playerData.id] = player;
@@ -811,7 +811,7 @@ export class Bot {
                 CommIn.unPackRad();
                 CommIn.unPackInt8U();
             }
-            return;
+            return; // syncMe has a job
         }
 
         for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
@@ -823,7 +823,7 @@ export class Bot {
             player.view.yaw = CommIn.unPackRadU();
             player.view.pitch = CommIn.unPackRad();
 
-            CommIn.unPackInt8U();
+            CommIn.unPackInt8U(); // scope
         }
 
         const didChange = player.position.x !== x || player.position.y !== y || player.position.z !== z || player.climbing !== climbing;
@@ -935,7 +935,14 @@ export class Bot {
     #processFirePacket() {
         const id = CommIn.unPackInt8U();
 
-        for (let i = 0; i < 6; i++) CommIn.unPackFloat();
+        const bullet = {
+            posX: CommIn.unPackFloat(),
+            posY: CommIn.unPackFloat(),
+            posZ: CommIn.unPackFloat(),
+            dirX: CommIn.unPackFloat(),
+            dirY: CommIn.unPackFloat(),
+            dirZ: CommIn.unPackFloat()
+        };
 
         const player = this.players[id];
         if (!player) return;
@@ -944,7 +951,7 @@ export class Bot {
 
         if (playerWeapon && playerWeapon.ammo) {
             playerWeapon.ammo.rounds--;
-            this.emit('playerFire', player, playerWeapon);
+            this.emit('playerFire', player, playerWeapon, bullet);
         }
     }
 
@@ -957,7 +964,7 @@ export class Bot {
 
         this.game.collectables[type].push({ id, x, y, z });
 
-        this.emit('spawnItem', type, id, { x, y, z });
+        this.emit('spawnItem', type, { x, y, z });
     }
 
     #processCollectPacket() {
@@ -1193,19 +1200,18 @@ export class Bot {
     }
 
     #processHitShieldPacket() {
-        const hb = CommIn.unPackInt8U();
-        const hp = CommIn.unPackInt8U();
+        const shieldHealth = CommIn.unPackInt8U();
+        const playerHealth = CommIn.unPackInt8U();
+        const dx = CommIn.unPackFloat();
+        const dz = CommIn.unPackFloat();
 
-        CommIn.unPackFloat();
-        CommIn.unPackFloat();
-
-        this.me.shieldHp = hb;
-        this.me.hp = hp;
+        this.me.shieldHp = shieldHealth;
+        this.me.hp = playerHealth;
 
         if (this.me.shieldHp <= 0) {
             this.me.streakRewards = this.me.streakRewards.filter((r) => r !== ShellStreak.HardBoiled);
-            this.emit('selfShieldLost');
-        } else this.emit('selfShieldHit', this.me.shieldHp);
+            this.emit('selfShieldLost', this.me.hp, { dx, dz });
+        } else this.emit('selfShieldHit', this.me.shieldHp, this.me.hp, { dx, dz });
     }
 
     #processGameOptionsPacket() {
@@ -1315,8 +1321,8 @@ export class Bot {
         const grenadeIdx = CommIn.unPackInt16U();
         const meleeIdx = CommIn.unPackInt16U();
 
-        CommIn.unPackInt8();
-        CommIn.unPackInt8();
+        const stampPositionX = CommIn.unPackInt8();
+        const stampPositionY = CommIn.unPackInt8();
 
         const findCosmetics = this.intents.includes(this.Intents.COSMETIC_DATA);
 
@@ -1340,6 +1346,9 @@ export class Bot {
             player.character.grenade = grenadeItem;
             player.character.melee = meleeItem;
 
+            player.character.stampPos.x = stampPositionX;
+            player.character.stampPos.y = stampPositionY;
+
             player.selectedGun = weaponIndex;
             player.weapons[0] = new GunList[weaponIndex]();
 
@@ -1353,7 +1362,7 @@ export class Bot {
         const oldBalance = this.account.eggBalance;
 
         this.account.eggBalance = newBalance;
-        this.emit('balanceUpdate', newBalance - oldBalance, newBalance);
+        this.emit('balanceUpdate', oldBalance, newBalance);
     }
 
     #processRespawnDeniedPacket() {
@@ -1697,7 +1706,7 @@ export class Bot {
                     break;
 
                 case CommCode.musicInfo:
-                    CommIn.unPackLongString();
+                    CommIn.unPackLongString(); // rip background music
                     break;
 
                 default:
