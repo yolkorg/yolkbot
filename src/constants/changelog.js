@@ -1,7 +1,7 @@
 /* eslint-disable */
 export const Changelog = [
     {
-        "version": "1.0.7",
+        "version": "1.0.8",
         "date": "May 3 2025",
         "content": [
             "Hit the gas with the latest Shell Shockers update introducing our smash new game - Kartbros.io.",
