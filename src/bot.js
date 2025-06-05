@@ -757,7 +757,7 @@ export class Bot {
 
         if (this.me.id === playerData.id) {
             this.me = player;
-            this.emit('botJoined', this.me);
+            this.emit('botJoin', this.me);
         }
     }
 
@@ -823,6 +823,7 @@ export class Bot {
         }
 
         const didChange = player.position.x !== x || player.position.y !== y || player.position.z !== z || player.climbing !== climbing;
+        const oldPosition = didChange ? { ...player.position } : null;
 
         if (player.position.x !== x) player.position.x = x;
         if (player.position.z !== z) player.position.z = z;
@@ -833,7 +834,7 @@ export class Bot {
         if (player.climbing !== climbing) player.climbing = climbing;
 
         if (didChange) {
-            this.emit('playerMove', player, player.position);
+            this.emit('playerMove', player, oldPosition, player.position);
 
             if (this.game.gameModeId === GameMode.KOTC) {
                 const activeZone = this.game.activeZone;
@@ -988,10 +989,10 @@ export class Bot {
         const player = this.players[id];
         if (!player) return;
 
-        const oldHP = player.hp;
+        const oldHealth = player.hp;
         player.hp = hp;
 
-        this.emit('playerDamaged', player, oldHP, player.hp);
+        this.emit('playerDamage', player, oldHealth, player.hp);
     }
 
     #processHitMePacket() {
@@ -1000,10 +1001,10 @@ export class Bot {
         CommIn.unPackFloat();
         CommIn.unPackFloat();
 
-        const oldHp = this.me.hp;
+        const oldHealth = this.me.hp;
         this.me.hp = hp;
 
-        this.emit('selfDamaged', oldHp, this.me.hp);
+        this.emit('playerDamage', this.me, oldHealth, this.me.hp);
     }
 
     #processSyncMePacket() {
@@ -1036,7 +1037,7 @@ export class Bot {
         player.position.z = newZ;
 
         if (oldX !== newX || oldY !== newY || oldZ !== newZ)
-            this.emit('selfMoved', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
+            this.emit('playerMove', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
     }
 
     #processEventModifierPacket() {
@@ -1353,7 +1354,7 @@ export class Bot {
 
     #processRespawnDeniedPacket() {
         this.me.playing = false;
-        this.emit('selfRespawnFail');
+        this.emit('respawnDenied');
     }
 
     #processMeleePacket() {
@@ -1422,7 +1423,7 @@ export class Bot {
         if (this.intents.includes(this.Intents.COSMETIC_DATA))
             item = findItemById(item);
 
-        if (itemType === ItemType.Grenade) this.emit('grenadeExploded', item, { x, y, z }, damage, radius);
+        if (itemType === ItemType.Grenade) this.emit('grenadeExplode', item, { x, y, z }, damage, radius);
         else this.emit('rocketHit', { x, y, z }, damage, radius);
     }
 
@@ -1493,7 +1494,7 @@ export class Bot {
         if (this.intents.includes(this.Intents.KOTC_ZONES) || this.intents.includes(this.Intents.PATHFINDING)) {
             this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
 
-            this.emit('mapLoaded', this.game.map.raw);
+            this.emit('mapLoad', this.game.map.raw);
 
             if (this.game.gameModeId === GameMode.KOTC) {
                 const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
