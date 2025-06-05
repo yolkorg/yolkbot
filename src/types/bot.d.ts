@@ -10,7 +10,8 @@ type intents = {
     NO_LOGIN: 11,
     DEBUG_BUFFER: 12,
     DEBUG_BEST_TARGET: 14,
-    KOTC_ZONES: 15
+    KOTC_ZONES: 15,
+    NO_AFK_KICK: 16
 }
 
 import { Character, GamePlayer, Position } from './bot/GamePlayer';
