@@ -54,8 +54,8 @@ const intents = {
     NO_LOGIN: 11,
     DEBUG_BUFFER: 12,
     DEBUG_BEST_TARGET: 14,
-    KOTC_ZONES: 15,
-    NO_AFK_KICK: 16
+    NO_AFK_KICK: 16,
+    LOAD_MAP: 17
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -1504,7 +1504,7 @@ export class Bot {
 
         CommIn.unPackInt8U(); // abTestBucket, unused
 
-        if (this.intents.includes(this.Intents.KOTC_ZONES) || this.intents.includes(this.Intents.PATHFINDING)) {
+        if (this.intents.includes(this.Intents.LOAD_MAP) || this.intents.includes(this.Intents.PATHFINDING)) {
             this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
 
             this.emit('mapLoad', this.game.map.raw);
