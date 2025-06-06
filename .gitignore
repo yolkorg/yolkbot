@@ -9,7 +9,6 @@ package-lock.json
 build
 dist
 .env
-bytes.txt
 
 # mac cache
 .DS_Store
