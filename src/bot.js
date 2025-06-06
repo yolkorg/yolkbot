@@ -2032,7 +2032,7 @@ export class Bot {
 
         if (this.matchmaker) {
             this.matchmaker.close();
-            if (!noCleanup) this.matchmaker = null;
+            if (!noCleanup) delete this.matchmaker;
         }
 
         if (!noCleanup) {
@@ -2040,8 +2040,16 @@ export class Bot {
             delete this.api;
             delete this.game;
             delete this.me;
+            delete this.pathing;
             delete this.players;
             delete this.state;
+
+            this.#initialAccount = {};
+            this.#initialGame = {};
+
+            this.#hooks = {};
+            this.#globalHooks = [];
+            this.#dispatches = [];
         }
 
         clearInterval(this.afkKickInterval);
