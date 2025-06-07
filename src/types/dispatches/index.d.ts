@@ -1,3 +1,4 @@
+import BanPlayerDispatch from './BanPlayerDispatch';
 import BootPlayerDispatch from './BootPlayerDispatch';
 import ChatDispatch from './ChatDispatch';
 import FireDispatch from './FireDispatch';
@@ -19,6 +20,10 @@ import SpawnDispatch from './SpawnDispatch';
 import SwapWeaponDispatch from './SwapWeaponDispatch';
 import SwitchTeamDispatch from './SwitchTeamDispatch';
 import ThrowGrenadeDispatch from './ThrowGrenadeDispatch';
+
+declare module 'BanPlayerDispatch' {
+    export default BanPlayerDispatch;
+}
 
 declare module 'BootPlayerDispatch' {
     export default BootPlayerDispatch;
@@ -102,6 +107,7 @@ declare module 'SwitchTeamDispatch' {
 
 declare module 'dispatches' {
     export {
+        BanPlayerDispatch,
         BootPlayerDispatch,
         ChatDispatch,
         FireDispatch,
@@ -125,6 +131,7 @@ declare module 'dispatches' {
     }
 
     const dispatches: {
+        BanPlayerDispatch: typeof BanPlayerDispatch,
         BootPlayerDispatch: typeof BootPlayerDispatch,
         ChatDispatch: typeof ChatDispatch,
         FireDispatch: typeof FireDispatch,
@@ -151,6 +158,7 @@ declare module 'dispatches' {
 }
 
 export type ADispatch =
+    BanPlayerDispatch |
     BootPlayerDispatch |
     ChatDispatch |
     FireDispatch |
