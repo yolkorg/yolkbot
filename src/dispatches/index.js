@@ -1,3 +1,4 @@
+import BanPlayerDispatch from './BanPlayerDispatch.js';
 import BootPlayerDispatch from './BootPlayerDispatch.js';
 import ChatDispatch from './ChatDispatch.js';
 import FireDispatch from './FireDispatch.js';
@@ -21,6 +22,7 @@ import SwitchTeamDispatch from './SwitchTeamDispatch.js';
 import ThrowGrenadeDispatch from './ThrowGrenadeDispatch.js';
 
 export {
+    BanPlayerDispatch,
     BootPlayerDispatch,
     ChatDispatch,
     FireDispatch,
@@ -45,6 +47,7 @@ export {
 }
 
 export default {
+    BanPlayerDispatch,
     BootPlayerDispatch,
     ChatDispatch,
     FireDispatch,

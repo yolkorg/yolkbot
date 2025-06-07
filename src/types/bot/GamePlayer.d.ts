@@ -93,6 +93,11 @@ export interface Social {
 
 export type PlayerWeapons = [AnyGun, Cluck9mm];
 
+export interface PlayerAdminData {
+    ip: string;
+    dbId: string;
+}
+
 export class GamePlayer {
     id: string;
     uniqueId: string;
@@ -120,6 +125,7 @@ export class GamePlayer {
     hpShield: number;
     spawnShield: number;
     randomSeed: number;
+    admin?: PlayerAdminData;
 
     constructor(playerData: PlayerData);
 }

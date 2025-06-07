@@ -11,7 +11,8 @@ type intents = {
     DEBUG_BUFFER: 12,
     DEBUG_BEST_TARGET: 14,
     NO_AFK_KICK: 16,
-    LOAD_MAP: 17
+    LOAD_MAP: 17,
+    OBSERVE_GAME: 18
 }
 
 import { Character, GamePlayer, Position } from './bot/GamePlayer';
@@ -138,6 +139,7 @@ export interface Account {
         monthly: Stats;
     }
     challenges: Challenges[];
+    adminRoles: number;
     rawLoginData: any; // someday i'll type it
 }
 
@@ -339,6 +341,7 @@ export class Bot {
     on(event: 'playerEnterZone', cb: (player: GamePlayer) => void): void;
     on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun, bullet: FireBullet) => void): void;
     on(event: 'playerJoin', cb: (player: GamePlayer) => void): void;
+    on(event: 'playerInfo', cb: (player: GamePlayer, playerIP: string, playerDBId: string) => void): void;
     on(event: 'playerLeave', cb: (player: GamePlayer) => void): void;
     on(event: 'playerLeaveZone', cb: (player: GamePlayer) => void): void;
     on(event: 'playerMelee', cb: (player: GamePlayer) => void): void;

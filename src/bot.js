@@ -55,7 +55,8 @@ const intents = {
     DEBUG_BUFFER: 12,
     DEBUG_BEST_TARGET: 14,
     NO_AFK_KICK: 16,
-    LOAD_MAP: 17
+    LOAD_MAP: 17,
+    OBSERVE_GAME: 18
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -236,6 +237,9 @@ export class Bot {
             // balance is tracked
             eggBalance: 0,
 
+            // admins!
+            adminRoles: 0,
+
             // raw login
             rawLoginData: {}
         }
@@ -329,6 +333,7 @@ export class Bot {
 
         this.account.rawLoginData = loginData;
 
+        this.account.adminRoles = loginData.adminRoles || 0;
         this.account.eggBalance = loginData.currentBalance;
         this.account.emailVerified = loginData.emailVerified;
         this.account.firebaseId = loginData.firebaseId;
@@ -1475,7 +1480,7 @@ export class Bot {
 
     #processSocketReadyPacket() {
         const out = CommOut.getBuffer();
-        out.packInt8(CommCode.joinGame);
+        out.packInt8(this.intents.includes(this.Intents.OBSERVE_GAME) ? CommCode.observeGame : CommCode.joinGame);
 
         out.packString(this.state.name);
         out.packString(this.game.raw.uuid);
@@ -1547,6 +1552,23 @@ export class Bot {
         }, 15000);
 
         this.emit('gameReady');
+    }
+
+    #processPlayerInfoPacket() {
+        const playerId = CommIn.unPackInt8U();
+        const playerDBId = CommIn.unPackString(128);
+        const playerIp = CommIn.unPackString(32);
+
+        if (!this.players[playerId]) return;
+
+        const player = this.players[playerId];
+
+        player.admin = {
+            ip: playerIp,
+            dbId: playerDBId
+        };
+
+        this.emit('playerInfo', player, playerIp, playerDBId);
     }
 
     processPacket(packet) {
@@ -1697,6 +1719,10 @@ export class Bot {
 
                 case CommCode.respawnDenied:
                     this.#processRespawnDeniedPacket();
+                    break;
+
+                case CommCode.playerInfo:
+                    this.#processPlayerInfoPacket();
                     break;
 
                 // we do not plan to implement these
