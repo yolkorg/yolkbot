@@ -2,6 +2,12 @@ import { AUG, CSG1, DozenGauge, Eggk47, M24, RPEGG, SMG } from './guns.js';
 
 export { findItemById } from './findItemById.js';
 
+export const BanDuration = {
+    FiveMinutes: 0,
+    FifteenMinutes: 1,
+    OneHour: 2
+}
+
 export const ChatFlag = {
     None: 0,
     Pinned: 2,
