@@ -9,6 +9,7 @@ export class SwitchTeamDispatch {
     check(bot) {
         if (!bot.state.inGame || bot.me.playing) return false; // you probably cant change team mid-game
         if (bot.game.gameModeId === 0) return false; // ffa
+        if (bot.intents.includes(bot.Intents.OBSERVE_GAME)) return false;
 
         if (bot.game.isPrivate) {
             // hosts can disable team switching in private games
