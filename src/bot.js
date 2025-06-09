@@ -683,6 +683,15 @@ export class Bot {
         else this.#hooks[event] = [cb];
     }
 
+    once(event, cb) {
+        const onceCb = (...args) => {
+            cb(...args);
+            this.off(event, onceCb);
+        };
+
+        this.on(event, onceCb);
+    }
+
     onAny(cb) {
         this.#globalHooks.push(cb);
     }
