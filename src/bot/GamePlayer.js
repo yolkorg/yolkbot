@@ -1,5 +1,7 @@
-import { GunList, Movement, ReverseSocialMedia, ShellStreak } from '../constants/index.js';
+import { GunList, Movement, ShellStreak, SocialMedia } from '../constants/index.js';
 import { Cluck9mm } from '../constants/guns.js';
+
+const RSocialMedia = Object.fromEntries(Object.entries(SocialMedia).map(([key, value]) => [value, key.toLowerCase()]));
 
 export class GamePlayer {
     constructor(playerData, activeZone = null) {
@@ -14,7 +16,7 @@ export class GamePlayer {
         this.playing = playerData.playing;
 
         this.socials = playerData.social && JSON.parse(playerData.social);
-        if (this.socials) this.socials.forEach((social) => social.type = ReverseSocialMedia[social.id]);
+        if (this.socials) this.socials.forEach((social) => social.type = RSocialMedia[social.id]);
 
         this.isVip = playerData.upgradeProductId > 0;
         this.showBadge = !playerData.hideBadge || false;
