@@ -19,3 +19,5 @@ export declare const CloseCode: {
     noClustersAvailable: number;
     locked: number;
 };
+
+export default CloseCode;

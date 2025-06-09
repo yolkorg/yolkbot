@@ -1,7 +1,7 @@
-import { findItemById, GunList, ItemType } from '../constants/index.js';
-
 import CommOut from '../comm/CommOut.js';
-import { CommCode } from '../constants/codes.js';
+import CommCode from '../constants/CommCode.js';
+
+import { findItemById, GunList, ItemType } from '../constants/index.js';
 
 const isDefault = (itemId) => findItemById(itemId) && findItemById(itemId).unlock === 'default';
 const isType = (itemId, type) => findItemById(itemId) && findItemById(itemId).item_type_id === type;
@@ -92,7 +92,7 @@ export class SaveLoadoutDispatch {
 
         if (bot.me) saveLoadout.then(() => {
             if (bot.state.inGame) {
-                const out = CommOut.getBuffer();
+                const out = new CommOut();
                 out.packInt8(CommCode.changeCharacter);
                 out.packInt8(this.changes?.classIdx || bot.me.selectedGun);
                 out.send(bot.game.socket);

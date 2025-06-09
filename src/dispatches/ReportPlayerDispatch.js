@@ -1,5 +1,5 @@
 import CommOut from '../comm/CommOut.js';
-import { CommCode } from '../constants/codes.js';
+import CommCode from '../constants/CommCode.js';
 
 export class ReportPlayerDispatch {
     constructor(idOrName, reasons = {}) {
@@ -39,7 +39,7 @@ export class ReportPlayerDispatch {
     execute(bot) {
         const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
 
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.reportPlayer);
         out.packString(target.uniqueId);
         out.packInt8(this.reasonInt);

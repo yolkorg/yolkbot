@@ -50,3 +50,5 @@ export declare const CommCode: {
     playerInfo: number;
     challengeCompleted: number;
 };
+
+export default CommCode;
