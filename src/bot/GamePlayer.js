@@ -50,13 +50,9 @@ export class GamePlayer {
         }
 
         this.stats = {
-            killsInGame: playerData.kills,
-            deathsInGame: playerData.deaths,
-            streak: playerData.streak,
             totalKills: playerData.totalKills,
             totalDeaths: playerData.totalDeaths,
-            bestGameStreak: playerData.bestGameStreak,
-            bestOverallStreak: playerData.bestOverallStreak
+            bestStreak: playerData.bestStreak
         }
 
         this.activeGun = playerData.weaponIdx;
