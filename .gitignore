@@ -6,8 +6,10 @@ node_modules
 package-lock.json
 
 # output
-build
 dist
+tar
+
+# protected
 .env
 
 # mac cache

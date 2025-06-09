@@ -1,18 +1,18 @@
 bun cli/build.js --no-minify
 
-rm -rf ./build/
-mkdir build
+rm -rf ./tar/
+mkdir tar
 
 version=$(jq -r '.version' package.json)
 buildId=$RANDOM
 
-npm pack --pack-destination ./build/
+npm pack --pack-destination ./tar/
 
-mv build/yolkbot-${version}.tgz build/yolkbot-${buildId}.tgz
+mv tar/yolkbot-${version}.tgz tar/yolkbot-${buildId}.tgz
 
 cd ../yolklab || exit 1
 
 bun rm yolkbot
-bun i file:../yolkbot/build/yolkbot-${buildId}.tgz
+bun i file:../yolkbot/tar/yolkbot-${buildId}.tgz
 
 cd ../yolkbot || exit 1
