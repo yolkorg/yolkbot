@@ -1,10 +1,6 @@
 /* eslint-disable */
 export const Regions = [
     {
-        "id": "useast",
-        "sub": "egs-static-live-useast-191w3fe4"
-    },
-    {
         "id": "singapore",
         "sub": "egs-static-live-singapore-5r545eei"
     },
@@ -27,5 +23,9 @@ export const Regions = [
     {
         "id": "uswest",
         "sub": "egs-static-live-uswest-192r5xds"
+    },
+    {
+        "id": "useast",
+        "sub": "egs-static-live-useast-191w3fe4"
     }
 ];
