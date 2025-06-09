@@ -142,6 +142,7 @@ export interface Account {
     challenges: Challenges[];
     adminRoles: number;
     rawLoginData: any; // someday i'll type it
+    isDoubleEggWeeknd: () => boolean;
 }
 
 export interface GameOptions {
