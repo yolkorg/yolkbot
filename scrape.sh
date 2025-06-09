@@ -15,5 +15,9 @@ bun cli/scrape/fromJSON/shellNews.js
 bun cli/scrape/fromJSON/shellYoutube.js
 bun cli/scrape/fromJSON/sounds.js
 
+printf "\nfrom WS...\n"
+
+bun cli/scrape/fromWS/matchmaker.js
+
 printf "\n"
 echo "scraping complete!"
