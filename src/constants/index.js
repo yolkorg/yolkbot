@@ -109,16 +109,6 @@ export const SocialMedia = {
     Twitch: 6
 }
 
-export const ReverseSocialMedia = {
-    0: 'facebook',
-    1: 'instagram',
-    2: 'tiktok',
-    3: 'discord',
-    4: 'youtube',
-    5: 'twitter',
-    6: 'twitch'
-}
-
 export const SocialReward = {
     Discord: 'rew_1200',
     Tiktok: 'rew_1208',
