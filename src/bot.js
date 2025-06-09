@@ -244,7 +244,13 @@ export class Bot {
             adminRoles: 0,
 
             // raw login
-            rawLoginData: {}
+            rawLoginData: {},
+
+            isDoubleEggWeeknd: () => {
+                const day = new Date().getUTCDay();
+                const hours = new Date().getUTCHours();
+                return (day >= 5 && hours >= 20) || day === 6 || day === 0;
+            }
         }
 
         this.#initialAccount = this.account;
