@@ -1,5 +1,5 @@
 import { API } from './api';
-import { GameModes } from './constants/index';
+import { Region } from './constants/regions';
 import yolkws from './socket';
 
 interface MatchmakerParams {
@@ -10,26 +10,6 @@ interface MatchmakerParams {
     noLogin?: boolean;
     api?: API;
 };
-
-export interface Region {
-    id: string;
-    sub: string;
-};
-
-export interface FindGameParams {
-    region: string;
-    mode: keyof typeof GameModes;
-};
-
-export interface RawGameData {
-    command: 'gameFound';
-    region: string;
-    subdomain: string;
-    id: string;
-    uuid: string;
-    private: boolean;
-    noobLobby: boolean;
-}
 
 export interface MatchmakerCommand {
     command: string;
@@ -56,10 +36,6 @@ export declare class Matchmaker {
     send(msg: MatchmakerCommand): void;
 
     getRegions(): Promise<Region[]>;
-    findPublicGame(params: FindGameParams): Promise<RawGameData>;
-
-    getRandomRegion(): string;
-    getRandomGameMode(): keyof typeof GameModes;
 
     waitForConnect(): Promise<void>;
     close(): void;

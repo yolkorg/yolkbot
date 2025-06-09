@@ -12,7 +12,8 @@ type intents = {
     DEBUG_BEST_TARGET: 14,
     NO_AFK_KICK: 16,
     LOAD_MAP: 17,
-    OBSERVE_GAME: 18
+    OBSERVE_GAME: 18,
+    NO_REGION_CHECK: 19
 }
 
 import { Character, GamePlayer, Position } from './bot/GamePlayer';
@@ -23,7 +24,7 @@ import { Item } from './constants/items';
 import { ADispatch } from './dispatches/index';
 import { NodeList } from './pathing/mapnode';
 import { API } from './api';
-import { FindGameParams, Matchmaker, RawGameData } from './matchmaker';
+import { Matchmaker } from './matchmaker';
 import yolkws from './socket';
 
 export interface BotParams {
@@ -190,6 +191,16 @@ export interface GameSpatula {
     controlledByTeam: number;
 }
 
+export interface RawGameData {
+    command: 'gameFound';
+    region: string;
+    subdomain: string;
+    id: string;
+    uuid: string;
+    private: boolean;
+    noobLobby: boolean;
+}
+
 export interface Game {
     raw: RawGameData;
     code: string;
@@ -297,8 +308,10 @@ export class Bot {
     createAccount(email: string, pass: string): Promise<Account | false>;
 
     initMatchmaker(): Promise<boolean>;
-    createPrivateGame(opts: { region: string; mode: string; map: string }): Promise<RawGameData>;
-    findPublicGame(params: FindGameParams): Promise<RawGameData>;
+
+    createPrivateGame(region: string, mode: number, map: string): Promise<RawGameData | string>;
+    findPublicGame(region: string, mode: number): Promise<RawGameData | string>;
+
     join(botName: string, data: string | RawGameData): Promise<void>;
 
     processPacket(data: number[]): void;

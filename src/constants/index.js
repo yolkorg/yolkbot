@@ -50,23 +50,10 @@ export const GameMode = {
     KOTC: 3
 }
 
-export const RawGameModes = {
-    ffa: 0,
-    team: 1,
-    spatula: 2,
-    kotc: 3
-}
-
 export const GameOptionFlag = {
     Locked: 1,
     NoTeamChange: 2,
     NoTeamShuffle: 4
-}
-
-export const RawGameOptionFlags = {
-    locked: 1,
-    noTeamChange: 2,
-    noTeamShuffle: 4
 }
 
 export const GunEquipTime = 13;
