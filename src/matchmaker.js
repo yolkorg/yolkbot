@@ -1,5 +1,5 @@
 import API from './api.js';
-import { PlayType, ProxiesEnabled, RawGameModes } from './constants/index.js';
+import { ProxiesEnabled } from './constants/index.js';
 import { validate } from './wasm/wrapper.js';
 
 import yolkws from './socket.js';
@@ -116,52 +116,6 @@ export class Matchmaker {
 
             this.ws.send(JSON.stringify({ command: 'regionList' }));
         });
-    }
-
-    async findPublicGame(params = {}) {
-        await this.waitForConnect();
-
-        if (!params.region && !this.regionList && !this.regionList.length)
-            return this.#processError('pass a region to createPrivateGame or call getRegions() for a random one');
-
-        if (!params.region) opts.region = this.getRandomRegion();
-
-        if (this.regionList.length && !this.regionList.find(r => r.id === params.region))
-            return this.#processError('did not find region in regionList');
-
-        if (!params.mode) return this.#processError('pass a mode to findPublicGame')
-        if (typeof RawGameModes[params.mode] !== 'number') return this.#processError('invalid mode passed to findPublicGame, see GameModes for a list')
-
-        return new Promise((res) => {
-            const opts = {
-                command: 'findGame',
-                region: params.region,
-                playType: PlayType.JoinPublic,
-                gameType: RawGameModes[params.mode],
-                sessionId: this.sessionId
-            };
-
-            const listener = (data2) => {
-                if (data2.command === 'gameFound') {
-                    this.off('msg', listener);
-                    res(data2);
-                }
-            };
-
-            this.on('msg', listener);
-
-            this.ws.send(JSON.stringify(opts));
-        });
-    }
-
-    getRandomRegion() {
-        if (!this.regionList && !this.regionList.length) this.#processError('use <Matchmaker>.getRegions() before getRandomRegion()');
-        else return this.regionList[Math.floor(Math.random() * this.regionList.length)].id;
-    }
-
-    getRandomGameMode() {
-        const gameModeArray = Object.keys(RawGameModes);
-        return gameModeArray[Math.floor(Math.random() * gameModeArray.length)];
     }
 
     close() {

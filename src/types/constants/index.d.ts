@@ -50,13 +50,6 @@ export declare const GameMode: {
     KOTC: number;
 };
 
-export declare const RawGameModes: {
-    ffa: number;
-    team: number;
-    spatula: number;
-    kotc: number;
-};
-
 export declare const GameOptionFlags: {
     Locked: number;
     NoTeamChange: number;
