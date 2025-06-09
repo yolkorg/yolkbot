@@ -736,13 +736,13 @@ export class Bot {
             pitch: CommIn.unPackRad(),
             score: CommIn.unPackInt32U(),
             // the following are all stats
-            kills: CommIn.unPackInt16U(),
-            deaths: CommIn.unPackInt16U(),
-            streak: CommIn.unPackInt16U(),
+            $kills: CommIn.unPackInt16U(),
+            $deaths: CommIn.unPackInt16U(),
+            $streak: CommIn.unPackInt16U(),
             totalKills: CommIn.unPackInt32U(),
             totalDeaths: CommIn.unPackInt32U(),
-            bestGameStreak: CommIn.unPackInt16U(),
-            bestOverallStreak: CommIn.unPackInt16U(),
+            bestStreak: CommIn.unPackInt16U(),
+            $bestOverallStreak: CommIn.unPackInt16U(),
             // end stats
             shield: CommIn.unPackInt8U(),
             hp: CommIn.unPackInt8U(),
@@ -917,7 +917,6 @@ export class Bot {
             killed.hp = 100;
             killed.spawnShield = 0;
 
-            killed.stats.deathsInGame++;
             killed.stats.totalDeaths++;
 
             killed.inKotcZone = false;
@@ -926,12 +925,10 @@ export class Bot {
 
         if (killer) {
             killer.streak++;
-            killer.stats.killsInGame++;
             killer.stats.totalKills++;
             killer.stats.streak = killer.streak;
 
-            if (killer.streak > killer.stats.bestGameStreak) killer.stats.bestGameStreak = killer.streak;
-            if (killer.streak > killer.stats.bestOverallStreak) killer.stats.bestOverallStreak = killer.streak;
+            if (killer.streak > killer.stats.bestStreak) killer.stats.bestStreak = killer.streak;
         }
 
         this.emit('playerDeath', killed, killer);

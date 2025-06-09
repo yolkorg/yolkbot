@@ -29,13 +29,9 @@ export interface Character {
 }
 
 export interface PlayerStats {
-    killsInGame: number;
-    deathsInGame: number;
-    streak: number;
     totalKills: number;
     totalDeaths: number;
-    bestGameStreak: number;
-    bestOverallStreak: number;
+    bestStreak: number;
 }
 
 export type PlayerTeam = 0 | 1 | 2;
@@ -66,13 +62,13 @@ export interface PlayerData {
     yaw: number;
     pitch: number;
     score: number;
-    kills: number;
-    deaths: number;
-    streak: number;
+    $kills: number;
+    $deaths: number;
+    $streak: number;
     totalKills: number;
     totalDeaths: number;
-    bestGameStreak: number;
-    bestOverallStreak: number;
+    bestStreak: number;
+    $bestOverallStreak: number;
     shield: number;
     hp: number;
     playing: boolean;
