@@ -2,8 +2,8 @@ import API from './api.js';
 
 import CommIn from './comm/CommIn.js';
 import CommOut from './comm/CommOut.js';
-import { CloseCode } from './comm/Codes.js';
-import { CommCode } from './constants/codes.js';
+import CloseCode from './constants/CloseCode.js';
+import CommCode from './constants/CommCode.js';
 
 import GamePlayer from './bot/GamePlayer.js';
 import Matchmaker from './matchmaker.js';
@@ -628,7 +628,7 @@ export class Bot {
             if (this.lastUpdateTick >= 2) {
                 this.emit('tick');
 
-                const out = CommOut.getBuffer();
+                const out = new CommOut();
 
                 out.packInt8(CommCode.syncMe);
 
@@ -1065,7 +1065,7 @@ export class Bot {
     }
 
     #processEventModifierPacket() {
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.eventModifier);
         out.send(this.game.socket);
     }
@@ -1300,7 +1300,7 @@ export class Bot {
         this.emit('pingUpdate', oldPing, this.ping);
 
         setTimeout(() => {
-            const out = CommOut.getBuffer();
+            const out = new CommOut();
             out.packInt8(CommCode.ping);
             out.send(this.game.socket);
             this.lastPingTime = Date.now();
@@ -1412,7 +1412,7 @@ export class Bot {
     }
 
     updateGameOptions() {
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.gameOptions);
         out.packInt8(this.game.options.gravity * 4);
         out.packInt8(this.game.options.damage * 4);
@@ -1487,7 +1487,7 @@ export class Bot {
     }
 
     #processSocketReadyPacket() {
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(this.intents.includes(this.Intents.OBSERVE_GAME) ? CommCode.observeGame : CommCode.joinGame);
 
         out.packString(this.state.name);
@@ -1537,7 +1537,7 @@ export class Bot {
         this.state.inGame = true;
         this.lastDeathTime = Date.now();
 
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.clientReady);
         out.send(this.game.socket);
 
@@ -1546,14 +1546,14 @@ export class Bot {
         if (this.intents.includes(this.Intents.PING)) {
             this.lastPingTime = Date.now();
 
-            const out2 = CommOut.getBuffer();
+            const out2 = new CommOut();
             out2.packInt8(CommCode.ping);
             out2.send(this.game.socket);
         }
 
         this.afkKickInterval = setInterval(() => {
             if (this.state.inGame && !this.me.playing && (Date.now() - this.lastDeathTime) >= 15000) {
-                const out3 = CommOut.getBuffer();
+                const out3 = new CommOut();
                 out3.packInt8(CommCode.keepAlive);
                 out3.send(this.game.socket);
             }
@@ -1733,8 +1733,7 @@ export class Bot {
                     this.#processPlayerInfoPacket();
                     break;
 
-                // we do not plan to implement these
-                // for more info, see comm/codes.js
+                // useless to us
                 case CommCode.expireUpgrade:
                 case CommCode.clientReady:
                     break;

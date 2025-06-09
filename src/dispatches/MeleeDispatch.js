@@ -1,7 +1,7 @@
 import CommOut from '../comm/CommOut.js';
+import CommCode from '../constants/CommCode.js';
 
 import { GunEquipTime } from '../constants/index.js';
-import { CommCode } from '../constants/codes.js';
 
 export class MeleeDispatch {
     validate() {
@@ -13,7 +13,7 @@ export class MeleeDispatch {
     }
 
     execute(bot) {
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.melee);
         out.send(bot.game.socket);
 
