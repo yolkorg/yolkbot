@@ -285,6 +285,8 @@ export class Bot {
     }
 
     async createAccount(email, pass) {
+        this.account = this.#initialAccount;
+
         this.account.email = email;
         this.account.password = pass;
 
@@ -293,6 +295,8 @@ export class Bot {
     }
 
     async login(email, pass) {
+        this.account = this.#initialAccount;
+
         this.account.email = email;
         this.account.password = pass;
 
@@ -301,14 +305,13 @@ export class Bot {
     }
 
     async loginWithRefreshToken(refreshToken) {
+        this.account = this.#initialAccount;
         const loginData = await this.api.loginWithRefreshToken(refreshToken);
         return this.#processLoginData(loginData);
     }
 
     async loginAnonymously() {
-        delete this.account.email;
-        delete this.account.password;
-
+        this.account = this.#initialAccount;
         const loginData = await this.api.loginAnonymously();
         return this.#processLoginData(loginData);
     }
