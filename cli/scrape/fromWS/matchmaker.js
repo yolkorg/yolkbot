@@ -22,9 +22,11 @@ ws.onmessage = (event) => {
     }
 
     if (data.command === 'regionList') {
+        const regions = data.regionList.sort((a, b) => a.id.localeCompare(b.id));
+
         fs.writeFileSync(
             path.join(import.meta.dirname, '..', '..', '..', 'src', 'constants', 'regions.js'),
-            `/* eslint-disable */\nexport const Regions = ${JSON.stringify(data.regionList, null, 4)};`
+            `/* eslint-disable */\nexport const Regions = ${JSON.stringify(regions, null, 4)};`
         );
 
         console.log('scraped regions');
