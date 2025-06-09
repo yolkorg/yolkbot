@@ -926,7 +926,6 @@ export class Bot {
         if (killer) {
             killer.streak++;
             killer.stats.totalKills++;
-            killer.stats.streak = killer.streak;
 
             if (killer.streak > killer.stats.bestStreak) killer.stats.bestStreak = killer.streak;
         }
