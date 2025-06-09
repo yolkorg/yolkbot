@@ -5,10 +5,6 @@ export const Regions = [
         "sub": "egs-static-live-useast-191w3fe4"
     },
     {
-        "id": "uswest",
-        "sub": "egs-static-live-uswest-192r5xds"
-    },
-    {
         "id": "singapore",
         "sub": "egs-static-live-singapore-5r545eei"
     },
@@ -27,5 +23,9 @@ export const Regions = [
     {
         "id": "sydney",
         "sub": "egs-static-live-sydney-302pa99o"
+    },
+    {
+        "id": "uswest",
+        "sub": "egs-static-live-uswest-192r5xds"
     }
 ];
