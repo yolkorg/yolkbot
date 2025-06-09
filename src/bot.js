@@ -17,13 +17,12 @@ import {
     FramesBetweenSyncs,
     GameAction,
     GameMode,
+    GameOptionFlag,
     GunList,
     ItemType,
     Movement,
     PlayType,
     ProxiesEnabled,
-    RawGameModes,
-    RawGameOptionFlags,
     ShellStreak,
     StateBufferSize
 } from './constants/index.js';
@@ -38,9 +37,12 @@ import { fetchMap, initKotcZones } from './util.js';
 
 import { Challenges } from './constants/challenges.js';
 import { Maps } from './constants/maps.js';
+import { Regions } from './constants/regions.js';
 
 const CoopStagesById = Object.fromEntries(Object.entries(CoopState).map(([key, value]) => [value, key.toLowerCase()]));
 const GameModeById = Object.fromEntries(Object.entries(GameMode).map(([key, value]) => [value, key]));
+
+const CCGameOptionFlag = Object.fromEntries(Object.entries(GameOptionFlag).map(([k, v]) => [k[0].toLowerCase() + k.slice(1), v]));
 
 const intents = {
     CHALLENGES: 1,
@@ -56,7 +58,8 @@ const intents = {
     DEBUG_BEST_TARGET: 14,
     NO_AFK_KICK: 16,
     LOAD_MAP: 17,
-    OBSERVE_GAME: 18
+    OBSERVE_GAME: 18,
+    NO_REGION_CHECK: 19
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -444,33 +447,12 @@ export class Bot {
         });
     }
 
-    async findPublicGame(opts) {
-        if (!this.matchmaker) this.initMatchmaker();
-        if (!this.matchmaker) return false;
+    async findPublicGame(region, modeId) {
+        if (typeof region !== 'string') return 'no_region_passed';
+        if (!Regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
 
-        return await this.matchmaker.findPublicGame(opts);
-    }
-
-    // region - a region id ('useast', 'germany', etc)
-    // mode - a mode name that corresponds to a GameMode id
-    // map - the name of a map
-    async createPrivateGame(opts = {}) {
-        if (!await this.initMatchmaker()) return false;
-
-        if (!opts.region && !this.matchmaker.regionList && !this.matchmaker.regionList.length)
-            return this.processError('pass a region to createPrivateGame or call getRegions() for a random one');
-
-        if (!opts.region) opts.region = this.matchmaker.getRandomRegion();
-
-        if (!opts.mode) return this.processError('pass a mode to createPrivateGame')
-        if (typeof RawGameModes[opts.mode] !== 'number') return this.processError('invalid mode passed to createPrivateGame')
-
-        if (!opts.map) opts.map = Maps[Maps.length * Math.random() | 0].name;
-
-        const map = Maps.find(m => m.name.toLowerCase() === opts.map.toLowerCase());
-        const mapIdx = Maps.indexOf(map);
-
-        if (mapIdx === -1) return this.processError('invalid map, see the Maps constant for a list');
+        if (typeof modeId !== 'number') return 'no_mode_passed';
+        if (Object.values(GameMode).indexOf(modeId) === -1) return 'invalid_mode_passed';
 
         await this.matchmaker.waitForConnect();
 
@@ -486,9 +468,45 @@ export class Bot {
 
             this.matchmaker.send({
                 command: 'findGame',
-                region: opts.region,
+                region,
+                playType: PlayType.JoinPublic,
+                gameType: modeId,
+                sessionId: this.sessionId
+            });
+        });
+
+        return game;
+    }
+
+    async createPrivateGame(region, modeId, map) {
+        if (typeof region !== 'string') return 'no_region_passed';
+        if (!Regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
+
+        if (typeof modeId !== 'number') return 'no_mode_passed';
+        if (Object.values(GameMode).indexOf(modeId) === -1) return 'invalid_mode_passed';
+
+        if (typeof map !== 'string') return 'no_map_passed';
+
+        const mapIdx = Maps.findIndex(m => m.name.toLowerCase() === opts.map.toLowerCase());
+        if (mapIdx === -1) return 'invalid_map_passed';
+
+        await this.matchmaker.waitForConnect();
+
+        const game = await new Promise((resolve) => {
+            const listener = (msg) => {
+                if (msg.command === 'gameFound') {
+                    this.matchmaker.off('msg', listener);
+                    resolve(msg);
+                }
+            };
+
+            this.matchmaker.on('msg', listener);
+
+            this.matchmaker.send({
+                command: 'findGame',
+                region,
                 playType: PlayType.CreatePrivate,
-                gameType: RawGameModes[opts.mode],
+                gameType: modeId,
                 sessionId: this.account.sessionId,
                 noobLobby: false,
                 map: mapIdx
@@ -1244,8 +1262,8 @@ export class Bot {
 
         const rawFlags = CommIn.unPackInt8U();
 
-        Object.keys(RawGameOptionFlags).forEach((optionFlagName) => {
-            const value = rawFlags & RawGameOptionFlags[optionFlagName] ? 1 : 0;
+        Object.keys(CCGameOptionFlag).forEach((optionFlagName) => {
+            const value = rawFlags & CCGameOptionFlag[optionFlagName] ? 1 : 0;
             this.game.options[optionFlagName] = value;
         });
 
