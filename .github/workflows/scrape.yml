@@ -24,7 +24,9 @@ jobs:
       - name: Run scrapers
         run: |
           ./scrape.sh
-          git diff --quiet ./src/constants/* || echo "CHANGED=true" >> $GITHUB_ENV
+          if git status --porcelain ./src/constants | grep .; then
+            echo "CHANGED=true" >> $GITHUB_ENV
+          fi
           echo $GITHUB_ENV
 
       - name: Commit and push changes
