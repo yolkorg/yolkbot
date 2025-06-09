@@ -1,9 +1,11 @@
-declare class CommIn {
+export declare class CommIn {
     static buffer: Uint8Array;
     static idx: number;
+
     static init(buf: ArrayBuffer): void;
+
     static isMoreDataAvailable(): number;
-    static peekInt8U(): number;
+
     static unPackInt8U(): number;
     static unPackInt8(): number;
     static unPackInt16U(): number;
@@ -15,6 +17,7 @@ declare class CommIn {
     static unPackRad(): number;
     static unPackFloat(): number;
     static unPackDouble(): number;
+
     static unPackString(maxLen?: number): string;
     static unPackLongString(maxLen?: number): string;
 }

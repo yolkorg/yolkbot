@@ -1,5 +1,5 @@
 import CommOut from '../comm/CommOut.js';
-import { CommCode } from '../constants/codes.js';
+import CommCode from '../constants/CommCode.js';
 
 export class ChatDispatch {
     constructor(msg) {
@@ -24,7 +24,7 @@ export class ChatDispatch {
     execute(bot) {
         bot.state.chatLines++;
 
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.chat);
         out.packString(this.msg);
         out.send(bot.game.socket);

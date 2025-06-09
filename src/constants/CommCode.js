@@ -51,3 +51,5 @@ export const CommCode = {
     "playerInfo": 59,
     "challengeCompleted": 60
 };
+
+export default CommCode;

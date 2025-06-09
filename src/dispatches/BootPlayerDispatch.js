@@ -1,5 +1,5 @@
 import CommOut from '../comm/CommOut.js';
-import { CommCode } from '../constants/codes.js';
+import CommCode from '../constants/CommCode.js';
 
 export class BootPlayerDispatch {
     constructor(uniqueId) {
@@ -17,7 +17,7 @@ export class BootPlayerDispatch {
     }
 
     execute(bot) {
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.bootPlayer);
         out.packString(this.uniqueId);
         out.send(bot.game.socket);

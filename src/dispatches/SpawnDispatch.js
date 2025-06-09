@@ -1,5 +1,5 @@
 import CommOut from '../comm/CommOut.js';
-import { CommCode } from '../constants/codes.js';
+import CommCode from '../constants/CommCode.js';
 
 export class SpawnDispatch {
     validate() {
@@ -15,7 +15,7 @@ export class SpawnDispatch {
     }
 
     execute(bot) {
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.requestRespawn);
         out.send(bot.game.socket);
 

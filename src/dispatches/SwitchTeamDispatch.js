@@ -1,5 +1,5 @@
 import CommOut from '../comm/CommOut.js';
-import { CommCode } from '../constants/codes.js';
+import CommCode from '../constants/CommCode.js';
 
 export class SwitchTeamDispatch {
     validate() {
@@ -30,7 +30,7 @@ export class SwitchTeamDispatch {
     }
 
     execute(bot) {
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.switchTeam);
         out.send(bot.game.socket);
     }

@@ -1,5 +1,5 @@
 import CommOut from '../comm/CommOut.js';
-import { CommCode } from '../constants/codes.js';
+import CommCode from '../constants/CommCode.js';
 
 import { BanDuration } from '../constants/index.js';
 
@@ -23,7 +23,7 @@ export class BanPlayerDispatch {
     }
 
     execute(bot) {
-        const out = CommOut.getBuffer();
+        const out = new CommOut();
         out.packInt8(CommCode.banPlayer);
         out.packString(this.uniqueId);
         out.packString(this.reason);
