@@ -355,7 +355,7 @@ export class Bot {
         this.account.ownedItemIds = loginData.ownedItemIds;
         this.account.session = loginData.session;
         this.account.sessionId = loginData.sessionId;
-        this.account.vip = loginData.upgradeProductId && !loginData.upgradeIsExpired;
+        this.account.vip = loginData.active_sub === 'IsVIP';
 
         if (this.intents.includes(this.Intents.STATS)) this.account.stats = {
             lifetime: loginData.statsLifetime,
