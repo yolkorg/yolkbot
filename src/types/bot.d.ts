@@ -88,9 +88,9 @@ export interface RawChallenge {
     challengeData: {
         period: number;
         challengeId: number;
-        reset: number;
-        claimed: number;
-        completed: number;
+        reset: 0 | 1;
+        claimed: 0 | 1;
+        completed: 0 | 1;
         data: number;
     }
 }
@@ -121,6 +121,62 @@ export interface AccountLoadout {
     stampPositionY: number;
 }
 
+export interface RawLoginData {
+    id: number;
+    firebaseId: string;
+    sessionId: string;
+    session: number;
+    emailVerified: boolean;
+    maskedEmail: string;
+    kills: number;
+    deaths: number;
+    streak: number;
+    currentBalance: number;
+    ownedItemIds: number[];
+    loadout: AccountLoadout | null;
+    upgradeProductId: number | null;
+    upgradeMultiplier: number | null;
+    upgradeAdFree: boolean | null;
+    upgradeExpiryDate: number | null;
+    upgradeIsExpired: boolean | null;
+    maybeSchoolEmail: boolean;
+    upgradeName: string | null;
+    upgradeType: 'subscription' | null;
+    subscriptionEnded: boolean;
+    social: string | null;
+    twitchLinked: boolean | null;
+    twitchName: string | null;
+    dateCreated: string;
+    dateModified: string;
+    accountAge: number;
+    statsLifetime: Stats;
+    statsMonthly: Stats;
+    eggsSpent: number | null;
+    eggsSpentMonthly: number | null;
+    challenges: RawChallenge[];
+    unclaimedRewards: RawChallenge[];
+    claimedChallenges: RawChallenge[];
+    notification: {
+        id: number;
+        type: {
+            [key: 'vip' | 'purchases']: {
+                ids: number[];
+                eggs: number;
+            }
+        };
+        read: 0 | 1;
+    }
+    adminRoles?: number;
+    active_sub: 'IsVIP' | 'WasVIP' | null;
+    firstSignin: boolean;
+    chwReady: {
+        period?: number;
+        span?: number;
+        limit?: number;
+        reset?: number;
+    }
+}
+
 export interface Account {
     id: number;
     firebaseId: string;
@@ -141,7 +197,7 @@ export interface Account {
     }
     challenges: Challenges[];
     adminRoles: number;
-    rawLoginData: any; // someday i'll type it
+    rawLoginData: RawLoginData;
     isDoubleEggWeeknd: () => boolean;
 }
 
