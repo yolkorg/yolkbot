@@ -201,6 +201,8 @@ export class API {
     }
 
     sendEmailVerification = async (idToken = this.idToken) => {
+        if (!idToken) return 'no_idtoken_passed';
+
         const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FirebaseKey, {
             method: 'POST',
             body: JSON.stringify({
