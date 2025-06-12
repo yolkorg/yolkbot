@@ -8,6 +8,34 @@ export declare const BanDuration: {
     OneHour: number;
 }
 
+export declare const ChallengeSubType: {
+    Killstreak: number;
+    KillWithWeapon: number;
+    MovementDistance: number;
+    Jumping: number;
+    TimePlayed: number;
+    TimeAlive: number;
+    KillWithCondition: number;
+    TotalKills: number;
+    SpatulaKills: number;
+    Collecting: number;
+    FromTheCoop: number;
+    SpecialOffensive: number;
+    WinKOTC: number;
+    KillWithSpatula: number;
+}
+
+export declare const ChallengeType: {
+    Kill: number;
+    Damage: number;
+    Death: number;
+    Movement: number;
+    Collect: number;
+    Time: number;
+    KOTC: number;
+    Spatula: number;
+}
+
 export declare const ChatFlag: {
     None: number;
     Pinned: number;

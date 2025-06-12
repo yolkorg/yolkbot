@@ -11,7 +11,7 @@ export interface Item {
     price: number;
     item_type_id: ItemTypeIds;
     item_type_name: ItemTypeNames;
-    exclusive_for_class: ClassIds;
+    exclusive_for_class: ClassIds | null;
     item_data: {
         meshName: string;
         tags: string[];
