@@ -8,13 +8,41 @@ export const BanDuration = {
     OneHour: 2
 }
 
+export const ChallengeSubType = {
+    Killstreak: 0,
+    KillWithWeapon: 1,
+    MovementDistance: 3,
+    Jumping: 4,
+    TimePlayed: 6,
+    TimeAlive: 7,
+    KillWithCondition: 8,
+    TotalKills: 10,
+    SpatulaKills: 10,
+    Collecting: 18,
+    FromTheCoop: 20,
+    SpecialOffensive: 21,
+    WinKOTC: 23,
+    KillWithSpatula: 23
+}
+
+export const ChallengeType = {
+    Kill: 0,
+    Damage: 1,
+    Death: 2,
+    Movement: 3,
+    Collect: 4,
+    Time: 5,
+    KOTC: 6,
+    Spatula: 7
+}
+
 export const ChatFlag = {
     None: 0,
     Pinned: 2,
     Team: 4,
     Mod: 254,
     Server: 255
-};
+}
 
 export const ChiknWinnerDailyLimit = 3;
 
