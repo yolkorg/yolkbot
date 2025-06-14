@@ -4,10 +4,10 @@
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-light.png">
     <img src="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-dark.png" width="60%">
   </picture>
-  <h3>creating bots in 10 lines since 2025</h3>
+  <h3>build your bot in only 10 lines</h3>
   <p>
     <a href='https://github.com/yolkorg/yolkbot'>github</a> | 
-    <a href='https://yolkbot.villainsrule.xyz'>documentation</a> |
+    <a href='https://yolkbot.xyz'>documentation</a> |
     <a href='https://npmjs.com/yolkbot'>npm</a> |
     <a href='https://discord.gg/gYugVUCaMr'>discord</a>
   </p>
