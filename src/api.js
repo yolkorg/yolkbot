@@ -225,6 +225,31 @@ export class API {
 
         return body.email;
     }
+
+    verifyOobCode = async (oobCode) => {
+        if (!oobCode) return 'no_oob_code_passed';
+
+        const req = await globals.fetch('https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=' + FirebaseKey, {
+            method: 'POST',
+            body: JSON.stringify({ oobCode }),
+            headers: {
+                ...baseHeaders,
+                'x-client-version': 'Chrome/JsCore/3.7.5/FirebaseCore-web',
+                'referer': 'https://shellshockio-181719.firebaseapp.com/',
+                'content-type': 'application/json'
+            },
+            dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
+        });
+
+        const body = await req.json();
+
+        if (!body.emailVerified) {
+            if (!this.suppressErrors) console.error('verifyOobCode: the game sent an invalid response', body);
+            return 'firebase_invalid_response';
+        }
+
+        return body.email;
+    }
 }
 
 export default API;
