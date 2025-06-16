@@ -328,17 +328,17 @@ export class Bot {
     #processLoginData(loginData) {
         if (typeof loginData !== 'object') {
             this.emit('authFail', loginData);
-            return false;
+            return loginData;
         }
 
         if (loginData.banRemaining) {
             this.emit('banned', loginData.banRemaining);
-            return false;
+            return 'account_banned';
         }
 
         if (!loginData.playerOutput) {
             this.emit('authFail', loginData);
-            return false;
+            return loginData;
         }
 
         loginData = loginData.playerOutput;
@@ -397,7 +397,7 @@ export class Bot {
     async initMatchmaker() {
         if (!this.account.sessionId && !this.intents.includes(this.Intents.NO_LOGIN)) {
             const anonLogin = await this.loginAnonymously();
-            if (!anonLogin) return false;
+            if (typeof anonLogin !== 'object') return anonLogin;
         }
 
         if (!this.matchmaker) {
@@ -1277,7 +1277,6 @@ export class Bot {
         this.game.options.mustUseSecondary = this.game.options.weaponsDisabled.every((v) => v);
 
         this.emit('gameOptionsChange', oldOptions, this.game.options);
-        return false;
     }
 
     #processGameActionPacket() {
