@@ -419,40 +419,6 @@ export class Bot {
         return true;
     }
 
-    async #joinGameWithCode(code) {
-        if (!await this.initMatchmaker()) return 'matchmakerInitFail';
-
-        await this.matchmaker.waitForConnect();
-
-        return await new Promise((resolve) => {
-            const listener = (message) => {
-                if (message.command === 'gameFound') {
-                    this.matchmaker.off('msg', listener);
-
-                    this.game.raw = message;
-                    this.game.code = message.id;
-
-                    resolve(message.id);
-                }
-
-                if (message.error && message.error === 'gameNotFound') {
-                    this.processError(`Game ${code} not found (likely expired).`)
-                    this.leave();
-                    return 'gameNotFound';
-                }
-            };
-
-            this.matchmaker.on('msg', listener);
-
-            this.matchmaker.send({
-                command: 'joinGame',
-                id: code,
-                observe: false,
-                sessionId: this.account.sessionId
-            });
-        });
-    }
-
     async findPublicGame(region, modeId) {
         if (typeof region !== 'string') return 'no_region_passed';
         if (!Regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
@@ -528,7 +494,36 @@ export class Bot {
         if (typeof data === 'string') {
             if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
 
-            const joinResult = await this.#joinGameWithCode(data);
+            if (!await this.initMatchmaker()) return 'matchmakerInitFail';
+            await this.matchmaker.waitForConnect();
+
+            const joinResult = await new Promise((resolve) => {
+                const listener = (message) => {
+                    if (message.command === 'gameFound') {
+                        this.matchmaker.off('msg', listener);
+
+                        this.game.raw = message;
+                        this.game.code = message.id;
+
+                        resolve(message.id);
+                    }
+
+                    if (message.error && message.error === 'gameNotFound') {
+                        this.processError(`game "${data}" not found, it may have expired.`);
+                        this.leave();
+                        return 'gameNotFound';
+                    }
+                };
+
+                this.matchmaker.on('msg', listener);
+
+                this.matchmaker.send({
+                    command: 'joinGame',
+                    id: data,
+                    observe: false,
+                    sessionId: this.account.sessionId
+                });
+            });
 
             if (joinResult === 'matchmakerInitFail') return this.processError('failed to create matchmaker, you may be ratelimited (try a vpn?)');
             if (joinResult === 'gameNotFound') return this.processError('game not found, it may have expired or been deleted');
