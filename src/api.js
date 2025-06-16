@@ -121,7 +121,7 @@ export class API {
         this.idToken = firebaseToken;
 
         const servicesQuery = await this.queryServices({ cmd: 'auth', firebaseToken });
-        return { firebase: body, ...servicesQuery };
+        return typeof servicesQuery === 'object' ? { firebase: body, ...servicesQuery } : servicesQuery;
     }
 
     createAccount = async (email, password) =>
@@ -172,7 +172,7 @@ export class API {
         this.idToken = token;
 
         const response = await this.queryServices({ cmd: 'auth', firebaseToken: token });
-        return { firebase: body, ...response };
+        return typeof response === 'object' ? { firebase: body, ...response } : response;
     }
 
     loginAnonymously = async () => {
@@ -197,7 +197,7 @@ export class API {
         this.idToken = firebaseToken;
 
         const query = await this.queryServices({ cmd: 'auth', firebaseToken });
-        return { firebase: body, ...query };
+        return typeof query === 'object' ? { firebase: body, ...query } : query;
     }
 
     sendEmailVerification = async (idToken = this.idToken) => {
