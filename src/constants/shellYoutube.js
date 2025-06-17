@@ -2,6 +2,26 @@
 export const ShellYoutube = [
     {
         "active": true,
+        "link": "https://www.youtube.com/watch?v=c6mWE1a6sro",
+        "desc": "",
+        "imageExt": "",
+        "id": "c6mWE1a6sro",
+        "author": "Blue Panda",
+        "title": "Calm 21 Streak ☺️",
+        "externalImg": "https://i.ytimg.com/vi/c6mWE1a6sro/hqdefault.jpg"
+    },
+    {
+        "active": true,
+        "link": "https://www.youtube.com/watch?v=cHULiapM2-A",
+        "desc": "",
+        "imageExt": "",
+        "id": "cHULiapM2-A",
+        "author": "Clingzter ",
+        "title": "The CRACKSHOT that traveled through time!",
+        "externalImg": "https://i.ytimg.com/vi/cHULiapM2-A/hqdefault.jpg"
+    },
+    {
+        "active": true,
         "link": "https://www.youtube.com/watch?v=9Eq-jX5XNP4",
         "desc": "",
         "imageExt": "",
@@ -59,46 +79,6 @@ export const ShellYoutube = [
         "author": "Shell League",
         "title": "CRAZY KotC match Highlights",
         "externalImg": "https://i.ytimg.com/vi/-Pj2j-PC020/hqdefault.jpg"
-    },
-    {
-        "active": true,
-        "link": "https://www.youtube.com/watch?v=6z9KKTk4kdw",
-        "desc": "",
-        "imageExt": "",
-        "id": "6z9KKTk4kdw",
-        "author": "TheKingmanYT",
-        "title": "1v1ing THE GOAT KT_VEI",
-        "externalImg": "https://i.ytimg.com/vi/6z9KKTk4kdw/hqdefault.jpg"
-    },
-    {
-        "active": true,
-        "link": "https://www.youtube.com/watch?v=Jn1cT1PEi0s",
-        "desc": "",
-        "imageExt": "",
-        "id": "Jn1cT1PEi0s",
-        "author": "Meep ",
-        "title": "10 Kill Streak /w Ancient Guns! | New Update",
-        "externalImg": "https://i.ytimg.com/vi/Jn1cT1PEi0s/hqdefault.jpg"
-    },
-    {
-        "active": true,
-        "link": "https://www.youtube.com/watch?v=iKx-xz5T_T8",
-        "desc": "",
-        "imageExt": "",
-        "id": "iKx-xz5T_T8",
-        "author": "Bubbleaxe",
-        "title": "WALKIN | Montage",
-        "externalImg": "https://i.ytimg.com/vi/iKx-xz5T_T8/hqdefault.jpg"
-    },
-    {
-        "active": true,
-        "link": "https://www.youtube.com/watch?v=I7MEVsuYVkY",
-        "desc": "",
-        "imageExt": "",
-        "id": "I7MEVsuYVkY",
-        "author": "Galactic",
-        "title": "Smooth Lofi gameplay w/Phoenix Yt",
-        "externalImg": "https://i.ytimg.com/vi/I7MEVsuYVkY/hqdefault.jpg"
     },
     {
         "active": true,
