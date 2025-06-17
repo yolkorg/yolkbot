@@ -17,10 +17,6 @@ export const Regions = [
         "sub": "egs-static-live-sydney-302pa99o"
     },
     {
-        "id": "uscentral",
-        "sub": "egs-static-live-uscentral-451sa2ap"
-    },
-    {
         "id": "useast",
         "sub": "egs-static-live-useast-191w3fe4"
     },
