@@ -9,7 +9,7 @@
     <a href='https://github.com/yolkorg/yolkbot'>github</a> | 
     <a href='https://yolkbot.xyz'>documentation</a> |
     <a href='https://npmjs.com/yolkbot'>npm</a> |
-    <a href='https://discord.gg/gYugVUCaMr'>discord</a>
+    <a href='https://discord.gg/VUVRmmCXzN'>discord</a>
   </p>
 </div>
 
