@@ -300,7 +300,7 @@ export class Bot {
         this.account.password = pass;
 
         const loginData = await this.api.createAccount(email, pass);
-        return this.#processLoginData(loginData);
+        return this.processLoginData(loginData);
     }
 
     async login(email, pass) {
@@ -310,22 +310,22 @@ export class Bot {
         this.account.password = pass;
 
         const loginData = await this.api.loginWithCredentials(email, pass);
-        return this.#processLoginData(loginData);
+        return this.processLoginData(loginData);
     }
 
     async loginWithRefreshToken(refreshToken) {
         this.account = this.#initialAccount;
         const loginData = await this.api.loginWithRefreshToken(refreshToken);
-        return this.#processLoginData(loginData);
+        return this.processLoginData(loginData);
     }
 
     async loginAnonymously() {
         this.account = this.#initialAccount;
         const loginData = await this.api.loginAnonymously();
-        return this.#processLoginData(loginData);
+        return this.processLoginData(loginData);
     }
 
-    #processLoginData(loginData) {
+    processLoginData(loginData) {
         if (typeof loginData !== 'object') {
             this.emit('authFail', loginData);
             return loginData;
