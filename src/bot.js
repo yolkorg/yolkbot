@@ -459,7 +459,7 @@ export class Bot {
 
         if (typeof map !== 'string') return 'no_map_passed';
 
-        const mapIdx = Maps.findIndex(m => m.name.toLowerCase() === opts.map.toLowerCase());
+        const mapIdx = Maps.findIndex(m => m.name.toLowerCase() === map.toLowerCase());
         if (mapIdx === -1) return 'invalid_map_passed';
 
         await this.matchmaker.waitForConnect();
