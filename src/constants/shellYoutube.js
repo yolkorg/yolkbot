@@ -2,6 +2,16 @@
 export const ShellYoutube = [
     {
         "active": true,
+        "link": "https://www.youtube.com/watch?v=4w5Jr6s9Pds",
+        "desc": "",
+        "imageExt": "",
+        "id": "4w5Jr6s9Pds",
+        "author": "Duier",
+        "title": "1v1ing Rogue! A close 1v1!",
+        "externalImg": "https://i.ytimg.com/vi/4w5Jr6s9Pds/hqdefault.jpg"
+    },
+    {
+        "active": true,
         "link": "https://www.youtube.com/watch?v=c6mWE1a6sro",
         "desc": "",
         "imageExt": "",
