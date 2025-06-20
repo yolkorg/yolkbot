@@ -23,5 +23,9 @@ export const Regions = [
     {
         "id": "useast",
         "sub": "egs-static-live-useast-191w3fe4"
+    },
+    {
+        "id": "uswest",
+        "sub": "egs-static-live-uswest-192r5xds"
     }
 ];
