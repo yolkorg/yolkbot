@@ -196,6 +196,14 @@ export class Bot {
         this.account = {
             // used for auth
             id: 0,
+
+            firebase: {
+                idToken: '',
+                refreshToken: '',
+                expiresIn: '3600',
+                localId: ''
+            },
+
             firebaseId: '',
             sessionId: '',
             session: '',
@@ -341,6 +349,8 @@ export class Bot {
             return loginData;
         }
 
+        this.account.firebase = loginData.firebase || {};
+
         loginData = loginData.playerOutput;
 
         this.account.rawLoginData = loginData;
@@ -426,7 +436,7 @@ export class Bot {
         if (typeof modeId !== 'number') return 'no_mode_passed';
         if (Object.values(GameMode).indexOf(modeId) === -1) return 'invalid_mode_passed';
 
-        await this.matchmaker.waitForConnect();
+        if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
 
         const game = await new Promise((resolve) => {
             const listener = (msg) => {
