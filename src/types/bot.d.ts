@@ -127,7 +127,7 @@ export interface RawLoginData {
     sessionId: string;
     session: number;
     emailVerified: boolean;
-    maskedEmail: string;
+    maskedEmail: string | null;
     kills: number;
     deaths: number;
     streak: number;
@@ -139,7 +139,7 @@ export interface RawLoginData {
     upgradeAdFree: boolean | null;
     upgradeExpiryDate: number | null;
     upgradeIsExpired: boolean | null;
-    maybeSchoolEmail: boolean;
+    maybeSchoolEmail: boolean | null;
     upgradeName: string | null;
     upgradeType: 'subscription' | null;
     subscriptionEnded: boolean;
@@ -177,8 +177,16 @@ export interface RawLoginData {
     }
 }
 
+export interface AccountFirebase {
+    idToken: string;
+    refeshToken: string;
+    expiresIn: string;
+    localId: string;
+}
+
 export interface Account {
     id: number;
+    firebase: AccountFirebase;
     firebaseId: string;
     sessionId: string;
     session: string;
