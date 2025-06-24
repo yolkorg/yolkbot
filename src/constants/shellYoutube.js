@@ -2,6 +2,16 @@
 export const ShellYoutube = [
     {
         "active": true,
+        "link": "https://www.youtube.com/watch?v=f-Q_P0CnHQU",
+        "desc": "",
+        "imageExt": "",
+        "id": "f-Q_P0CnHQU",
+        "author": "Blue Panda",
+        "title": "50 Kills, No One Stands a Chance",
+        "externalImg": "https://i.ytimg.com/vi/f-Q_P0CnHQU/hqdefault.jpg"
+    },
+    {
+        "active": true,
         "link": "https://www.youtube.com/watch?v=4w5Jr6s9Pds",
         "desc": "",
         "imageExt": "",
