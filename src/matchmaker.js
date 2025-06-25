@@ -16,9 +16,12 @@ export class Matchmaker {
     onListeners = new Map();
     onceListeners = new Map();
 
+    #noExitOnError = false;
     #forceClose = false;
 
     constructor(params = {}) {
+        this.#noExitOnError = params.noExitOnError || false;
+
         if (!params.instance) params.instance = 'shellshock.io';
         if (!params.protocol) params.protocol = 'wss';
 
@@ -163,8 +166,10 @@ export class Matchmaker {
 
     #processError(error) {
         if (this.onListeners.has('error')) this.#emit('error', error);
-        // eslint-disable-next-line custom/no-throw
-        else throw error;
+        else {
+            console.error(error);
+            if (!this.#noExitOnError) process.exit(1);
+        }
     }
 }
 

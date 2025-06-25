@@ -13,7 +13,8 @@ type intents = {
     NO_AFK_KICK: 16,
     LOAD_MAP: 17,
     OBSERVE_GAME: 18,
-    NO_REGION_CHECK: 19
+    NO_REGION_CHECK: 19,
+    NO_EXIT_ON_ERROR: 20
 }
 
 import { Character, GamePlayer, Position } from './bot/GamePlayer';
