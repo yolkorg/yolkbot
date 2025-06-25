@@ -8,6 +8,7 @@ interface MatchmakerParams {
     proxy?: string;
     sessionId?: string;
     noLogin?: boolean;
+    noExitOnError?: boolean;
     api?: API;
 };
 

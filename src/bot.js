@@ -59,7 +59,8 @@ const intents = {
     NO_AFK_KICK: 16,
     LOAD_MAP: 17,
     OBSERVE_GAME: 18,
-    NO_REGION_CHECK: 19
+    NO_REGION_CHECK: 19,
+    NO_EXIT_ON_ERROR: 20
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -2032,8 +2033,10 @@ export class Bot {
 
     processError(error) {
         if (this.#hooks.error && this.#hooks.error.length) this.emit('error', error);
-        // eslint-disable-next-line custom/no-throw
-        else throw error;
+        else {
+            console.error(error);
+            if (!this.intents.includes(this.Intents.NO_EXIT_ON_ERROR)) process.exit(1);
+        }
     }
 
     leave(code = CloseCode.mainMenu) {
