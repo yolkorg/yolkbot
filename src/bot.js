@@ -472,7 +472,7 @@ export class Bot {
         const mapIdx = Maps.findIndex(m => m.name.toLowerCase() === map.toLowerCase());
         if (mapIdx === -1) return 'invalid_map_passed';
 
-        await this.matchmaker.waitForConnect();
+        if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
 
         const game = await new Promise((resolve) => {
             const listener = (msg) => {
@@ -505,7 +505,6 @@ export class Bot {
             if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
 
             if (!await this.initMatchmaker()) return 'matchmakerInitFail';
-            await this.matchmaker.waitForConnect();
 
             const joinResult = await new Promise((resolve) => {
                 const listener = (message) => {
