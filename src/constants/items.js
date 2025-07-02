@@ -2638,7 +2638,6 @@ export const Items = [
                 "Yellow",
                 "JulyM24",
                 "bun_mayan",
-                "premFeatOne",
                 "May25"
             ]
         },
@@ -3349,7 +3348,7 @@ export const Items = [
                 "premFeatTwo"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.05234545439905691,
@@ -5640,10 +5639,11 @@ export const Items = [
                 "JunM23",
                 "Yellow",
                 "Brown",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.050488251857767175,
@@ -5667,10 +5667,11 @@ export const Items = [
                 "Brown",
                 "White",
                 "Red",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.06391937586354324,
@@ -5693,10 +5694,11 @@ export const Items = [
                 "JunM23",
                 "Yellow",
                 "Black",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.09472312087566159,
@@ -7200,7 +7202,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.03139999298521712,
@@ -7946,10 +7948,11 @@ export const Items = [
                 "JunM23",
                 "Green",
                 "White",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.09812463178535724,
@@ -7972,10 +7975,11 @@ export const Items = [
                 "JunM23",
                 "Rainbow",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": 0.017159674628105748,
@@ -8979,10 +8983,12 @@ export const Items = [
             "meshName": "hat_crash",
             "tags": [
                 "Badegg",
-                "Red"
+                "Red",
+                "Jul25",
+                "premFeatOne"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.015373292358376367,
@@ -9810,7 +9816,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.09519071283078828,
@@ -10292,10 +10298,11 @@ export const Items = [
                 "Summer2",
                 "JunM23",
                 "Red",
-                "Yellow"
+                "Yellow",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.08452722773723353,
@@ -10317,10 +10324,11 @@ export const Items = [
                 "Summer2",
                 "JunM23",
                 "Red",
-                "Blue"
+                "Blue",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.08452722773723353,
@@ -10343,10 +10351,11 @@ export const Items = [
                 "JunM23",
                 "Yellow",
                 "Green",
-                "Brown"
+                "Brown",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.07565028269552926,
@@ -10369,10 +10378,11 @@ export const Items = [
                 "JunM23",
                 "Gold",
                 "Yellow",
-                "Brown"
+                "Brown",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.12876061452866017,
@@ -10394,10 +10404,11 @@ export const Items = [
                 "Summer2",
                 "JunM23",
                 "Red",
-                "Meme"
+                "Meme",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase",
         "align": {
             "x": -0.10068510003333841,
@@ -10419,10 +10430,12 @@ export const Items = [
                 "Summer2",
                 "JunM23",
                 "Brown",
-                "JunM24"
+                "JunM24",
+                "Jul25",
+                "premFeatOne"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -10736,7 +10749,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": 0.021915916439513516,
@@ -10762,7 +10775,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": 0.0208010053824621,
@@ -10788,7 +10801,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": 0.021915916439513516,
@@ -10814,7 +10827,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": 0.02370142462174929,
@@ -10841,7 +10854,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": 0.0006045990621803554,
@@ -10867,7 +10880,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.03449437859488835,
@@ -11145,7 +11158,7 @@ export const Items = [
                 "premFeatTwo"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -11558,8 +11571,7 @@ export const Items = [
                 "Green",
                 "Gray",
                 "Grey",
-                "May25",
-                "premFeatOne"
+                "May25"
             ]
         },
         "is_available": false,
@@ -14936,7 +14948,7 @@ export const Items = [
                 "Eyes"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.13533271945095926,
@@ -14962,7 +14974,7 @@ export const Items = [
                 "Orange"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase",
         "align": {
             "x": -0.16291756742233354,
@@ -14973,7 +14985,7 @@ export const Items = [
     {
         "id": 1597,
         "name": "The Green Machine",
-        "price": 4,
+        "price": 2147483647,
         "item_type_id": 1,
         "item_type_name": "Hat",
         "category_name": "Hats",
@@ -14986,16 +14998,42 @@ export const Items = [
                 "Green"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
-        "activeProduct": true,
-        "sku": [
-            "item_hat_kartbros"
-        ],
         "align": {
             "x": 0.013567821915410505,
             "y": 0.1229279294691179,
             "z": 0.0061995837427129
+        }
+    },
+    {
+        "id": 1598,
+        "name": "Shimmer Shell ",
+        "price": 4,
+        "item_type_id": 1,
+        "item_type_name": "Hat",
+        "category_name": "Hats",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "hat_premium_ClamWings",
+            "tags": [
+                "Jul25",
+                "Premium",
+                "Opal",
+                "White",
+                "Bone"
+            ]
+        },
+        "is_available": true,
+        "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_hat_shell"
+        ],
+        "align": {
+            "x": 0.05647486614296682,
+            "y": -0.14489875709066524,
+            "z": 0.025078556618837844
         }
     },
     {
@@ -18647,10 +18685,11 @@ export const Items = [
                 "JunM23",
                 "Blue",
                 "Water",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -18669,10 +18708,11 @@ export const Items = [
                 "JunM23",
                 "Pink",
                 "Food",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -18690,10 +18730,11 @@ export const Items = [
                 "Summer",
                 "JunM23",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -18710,10 +18751,11 @@ export const Items = [
             "tags": [
                 "Summer",
                 "JunM23",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -20558,10 +20600,11 @@ export const Items = [
                 "Summer",
                 "JunM23",
                 "Red",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -20580,10 +20623,11 @@ export const Items = [
                 "JunM23",
                 "Green",
                 "Tent",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -20604,10 +20648,11 @@ export const Items = [
                 "Red",
                 "Blue",
                 "Tree",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -20625,10 +20670,11 @@ export const Items = [
                 "Summer",
                 "JunM23",
                 "Orange",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -20646,10 +20692,11 @@ export const Items = [
                 "Summer",
                 "JunM23",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -20941,7 +20988,7 @@ export const Items = [
                 "premFeatTwo"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -21078,10 +21125,12 @@ export const Items = [
             "y": 12,
             "tags": [
                 "Scavenger",
-                "Blue"
+                "Blue",
+                "Jul25",
+                "premFeatOne"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23032,10 +23081,11 @@ export const Items = [
                 "JunM23",
                 "Summer2",
                 "Red",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23053,10 +23103,11 @@ export const Items = [
                 "JunM23",
                 "Summer2",
                 "White",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23073,10 +23124,11 @@ export const Items = [
             "tags": [
                 "JunM23",
                 "Summer2",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23097,10 +23149,11 @@ export const Items = [
                 "Blue",
                 "Yellow",
                 "Red",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -23310,7 +23363,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -23331,7 +23384,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -23354,7 +23407,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -23376,7 +23429,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -23419,7 +23472,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -24396,8 +24449,7 @@ export const Items = [
                 "Leopard",
                 "Orange",
                 "bun_mayan",
-                "May25",
-                "premFeatOne"
+                "May25"
             ]
         },
         "is_available": false,
@@ -26376,10 +26428,11 @@ export const Items = [
                 "JunM24",
                 "Text",
                 "Blue",
-                "Summer"
+                "Summer",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -26419,10 +26472,11 @@ export const Items = [
                 "JunM24",
                 "Pink",
                 "Text",
-                "Summer"
+                "Summer",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -26852,7 +26906,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28032,7 +28086,7 @@ export const Items = [
                 "Wheel"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "manual"
     },
     {
@@ -28054,7 +28108,7 @@ export const Items = [
                 "Green"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28076,7 +28130,7 @@ export const Items = [
                 "Orange"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28097,7 +28151,7 @@ export const Items = [
                 "Orange"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28120,7 +28174,7 @@ export const Items = [
                 "Silver"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28144,7 +28198,7 @@ export const Items = [
                 "Newsletter"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28185,7 +28239,7 @@ export const Items = [
                 "Red"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28207,7 +28261,7 @@ export const Items = [
                 "Text"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -28249,6 +28303,72 @@ export const Items = [
         },
         "is_available": true,
         "unlock": "purchase"
+    },
+    {
+        "id": 2646,
+        "name": "No Bad Days Stamp",
+        "price": 2147483647,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 28,
+            "y": 20,
+            "tags": [
+                "Jul25",
+                "Summer",
+                "White",
+                "Yellow",
+                "Orange",
+                "Gold"
+            ]
+        },
+        "is_available": false,
+        "unlock": "manual"
+    },
+    {
+        "id": 2647,
+        "name": "Eggman Stamp",
+        "price": 10000,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 29,
+            "y": 20,
+            "tags": [
+                "Jul25",
+                "DC",
+                "Batman",
+                "Yellow",
+                "Black",
+                "Gold"
+            ]
+        },
+        "is_available": true,
+        "unlock": "purchase"
+    },
+    {
+        "id": 2648,
+        "name": "GSE Clan Stamp",
+        "price": 2147483647,
+        "item_type_id": 2,
+        "item_type_name": "Stamp",
+        "category_name": "Stamps",
+        "exclusive_for_class": null,
+        "item_data": {
+            "x": 30,
+            "y": 20,
+            "tags": [
+                "Jul25",
+                "SL",
+                "Community"
+            ]
+        },
+        "is_available": false,
+        "unlock": "manual"
     },
     {
         "id": 3100,
@@ -28903,10 +29023,11 @@ export const Items = [
                 "Blue",
                 "Orange",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -29282,7 +29403,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -30257,10 +30378,11 @@ export const Items = [
                 "Blue",
                 "Orange",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -30643,7 +30765,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -31632,10 +31754,11 @@ export const Items = [
                 "Blue",
                 "Orange",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -31769,7 +31892,7 @@ export const Items = [
                 "premFeatTwo"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -32215,7 +32338,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -33207,10 +33330,11 @@ export const Items = [
                 "Blue",
                 "Orange",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -33755,7 +33879,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -34733,10 +34857,11 @@ export const Items = [
                 "Blue",
                 "Orange",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -35129,7 +35254,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -36137,10 +36262,11 @@ export const Items = [
                 "Blue",
                 "Orange",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -36530,7 +36656,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -37479,10 +37605,11 @@ export const Items = [
                 "Blue",
                 "Orange",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -37830,7 +37957,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -38066,7 +38193,7 @@ export const Items = [
     {
         "id": 4258,
         "name": "The Quackshot",
-        "price": 2147483647,
+        "price": 4,
         "item_type_id": 3,
         "item_type_name": "Primary",
         "category_name": "Crackshot Primary Weapons",
@@ -38076,11 +38203,18 @@ export const Items = [
             "tags": [
                 "May24",
                 "Duck",
-                "Crackshot"
+                "Crackshot",
+                "premFeatOne",
+                "Jul25",
+                "Green"
             ]
         },
-        "is_available": false,
-        "unlock": "premium"
+        "is_available": true,
+        "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_m24_quack"
+        ]
     },
     {
         "id": 4259,
@@ -38699,7 +38833,7 @@ export const Items = [
                 "JunM24"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -39083,7 +39217,7 @@ export const Items = [
     {
         "id": 16039,
         "name": "Basket Bros Grenade",
-        "price": 2147483647,
+        "price": 5,
         "item_type_id": 6,
         "item_type_name": "Grenade",
         "category_name": "Grenades",
@@ -39100,8 +39234,12 @@ export const Items = [
             "smokeColors": "white",
             "fireColors": "white"
         },
-        "is_available": false,
-        "unlock": "manual"
+        "is_available": true,
+        "unlock": "premium",
+        "activeProduct": true,
+        "sku": [
+            "item_gre_bros"
+        ]
     },
     {
         "id": 16040,
@@ -39212,14 +39350,16 @@ export const Items = [
                 "Black",
                 "Cute",
                 "Jun24",
-                "bun_plant"
+                "bun_plant",
+                "Jul25",
+                "premFeatOne"
             ],
             "sound": "grenade_bees",
             "cell": 13,
             "smokeColors": "white",
             "fireColors": "default"
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -39274,7 +39414,7 @@ export const Items = [
             "smokeColors": "softblack",
             "fireColors": "default"
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
@@ -39601,7 +39741,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -39623,7 +39763,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -39668,7 +39808,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -40225,7 +40365,7 @@ export const Items = [
     {
         "id": 16093,
         "name": "Banana Grenade",
-        "price": 5,
+        "price": 2147483647,
         "item_type_id": 6,
         "item_type_name": "Grenade",
         "category_name": "Grenades",
@@ -40242,11 +40382,34 @@ export const Items = [
             "smokeColors": "yellow",
             "fireColors": "yellow"
         },
+        "is_available": false,
+        "unlock": "premium"
+    },
+    {
+        "id": 16094,
+        "name": "Crab Rave Grenade",
+        "price": 6,
+        "item_type_id": 6,
+        "item_type_name": "Grenade",
+        "category_name": "Grenades",
+        "exclusive_for_class": null,
+        "item_data": {
+            "meshName": "grenade_CrabRave",
+            "tags": [
+                "Jul25",
+                "Red",
+                "Summer"
+            ],
+            "sound": "grenade_CrabRave",
+            "cell": 29,
+            "smokeColors": "blue",
+            "fireColors": "red"
+        },
         "is_available": true,
         "unlock": "premium",
         "activeProduct": true,
         "sku": [
-            "item_gre_banana"
+            "item_gre_crab"
         ]
     },
     {
@@ -40605,10 +40768,11 @@ export const Items = [
                 "Blue",
                 "Orange",
                 "Yellow",
-                "JunM24"
+                "JunM24",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -41159,7 +41323,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -41942,8 +42106,7 @@ export const Items = [
                 "Grey",
                 "Gray",
                 "AugM24",
-                "May25",
-                "premFeatOne"
+                "May25"
             ]
         },
         "is_available": false,
@@ -42045,10 +42208,11 @@ export const Items = [
                 "JunM23",
                 "Summer2",
                 "Pink",
-                "Food"
+                "Food",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -42066,10 +42230,11 @@ export const Items = [
                 "Summer2",
                 "Blue",
                 "Yellow",
-                "Tools"
+                "Tools",
+                "Jul25"
             ]
         },
-        "is_available": false,
+        "is_available": true,
         "unlock": "purchase"
     },
     {
@@ -42209,7 +42374,7 @@ export const Items = [
         "category_name": "Melee",
         "exclusive_for_class": null,
         "item_data": {
-            "meshName": "melee_kart",
+            "meshName": "melee_kwhisk",
             "tags": [
                 "Aug23",
                 "Kart",
@@ -42219,7 +42384,7 @@ export const Items = [
                 "Jun25"
             ]
         },
-        "is_available": true,
+        "is_available": false,
         "unlock": "purchase"
     },
     {
@@ -42383,8 +42548,7 @@ export const Items = [
                 "Black",
                 "Brown",
                 "bun_mayan",
-                "May25",
-                "premFeatOne"
+                "May25"
             ]
         },
         "is_available": false,

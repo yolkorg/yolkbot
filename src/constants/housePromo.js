@@ -178,6 +178,28 @@ export const HousePromo = {
     ],
     "small": [
         {
+            "active": true,
+            "linksToVipStore": "1",
+            "imageExt": ".png",
+            "label": "VIP",
+            "id": "kuzrh1cwt",
+            "weighted": false,
+            "hideOnCG": false,
+            "linksTo": "linksToVipStore"
+        },
+        {
+            "imageExt": ".jpg",
+            "active": true,
+            "label": "Kart Bros",
+            "link": [
+                "https://kartbros.io/"
+            ],
+            "id": "mbgzmt107",
+            "weighted": true,
+            "hideOnCG": true,
+            "linksTo": "link"
+        },
+        {
             "link": [
                 "https://freegames.io/game/football-bros?utm_source=shell_shockers_houseads&utm_medium=referral"
             ],
@@ -199,28 +221,6 @@ export const HousePromo = {
             "label": "Basket Bros",
             "id": "kokajqjqu",
             "weighted": false,
-            "hideOnCG": true,
-            "linksTo": "link"
-        },
-        {
-            "active": true,
-            "linksToVipStore": "1",
-            "imageExt": ".png",
-            "label": "VIP",
-            "id": "kuzrh1cwt",
-            "weighted": false,
-            "hideOnCG": false,
-            "linksTo": "linksToVipStore"
-        },
-        {
-            "imageExt": ".jpg",
-            "active": true,
-            "label": "Kart Bros",
-            "link": [
-                "https://kartbros.io/"
-            ],
-            "id": "mbgzmt107",
-            "weighted": true,
             "hideOnCG": true,
             "linksTo": "link"
         },
@@ -689,9 +689,9 @@ export const HousePromo = {
         }
     ],
     "houseAdPercentChance": 100,
-    "specialItemsTag": "Jun25",
-    "featuredSocialMedia": "tiktok",
-    "premFeatured": "premFeatTwo",
+    "specialItemsTag": "Jul25",
+    "featuredSocialMedia": "discord",
+    "premFeatured": "premFeatOne",
     "smHouseAds": [
         {
             "ad": "badEgg",

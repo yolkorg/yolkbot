@@ -1845,6 +1845,21 @@ export const ShopItems = [
     },
     {
         "itemIds": [
+            4258
+        ],
+        "sku": "item_m24_quack",
+        "name": "The Quackshot",
+        "price": 4,
+        "salePrice": null,
+        "flagText": "",
+        "type": "item",
+        "inStore": 0,
+        "currency": 0,
+        "isActive": true,
+        "id": 156
+    },
+    {
+        "itemIds": [
             4054
         ],
         "sku": "item_smg_infernal",
@@ -2088,25 +2103,25 @@ export const ShopItems = [
     },
     {
         "itemIds": [
-            16093
+            16094
         ],
-        "sku": "item_gre_banana",
-        "name": "Banana Grenade",
-        "price": 5,
+        "sku": "item_gre_crab",
+        "name": "Crab Rave Grenade",
+        "price": 6,
         "salePrice": null,
         "flagText": "",
         "type": "item",
         "inStore": 1,
         "currency": 0,
         "isActive": true,
-        "id": 210
+        "id": 213
     },
     {
         "itemIds": [
-            1597
+            1598
         ],
-        "sku": "item_hat_kartbros",
-        "name": "Bro Kart Sigma",
+        "sku": "item_hat_shell",
+        "name": "Shimmer Shell Wings",
         "price": 4,
         "salePrice": null,
         "flagText": "",
@@ -2114,17 +2129,32 @@ export const ShopItems = [
         "inStore": 1,
         "currency": 0,
         "isActive": true,
-        "id": 211
+        "id": 214
     },
     {
         "itemIds": [
-            1480,
-            2635,
-            3437,
-            15090
+            16039
         ],
-        "sku": "bun_ridge",
-        "name": "Ridge Racer",
+        "sku": "item_gre_bros",
+        "name": "Bros Grenade",
+        "price": 5,
+        "salePrice": null,
+        "flagText": "",
+        "type": "item",
+        "inStore": 0,
+        "currency": 0,
+        "isActive": true,
+        "id": 215
+    },
+    {
+        "itemIds": [
+            1171,
+            2117,
+            3625,
+            16022
+        ],
+        "sku": "bun_kill",
+        "name": "Killstreak Bundle",
         "price": 7,
         "salePrice": null,
         "flagText": "",
@@ -2132,6 +2162,6 @@ export const ShopItems = [
         "inStore": 1,
         "currency": 0,
         "isActive": true,
-        "id": 212
+        "id": 216
     }
 ];
