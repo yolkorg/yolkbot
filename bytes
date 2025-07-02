@@ -29,5 +29,6 @@ fi
 
 bytesContent=$(cat bytes.txt)
 sed -i '' "s|toUint8Array('.*')|toUint8Array('$bytesContent')|g" ./src/wasm/bytes.js
+rm -rf ./bytes.txt
 
 echo "Replaced bytes in ./src/wasm/bytes.ts with content from $file"
