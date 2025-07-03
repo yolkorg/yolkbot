@@ -2,16 +2,6 @@
 export const ShellYoutube = [
     {
         "active": true,
-        "link": "https://www.youtube.com/watch?v=5SkcA1fUz5w",
-        "desc": "",
-        "imageExt": "",
-        "id": "5SkcA1fUz5w",
-        "author": "Blue Panda",
-        "title": "Ranked 5v5 KOTC game DOMINATED by RPG",
-        "externalImg": "https://i.ytimg.com/vi/5SkcA1fUz5w/hqdefault.jpg"
-    },
-    {
-        "active": true,
         "link": "https://www.youtube.com/watch?v=f-Q_P0CnHQU",
         "desc": "",
         "imageExt": "",
