@@ -12,7 +12,7 @@ let parsed = '';
 
 eval(`parsed = ${match}`);
 
-const langData = await fetch('https://shellshock.io/language/en.json', {
+const langData = await fetch('https://shellshock.io/language/en.json?' + Date.now(), {
     headers: {
         'User-Agent': UserAgent
     }

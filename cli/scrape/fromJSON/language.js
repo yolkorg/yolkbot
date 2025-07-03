@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { UserAgent } from '../common.js';
 
-const data = await fetch('https://shellshock.io/language/en.json', {
+const data = await fetch('https://shellshock.io/language/en.json?' + Date.now(), {
     headers: {
         'User-Agent': UserAgent
     }

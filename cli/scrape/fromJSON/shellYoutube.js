@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { UserAgent } from '../common.js';
 
-const data = await fetch('https://shellshock.io/data/shellYouTube.json', {
+const data = await fetch('https://shellshock.io/data/shellYouTube.json?' + Date.now(), {
     headers: {
         'User-Agent': UserAgent
     }
