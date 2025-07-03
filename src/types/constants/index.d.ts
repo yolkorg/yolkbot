@@ -51,7 +51,7 @@ export declare const CollectType: {
     Grenade: number;
 };
 
-export declare const CoopStates: {
+export declare const CoopState: {
     Start: number;
     Score: number;
     Win: number;
