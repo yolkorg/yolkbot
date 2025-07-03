@@ -1,9 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const data = await fetch('https://archive.yolkbot.xyz/commcodes/latest.json');
-
-const { codes } = await data.json();
+const data = await fetch('https://archive.yolkbot.xyz/commcodes/nameToNumber.json');
+const codes = await data.json();
 
 fs.writeFileSync(
     path.join(import.meta.dirname, '..', '..', '..', 'src', 'constants', 'CommCode.js'),
