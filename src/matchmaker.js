@@ -73,7 +73,7 @@ export class Matchmaker {
 
         this.ws.onclose = () => {
             this.connected = false;
-            if (!this.#forceClose) this.#createSocket(instance);
+            if (!this.#forceClose) this.#createSocket(instance, protocol, noLogin);
         }
     }
 

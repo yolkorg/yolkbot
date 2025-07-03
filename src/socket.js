@@ -26,7 +26,7 @@ class yolkws extends globals.WebSocket {
                     'sec-websocket-extensions': 'permessage-deflate; client_max_window_bits',
                     // 'sec-websocket-key': generateWebSocketKey(),
                     // 'sec-websocket-version': '13',
-                    'upgrade': 'websocket',
+                    // 'upgrade': 'websocket',
                     'user-agent': UserAgent
                 }
             })

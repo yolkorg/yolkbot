@@ -8,7 +8,7 @@ let js = '';
 export const getJS = async () => {
     if (js) return js;
 
-    const data = await fetch('https://shellshock.io/js/shellshock.js', {
+    const data = await fetch('https://shellshock.io/js/shellshock.js?' + Date.now(), {
         headers: {
             'User-Agent': UserAgent
         }
