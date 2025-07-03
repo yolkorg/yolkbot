@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-dark.png">
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-light.png">
-    <img src="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-dark.png" width="60%">
+    <img src="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-light.png" width="60%">
   </picture>
   <h3>build your bot in only 10 lines</h3>
   <p>
