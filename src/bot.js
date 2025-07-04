@@ -39,7 +39,6 @@ import { Challenges } from './constants/challenges.js';
 import { Maps } from './constants/maps.js';
 import { Regions } from './constants/regions.js';
 
-const CoopStagesById = Object.fromEntries(Object.entries(CoopState).map(([key, value]) => [value, key.toLowerCase()]));
 const GameModeById = Object.fromEntries(Object.entries(GameMode).map(([key, value]) => [value, key]));
 
 const CCGameOptionFlag = Object.fromEntries(Object.entries(GameOptionFlag).map(([k, v]) => [k[0].toLowerCase() + k.slice(1), v]));
@@ -188,7 +187,6 @@ export class Bot {
             capturing: 0,
             captureProgress: 0,
             numCapturing: 0,
-            stageName: '',
             capturePercent: 0.0
         }
 
@@ -1139,7 +1137,6 @@ export class Bot {
             this.game.teamScore[2] = CommIn.unPackInt8U(); // team 2 (red) score
 
             // not in shell, for utility purposes =D
-            this.game.stageName = CoopStagesById[this.game.stage]; // name of the stage ('start' / 'capturing' / 'etc')
             this.game.capturePercent = this.game.captureProgress / 1000; // progress of the capture as a percentage
             this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
 
@@ -1166,7 +1163,6 @@ export class Bot {
             delete this.game.capturing;
             delete this.game.captureProgress;
             delete this.game.numCapturing;
-            delete this.game.stageName;
             delete this.game.numCapturing;
             delete this.game.activeZone;
         }
@@ -1310,7 +1306,6 @@ export class Bot {
                 this.game.capturing = 0;
                 this.game.captureProgress = 0;
                 this.game.numCapturing = 0;
-                this.game.stageName = CoopStagesById[CoopState.Capturing];
                 this.game.capturePercent = 0.0;
             }
 
