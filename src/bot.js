@@ -1140,6 +1140,8 @@ export class Bot {
             this.game.capturePercent = this.game.captureProgress / 1000; // progress of the capture as a percentage
             this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
 
+            const oldPlayersOnZone = Object.values(this.players).filter((p) => p.inKotcZone && p.playing);
+
             if (this.game.activeZone) Object.values(this.players).forEach((player) => player.updateKotcZone(this.game.activeZone));
 
             if (this.game.numCapturing <= 0) Object.values(this.players).forEach((player) => {
@@ -1147,7 +1149,7 @@ export class Bot {
                 this.emit('playerLeaveZone', player);
             });
 
-            this.emit('gameStateChange', oldGame, this.game);
+            this.emit('gameStateChange', oldGame, this.game, oldPlayersOnZone);
         } else if (this.game.gameModeId === GameMode.Team) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();

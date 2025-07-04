@@ -404,7 +404,7 @@ export class Bot {
     on(event: 'gameOptionsChange', cb: (oldOptions: GameOptions, newOptions: GameOptions) => void): void;
     on(event: 'gameReady', cb: () => void): void;
     on(event: 'gameReset', cb: () => void): void;
-    on(event: 'gameStateChange', cb: (oldState: Game, newState: Game) => void): void;
+    on(event: 'gameStateChange', cb: (oldState: Game, newState: Game, oldPlayersOnZone: GamePlayer[]) => void): void;
     on(event: 'grenadeExplode', cb: (item: Item | number, pos: Position, damage: number, radius: number) => void): void;
     on(event: 'leave', cb: (closeCode: number) => void): void;
     on(event: 'mapLoad', cb: (map: MapJSON) => void): void;
