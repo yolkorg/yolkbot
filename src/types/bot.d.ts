@@ -288,7 +288,6 @@ export interface Game {
     capturing: number;
     captureProgress: number;
     numCapturing: number;
-    stageName: string;
     capturePercent: number;
 }
 
