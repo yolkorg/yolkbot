@@ -439,10 +439,14 @@ export class Bot {
 
         const game = await new Promise((resolve) => {
             const listener = (msg) => {
-                if (msg.command === 'gameFound') {
-                    this.matchmaker.off('msg', listener);
-                    resolve(msg);
-                }
+                if (msg.command === 'notice') return;
+
+                this.matchmaker.off('msg', listener);
+
+                if (msg.command === 'gameFound') return resolve(msg);
+                if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
+
+                this.processError('unknown matchmaker response ' + JSON.stringify(msg));
             };
 
             this.matchmaker.on('msg', listener);
@@ -475,10 +479,14 @@ export class Bot {
 
         const game = await new Promise((resolve) => {
             const listener = (msg) => {
-                if (msg.command === 'gameFound') {
-                    this.matchmaker.off('msg', listener);
-                    resolve(msg);
-                }
+                if (msg.command === 'notice') return;
+
+                this.matchmaker.off('msg', listener);
+
+                if (msg.command === 'gameFound') return resolve(msg);
+                if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
+
+                this.processError('unknown matchmaker response ' + JSON.stringify(msg));
             };
 
             this.matchmaker.on('msg', listener);
@@ -501,7 +509,7 @@ export class Bot {
         this.state.name = name || 'yolkbot';
 
         if (typeof data === 'string') {
-            if (data.includes('#')) data = data.split('#')[1]; // stupid shell kids put in full links
+            if (data.includes('#')) data = data.split('#')[1];
 
             if (!await this.initMatchmaker()) return 'matchmakerInitFail';
 
