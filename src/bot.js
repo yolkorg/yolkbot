@@ -864,10 +864,13 @@ export class Bot {
             if (controlKeys & Movement.Jump) player.jumping = true;
             else player.jumping = false;
 
+            if (controlKeys & Movement.Scope) player.scoping = true;
+            else player.scoping = false;
+
             player.view.yaw = CommIn.unPackRadU();
             player.view.pitch = CommIn.unPackRad();
 
-            CommIn.unPackInt8U(); // scope
+            player.scale = CommIn.unPackInt8U();
         }
 
         const didChange = player.position.x !== x || player.position.y !== y || player.position.z !== z || player.climbing !== climbing;
@@ -1072,8 +1075,8 @@ export class Bot {
 
         this.me.climbing = !!CommIn.unPackInt8U();
 
-        CommIn.unPackInt8U();
-        CommIn.unPackInt8U();
+        CommIn.unPackInt8U(); // rounds
+        CommIn.unPackInt8U(); // store
 
         if (!player) return;
 
@@ -1214,6 +1217,7 @@ export class Bot {
                 break;
 
             case ShellStreak.MiniEgg:
+                player.scale = 0.5;
                 player.streakRewards.push(ShellStreak.MiniEgg);
                 break;
         }
@@ -1235,6 +1239,8 @@ export class Bot {
 
         if (streaks.includes(ksType) && player.streakRewards.includes(ksType))
             player.streakRewards = player.streakRewards.filter((r) => r !== ksType);
+
+        if (ksType === ShellStreak.MiniEgg) player.scale = 1;
 
         this.emit('playerEndStreak', player, ksType);
     }
