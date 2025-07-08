@@ -4,7 +4,7 @@ export const ShellNews = [
         "content": "It's Summer Vacation! Relax and enjoy 🏖️",
         "imageExt": ".png",
         "id": "news_mcmfgxwu3",
-        "elId": "jeaIAw",
+        "elId": "d5R0NG",
         "active": true,
         "linksToChangeLog": "1"
     },
@@ -13,14 +13,14 @@ export const ShellNews = [
         "imageExt": ".png",
         "active": true,
         "id": "news_mcmf9ivm1",
-        "elId": "8vTT8x",
-        "link": "https://kartbros.io/"
+        "elId": "fFOBvh",
+        "link": "https://kartbros.io/?utm_source=ssnewsfeed&utm_medium=referral"
     },
     {
         "content": "🏈 Footballbros.io - Go Long!",
         "imageExt": ".png",
         "id": "news_mcmf9ivm2",
-        "elId": "rl8pRp",
+        "elId": "BdXkKh",
         "link": "https://footballbros.io/?utm_source=ssnewsfeed&utm_medium=referral",
         "active": true
     },
@@ -28,7 +28,7 @@ export const ShellNews = [
         "content": "🤼 Get ready to rumble! Check out WrestleBros.io and beat up your bros! 🏆",
         "imageExt": ".png",
         "id": "news_m4ukw0jq5",
-        "elId": "A7VRHi",
+        "elId": "BB7DR3",
         "link": "https://wrestlebros.io/?utm_source=ssnewsfeed&utm_medium=referral",
         "active": true
     }
