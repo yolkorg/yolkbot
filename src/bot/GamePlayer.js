@@ -21,6 +21,11 @@ export class GamePlayer {
         this.isVip = playerData.upgradeProductId > 0;
         this.showBadge = !playerData.hideBadge || false;
 
+        this.streak = playerData.score;
+        this.streakRewards = Object.values(ShellStreak).filter(streak => playerData.activeShellStreaks & streak);
+
+        this.scale = this.streakRewards.includes(ShellStreak.MiniEgg) ? 0.5 : 1;
+
         this.position = {
             x: playerData.x,
             y: playerData.y,
@@ -28,6 +33,7 @@ export class GamePlayer {
         };
 
         this.jumping = playerData.$controlKeys & Movement.Jump;
+        this.scoping = playerData.$controlKeys & Movement.Scope;
         this.climbing = false;
 
         this.view = {
@@ -67,9 +73,6 @@ export class GamePlayer {
         }
 
         this.grenades = 1;
-
-        this.streak = playerData.score;
-        this.streakRewards = Object.values(ShellStreak).filter(streak => playerData.activeShellStreaks & streak);
 
         this.hp = playerData.hp;
         this.hpShield = 0;
