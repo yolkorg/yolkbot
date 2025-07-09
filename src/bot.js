@@ -456,7 +456,7 @@ export class Bot {
                 region,
                 playType: PlayType.JoinPublic,
                 gameType: modeId,
-                sessionId: this.sessionId
+                sessionId: this.account.sessionId
             });
         });
 
