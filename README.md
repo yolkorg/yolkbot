@@ -4,10 +4,10 @@
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-light.png">
     <img src="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-light.png" width="60%">
   </picture>
-  <h3>build your bot in only 10 lines</h3>
+  <h3>a quick, fast, multipurpose, & always working shell shockers bot library!</h3>
   <p>
     <a href='https://github.com/yolkorg/yolkbot'>github</a> | 
-    <a href='https://yolkbot.xyz'>documentation</a> |
+    <a href='https://docs.yolkbot.xyz'>documentation</a> |
     <a href='https://npmjs.com/yolkbot'>npm</a> |
     <a href='https://discord.gg/VUVRmmCXzN'>discord</a>
   </p>
@@ -15,11 +15,11 @@
 
 <br>
 
-<h3 align='center'>why?</h3>
+<h3 align='center'>getting started</h3>
 <p align='center'>
-  this library creates a unified way to create shell shockers bots for any purpose.<br>
-  you no longer have to figure out how to write hundreds of lines just to join a game.<br>
-  create a bot & put it in a game in 3 lines, down from 300.
+  to get started with yolkbot, read our <a href="https://docs.yolkbot.xyz">documentation</a>.<br>
+  if you ever get confused, you can join our <a href="https://discord.gg/VUVRmmCXzN">discord server</a>!<br>
+  simple yolkbots can be made in 10 lines...what will you make?<br>
 </p>
 
 <br>
@@ -27,16 +27,6 @@
 <h3 align='center'>credits</h3>
 
 <p align='center'>
-  this codebase is written and maintained by <a href='https://github.com/villainsrule'>1ust</a><br>
-  special thanks to <a href='https://zastix.club'>zastix</a> for emotional support (you are amazing!)
-</p>
-
-<br>
-
-<h3 align='center'>dmca disclaimer</h3>
-
-<p align='center'>
-  parts of this repository are JSON files that come from data contained in Shell Shockers. <br>
-  per <a href='https://www.copyright.gov/reports/studies/dmca/sec-104-report-vol-1.pdf'>section 117 of the DMCA</a>, this repository is an archive and should not be subject to takedown. <br>
-  a false DMCA is considered illegal.
+  yolkbot is maintained with ❤️ by <a href='https://github.com/villainsrule'>1ust</a><br>
+  special thanks to <a href='https://github.com/zastlx'>zastix</a> for contributions & emotional support
 </p>
