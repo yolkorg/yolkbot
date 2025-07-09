@@ -66,7 +66,7 @@ export class Matchmaker {
             const data = JSON.parse(e.data);
 
             if (data.command === 'validateUUID')
-                this.ws.send(JSON.stringify({ command: 'validateUUID', hash: validate(data.uuid) }));
+                return this.ws.send(JSON.stringify({ command: 'validateUUID', hash: validate(data.uuid) }));
 
             this.#emit('msg', data);
         }
