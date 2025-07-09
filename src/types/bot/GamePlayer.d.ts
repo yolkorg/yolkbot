@@ -104,8 +104,12 @@ export class GamePlayer {
     socials: Social[];
     isVip: boolean;
     showBadge: boolean;
+    streak: number;
+    streakRewards: number[];
+    scale: number;
     position: Position;
     jumping: boolean;
+    scoping: boolean;
     climbing: boolean;
     view: View;
     inKotcZone: boolean;
@@ -115,8 +119,6 @@ export class GamePlayer {
     selectedGun: GunId;
     weapons: PlayerWeapons;
     grenades: number;
-    streak: number;
-    streakRewards: number[];
     hp: number;
     hpShield: number;
     spawnShield: number;
