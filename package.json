@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "1.1.6",
+    "version": "0.0.0-111",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -97,6 +97,10 @@
         "./dispatches/*.js": {
             "import": "./dist/dispatches/*.js",
             "types": "./dist/types/dispatches/*.d.ts"
+        },
+        "./socket": {
+            "import": "./dist/socket.js",
+            "types": "./dist/types/socket.d.ts"
         },
         "./wasm": {
             "import": "./dist/wasm/wrapper.js",
