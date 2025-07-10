@@ -559,7 +559,7 @@ export class Bot {
 
         const attempt = async () => {
             try {
-                const host = this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`;
+                const host = this.game.raw.host || this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`;
 
                 this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
                 this.game.socket.onerror = async (e) => {
