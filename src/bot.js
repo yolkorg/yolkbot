@@ -629,29 +629,27 @@ export class Bot {
         if (this.pathing.followingPath && this.intents.includes(this.Intents.PATHFINDING))
             this.#processPathfinding();
 
-        if (this.#dispatches.length > 0) {
-            for (let i = 0; i < this.#dispatches.length; i++) {
-                const disp = this.#dispatches[i];
-                if (disp.check(this)) {
-                    disp.execute(this);
-                    this.#dispatches.splice(i, 1);
-                }
+        for (let i = 0; i < this.#dispatches.length; i++) {
+            const disp = this.#dispatches[i];
+            if (disp.check(this)) {
+                disp.execute(this);
+                this.#dispatches.splice(i, 1);
             }
         }
 
         this.state.chatLines = Math.max(0, this.state.chatLines - 1 / (30 * 4));
 
         if (this.me.playing) {
-            const idx = this.state.stateIdx;
+            const currentIdx = this.state.stateIdx;
 
             if (this.intents.includes(this.Intents.DEBUG_BUFFER)) {
-                console.log('setting buffer for idx', idx);
+                console.log('setting buffer for idx', currentIdx);
                 console.log('checking...shotsFired', this.state.shotsFired);
             }
 
             this.me.jumping = !!(this.state.controlKeys & Movement.Jump);
 
-            this.state.buffer[idx] = {
+            this.state.buffer[currentIdx] = {
                 controlKeys: this.state.controlKeys,
                 yaw: this.state.yaw,
                 pitch: this.state.pitch,
@@ -670,23 +668,23 @@ export class Bot {
                 out.packInt8(this.state.stateIdx); // stateIdx
                 out.packInt8(this.state.serverStateIdx);
 
-                const startIdx = mod((this.state.stateIdx - FramesBetweenSyncs) + 1, StateBufferSize);
+                const startIdx = mod(this.state.stateIdx - FramesBetweenSyncs + 1, StateBufferSize);
+
                 for (let i = 0; i < FramesBetweenSyncs; i++) {
-                    const idxOnFrame = mod(startIdx + i, StateBufferSize);
+                    const idx = mod(startIdx + i, StateBufferSize);
+                    const frame = this.state.buffer[idx] || {};
+                    const keys = frame.controlKeys || 0;
+                    const shots = frame.shotsFired || 0;
+                    const yaw = frame.yaw ?? this.state.yaw;
+                    const pitch = frame.pitch ?? this.state.pitch;
 
                     if (this.intents.includes(this.Intents.DEBUG_BUFFER))
-                        console.log('going with', this.state.stateIdx, startIdx, idxOnFrame, this.state.buffer[idxOnFrame]);
+                        console.log('going with', this.state.stateIdx, startIdx, idx, frame);
 
-                    out.packInt8(this.state.buffer[idxOnFrame]?.controlKeys || 0);
-                    out.packInt8(this.state.buffer[idxOnFrame]?.shotsFired || 0);
-
-                    const targetYaw = this.state.buffer[idxOnFrame]?.yaw || this.state.yaw;
-                    const targetPitch = this.state.buffer[idxOnFrame]?.pitch || this.state.pitch;
-                    const resultingCoords = coords(targetYaw, targetPitch);
-
-                    out.packString(resultingCoords); // coords from the wasm :100:
-
-                    out.packInt8(100); // fixes commcode issues, supposed to be scale or smth
+                    out.packInt8(keys);
+                    out.packInt8(shots);
+                    out.packString(coords(yaw, pitch));
+                    out.packInt8(100);
                 }
 
                 out.send(this.game.socket);
@@ -699,17 +697,18 @@ export class Bot {
             this.state.stateIdx = mod(this.state.stateIdx + 1, StateBufferSize);
         }
 
-        if (this.intents.includes(this.Intents.PLAYER_HEALTH)) {
-            for (const player of Object.values(this.players)) {
-                if (player.playing && player.hp > 0) {
-                    const regenSpeed = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
+        if (!this.intents.includes(this.Intents.PLAYER_HEALTH)) return;
 
-                    if (player.streakRewards.includes(ShellStreak.OverHeal)) player.hp = Math.max(100, player.hp - regenSpeed);
-                    else player.hp = Math.min(100, player.hp + regenSpeed);
-                }
+        const regen = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
 
-                if (player.spawnShield > 0) player.spawnShield -= 6;
+        for (const player of Object.values(this.players)) {
+            if (player.playing && player.hp > 0) {
+                const overHeal = player.streakRewards.includes(ShellStreak.OverHeal);
+                player.hp += overHeal ? -regen : regen;
+                player.hp = overHeal ? Math.max(100, player.hp) : Math.min(100, player.hp);
             }
+
+            if (player.spawnShield > 0) player.spawnShield -= 6;
         }
     }
 
@@ -886,42 +885,39 @@ export class Bot {
             player.scale = CommIn.unPackInt8U();
         }
 
-        const didChange = player.position.x !== x || player.position.y !== y || player.position.z !== z || player.climbing !== climbing;
-        const oldPosition = didChange ? { ...player.position } : null;
+        const px = player.position;
+        const posChanged = px.x !== x || px.y !== y || px.z !== z;
+        const climbingChanged = player.climbing !== climbing;
+        const didChange = posChanged || climbingChanged;
 
-        if (player.position.x !== x) player.position.x = x;
-        if (player.position.z !== z) player.position.z = z;
+        const oldPosition = didChange ? { ...px } : null;
 
-        if (!player.jumping || Math.abs(player.position.y - y) > 0.5 && player.position.y !== y)
-            player.position.y = y;
+        if (px.x !== x) px.x = x;
+        if (px.z !== z) px.z = z;
+        if (!player.jumping || Math.abs(px.y - y) > 0.5) px.y = y;
+        if (climbingChanged) player.climbing = climbing;
 
-        if (player.climbing !== climbing) player.climbing = climbing;
+        if (!didChange) return;
 
-        if (didChange) {
-            this.emit('playerMove', player, oldPosition, player.position);
+        this.emit('playerMove', player, oldPosition, px);
 
-            if (this.game.gameModeId === GameMode.KOTC) {
-                const activeZone = this.game.activeZone;
-                if (!activeZone) {
-                    if (player.inKotcZone) {
-                        player.inKotcZone = false;
-                        this.emit('playerLeaveZone', player);
-                    }
-                    return;
-                }
+        if (this.game.gameModeId !== GameMode.KOTC) return;
 
-                const wasInZone = !!player.inKotcZone;
+        const zone = this.game.activeZone;
+        const wasIn = !!player.inKotcZone;
 
-                player.updateKotcZone(activeZone);
+        if (!zone && wasIn) {
+            player.inKotcZone = false;
+            this.emit('playerLeaveZone', player);
+            return;
+        }
 
-                if (!player.inKotcZone && wasInZone) {
-                    player.inKotcZone = false;
-                    this.emit('playerLeaveZone', player);
-                } else if (player.inKotcZone && !wasInZone) {
-                    player.inKotcZone = true;
-                    this.emit('playerEnterZone', player);
-                }
-            }
+        player.updateKotcZone(zone);
+
+        const nowIn = !!player.inKotcZone;
+        if (wasIn !== nowIn) {
+            player.inKotcZone = nowIn;
+            this.emit(nowIn ? 'playerEnterZone' : 'playerLeaveZone', player);
         }
     }
 
