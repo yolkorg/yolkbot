@@ -875,8 +875,13 @@ export class Bot {
             if (controlKeys & Movement.Scope) player.scoping = true;
             else player.scoping = false;
 
+            const oldView = { ...player.view };
+
             player.view.yaw = CommIn.unPackRadU();
             player.view.pitch = CommIn.unPackRad();
+
+            if (player.view.yaw !== oldView.yaw || player.view.pitch !== oldView.pitch)
+                this.emit('playerRotate', player, oldView, player.view);
 
             player.scale = CommIn.unPackInt8U();
         }

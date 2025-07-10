@@ -17,7 +17,7 @@ type intents = {
     NO_EXIT_ON_ERROR: 20
 }
 
-import { Character, GamePlayer, Position } from './bot/GamePlayer';
+import { Character, GamePlayer, Position, View } from './bot/GamePlayer';
 import { Challenge } from './constants/challenges';
 import { AnyGun } from './constants/guns';
 import { MapJSON } from './constants/maps';
@@ -427,6 +427,7 @@ export class Bot {
     on(event: 'playerPause', cb: (player: GamePlayer) => void): void;
     on(event: 'playerReload', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
+    on(event: 'playerRotate', cb: (player: GamePlayer, oldView: View, newView: View) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
     on(event: 'respawnDenied', cb: () => void): void;
