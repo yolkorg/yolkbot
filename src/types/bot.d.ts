@@ -1,6 +1,6 @@
 type intents = {
     CHALLENGES: 1,
-    STATS: 2,
+    BOT_STATS: 2,
     PATHFINDING: 3,
     PING: 5,
     COSMETIC_DATA: 6,
