@@ -38,29 +38,10 @@ export class Matchmaker {
     }
 
     async #createSocket(instance, protocol, noLogin) {
-        const attempt = async () => {
-            try {
-                this.ws = new yolkws(`${protocol}://${instance}/matchmaker/`, this.proxy);
-                this.ws.onerror = async (e) => {
-                    this.#processError(e);
-                    await new Promise((resolve) => setTimeout(resolve, 100));
-                    return await attempt();
-                }
-            } catch {
-                await new Promise((resolve) => setTimeout(resolve, 100));
-                await attempt();
-            }
-        }
+        this.ws = new yolkws(`${protocol}://${instance}/matchmaker/`, this.proxy);
 
-        await attempt();
-
-        this.ws.onopen = () => {
-            this.connected = true;
-            this.ws.onerror = null;
-
-            if (this.sessionId || noLogin)
-                this.onceConnected.forEach(func => func());
-        };
+        const didConnect = await this.ws.tryConnect();
+        if (!didConnect) return this.#processError('WebSocket did not connect...');
 
         this.ws.onmessage = (e) => {
             const data = JSON.parse(e.data);
@@ -75,6 +56,9 @@ export class Matchmaker {
             this.connected = false;
             if (!this.#forceClose) this.#createSocket(instance, protocol, noLogin);
         }
+
+        this.connected = true;
+        if (this.sessionId || noLogin) this.onceConnected.forEach(func => func());
     }
 
     async #createSessionId() {
