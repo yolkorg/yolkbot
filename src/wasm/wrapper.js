@@ -74,6 +74,8 @@ const calculateMovements = (currentYaw, currentPitch, targetYaw, targetPitch) =>
     return { movementX, movementY };
 }
 
+const getYawPitch = () => exports.get_yaw_pitch();
+
 const coords = (yaw, pitch) => {
     if (!canvasListeners.pointermove) {
         exports.start();
@@ -95,4 +97,4 @@ const coords = (yaw, pitch) => {
     return newYawPitch.coords;
 }
 
-export { coords, process, validate };
+export { coords, getYawPitch, process, validate };
