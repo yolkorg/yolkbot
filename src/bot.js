@@ -45,7 +45,7 @@ const CCGameOptionFlag = Object.fromEntries(Object.entries(GameOptionFlag).map((
 
 const intents = {
     CHALLENGES: 1,
-    STATS: 2,
+    BOT_STATS: 2,
     PATHFINDING: 3,
     PING: 5,
     COSMETIC_DATA: 6,
@@ -367,7 +367,7 @@ export class Bot {
         this.account.sessionId = loginData.sessionId;
         this.account.vip = loginData.active_sub === 'IsVIP';
 
-        if (this.intents.includes(this.Intents.STATS)) this.account.stats = {
+        if (this.intents.includes(this.Intents.BOT_STATS)) this.account.stats = {
             lifetime: loginData.statsLifetime,
             monthly: loginData.statsCurrent
         };
