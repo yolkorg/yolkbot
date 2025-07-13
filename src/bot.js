@@ -559,7 +559,7 @@ export class Bot {
 
         const attempt = async () => {
             try {
-                const host = this.game.raw.host || this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`;
+                const host = this.game.raw.host || (this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`);
 
                 this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
                 this.game.socket.onerror = async (e) => {
@@ -1026,6 +1026,7 @@ export class Bot {
         const id = CommIn.unPackInt16U();
 
         const player = this.players[playerId];
+        if (!player) return;
 
         this.game.collectables[type] = this.game.collectables[type].filter(c => c.id !== id);
 
@@ -1187,7 +1188,9 @@ export class Bot {
     #processBeginStreakPacket() {
         const id = CommIn.unPackInt8U();
         const ksType = CommIn.unPackInt8U();
+
         const player = this.players[id];
+        if (!player) return;
 
         switch (ksType) {
             case ShellStreak.HardBoiled:
@@ -1237,7 +1240,9 @@ export class Bot {
     #processEndStreakPacket() {
         const id = CommIn.unPackInt8U();
         const ksType = CommIn.unPackInt8U();
+
         const player = this.players[id];
+        if (!player) return;
 
         const streaks = [
             ShellStreak.EggBreaker,
@@ -1259,6 +1264,8 @@ export class Bot {
         const playerHealth = CommIn.unPackInt8U();
         const dx = CommIn.unPackFloat();
         const dz = CommIn.unPackFloat();
+
+        if (!this.me) return;
 
         this.me.shieldHp = shieldHealth;
         this.me.hp = playerHealth;
@@ -1607,9 +1614,8 @@ export class Bot {
         const playerDBId = CommIn.unPackString(128);
         const playerIp = CommIn.unPackString(32);
 
-        if (!this.players[playerId]) return;
-
         const player = this.players[playerId];
+        if (!player) return;
 
         player.admin = {
             ip: playerIp,
