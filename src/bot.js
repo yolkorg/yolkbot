@@ -59,7 +59,8 @@ const intents = {
     LOAD_MAP: 17,
     OBSERVE_GAME: 18,
     NO_REGION_CHECK: 19,
-    NO_EXIT_ON_ERROR: 20
+    NO_EXIT_ON_ERROR: 20,
+    RENEW_SESSION: 21
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -288,8 +289,8 @@ export class Bot {
 
         this.hasQuit = false;
 
-        if (this.intents.includes(this.Intents.NO_AFK_KICK))
-            this.afkKickInterval = 0;
+        if (this.intents.includes(this.Intents.NO_AFK_KICK)) this.afkKickInterval = 0;
+        if (this.intents.includes(this.Intents.RENEW_SESSION)) this.renewSessionInterval = 0;
     }
 
     dispatch(dispatch) {
@@ -375,6 +376,19 @@ export class Bot {
             this.#importChallenges(loginData.challenges);
 
         this.emit('authSuccess', this.account);
+
+        if (this.intents.includes(this.Intents.RENEW_SESSION)) {
+            this.renewSessionInterval = setInterval(async () => {
+                if (!this.account?.sessionId) return clearInterval(this.renewSessionInterval);
+
+                const res = await this.api.queryServices({
+                    cmd: 'renewSession',
+                    sessionId: this.account.sessionId
+                });
+
+                if (res.data !== 'renewed') this.emit('sessionExpired');
+            }, 600000); // 10 minutes
+        }
 
         return this.account;
     }
@@ -1598,7 +1612,7 @@ export class Bot {
             out2.send(this.game.socket);
         }
 
-        this.afkKickInterval = setInterval(() => {
+        if (this.intents.includes(this.Intents.NO_AFK_KICK)) this.afkKickInterval = setInterval(() => {
             if (this.state.inGame && !this.me.playing && (Date.now() - this.lastDeathTime) >= 15000) {
                 const out3 = new CommOut();
                 out3.packInt8(CommCode.keepAlive);
@@ -2104,6 +2118,9 @@ export class Bot {
 
     logout() {
         this.account = this.#initialAccount;
+
+        if (this.intents.includes(this.Intents.RENEW_SESSION))
+            clearInterval(this.renewSessionInterval);
     }
 
     quit(noCleanup = false) {
@@ -2133,7 +2150,8 @@ export class Bot {
             this.#dispatches = [];
         }
 
-        clearInterval(this.afkKickInterval);
+        if (this.intents.includes(this.Intents.NO_AFK_KICK)) clearInterval(this.afkKickInterval);
+        if (this.intents.includes(this.Intents.RENEW_SESSION)) clearInterval(this.renewSessionInterval);
 
         this.hasQuit = true;
     }
