@@ -23,33 +23,13 @@ export class API {
     }
 
     queryServices = async (request) => {
-        let ws;
-        let tries = 0;
+        const ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.socksProxy);
+        const didConnect = await ws.tryConnect(-2);
+        if (!didConnect) return 'websocket_connect_fail';
 
-        const attempt = async () => {
-            try {
-                ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.socksProxy);
-                ws.onerror = async (e) => {
-                    tries++;
-                    console.error(e);
-                    await new Promise((resolve) => setTimeout(resolve, 100));
-                    return await attempt();
-                }
-            } catch {
-                if (tries > this.maxRetries) return 'max_retries_exceeded';
-                await new Promise((resolve) => setTimeout(resolve, 100));
-                await attempt();
-            }
-        }
-
-        await attempt();
+        ws.send(JSON.stringify(request));
 
         return new Promise((resolve) => {
-            ws.onopen = () => {
-                ws.onerror = null;
-                ws.send(JSON.stringify(request));
-            }
-
             let resolved = false;
 
             ws.onmessage = (mes) => {

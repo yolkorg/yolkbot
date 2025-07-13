@@ -571,27 +571,13 @@ export class Bot {
             if (!this.game.raw.uuid) return this.processError('invalid game object passed to join (missing uuid)');
         }
 
-        const attempt = async () => {
-            try {
-                const host = this.game.raw.host || (this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`);
-
-                this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
-                this.game.socket.onerror = async (e) => {
-                    this.processError(e);
-                    await new Promise((resolve) => setTimeout(resolve, 100));
-                    return await attempt();
-                }
-            } catch {
-                await new Promise((resolve) => setTimeout(resolve, 100));
-                await attempt();
-            }
-        }
-
-        await attempt();
-
+        const host = this.game.raw.host || (this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`);
+        this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
         this.game.socket.binaryType = 'arraybuffer';
 
-        this.game.socket.onopen = () => this.game.socket.onerror = null;
+        const didConnect = await this.game.socket.tryConnect();
+        if (!didConnect) return this.processError('WebSocket did not connect...');
+
         this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
         this.game.socket.onclose = (e) => {
