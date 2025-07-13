@@ -14,7 +14,8 @@ type intents = {
     LOAD_MAP: 17,
     OBSERVE_GAME: 18,
     NO_REGION_CHECK: 19,
-    NO_EXIT_ON_ERROR: 20
+    NO_EXIT_ON_ERROR: 20,
+    RENEW_SESSION: 21
 }
 
 import { Character, GamePlayer, Position, View } from './bot/GamePlayer';
@@ -434,6 +435,7 @@ export class Bot {
     on(event: 'rocketHit', cb: (pos: Position, damage: number, blastRadius: number) => void): void;
     on(event: 'selfShieldHit', cb: (newShieldHealth: number, newPlayerHealth: number, dir: { dx: number, dz: number }) => void): void;
     on(event: 'selfShieldLost', cb: (newPlayerHealth: number, dir: { dx: number, dz: number }) => void): void;
+    on(event: 'sessionExpired', cb: () => void): void;
     on(event: 'spawnItem', cb: (itemType: number, itemPosition: Position) => void): void;
     on(event: 'tick', cb: () => void): void;
 
