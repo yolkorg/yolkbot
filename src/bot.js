@@ -433,6 +433,9 @@ export class Bot {
                 api: this.api
             });
 
+            const didConnect = await this.matchmaker.ws.tryConnect();
+            if (!didConnect) return 'matchmaker_tryconnect_failed';
+
             this.matchmaker.on('authFail', (data) => this.emit('authFail', data));
             this.matchmaker.on('error', (data) => this.processError(data));
 
