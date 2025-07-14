@@ -10,7 +10,6 @@ export const CommCode = {
     "banPlayer": 7,
     "loginRequired": 8,
     "gameLocked": 9,
-    "reportPlayer": 10,
     "switchTeam": 13,
     "changeCharacter": 14,
     "pause": 15,
