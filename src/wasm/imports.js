@@ -40,7 +40,7 @@ export const getImports = (wasm, exports) => {
         return real;
     }
 
-    const __wbg_adapter_22 = (arg0, arg1, arg2) => wasm().closure30_externref_shim(arg0, arg1, arg2);
+    const __wbg_adapter_22 = (arg0, arg1, arg2) => wasm().closure28_externref_shim(arg0, arg1, arg2);
 
     let iter = 1;
 
@@ -56,14 +56,12 @@ export const getImports = (wasm, exports) => {
             __wbg_createElement_8c9931a732ee2fea: () => element,
             __wbg_document_d249400bd7bd996d: () => addToExternrefTable(wasm(), {}),
             __wbg_from_2a5d3e218e67aa85: (...args) => Array.from(args[0]),
-            __wbg_getElementById_f827f0d6648718a8: () => addToExternrefTable(wasm(), {}),
             __wbg_getGamepads_1f997cef580c9088: (...args) => args[0].getGamepads(),
             __wbg_get_67b2ba62fc30de12: (...args) => Reflect.get(args[0], args[1]),
             __wbg_get_b9b93047fe3cf45b: (...args) => args[0][args[1] >>> 0],
             __wbg_has_a5ea9117f258a0ec: () => true,
             __wbg_innerText_df9aeb9435e40973: () => { },
             __wbg_instanceof_Gamepad_365ec8404255ce00: () => true,
-            __wbg_instanceof_HtmlCanvasElement_2ea67072a7624ac5: () => true,
             __wbg_instanceof_HtmlElement_51378c201250b16c: () => true,
             __wbg_instanceof_Window_def73ea0955fc569: () => true,
             __wbg_isTrusted_cc994b7949c53593: () => true,
@@ -117,8 +115,8 @@ export const getImports = (wasm, exports) => {
                 const ret = typeof (v) === 'boolean' ? (v ? 1 : 0) : 2;
                 return ret;
             },
-            __wbindgen_closure_wrapper98: (arg0, arg1) => makeMutClosure(arg0, arg1, 31, __wbg_adapter_22),
-            __wbindgen_closure_wrapper99: (arg0, arg1) => makeMutClosure(arg0, arg1, 31, __wbg_adapter_22),
+            __wbindgen_closure_wrapper94: (arg0, arg1) => makeMutClosure(arg0, arg1, 31, __wbg_adapter_22),
+            __wbindgen_closure_wrapper95: (arg0, arg1) => makeMutClosure(arg0, arg1, 31, __wbg_adapter_22),
             __wbindgen_number_get: (arg0, arg1) => {
                 const obj = arg1;
                 const ret = typeof (obj) === 'number' ? obj : undefined;
