@@ -27,8 +27,6 @@ export class API {
         const didConnect = await ws.tryConnect(-2);
         if (!didConnect) return 'websocket_connect_fail';
 
-        ws.send(JSON.stringify(request));
-
         return new Promise((resolve) => {
             let resolved = false;
 
@@ -52,6 +50,8 @@ export class API {
 
             ws.onerror = () => !resolved && resolve('unknown_socket_error');
             ws.onclose = () => !resolved && resolve('services_closed_early');
+
+            ws.send(JSON.stringify(request));
         });
     }
 

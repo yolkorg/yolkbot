@@ -92,6 +92,7 @@ class yolkws {
 
     set onmessage(handler) {
         if (this.socket) this.socket.onmessage = handler;
+        else console.error('set onmessage before socket existed');
     }
 
     get onclose() {
@@ -100,6 +101,7 @@ class yolkws {
 
     set onclose(handler) {
         if (this.socket) this.socket.onclose = handler;
+        else console.error('set onclose before socket existed');
     }
 
     get onerror() {
@@ -108,16 +110,17 @@ class yolkws {
 
     set onerror(handler) {
         if (this.socket) this.socket.onerror = handler;
+        else console.error('set onclose before socket existed');
     }
 
     // methods
 
-    get send() {
-        return this.socket?.send;
+    send(data) {
+        return this.socket?.send(data);
     }
 
-    get close() {
-        return this.socket?.close;
+    close(data) {
+        return this.socket?.close(data);
     }
 }
 
