@@ -84,6 +84,8 @@ class yolkws {
         })
     }
 
+    // listeners
+
     get onmessage() {
         return this.socket?.onmessage;
     }
@@ -98,6 +100,20 @@ class yolkws {
 
     set onclose(handler) {
         if (this.socket) this.socket.onclose = handler;
+    }
+
+    get onerror() {
+        return this.socket?.onerror;
+    }
+
+    set onerror(handler) {
+        if (this.socket) this.socket.onerror = handler;
+    }
+
+    // methods
+
+    get send() {
+        return this.socket?.send;
     }
 
     get close() {
