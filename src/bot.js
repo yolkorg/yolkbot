@@ -438,8 +438,6 @@ export class Bot {
 
             this.matchmaker.on('authFail', (data) => this.emit('authFail', data));
             this.matchmaker.on('error', (data) => this.processError(data));
-
-            await this.matchmaker.getRegions();
         }
 
         return true;

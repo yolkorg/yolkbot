@@ -20,6 +20,18 @@ Object.assign(importObj, getImports(() => exports, values));
 const wasm = await WebAssembly.instantiate(wasmBytes, importObj);
 exports = wasm.instance.exports;
 
+const rnd = (max) => Math.floor(Math.random() * max) + 1
+
+exports.start();
+
+const [ptr, len] = passStringToWasm(exports, [...Array(14)].map(() => Math.random().toString(36)[2]).join(''));
+exports.set_mouse_params(50, 1, 0.9, false, ptr, len);
+
+for (let i = 0; i < 5; i++) canvasListeners.pointermove({
+    movementX: rnd(5),
+    movementY: rnd(10)
+});
+
 const process = async (str, date) => {
     if (date) values.processDate = date;
 
@@ -77,18 +89,10 @@ const calculateMovements = (currentYaw, currentPitch, targetYaw, targetPitch) =>
 const getYawPitch = () => exports.get_yaw_pitch();
 
 const coords = (yaw, pitch) => {
-    if (!canvasListeners.pointermove) {
-        exports.start();
-
-        const [ptr, len] = passStringToWasm(exports, [...Array(14)].map(() => Math.random().toString(36)[2]).join(''));
-        exports.set_mouse_params(50, 1, 0.9, false, ptr, len);
-    }
-
     const currentYawPitch = exports.get_yaw_pitch();
     const movements = calculateMovements(currentYawPitch.yaw, currentYawPitch.pitch, yaw, pitch);
 
     canvasListeners.pointermove({
-        isTrusted: true,
         movementX: movements.movementX,
         movementY: movements.movementY
     });
