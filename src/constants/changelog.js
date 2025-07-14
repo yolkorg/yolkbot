@@ -1,7 +1,7 @@
 /* eslint-disable */
 export const Changelog = [
     {
-        "version": "1.0.8",
+        "version": "1.0.9",
         "date": "July 2",
         "content": [
             "Summertime - and the living is easy! Welcome to the Summer Vacation update.",

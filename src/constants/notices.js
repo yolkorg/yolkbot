@@ -1,4 +1,4 @@
 /* eslint-disable */
 export const Notices = {
-    "version": "1.0.8"
+    "version": "1.0.9"
 };
