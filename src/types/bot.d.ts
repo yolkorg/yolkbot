@@ -15,7 +15,8 @@ type intents = {
     OBSERVE_GAME: 18,
     NO_REGION_CHECK: 19,
     NO_EXIT_ON_ERROR: 20,
-    RENEW_SESSION: 21
+    RENEW_SESSION: 21,
+    VIP_HIDE_BADGE: 22
 }
 
 import { Character, GamePlayer, Position, View } from './bot/GamePlayer';
@@ -161,10 +162,14 @@ export interface RawLoginData {
     notification: {
         id: number;
         type: {
-            [key: 'vip' | 'purchases']: {
+            vip: {
                 ids: number[];
                 eggs: number;
-            }
+            };
+            purchases: {
+                ids: number[];
+                eggs: number;
+            };
         };
         read: 0 | 1;
     }

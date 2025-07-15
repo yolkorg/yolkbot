@@ -60,7 +60,8 @@ const intents = {
     OBSERVE_GAME: 18,
     NO_REGION_CHECK: 19,
     NO_EXIT_ON_ERROR: 20,
-    RENEW_SESSION: 21
+    RENEW_SESSION: 21,
+    VIP_HIDE_BADGE: 22
 }
 
 const mod = (n, m) => ((n % m) + m) % m;
@@ -1538,15 +1539,14 @@ export class Bot {
         const out = new CommOut();
         out.packInt8(this.intents.includes(this.Intents.OBSERVE_GAME) ? CommCode.observeGame : CommCode.joinGame);
 
-        out.packString(this.state.name);
         out.packString(this.game.raw.uuid);
-
-        out.packInt8(0); // hidebadge
+        out.packInt8(+this.intents.includes(this.Intents.VIP_HIDE_BADGE));
         out.packInt8(this.state.weaponIdx || this.account?.loadout?.classIdx || 0);
+        out.packString(this.state.name);
 
         out.packInt32(this.account.session);
-        out.packString(this.account.firebaseId);
         out.packString(this.account.sessionId);
+        out.packString(this.account.firebaseId);
 
         out.send(this.game.socket);
     }
