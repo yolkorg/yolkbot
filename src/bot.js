@@ -1018,7 +1018,7 @@ export class Bot {
 
         this.game.collectables[type].push({ id, x, y, z });
 
-        this.emit('spawnItem', type, { x, y, z });
+        this.emit('spawnItem', type, { x, y, z }, id);
     }
 
     #processCollectPacket() {
@@ -1036,7 +1036,7 @@ export class Bot {
             const playerWeapon = player.weapons[applyToWeaponIdx];
             if (playerWeapon && playerWeapon.ammo) {
                 playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
-                this.emit('collectAmmo', player, playerWeapon);
+                this.emit('playerCollectAmmo', player, playerWeapon, id);
             }
         }
 
@@ -1044,7 +1044,7 @@ export class Bot {
             player.grenades++;
             if (player.grenades > 3) player.grenades = 3;
 
-            this.emit('collectGrenade', player);
+            this.emit('playerCollectGrenade', player, id);
         }
     }
 

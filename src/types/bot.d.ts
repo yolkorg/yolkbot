@@ -403,8 +403,6 @@ export class Bot {
     on(event: 'challengeComplete', cb: (player: GamePlayer, challengeId: number) => void): void;
     on(event: 'chat', cb: (player: GamePlayer | undefined, message: string, flags: number) => void): void;
     on(event: 'close', cb: (code: number) => void): void;
-    on(event: 'collectAmmo', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
-    on(event: 'collectGrenade', cb: (player: GamePlayer) => void): void;
     on(event: 'error', cb: (error: string) => void): void;
     on(event: 'gameForcePause', cb: () => void): void;
     on(event: 'gameOptionsChange', cb: (oldOptions: GameOptions, newOptions: GameOptions) => void): void;
@@ -419,6 +417,8 @@ export class Bot {
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerChangeCharacter', cb: (player: GamePlayer, oldCharacter: Character, newCharacter: Character) => void): void;
     on(event: 'playerChangeGun', cb: (player: GamePlayer, oldGunId: number, newGunId: number) => void): void;
+    on(event: 'playerCollectAmmo', cb: (player: GamePlayer, weapon: AnyGun, itemId: number) => void): void;
+    on(event: 'playerCollectGrenade', cb: (player: GamePlayer, itemId: number) => void): void;
     on(event: 'playerDamage', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
     on(event: 'playerDeath', cb: (killed: GamePlayer, killer: GamePlayer) => void): void;
     on(event: 'playerEndStreak', cb: (player: GamePlayer, streakType: number) => void): void;
@@ -436,12 +436,13 @@ export class Bot {
     on(event: 'playerRotate', cb: (player: GamePlayer, oldView: View, newView: View) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
+    on(event: 'playerThrowGrenade', cb: (player: GamePlayer, position: Position, dPosition: Position) => void): void;
     on(event: 'respawnDenied', cb: () => void): void;
     on(event: 'rocketHit', cb: (pos: Position, damage: number, blastRadius: number) => void): void;
     on(event: 'selfShieldHit', cb: (newShieldHealth: number, newPlayerHealth: number, dir: { dx: number, dz: number }) => void): void;
     on(event: 'selfShieldLost', cb: (newPlayerHealth: number, dir: { dx: number, dz: number }) => void): void;
     on(event: 'sessionExpired', cb: () => void): void;
-    on(event: 'spawnItem', cb: (itemType: number, itemPosition: Position) => void): void;
+    on(event: 'spawnItem', cb: (itemType: number, itemPosition: Position, itemId: number) => void): void;
     on(event: 'tick', cb: () => void): void;
 
     checkChiknWinner(): Promise<ChiknWinnerStatus>;
