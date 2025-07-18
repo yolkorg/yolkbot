@@ -527,7 +527,7 @@ export class Bot {
         if (typeof data === 'string') {
             if (data.includes('#')) data = data.split('#')[1];
 
-            if (!await this.initMatchmaker()) return 'matchmakerInitFail';
+            if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
 
             const joinResult = await new Promise((resolve) => {
                 const listener = (message) => {
@@ -557,8 +557,7 @@ export class Bot {
                 });
             });
 
-            if (joinResult === 'matchmakerInitFail') return this.processError('failed to create matchmaker, you may be ratelimited (try a vpn?)');
-            if (joinResult === 'gameNotFound') return this.processError('game not found, it may have expired or been deleted');
+            if (joinResult === 'gameNotFound') return 'game_not_found';
             if (!this.game.raw.id) return this.processError('an internal error occured while joining the game, please report this to developers');
         }
 
@@ -568,9 +567,9 @@ export class Bot {
             this.game.raw = data;
             this.game.code = this.game.raw.id;
 
-            if (!this.game.raw.id) return this.processError('invalid game object passed to join (missing id)');
-            if (!this.game.raw.subdomain) return this.processError('invalid game object passed to join (missing subdomain)');
-            if (!this.game.raw.uuid) return this.processError('invalid game object passed to join (missing uuid)');
+            if (!this.game.raw.id) return 'invalid_game_object';
+            if (!this.game.raw.subdomain) return 'invalid_game_object';
+            if (!this.game.raw.uuid) return 'invalid_game_object';
         }
 
         const host = this.game.raw.host || (this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`);
@@ -578,7 +577,7 @@ export class Bot {
         this.game.socket.binaryType = 'arraybuffer';
 
         const didConnect = await this.game.socket.tryConnect();
-        if (!didConnect) return this.processError('WebSocket did not connect...');
+        if (!didConnect) return 'websocket_tryconnect_fail';
 
         this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
@@ -589,6 +588,8 @@ export class Bot {
                 this.leave(-1);
             }
         }
+
+        return true;
     }
 
     #processPathfinding() {
@@ -1843,6 +1844,7 @@ export class Bot {
                 await this.checkChiknWinner();
                 return 'on_cooldown';
             } else if (response.error === 'SESSION_EXPIRED') {
+                this.emit('sessionExpired');
                 return 'session_expired';
             } else {
                 console.error('Unknown Chikn Winner response, report this on Github:', response);
@@ -1934,6 +1936,8 @@ export class Bot {
             playerId: this.account.id
         });
 
+        if (typeof result === 'string') return result;
+
         this.#importChallenges(result);
 
         return this.account.challenges;
@@ -1946,6 +1950,8 @@ export class Bot {
             slotId: challengeId
         });
 
+        if (typeof result === 'string') return result;
+
         this.#importChallenges(result);
 
         return this.account.challenges;
@@ -1957,6 +1963,8 @@ export class Bot {
             sessionId: this.account.sessionId,
             slotId: challengeId
         });
+
+        if (typeof result === 'string') return result;
 
         this.#importChallenges(result.challenges);
 
@@ -1975,6 +1983,8 @@ export class Bot {
             sessionId: this.account.sessionId
         });
 
+        if (typeof result === 'string') return result;
+
         this.account.eggBalance = result.currentBalance;
 
         return result.currentBalance;
@@ -1988,6 +1998,8 @@ export class Bot {
             id: this.account.id,
             code
         });
+
+        if (typeof result === 'string') return result;
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance = result.eggs_given;
@@ -2009,6 +2021,8 @@ export class Bot {
             reward
         });
 
+        if (typeof result === 'string') return result;
+
         if (result.result === 'SUCCESS') {
             this.account.eggBalance += result.eggsGiven;
             result.itemIds.forEach((id) => this.account.ownedItemIds.push(id));
@@ -2024,6 +2038,8 @@ export class Bot {
             sessionId: this.account.sessionId,
             rewardTag
         });
+
+        if (typeof result === 'string') return result;
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance += result.eggsGiven;
@@ -2041,6 +2057,8 @@ export class Bot {
             itemId,
             save: true
         });
+
+        if (typeof result === 'string') return result;
 
         if (result.result === 'SUCCESS') {
             this.account.eggBalance = result.currentBalance;
