@@ -26,7 +26,7 @@ import { MapJSON } from './constants/maps';
 import { Item } from './constants/items';
 import { ADispatch } from './dispatches/index';
 import { NodeList } from './pathing/mapnode';
-import { API } from './api';
+import { AnonError, API, LoginError, QueryServicesError } from './api';
 import { Matchmaker } from './matchmaker';
 import yolkws from './socket';
 
@@ -344,6 +344,10 @@ export interface FireBullet {
     dirZ: number;
 }
 
+type FindPublicErrors = 'no_region_passed' | 'invalid_region_passed' | 'no_mode_passed' | 'invalid_mode_passed' | 'matchmaker_init_fail' | 'internal_session_error';
+type CreatePrivateErrors = FindPublicErrors | 'invalid_map_passed';
+type BotLoginError = 'account_banned';
+
 export class Bot {
     static Intents: intents;
     Intents: intents;
@@ -373,17 +377,17 @@ export class Bot {
 
     constructor(params?: BotParams);
 
-    loginAnonymously(): Promise<Account | false>;
-    loginWithRefreshToken(refreshToken: string): Promise<Account | false>;
-    login(email: string, pass: string): Promise<Account | false>;
-    createAccount(email: string, pass: string): Promise<Account | false>;
+    loginAnonymously(): Promise<Account | BotLoginError | AnonError>;
+    loginWithRefreshToken(refreshToken: string): Promise<Account | BotLoginError | LoginError>;
+    login(email: string, pass: string): Promise<Account | BotLoginError | LoginError>;
+    createAccount(email: string, pass: string): Promise<Account | BotLoginError | LoginError>;
 
-    initMatchmaker(): Promise<boolean>;
+    initMatchmaker(): Promise<true | BotLoginError | AnonError | 'matchmaker_tryconnect_failed'>;
 
-    createPrivateGame(region: string, mode: number, map: string): Promise<RawGameData | string>;
-    findPublicGame(region: string, mode: number): Promise<RawGameData | string>;
+    createPrivateGame(region: string, mode: number, map: string): Promise<RawGameData | FindPublicErrors>;
+    findPublicGame(region: string, mode: number): Promise<RawGameData | CreatePrivateErrors>;
 
-    join(botName: string, data: string | RawGameData): Promise<void>;
+    join(botName: string, data: string | RawGameData): Promise<true | 'matchmaker_init_fail' | 'game_not_found' | 'websocket_tryconnect_fail' | 'invalid_game_object'>;
 
     processPacket(data: number[]): void;
     dispatch(disp: ADispatch): boolean;
@@ -445,19 +449,19 @@ export class Bot {
     on(event: 'spawnItem', cb: (itemType: number, itemPosition: Position, itemId: number) => void): void;
     on(event: 'tick', cb: () => void): void;
 
-    checkChiknWinner(): Promise<ChiknWinnerStatus>;
-    playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | string>;
-    resetChiknWinner(): Promise<ChiknWinnerStatus>;
+    checkChiknWinner(): Promise<ChiknWinnerStatus | QueryServicesError>;
+    playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | QueryServicesError | 'hit_daily_limit' | 'on_cooldown' | 'session_expired' | 'unknown_error'>;
+    resetChiknWinner(): Promise<ChiknWinnerStatus | QueryServicesError | 'not_enough_eggs' | 'not_at_limit' | 'unknown_error'>;
 
-    refreshChallenges(): Promise<Challenges[]>;
-    claimChallenge(challengeId: number): Promise<{ eggReward: number, updatedChallenges: Challenges[] }>;
-    rerollChallenge(challengeId: number): Promise<Challenges[]>;
+    refreshChallenges(): Promise<Challenges[] | QueryServicesError>;
+    claimChallenge(challengeId: number): Promise<{ eggReward: number, updatedChallenges: Challenges[] } | QueryServicesError>;
+    rerollChallenge(challengeId: number): Promise<Challenges[] | QueryServicesError>;
 
-    refreshBalance(): Promise<number>;
-    redeemCode(code: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
-    claimURLReward(reward: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
-    claimSocialReward(rewardTag: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; }>;
-    buyItem(itemId: number): Promise<{ result: string; currentBalance: number; itemId: number; }>;
+    refreshBalance(): Promise<number | QueryServicesError>;
+    redeemCode(code: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; } | QueryServicesError>;
+    claimURLReward(reward: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; } | QueryServicesError>;
+    claimSocialReward(rewardTag: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; } | QueryServicesError>;
+    buyItem(itemId: number): Promise<{ result: string; currentBalance: number; itemId: number; } | QueryServicesError>;
 
     leave(code?: number): void;
     logout(): void;

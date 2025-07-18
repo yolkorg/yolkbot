@@ -85,7 +85,7 @@ export class API {
                 return 'firebase_no_credentials';
             } else if (error.code === 'ERR_BAD_REQUEST') {
                 if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password);
-                if (!this.suppressErrors) console.error('loginWithCredentials: Error:', error.response?.data || error);
+                if (!this.suppressErrors) console.error('loginWithCredentials: Error:', body || error);
                 return 'firebase_bad_request';
             } else {
                 if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password, error);
@@ -203,7 +203,7 @@ export class API {
             return 'firebase_invalid_response';
         }
 
-        return body.email;
+        return { email: body.email };
     }
 
     verifyOobCode = async (oobCode) => {
