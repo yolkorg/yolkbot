@@ -14,7 +14,7 @@ export class ChatDispatch {
     }
 
     check(bot) {
-        if (!bot.state.inGame) return false;
+        if (!bot.state?.inGame) return false;
         if (!bot.game.isPrivate && !bot.account.adminRoles && bot.state.chatLines >= 2) return false;
         if (!bot.game.isPrivate && !bot.account.emailVerified && !bot.account.isAged) return false;
 

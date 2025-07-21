@@ -25,7 +25,7 @@ export class API {
     queryServices = async (request) => {
         const ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.socksProxy);
         const didConnect = await ws.tryConnect(-2);
-        if (!didConnect) return 'websocket_connect_fail';
+        if (!didConnect || ws.socket.readyState < 1) return 'websocket_connect_fail';
 
         return new Promise((resolve) => {
             let resolved = false;
