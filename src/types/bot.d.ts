@@ -9,7 +9,6 @@ type intents = {
     LOG_PACKETS: 10,
     NO_LOGIN: 11,
     DEBUG_BUFFER: 12,
-    DEBUG_BEST_TARGET: 14,
     NO_AFK_KICK: 16,
     LOAD_MAP: 17,
     OBSERVE_GAME: 18,
@@ -394,7 +393,6 @@ export class Bot {
     update(): void;
 
     canSee(player: GamePlayer): boolean;
-    getBestTarget(customFilter?: (player: GamePlayer) => boolean): { player: GamePlayer, inLoS: boolean } | undefined;
 
     onAny(cb: Function): void;
     off(event: string, cb: Function): void;

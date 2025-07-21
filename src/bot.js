@@ -54,7 +54,6 @@ const intents = {
     LOG_PACKETS: 10,
     NO_LOGIN: 11,
     DEBUG_BUFFER: 12,
-    DEBUG_BEST_TARGET: 14,
     NO_AFK_KICK: 16,
     LOAD_MAP: 17,
     OBSERVE_GAME: 18,
@@ -1890,43 +1889,6 @@ export class Bot {
     canSee(target) {
         if (!this.intents.includes(this.Intents.PATHFINDING)) return this.processError('You must have the PATHFINDING intent to use this method.');
         return this.pathing.nodeList.hasLineOfSight(this.me.position, target.position);
-    }
-
-    getBestTarget(customFilter = () => true) {
-        const options = Object.values(this.players)
-            .filter((player) => player?.playing)
-            .filter((player) => player.hp > 0)
-            .filter((player) => player.id !== this.me.id)
-            .filter((player) => this.me.team === 0 || player.team !== this.me.team)
-            .filter((player) => !!customFilter(player));
-
-        const distancePlayers = options.map(player => ({
-            player,
-            distance: Math.sqrt(
-                Math.pow(player.position.x - this.me.position.x, 2) +
-                Math.pow(player.position.y - this.me.position.y, 2) +
-                Math.pow(player.position.z - this.me.position.z, 2)
-            )
-        })).sort((a, b) => a.distance - b.distance);
-
-        if (!distancePlayers.length) {
-            if (this.intents.includes(this.Intents.DEBUG_BEST_TARGET)) console.log('no targets found');
-            return null;
-        }
-
-        const closestLoSPlayer = distancePlayers.find(player => this.canSee(player.player));
-
-        if (this.intents.includes(this.Intents.DEBUG_BEST_TARGET)) {
-            console.log('detected ', distancePlayers.length, 'targets');
-            console.log('closest target: ', distancePlayers[0].player.name);
-            console.log('all targets (ordered): ', distancePlayers.map(a => a.player.name));
-            console.log('found LoS player?', !!closestLoSPlayer);
-            if (closestLoSPlayer) console.log('closest LoS player: ', closestLoSPlayer.player.name);
-        }
-
-        if (closestLoSPlayer) return { player: closestLoSPlayer.player, inLoS: true };
-
-        return { player: distancePlayers[0].player, inLoS: false };
     }
 
     async refreshChallenges() {
