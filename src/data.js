@@ -28,24 +28,25 @@ class DataLoaderClass {
             requiredValues.forEach((value) => {
                 if (local[value].hash !== remoteManifest[value].hash) mustLoad.push(value);
             });
-            this.load(mustLoad);
+            await this.load(mustLoad);
         }
     }
 
     async load(values) {
-        values.forEach((value) => {
+        return Promise.all(values.map((value) => {
             const p = this.manifest[value].path;
-            this.#getText(`https://data.yolkbot.xyz${p}`).then((data) => {
+            return this.#getText(`https://data.yolkbot.xyz${p}`).then((data) => {
                 const filePath = path.join(localDir, p);
                 if (!fs.existsSync(path.dirname(filePath))) {
                     fs.mkdirSync(path.dirname(filePath), { recursive: true });
                 }
                 fs.writeFileSync(filePath, data);
+                return true;
             }).catch((err) => {
                 console.error(`[DataLoader] Failed to load ${value}:`, err);
                 console.error(`[DataLoader] URL: https://data.yolkbot.xyz${this.manifest[value].path}`);
             });
-        })
+        }));
     }
 
     getFile(fileName) {
