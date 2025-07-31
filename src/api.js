@@ -15,7 +15,7 @@ export class API {
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
 
-        this.httpProxy = params.httpProxy || params.proxy?.replace(/socks([4|5|4a|5h]+):\/\//g, 'https://') || '';
+        this.httpProxy = params.httpProxy || params.proxy?.replace(/socks([4|5|4a|5h]+):\/\//g, 'https://') || undefined;
         this.socksProxy = params.proxy;
 
         this.maxRetries = params.maxRetries || 5;

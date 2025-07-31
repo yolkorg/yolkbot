@@ -1,6 +1,3 @@
-import DataLoader from './data.js';
-await DataLoader.loadManifest();
-
 import API from './api.js';
 
 import CommIn from './comm/CommIn.js';
@@ -81,7 +78,7 @@ export class Bot {
     #initialGame;
 
     constructor(params = {}) {
-        if (params.proxy && !ProxiesEnabled) this.processError('proxies do not work and hence are not supported in the browser');
+        if ((params.proxy || params.httpProxy) && !ProxiesEnabled) this.processError('proxies do not work and hence are not supported in the browser');
 
         this.intents = params.intents || [];
 
