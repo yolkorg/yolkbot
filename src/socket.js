@@ -16,6 +16,7 @@ class yolkws {
     binaryType = '';
 
     maxRetries = 5;
+    connectionTimeout = 5000;
 
     constructor(url, proxy) {
         this.url = url;
@@ -66,7 +67,7 @@ class yolkws {
                 if (IsBrowser) this.socket.close();
                 else this.socket.terminate();
                 resolve(await retryOrQuit());
-            }, 5000);
+            }, this.connectionTimeout);
 
             const errorListener = async (e) => {
                 clearTimeout(timeout);

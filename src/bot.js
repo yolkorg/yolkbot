@@ -206,7 +206,7 @@ export class Bot {
 
             firebaseId: '',
             sessionId: '',
-            session: '',
+            session: 0,
 
             // raw login params
             email: '',
