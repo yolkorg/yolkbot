@@ -61,7 +61,7 @@ export class API {
         let body, firebaseToken;
 
         try {
-            const request = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
+            const request = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     email,
@@ -120,7 +120,7 @@ export class API {
         let body, token;
 
         try {
-            const request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
+            const request = await fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -156,7 +156,7 @@ export class API {
     }
 
     loginAnonymously = async () => {
-        const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
+        const req = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
             method: 'POST',
             body: JSON.stringify({ returnSecureToken: true }),
             headers: {
@@ -183,7 +183,7 @@ export class API {
     sendEmailVerification = async (idToken = this.idToken) => {
         if (!idToken) return 'no_idtoken_passed';
 
-        const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FirebaseKey, {
+        const req = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FirebaseKey, {
             method: 'POST',
             body: JSON.stringify({
                 requestType: 'VERIFY_EMAIL',
@@ -209,7 +209,7 @@ export class API {
     verifyOobCode = async (oobCode) => {
         if (!oobCode) return 'no_oob_code_passed';
 
-        const req = await globals.fetch('https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=' + FirebaseKey, {
+        const req = await fetch('https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=' + FirebaseKey, {
             method: 'POST',
             body: JSON.stringify({ oobCode }),
             headers: {

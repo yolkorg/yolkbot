@@ -1,16 +1,15 @@
+import report from './reporter.js';
+
 const globals = {};
 
-if (typeof process !== 'undefined') {
-    globals.fetch = (await import('undici')).fetch;
-    globals.SocksProxyAgent = (await import('smallsocks')).SocksProxyAgent;
-    globals.ProxyAgent = (await import('undici')).ProxyAgent;
-    globals.WebSocket = (await import('ws')).default;
-} else if (typeof window !== 'undefined') {
-    globals.fetch = fetch.bind(window);
-    globals.SocksProxyAgent = null;
-    globals.ProxyAgent = class {};
-    globals.WebSocket = WebSocket;
-// eslint-disable-next-line custom/no-throw
-} else throw new Error('unknown environment...could not detect node.js or browser...open an issue in the yolkbot github');
+const isWorker = typeof WebSocketPair !== 'undefined';
+const isNode = typeof process !== 'undefined' && !isWorker;
+const isBrowser = typeof window !== 'undefined';
+
+if (!isBrowser && !isWorker && !isNode) report({ tag: 'uenv' });
+
+globals.SocksProxyAgent = isNode ? (await import('smallsocks')).SocksProxyAgent : null;
+globals.ProxyAgent = isNode ? (await import('undici')).ProxyAgent : class {};
+globals.WebSocket = isBrowser || isWorker ? self.WebSocket : await import('ws'); 
 
 export default globals;

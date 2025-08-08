@@ -1,5 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 
+import { IsBrowser } from '../constants/index.js';
+
 import { canvasListeners, getImports } from './imports.js';
 import { getStringFromWasm, passStringToWasm } from './utils.js';
 
@@ -12,25 +14,29 @@ const values = {
 
 const importObj = {};
 
-// eslint-disable-next-line prefer-const
 let exports;
 
 Object.assign(importObj, getImports(() => exports, values));
 
-const wasm = await WebAssembly.instantiate(wasmBytes, importObj);
-exports = wasm.instance.exports;
+const initWasm = async () => {
+    const wasm = await WebAssembly.instantiate(wasmBytes, importObj);
+    exports = wasm.instance.exports;
 
-const rnd = (max) => Math.floor(Math.random() * max) + 1
+    const rnd = (max) => Math.floor(Math.random() * max) + 1
 
-exports.start();
+    exports.start();
 
-const [ptr, len] = passStringToWasm(exports, [...Array(14)].map(() => Math.random().toString(36)[2]).join(''));
-exports.set_mouse_params(50, 1, 0.9, false, ptr, len);
+    const [ptr, len] = passStringToWasm(exports, [...Array(14)].map(() => Math.random().toString(36)[2]).join(''));
+    exports.set_mouse_params(50, 1, 0.9, false, ptr, len);
 
-for (let i = 0; i < 5; i++) canvasListeners.pointermove({
-    movementX: rnd(5),
-    movementY: rnd(10)
-});
+    for (let i = 0; i < 5; i++) canvasListeners.pointermove({
+        movementX: rnd(5),
+        movementY: rnd(10)
+    });
+}
+
+if (IsBrowser) initWasm();
+else await initWasm();
 
 const process = async (str, date) => {
     if (date) values.processDate = date;
