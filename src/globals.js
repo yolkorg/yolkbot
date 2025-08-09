@@ -10,6 +10,6 @@ if (!isBrowser && !isWorker && !isNode) report({ tag: 'uenv' });
 
 globals.SocksProxyAgent = isNode ? (await import('smallsocks')).SocksProxyAgent : null;
 globals.ProxyAgent = isNode ? (await import('undici')).ProxyAgent : class {};
-globals.WebSocket = isBrowser || isWorker ? self.WebSocket : await import('ws'); 
+globals.WebSocket = isBrowser || isWorker ? self.WebSocket : (await import('ws')).default; 
 
 export default globals;
