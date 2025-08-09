@@ -7,9 +7,9 @@ const distDir = path.join(import.meta.dirname, '..', 'dist');
 
 const manifest = await fetch('https://data.yolkbot.xyz/manifest.json').then(res => res.json());
 
-const buildAndWrite = async (dest, code) => {
+const buildAndWrite = async (dest, code, forceMinify) => {
     const esmResult = await esbuild.transform(code, {
-        minify: process.argv[2] !== '--no-minify',
+        minify: forceMinify || process.argv[2] !== '--no-minify',
         keepNames: true,
         loader: 'js',
         format: 'esm',
@@ -32,7 +32,7 @@ const handleConstants = async (src, dest, code) => {
 
         const serverResult = await fetch(`https://data.yolkbot.xyz${serverPath}`).then(res => res.text());
         const rewrittenCode = code.replace(/{}|\[\]/, serverResult);
-        return buildAndWrite(dest, rewrittenCode);
+        return buildAndWrite(dest, rewrittenCode, true);
     } else return buildAndWrite(dest, code);
 }
 
