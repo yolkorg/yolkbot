@@ -10,8 +10,7 @@ export interface QueryResponse {
 interface APIParams {
     instance?: string;
     protocol?: string;
-    httpProxy?: string;
-    socksProxy?: string;
+    proxy?: string;
     maxRetries?: number;
     suppressErrors?: boolean;
 }
@@ -26,8 +25,7 @@ export class API {
     instance: string;
     protocol: string;
 
-    httpProxy: string;
-    socksProxy: string;
+    proxy?: string;
 
     maxRetries: number;
     suppressErrors: boolean;

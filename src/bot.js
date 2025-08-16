@@ -78,7 +78,7 @@ export class Bot {
     #initialGame;
 
     constructor(params = {}) {
-        if ((params.proxy || params.httpProxy) && !ProxiesEnabled) this.processError('proxies do not work and hence are not supported in the browser');
+        if (params.proxy && !ProxiesEnabled) this.processError('proxies do not work and hence are not supported in the browser');
 
         this.intents = params.intents || [];
 
@@ -90,7 +90,6 @@ export class Bot {
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
         this.proxy = params.proxy || '';
-        this.httpProxy = params.httpProxy || '';
 
         this.state = {
             // kept for specifying various params
@@ -269,7 +268,6 @@ export class Bot {
             instance: this.instance,
             protocol: this.protocol,
             proxy: this.proxy,
-            httpProxy: this.httpProxy,
             maxRetries: params?.apiMaxRetries
         });
 

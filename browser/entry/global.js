@@ -26,4 +26,7 @@ const yolkbot = {
 
 window.yolkbot = yolkbot;
 
-if (window.onYolkReady && typeof window.onYolkReady === 'function') window.onYolkReady();
+if (window.onYolkReady && typeof window.onYolkReady === 'function') {
+    console.warn('window.onYolkReady is no longer required as of yolkbot 1.3.0. You don\'t have to put your code inside it anymore.');
+    window.onYolkReady();
+}

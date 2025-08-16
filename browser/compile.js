@@ -32,10 +32,8 @@ const build = async (module) => {
         bundle: true,
         target: 'esnext',
         format: 'esm',
-        banner: { js: `${module === 'global' ? '(async()=>{' : ''}` },
-        footer: { js: module === 'global' ? '})();' : '' },
         plugins: [replaceItemImport],
-        external: ['smallsocks', 'ws', 'undici', 'node:fs', 'node:os', 'node:path']
+        external: ['smallsocks', 'ws', 'node:*']
     });
 
     const output = fs.readFileSync(path.join(buildDir, `${module}.js`), 'utf-8');
