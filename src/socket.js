@@ -1,4 +1,4 @@
-import globals from './globals.js';
+import globals from './env/globals.js';
 import { IsBrowser, ProxiesEnabled, UserAgent } from './constants/index.js';
 
 /*

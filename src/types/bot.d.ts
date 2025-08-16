@@ -32,7 +32,6 @@ import yolkws from './socket';
 export interface BotParams {
     intents?: number[];
     proxy?: string;
-    httpProxy?: string;
     instance?: string;
     protocol?: string;
     apiMaxRetries?: number;
@@ -355,7 +354,6 @@ export class Bot {
     instance: string;
     protocol: string;
     proxy: string;
-    httpProxy: string;
 
     state: BotState;
     players: Record<string, GamePlayer>;

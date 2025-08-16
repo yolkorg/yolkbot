@@ -15,37 +15,6 @@ export default [
         ignores: ['browser/build']
     },
     {
-        plugins: {
-            custom: {
-                rules: {
-                    'no-throw': {
-                        create(context) {
-                            return {
-                                ThrowStatement(node) {
-                                    context.report({
-                                        node,
-                                        message: 'Throwing an Error is not allowed'
-                                    });
-                                }
-                            };
-                        },
-                        meta: {
-                            name: 'no-throw',
-                            type: 'problem',
-                            docs: {
-                                description: 'Disallows throwing erorrs',
-                                recommended: true
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        rules: {
-            'custom/no-throw': 'error'
-        }
-    },
-    {
         rules: {
             'array-callback-return': 'error',
             'arrow-body-style': ['error', 'as-needed'],
@@ -153,26 +122,16 @@ export default [
         rules: {
             'stylistic/arrow-spacing': 'error',
             'stylistic/block-spacing': ['error', 'always'],
-            'stylistic/brace-style': ['error', '1tbs', {
-                'allowSingleLine': true
-            }],
+            'stylistic/brace-style': ['error', '1tbs', { 'allowSingleLine': true }],
             'stylistic/comma-dangle': ['error', 'never'],
             'stylistic/comma-style': ['error', 'last'],
             'stylistic/indent': ['error', 4],
-            'stylistic/key-spacing': ['error', {
-                'beforeColon': false
-            }],
-            // 'stylistic/max-len': ['error', { 'code': 150, 'tabWidth': 4 }],
+            'stylistic/key-spacing': ['error', { 'beforeColon': false }],
             'stylistic/no-extra-semi': 'error',
             'stylistic/no-mixed-spaces-and-tabs': 'error',
             'stylistic/no-multi-spaces': 'error',
             'stylistic/no-multiple-empty-lines': ['error', { 'max': 1 }],
             'stylistic/no-tabs': 'error',
-            'stylistic/object-curly-newline': ['error', {
-                'multiline': true,
-                'minProperties': 8,
-                'consistent': true
-            }],
             'stylistic/object-curly-spacing': ['error', 'always'],
             'stylistic/quotes': ['error', 'single']
         }

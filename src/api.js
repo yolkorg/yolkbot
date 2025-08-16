@@ -1,4 +1,4 @@
-import globals from './globals.js';
+import globals from './env/globals.js';
 import yolkws from './socket.js';
 
 import { FirebaseKey, UserAgent } from './constants/index.js';
@@ -15,15 +15,14 @@ export class API {
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
 
-        this.httpProxy = params.httpProxy || params.proxy?.replace(/socks([4|5|4a|5h]+):\/\//g, 'https://') || undefined;
-        this.socksProxy = params.proxy;
+        this.proxy = params.proxy;
 
         this.maxRetries = params.maxRetries || 5;
         this.suppressErrors = params.suppressErrors || false;
     }
 
     queryServices = async (request) => {
-        const ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.socksProxy);
+        const ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.proxy);
         const didConnect = await ws.tryConnect(-2);
         if (!didConnect || ws.socket.readyState < 1) return 'websocket_connect_fail';
 
@@ -61,7 +60,7 @@ export class API {
         let body, firebaseToken;
 
         try {
-            const request = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
+            const request = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     email,
@@ -72,7 +71,7 @@ export class API {
                     ...baseHeaders,
                     'content-type': 'application/json'
                 },
-                dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
+                proxy: this.proxy
             });
 
             body = await request.json();
@@ -120,14 +119,14 @@ export class API {
         let body, token;
 
         try {
-            const request = await fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
+            const request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
                 method: 'POST',
                 body: formData,
                 headers: {
                     ...baseHeaders,
                     'content-type': 'application/x-www-form-urlencoded'
                 },
-                dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
+                proxy: this.proxy
             });
 
             body = await request.json();
@@ -156,14 +155,14 @@ export class API {
     }
 
     loginAnonymously = async () => {
-        const req = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
+        const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
             method: 'POST',
             body: JSON.stringify({ returnSecureToken: true }),
             headers: {
                 ...baseHeaders,
                 'content-type': 'application/json'
             },
-            dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
+            proxy: this.proxy
         });
 
         const body = await req.json();
@@ -183,17 +182,14 @@ export class API {
     sendEmailVerification = async (idToken = this.idToken) => {
         if (!idToken) return 'no_idtoken_passed';
 
-        const req = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FirebaseKey, {
+        const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FirebaseKey, {
             method: 'POST',
-            body: JSON.stringify({
-                requestType: 'VERIFY_EMAIL',
-                idToken
-            }),
+            body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken }),
             headers: {
                 ...baseHeaders,
                 'content-type': 'application/json'
             },
-            dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
+            proxy: this.proxy
         });
 
         const body = await req.json();
@@ -209,7 +205,7 @@ export class API {
     verifyOobCode = async (oobCode) => {
         if (!oobCode) return 'no_oob_code_passed';
 
-        const req = await fetch('https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=' + FirebaseKey, {
+        const req = await globals.fetch('https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=' + FirebaseKey, {
             method: 'POST',
             body: JSON.stringify({ oobCode }),
             headers: {
@@ -218,7 +214,7 @@ export class API {
                 'referer': 'https://shellshockio-181719.firebaseapp.com/',
                 'content-type': 'application/json'
             },
-            dispatcher: this.httpProxy ? new globals.ProxyAgent(this.httpProxy) : undefined
+            proxy: this.proxy
         });
 
         const body = await req.json();

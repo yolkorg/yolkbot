@@ -9,7 +9,8 @@ package-lock.json
 dist
 tar
 
-# protected
+# local dev
+tests
 .env
 
 # mac cache
