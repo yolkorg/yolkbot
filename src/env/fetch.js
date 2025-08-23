@@ -1,5 +1,6 @@
 import dns from 'node:dns';
 import net from 'node:net';
+import tls from 'node:tls';
 
 const parseProxyUrl = (proxyUrl) => {
     if (!proxyUrl) return null;
@@ -19,6 +20,10 @@ const sendHttpRequest = (socket, { method, pathname, destHost, headers, body }, 
         reqHeaders += `${k}: ${v}\r\n`;
     }
 
+    if (body && !('Content-Length' in headers)) {
+        reqHeaders += `Content-Length: ${Buffer.byteLength(body)}\r\n`;
+    }
+
     let req = `${method} ${pathname} HTTP/1.1\r\nHost: ${destHost}\r\n${reqHeaders}Connection: close\r\n\r\n`;
     if (body) req += body;
     socket.write(req);
@@ -28,21 +33,43 @@ const sendHttpRequest = (socket, { method, pathname, destHost, headers, body }, 
     socket.on('data', (data) => response += data.toString());
 
     socket.on('end', () => {
-        const body = response.split('\r\n\r\n')[1];
-        resolve({ json: () => JSON.parse(body), text: () => body });
+        const isChunked = /transfer-encoding:\s*chunked/i.test(response);
+
+        let parsedBody = response.split('\r\n\r\n')[1];
+        if (isChunked) {
+            const body2 = parsedBody;
+            const chunks = [];
+            let i = 0;
+            while (i < body2.length) {
+                const rnIdx = body2.indexOf('\r\n', i);
+                if (rnIdx === -1) break;
+                const sizeHex = body2.slice(i, rnIdx).trim();
+                const size = parseInt(sizeHex, 16);
+                if (size === 0) break;
+                i = rnIdx + 2;
+                chunks.push(body2.slice(i, i + size));
+                i += size + 2;
+            }
+            parsedBody = chunks.join('');
+        }
+
+        resolve({ json: () => JSON.parse(parsedBody), text: () => parsedBody });
     });
 };
 
 const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) => new Promise((resolve, reject) => {
-    const { hostname, port, pathname } = new URL(url);
-    const destPort = port ? parseInt(port) : 80;
+    const { hostname, port, pathname, protocol, search } = new URL(url);
+    const isHttps = protocol === 'https:';
+    const destPort = port ? parseInt(port) : (isHttps ? 443 : 80);
     const destHost = hostname;
+    const fullPathname = pathname + search;
     const proxyInfo = parseProxyUrl(proxy);
 
     if (!proxyInfo) return dns.lookup(destHost, (err, address) => {
         if (err) return reject(err);
-        const socket = net.connect(destPort, address, () => {
-            sendHttpRequest(socket, { method, pathname, destHost, headers, body }, resolve);
+        const connectFn = isHttps ? tls.connect : net.connect;
+        const socket = connectFn(destPort, address, isHttps ? { servername: destHost } : undefined, () => {
+            sendHttpRequest(socket, { method, pathname: fullPathname, destHost, headers, body }, resolve);
         });
         socket.on('error', reject);
     });
@@ -54,6 +81,26 @@ const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) 
             if (user && pass) socket.write(Buffer.from([0x05, 0x01, 0x02]));
             else socket.write(Buffer.from([0x05, 0x01, 0x00]));
         });
+
+        const sendConnect = () => {
+            let req;
+            if (remoteResolve) {
+                const hostBuf = Buffer.from(destHost);
+                req = Buffer.concat([
+                    Buffer.from([0x05, 0x01, 0x00, 0x03, hostBuf.length]),
+                    hostBuf,
+                    Buffer.from([(destPort >> 8) & 0xff, destPort & 0xff])
+                ]);
+            } else {
+                const ipBuf = Buffer.from(ipOrHost.split('.').map(Number));
+                req = Buffer.concat([
+                    Buffer.from([0x05, 0x01, 0x00, 0x01]),
+                    ipBuf,
+                    Buffer.from([(destPort >> 8) & 0xff, destPort & 0xff])
+                ]);
+            }
+            socket.write(req);
+        };
 
         let stage = 0;
         socket.on('data', (data) => {
@@ -79,30 +126,10 @@ const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) 
                 sendConnect();
             } else if (stage === 1) {
                 if (data[1] !== 0x00) return reject('SOCKS5 proxy connection failed :(');
-                sendHttpRequest(socket, { method, pathname, destHost, headers, body }, resolve);
+                sendHttpRequest(socket, { method, pathname: fullPathname, destHost, headers, body }, resolve);
                 stage = 2;
             }
         });
-
-        const sendConnect = () => {
-            let req;
-            if (remoteResolve) {
-                const hostBuf = Buffer.from(destHost);
-                req = Buffer.concat([
-                    Buffer.from([0x05, 0x01, 0x00, 0x03, hostBuf.length]),
-                    hostBuf,
-                    Buffer.from([(destPort >> 8) & 0xff, destPort & 0xff])
-                ]);
-            } else {
-                const ipBuf = Buffer.from(ipOrHost.split('.').map(Number));
-                req = Buffer.concat([
-                    Buffer.from([0x05, 0x01, 0x00, 0x01]),
-                    ipBuf,
-                    Buffer.from([(destPort >> 8) & 0xff, destPort & 0xff])
-                ]);
-            }
-            socket.write(req);
-        };
 
         socket.on('error', reject);
     };

@@ -33,7 +33,7 @@ const build = async (module) => {
         target: 'esnext',
         format: 'esm',
         plugins: [replaceItemImport],
-        external: ['smallsocks', 'ws', 'node:*']
+        external: ['node:*']
     });
 
     const output = fs.readFileSync(path.join(buildDir, `${module}.js`), 'utf-8');

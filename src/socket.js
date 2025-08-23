@@ -1,14 +1,6 @@
 import globals from './env/globals.js';
 import { IsBrowser, ProxiesEnabled, UserAgent } from './constants/index.js';
 
-/*
-const generateWebSocketKey = () => {
-    const array = new Uint8Array(16);
-    crypto.getRandomValues(array);
-    return btoa(String.fromCharCode(...array));
-}
-*/
-
 class yolkws {
     url = '';
     proxy = '';
@@ -39,19 +31,15 @@ class yolkws {
 
         try {
             this.socket = IsBrowser ? new globals.WebSocket(this.url) : new globals.WebSocket(this.url, {
-                agent: this.proxy ? new globals.SocksProxyAgent(this.proxy) : undefined,
+                proxy: this.proxy || undefined,
                 headers: {
                     'accept-encoding': 'gzip, deflate, br, zstd',
                     'accept-language': 'en-US,en;q=0.9',
                     'cache-control': 'no-cache',
                     'connection': 'Upgrade',
-                    'host': url.host,
                     'origin': url.origin.replace('ws', 'http'),
                     'pragma': 'no-cache',
                     'sec-websocket-extensions': 'permessage-deflate; client_max_window_bits',
-                    // 'sec-websocket-key': generateWebSocketKey(),
-                    // 'sec-websocket-version': '13',
-                    // 'upgrade': 'websocket',
                     'user-agent': UserAgent
                 }
             });
