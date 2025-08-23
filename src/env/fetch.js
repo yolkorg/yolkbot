@@ -14,7 +14,7 @@ const parseProxyUrl = (proxyUrl) => {
     };
 };
 
-const sendHttpRequest = (socket, { method, pathname, destHost, headers, body }, resolve) => {
+const sendHttpRequest = (socket, { method, pathname, destHost, destPort, headers, body }, resolve) => {
     let reqHeaders = '';
     for (const [k, v] of Object.entries(headers)) {
         reqHeaders += `${k}: ${v}\r\n`;
@@ -24,13 +24,27 @@ const sendHttpRequest = (socket, { method, pathname, destHost, headers, body }, 
         reqHeaders += `Content-Length: ${Buffer.byteLength(body)}\r\n`;
     }
 
-    let req = `${method} ${pathname} HTTP/1.1\r\nHost: ${destHost}\r\n${reqHeaders}Connection: close\r\n\r\n`;
+    let req = `${method} ${pathname} HTTP/1.1\r\nHost: ${destHost}${destPort !== 80 && destPort !== 443 ? ':' + destPort : ''}\r\n${reqHeaders}Connection: close\r\n\r\n`;
     if (body) req += body;
     socket.write(req);
 
     let response = '';
 
-    socket.on('data', (data) => response += data.toString());
+    socket.on('data', (data) => {
+        response += data.toString();
+
+        if (/transfer-encoding:\s*chunked/i.test(response)) {
+            if (response.includes('\r\n0\r\n\r\n')) socket.end();
+        } else {
+            const contentLengthMatch = response.match(/content-length:\s*(\d+)/i);
+            if (contentLengthMatch) {
+                const contentLength = parseInt(contentLengthMatch[1], 10);
+                const bodyStart = response.indexOf('\r\n\r\n') + 4;
+                const body3 = response.slice(bodyStart);
+                if (body3.length >= contentLength) socket.end();
+            }
+        }
+    });
 
     socket.on('end', () => {
         const isChunked = /transfer-encoding:\s*chunked/i.test(response);
@@ -66,12 +80,12 @@ const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) 
     const proxyInfo = parseProxyUrl(proxy);
 
     if (!proxyInfo) return dns.lookup(destHost, (err, address) => {
-        if (err) return reject(err);
+        if (err) throw err;
         const connectFn = isHttps ? tls.connect : net.connect;
         const socket = connectFn(destPort, address, isHttps ? { servername: destHost } : undefined, () => {
-            sendHttpRequest(socket, { method, pathname: fullPathname, destHost, headers, body }, resolve);
+            sendHttpRequest(socket, { method, pathname: fullPathname, destHost, destPort, headers, body }, resolve);
         });
-        socket.on('error', reject);
+        socket.on('error', (e) => { throw e });
     });
 
     const { host: proxyHost, port: proxyPort, user, pass, remoteResolve } = proxyInfo;
