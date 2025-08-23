@@ -50,6 +50,8 @@ class yolkws {
             return await retryOrQuit();
         }
 
+        if (this.onBeforeConnect) this.onBeforeConnect();
+
         return new Promise((resolve) => {
             const timeout = setTimeout(async () => {
                 if (IsBrowser) this.socket.close();

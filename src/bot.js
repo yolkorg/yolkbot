@@ -573,18 +573,20 @@ export class Bot {
         this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
         this.game.socket.binaryType = 'arraybuffer';
 
-        const didConnect = await this.game.socket.tryConnect();
-        if (!didConnect) return 'websocket_tryconnect_fail';
+        this.game.socket.onBeforeConnect = () => {
+            this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
 
-        this.game.socket.onmessage = (msg) => this.processPacket(msg.data);
-
-        this.game.socket.onclose = (e) => {
-            if (this.state.left) this.state.left = false;
-            else {
-                this.emit('close', e.code);
-                this.leave(-1);
+            this.game.socket.onclose = (e) => {
+                if (this.state.left) this.state.left = false;
+                else {
+                    this.emit('close', e.code);
+                    this.leave(-1);
+                }
             }
         }
+
+        const didConnect = await this.game.socket.tryConnect();
+        if (!didConnect) return 'websocket_tryconnect_fail';
 
         return true;
     }
