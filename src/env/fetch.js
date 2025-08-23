@@ -140,7 +140,12 @@ const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) 
                 sendConnect();
             } else if (stage === 1) {
                 if (data[1] !== 0x00) return reject('SOCKS5 proxy connection failed :(');
-                sendHttpRequest(socket, { method, pathname: fullPathname, destHost, headers, body }, resolve);
+                if (isHttps) {
+                    const tlsSocket = tls.connect({ socket, servername: destHost }, () => {
+                        sendHttpRequest(tlsSocket, { method, pathname: fullPathname, destHost, destPort, headers, body }, resolve);
+                    });
+                    tlsSocket.on('error', reject);
+                } else sendHttpRequest(socket, { method, pathname: fullPathname, destHost, destPort, headers, body }, resolve);
                 stage = 2;
             }
         });
