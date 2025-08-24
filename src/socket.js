@@ -54,8 +54,7 @@ class yolkws {
 
         return new Promise((resolve) => {
             const timeout = setTimeout(async () => {
-                if (globals.isBrowser) this.socket.close();
-                else this.socket.terminate();
+                this.socket.close();
                 resolve(await retryOrQuit());
             }, this.connectionTimeout);
 
