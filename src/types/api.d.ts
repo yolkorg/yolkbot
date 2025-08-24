@@ -8,11 +8,12 @@ export interface QueryResponse {
 }
 
 interface APIParams {
-    instance?: string;
-    protocol?: string;
     proxy?: string;
+    protocol?: string;
+    instance?: string;
     maxRetries?: number;
     suppressErrors?: boolean;
+    connectionTimeout?: number;
 }
 
 export type QueryServicesError = 'websocket_connect_fail' | 'bad_json' | 'unknown_socket_error' | 'services_closed_early';
@@ -22,13 +23,12 @@ export type EmailVerifyError = 'no_idtoken_passed' | 'firebase_invalid_response'
 export type OobCodeError = 'no_oob_code_passed' | 'firebase_unknown_error';
 
 export class API {
-    instance: string;
-    protocol: string;
-
     proxy?: string;
-
+    protocol: string;
+    instance: string;
     maxRetries: number;
     suppressErrors: boolean;
+    connectionTimeout: number;
 
     constructor(params?: APIParams);
 

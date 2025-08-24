@@ -1,5 +1,5 @@
 import globals from './env/globals.js';
-import { IsBrowser, ProxiesEnabled, UserAgent } from './constants/index.js';
+import { UserAgent } from './constants/index.js';
 
 class yolkws {
     url = '';
@@ -13,8 +13,8 @@ class yolkws {
     constructor(url, proxy) {
         this.url = url;
 
-        if (!ProxiesEnabled && proxy) {
-            console.error('You cannot pass a proxy to a yolkws in this environment.');
+        if (globals.isBrowser && proxy) {
+            console.error('You cannot pass a proxy to a yolkws inside of a browser.');
             process.exit(1);
         }
 
@@ -30,7 +30,7 @@ class yolkws {
         }
 
         try {
-            this.socket = IsBrowser ? new globals.WebSocket(this.url) : new globals.WebSocket(this.url, {
+            this.socket = globals.isBrowser ? new globals.WebSocket(this.url) : new globals.WebSocket(this.url, {
                 proxy: this.proxy || undefined,
                 headers: {
                     'accept-encoding': 'gzip, deflate, br, zstd',
@@ -54,7 +54,7 @@ class yolkws {
 
         return new Promise((resolve) => {
             const timeout = setTimeout(async () => {
-                if (IsBrowser) this.socket.close();
+                if (globals.isBrowser) this.socket.close();
                 else this.socket.terminate();
                 resolve(await retryOrQuit());
             }, this.connectionTimeout);

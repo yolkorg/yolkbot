@@ -3,13 +3,14 @@ import { Region } from './constants/regions';
 import yolkws from './socket';
 
 interface MatchmakerParams {
+    api?: API;
+    proxy?: string;
     instance?: string;
     protocol?: string;
-    proxy?: string;
-    sessionId?: string;
     noLogin?: boolean;
+    sessionId?: string;
     noExitOnError?: boolean;
-    api?: API;
+    connectionTimeout?: number;
 };
 
 export interface MatchmakerCommand {

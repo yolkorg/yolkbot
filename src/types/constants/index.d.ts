@@ -88,8 +88,6 @@ export declare const GunEquipTime: number;
 
 export declare const GunList: Array<typeof Eggk47 | typeof DozenGauge | typeof CSG1 | typeof RPEGG | typeof SMG | typeof M24 | typeof AUG>;
 
-export declare const IsBrowser: boolean;
-
 export declare const ItemType: {
     Hat: number;
     Stamp: number;
@@ -115,8 +113,6 @@ export declare const PlayTypes: {
     createPrivate: number;
     joinPrivate: number;
 };
-
-export declare const ProxiesEnabled: boolean;
 
 export declare const ShellStreak: {
     HardBoiled: number;

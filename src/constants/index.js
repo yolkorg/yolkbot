@@ -1,3 +1,4 @@
+import globals from '../env/globals.js';
 import { AUG, CSG1, DozenGauge, Eggk47, M24, RPEGG, SMG } from './guns.js';
 
 export { findItemById } from './findItemById.js';
@@ -88,8 +89,6 @@ export const GunEquipTime = 13;
 
 export const GunList = [Eggk47, DozenGauge, CSG1, RPEGG, SMG, M24, AUG];
 
-export const IsBrowser = typeof window !== 'undefined' || typeof WebSocketPair !== 'undefined';
-
 export const ItemType = {
     Hat: 1,
     Stamp: 2,
@@ -115,8 +114,6 @@ export const PlayType = {
     CreatePrivate: 1,
     JoinPrivate: 2
 }
-
-export const ProxiesEnabled = !IsBrowser && typeof Bun === 'undefined';
 
 export const ShellStreak = {
     HardBoiled: 1,
@@ -164,5 +161,5 @@ export const URLRewards = [
     'WelcomeBack'
 ]
 
-export const UserAgent = IsBrowser ? null :
+export const UserAgent = globals.isBrowser ? null :
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'

@@ -1,7 +1,7 @@
 import API from './api.js';
-import { ProxiesEnabled } from './constants/index.js';
 import { validate } from './wasm/wrapper.js';
 
+import globals from './env/globals.js';
 import yolkws from './socket.js';
 
 export class Matchmaker {
@@ -25,20 +25,27 @@ export class Matchmaker {
         if (!params.instance) params.instance = 'shellshock.io';
         if (!params.protocol) params.protocol = 'wss';
 
-        if (!params.api) this.api = new API({ instance: params.instance, protocol: params.protocol, proxy: params.proxy });
+        if (!params.api) this.api = new API({
+            proxy: params.proxy,
+            protocol: params.protocol,
+            instance: params.instance,
+            connectionTimeout: params.connectionTimeout
+        });
+
         else this.api = params.api;
 
         if (params.sessionId || params.noLogin) this.sessionId = params.sessionId;
         else this.#createSessionId();
 
-        if (params.proxy && !ProxiesEnabled) this.#processError('proxies do not work and hence are not supported in the browser');
+        if (params.proxy && globals.isBrowser) this.#processError('proxies do not work and hence are not supported in the browser');
         else if (params.proxy) this.proxy = params.proxy;
 
-        this.#createSocket(params.instance, params.protocol, params.noLogin);
+        this.#createSocket(params.instance, params.protocol, params.noLogin, params.connectionTimeout);
     }
 
-    async #createSocket(instance, protocol, noLogin) {
+    async #createSocket(instance, protocol, noLogin, connectionTimeout) {
         this.ws = new yolkws(`${protocol}://${instance}/matchmaker/`, this.proxy);
+        this.ws.connectionTimeout = connectionTimeout || 5000;
 
         const didConnect = await this.ws.tryConnect();
         if (!didConnect) return this.#processError('WebSocket did not connect...');
@@ -54,7 +61,7 @@ export class Matchmaker {
 
         this.ws.onclose = () => {
             this.connected = false;
-            if (!this.#forceClose) this.#createSocket(instance, protocol, noLogin);
+            if (!this.#forceClose) this.#createSocket(instance, protocol, noLogin, connectionTimeout);
         }
 
         this.connected = true;
