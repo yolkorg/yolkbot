@@ -35,6 +35,7 @@ export interface BotParams {
     instance?: string;
     protocol?: string;
     apiMaxRetries?: number;
+    connectionTimeout?: number;
 }
 
 export interface ChiknWinnerStatus {
@@ -351,9 +352,10 @@ export class Bot {
     Intents: intents;
     intents: number[];
 
+    proxy: string;
     instance: string;
     protocol: string;
-    proxy: string;
+    connectionTimeout: number;
 
     state: BotState;
     players: Record<string, GamePlayer>;

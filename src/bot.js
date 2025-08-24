@@ -22,13 +22,14 @@ import {
     ItemType,
     Movement,
     PlayType,
-    ProxiesEnabled,
     ShellStreak,
     StateBufferSize
 } from './constants/index.js';
 
 import LookAtPosDispatch from './dispatches/LookAtPosDispatch.js';
 import MovementDispatch from './dispatches/MovementDispatch.js';
+
+import globals from './env/globals.js';
 
 import { NodeList } from './pathing/mapnode.js';
 
@@ -78,7 +79,7 @@ export class Bot {
     #initialGame;
 
     constructor(params = {}) {
-        if (params.proxy && !ProxiesEnabled) this.processError('proxies do not work and hence are not supported in the browser');
+        if (params.proxy && globals.isBrowser) this.processError('proxies do not work and hence are not supported in the browser');
 
         this.intents = params.intents || [];
 
@@ -90,6 +91,8 @@ export class Bot {
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
         this.proxy = params.proxy || '';
+
+        this.connectionTimeout = params.connectionTimeout || 5000;
 
         this.state = {
             // kept for specifying various params
@@ -265,10 +268,11 @@ export class Bot {
         this.matchmaker = null;
 
         this.api = new API({
-            instance: this.instance,
-            protocol: this.protocol,
             proxy: this.proxy,
-            maxRetries: params?.apiMaxRetries
+            protocol: this.protocol,
+            instance: this.instance,
+            maxRetries: params?.apiMaxRetries,
+            connectionTimeout: this.connectionTimeout
         });
 
         this.ping = 0;
@@ -423,12 +427,13 @@ export class Bot {
 
         if (!this.matchmaker) {
             this.matchmaker = new Matchmaker({
-                sessionId: this.account.sessionId,
+                api: this.api,
                 proxy: this.proxy,
-                instance: this.instance,
                 protocol: this.protocol,
-                noLogin: this.intents.includes(this.Intents.NO_LOGIN),
-                api: this.api
+                instance: this.instance,
+                sessionId: this.account.sessionId,
+                connectionTimeout: this.connectionTimeout,
+                noLogin: this.intents.includes(this.Intents.NO_LOGIN)
             });
 
             const didConnect = await this.matchmaker.ws.tryConnect();
@@ -572,6 +577,7 @@ export class Bot {
         const host = this.game.raw.host || (this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`);
         this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
         this.game.socket.binaryType = 'arraybuffer';
+        this.game.socket.connectionTimeout = this.connectionTimeout;
 
         this.game.socket.onBeforeConnect = () => {
             this.game.socket.onmessage = (msg) => this.processPacket(msg.data);

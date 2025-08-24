@@ -1,7 +1,7 @@
-import { IsBrowser } from './constants/index.js';
+import globals from './env/globals.js';
 
 export const fetchMap = async (name, hash) => {
-    if (!IsBrowser) {
+    if (!globals.isIsolated) {
         const { existsSync, mkdirSync, readFileSync, writeFileSync } = await import('node:fs');
         const { join } = await import('node:path');
         const { homedir } = await import('node:os');

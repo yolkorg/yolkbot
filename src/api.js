@@ -12,17 +12,19 @@ const baseHeaders = {
 
 export class API {
     constructor(params = {}) {
+        this.proxy = params.proxy;
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
 
-        this.proxy = params.proxy;
-
         this.maxRetries = params.maxRetries || 5;
         this.suppressErrors = params.suppressErrors || false;
+        this.connectionTimeout = params.connectionTimeout || 5000;
     }
 
     queryServices = async (request) => {
         const ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.proxy);
+        ws.connectionTimeout = this.connectionTimeout;
+
         const didConnect = await ws.tryConnect(-2);
         if (!didConnect || ws.socket.readyState < 1) return 'websocket_connect_fail';
 

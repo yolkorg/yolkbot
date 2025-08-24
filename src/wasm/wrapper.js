@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 
-import { IsBrowser } from '../constants/index.js';
+import globals from '../env/globals.js';
 
 import { canvasListeners, getImports } from './imports.js';
 import { getStringFromWasm, passStringToWasm } from './utils.js';
@@ -35,7 +35,7 @@ const initWasm = async () => {
     });
 }
 
-if (IsBrowser) initWasm();
+if (globals.isBrowser) initWasm();
 else await initWasm();
 
 const process = async (str, date) => {
