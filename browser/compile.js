@@ -8,16 +8,25 @@ const buildDir = path.join(import.meta.dirname, 'build');
 if (fs.existsSync(buildDir)) fs.rmSync(buildDir, { recursive: true });
 fs.mkdirSync(buildDir);
 
-const replaceItemImport = {
-    name: 'replaceItemImport',
+const replaceBrowserFiles = {
+    name: 'replaceBrowserFiles',
 
     setup(build) {
-        const specialFilePath = path.join(import.meta.dirname, '../src/constants/findItemById.js').replace(/\\/g, '/');
+        const findItemById = path.join(import.meta.dirname, '../src/constants/findItemById.js').replace(/\\/g, '/');
 
         build.onLoad({
-            filter: new RegExp(specialFilePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$')
+            filter: new RegExp(findItemById.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$')
         }, () => ({
             contents: 'export const findItemById = () => null',
+            loader: 'js'
+        }));
+
+        const iFetch = path.join(import.meta.dirname, '../src/env/fetch.js').replace(/\\/g, '/');
+
+        build.onLoad({
+            filter: new RegExp(iFetch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$')
+        }, () => ({
+            contents: 'const iFetch = globalThis.fetch;\nexport default iFetch;',
             loader: 'js'
         }));
     }
@@ -32,7 +41,7 @@ const build = async (module) => {
         bundle: true,
         target: 'esnext',
         format: 'esm',
-        plugins: [replaceItemImport],
+        plugins: [replaceBrowserFiles],
         external: ['node:*']
     });
 
