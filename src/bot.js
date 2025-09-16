@@ -961,12 +961,15 @@ export class Bot {
         const killedId = CommIn.unPackInt8U();
         const killerId = CommIn.unPackInt8U();
 
-        CommIn.unPackInt8U(); // respawnTime
-        CommIn.unPackInt8U(); // killerLastDmg
-        CommIn.unPackInt8U(); // killedLastDmg
+        CommIn.unPackInt8U(); // timeUntilRespawn
+        CommIn.unPackInt8U(); // killerLastDamageCause
+
+        const damageCauseInt = CommIn.unPackInt8U();
 
         const killed = this.players[killedId];
         const killer = this.players[killerId];
+
+        const oldKilled = killed ? { ...killed } : null;
 
         if (killed) {
             if (killed.id === this.me.id) this.lastDeathTime = Date.now();
@@ -989,7 +992,7 @@ export class Bot {
             if (killer.streak > killer.stats.bestStreak) killer.stats.bestStreak = killer.streak;
         }
 
-        this.emit('playerDeath', killed, killer);
+        this.emit('playerDeath', killed, killer, oldKilled, damageCauseInt);
     }
 
     #processFirePacket() {

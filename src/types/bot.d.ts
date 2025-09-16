@@ -422,7 +422,7 @@ export class Bot {
     on(event: 'playerCollectAmmo', cb: (player: GamePlayer, weapon: AnyGun, itemId: number) => void): void;
     on(event: 'playerCollectGrenade', cb: (player: GamePlayer, itemId: number) => void): void;
     on(event: 'playerDamage', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
-    on(event: 'playerDeath', cb: (killed: GamePlayer, killer: GamePlayer) => void): void;
+    on(event: 'playerDeath', cb: (killed: GamePlayer, killer: GamePlayer, oldKilled: GamePlayer, damageInt: number) => void): void;
     on(event: 'playerEndStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerEnterZone', cb: (player: GamePlayer) => void): void;
     on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun, bullet: FireBullet) => void): void;
