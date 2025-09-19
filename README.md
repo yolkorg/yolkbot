@@ -1,8 +1,8 @@
 <div align='center'>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-light.png">
-    <img src="https://raw.githubusercontent.com/yolkorg/yolkdoc/master/img/logo-light.png" width="60%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://docs.yolkbot.xyz/banners/dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://docs.yolkbot.xyz/banners/light.png">
+    <img src="https://docs.yolkbot.xyz/banners/light.png" width="60%">
   </picture>
   <h3>a simple, fast, multipurpose, & always working shell shockers bot library!</h3>
   <p>
