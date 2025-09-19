@@ -15,6 +15,7 @@ import MovementDispatch from './MovementDispatch.js';
 import PauseDispatch from './PauseDispatch.js';
 import ReloadDispatch from './ReloadDispatch.js';
 import ReportPlayerDispatch from './ReportPlayerDispatch.js';
+import ResetGameDispatch from './ResetGameDispatch.js';
 import SaveLoadoutDispatch from './SaveLoadoutDispatch.js';
 import SpawnDispatch from './SpawnDispatch.js';
 import SwapWeaponDispatch from './SwapWeaponDispatch.js';
@@ -39,6 +40,7 @@ export {
     PauseDispatch,
     ReloadDispatch,
     ReportPlayerDispatch,
+    ResetGameDispatch,
     SaveLoadoutDispatch,
     SpawnDispatch,
     SwapWeaponDispatch,
@@ -64,6 +66,7 @@ export default {
     PauseDispatch,
     ReloadDispatch,
     ReportPlayerDispatch,
+    ResetGameDispatch,
     SaveLoadoutDispatch,
     SpawnDispatch,
     SwapWeaponDispatch,
