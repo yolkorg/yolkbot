@@ -1,0 +1,32 @@
+name: production yolkbot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: add deps
+        run: bun install
+
+      - name: build node
+        run: bun run cli/build.js
+
+      - name: build browser
+        run: bun run browser/compile.js
+
+      - name: install npm
+        run: bun install -g npm@latest
+
+      - run: npm publish
