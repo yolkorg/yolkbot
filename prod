@@ -8,8 +8,11 @@ fi
 
 sed -i '' "s/$current_version/$version_arg/g" package.json
 
-bun cli/build.js
-bun browser/compile.js
+echo "version updated in package.json to $version_arg"
+echo "please visit the workflow to run secure publishing"
+echo "https://github.com/yolkorg/yolkbot/actions/workflows/prod.yml"
 
-npm publish
+# bun cli/build.js
+# bun browser/compile.js
+# npm publish
 # bun cli/publish.js
