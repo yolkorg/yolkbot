@@ -13,3 +13,5 @@ bun cli/build.js --no-minify
 bun browser/compile.js
 
 npm publish --tag alpha
+
+npm deprecate yolkbot@"< $new_version" "previous yolkbot alpha versions are considered unstable and unfit for use. please upgrade your package to the latest yolkbot version."
