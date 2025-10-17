@@ -62,8 +62,8 @@ export default class AStar {
                     neighbor.h = this.heuristic(neighbor.position, end.position);
                     neighbor.f = neighbor.g + neighbor.h;
 
-                    if (!visited) heap.push(neighbor);
-                    else heap.rescoreElement(neighbor);
+                    if (visited) heap.rescoreElement(neighbor);
+                    else heap.push(neighbor);
                 }
             }
         }

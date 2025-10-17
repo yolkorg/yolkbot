@@ -1,5 +1,3 @@
-import * as esbuild from 'esbuild';
-
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -15,7 +13,7 @@ const replaceBrowserFiles = {
         const findItemById = path.join(import.meta.dirname, '../src/constants/findItemById.js').replace(/\\/g, '/');
 
         build.onLoad({
-            filter: new RegExp(findItemById.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$')
+            filter: new RegExp(`${findItemById.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`)
         }, () => ({
             contents: 'export const findItemById = () => null',
             loader: 'js'
@@ -24,7 +22,7 @@ const replaceBrowserFiles = {
         const iFetch = path.join(import.meta.dirname, '../src/env/fetch.js').replace(/\\/g, '/');
 
         build.onLoad({
-            filter: new RegExp(iFetch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$')
+            filter: new RegExp(`${iFetch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`)
         }, () => ({
             contents: 'const iFetch = globalThis.fetch;\nexport default iFetch;',
             loader: 'js'
@@ -32,25 +30,22 @@ const replaceBrowserFiles = {
     }
 };
 
-const build = async (module) => {
-    await esbuild.build({
-        entryPoints: [path.join(import.meta.dirname, 'entry', `${module}.js`)],
-        outfile: path.join(buildDir, `${module}.js`),
+fs.rmSync(buildDir, { recursive: true });
+fs.mkdirSync(buildDir);
 
-        minify: true,
+const build = async (module) => {
+    await Bun.build({
+        entryPoints: [path.join(import.meta.dirname, 'entry', `${module}.js`)],
+        outdir: path.join(buildDir),
+
+        minify: !process.argv.includes('-nm'),
         bundle: true,
-        target: 'esnext',
+        target: 'browser',
         format: 'esm',
-        plugins: [replaceBrowserFiles],
-        external: ['node:*']
+        plugins: [replaceBrowserFiles]
     });
 
-    const output = fs.readFileSync(path.join(buildDir, `${module}.js`), 'utf-8');
-    const modifiedOutput = output.replace(/await import\("[a-zA-Z:]+"\)/g, '{}');
-
-    fs.writeFileSync(path.join(buildDir, `${module}.js`), modifiedOutput);
-
-    console.log(`completed ${module} build!`);
+    console.log(`\x1b[32m✓ built browser/${module}\x1b[0m`);
 }
 
 build('global');
