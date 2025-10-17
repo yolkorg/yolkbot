@@ -1,4 +1,3 @@
-import * as esbuild from 'esbuild';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -8,16 +7,15 @@ const distDir = path.join(import.meta.dirname, '..', 'dist');
 const manifest = await fetch('https://data.yolkbot.xyz/manifest.json').then(res => res.json());
 
 const buildAndWrite = async (dest, code, forceMinify) => {
-    const esmResult = await esbuild.transform(code, {
-        minify: forceMinify || process.argv[2] !== '--no-minify',
-        keepNames: true,
-        loader: 'js',
-        format: 'esm',
-        target: 'esnext',
-        banner: '/* eslint-disable */\n'
+    const transpiler = new Bun.Transpiler({
+        minify: forceMinify || !process.argv.includes('-nm'),
+        target: 'browser',
+        loader: 'ts'
     });
 
-    return fs.writeFileSync(dest, esmResult.code);
+    const transpileResult = transpiler.transformSync(code);
+
+    return fs.writeFileSync(dest, transpileResult);
 }
 
 const handleConstants = async (src, dest, code) => {
@@ -32,8 +30,8 @@ const handleConstants = async (src, dest, code) => {
 
         const serverResult = await fetch(`https://data.yolkbot.xyz${serverPath}`).then(res => res.text());
         const rewrittenCode = code.replace(/{}|\[\]/, serverResult);
-        return buildAndWrite(dest, rewrittenCode, true);
-    } else return buildAndWrite(dest, code);
+        buildAndWrite(dest, rewrittenCode, true);
+    } else buildAndWrite(dest, code);
 }
 
 const copyAndMinify = async (src, dest) => {
@@ -68,4 +66,4 @@ fs.mkdirSync(distDir);
 
 copyAndMinify(srcDir, distDir);
 
-console.log('completed node build!');
+console.log('\x1b[32m✓ built node\x1b[0m');

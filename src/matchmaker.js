@@ -25,14 +25,13 @@ export class Matchmaker {
         if (!params.instance) params.instance = 'shellshock.io';
         if (!params.protocol) params.protocol = 'wss';
 
-        if (!params.api) this.api = new API({
+        if (params.api) this.api = params.api;
+        else this.api = new API({
             proxy: params.proxy,
             protocol: params.protocol,
             instance: params.instance,
             connectionTimeout: params.connectionTimeout
         });
-
-        else this.api = params.api;
 
         if (params.sessionId || params.noLogin) this.sessionId = params.sessionId;
         else this.#createSessionId();
@@ -157,10 +156,8 @@ export class Matchmaker {
 
     #processError(error) {
         if (this.onListeners.has('error')) this.#emit('error', error);
-        else {
-            console.error(error);
-            if (!this.#noExitOnError) process.exit(1);
-        }
+        else if (this.#noExitOnError) console.error(error);
+        else throw new Error(error);
     }
 }
 

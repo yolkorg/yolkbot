@@ -1,31 +1,28 @@
 import globals from './env/globals.js';
 
 export const fetchMap = async (name, hash) => {
-    if (!globals.isIsolated) {
-        const { existsSync, mkdirSync, readFileSync, writeFileSync } = await import('node:fs');
-        const { join } = await import('node:path');
-        const { homedir } = await import('node:os');
+    if (!globals.isIsolated && typeof process !== 'undefined') {
+        const { existsSync, mkdirSync, readFileSync, writeFileSync } = process.getBuiltinModule('node:fs');
+        const { join } = process.getBuiltinModule('node:path');
+        const { homedir } = process.getBuiltinModule('node:os');
 
         const yolkbotCache = join(homedir(), '.yolkbot');
-        const mapCache = join(yolkbotCache, 'maps');
-
         if (!existsSync(yolkbotCache)) mkdirSync(yolkbotCache);
+
+        const mapCache = join(yolkbotCache, 'maps');
         if (!existsSync(mapCache)) mkdirSync(mapCache);
 
         const mapFile = join(mapCache, `${name}-${hash}.json`);
 
-        if (existsSync(mapFile))
-            return JSON.parse(readFileSync(mapFile, 'utf-8'));
+        if (existsSync(mapFile)) return JSON.parse(readFileSync(mapFile, 'utf-8'));
 
         const data = await (await fetch(`https://esm.sh/gh/yolkorg/maps/maps/${name}.json?${hash}`)).json();
-
         writeFileSync(mapFile, JSON.stringify(data, null, 4), { flag: 'w+' });
-
-        return data;
-    } else {
-        const data = await (await fetch(`https://esm.sh/gh/yolkorg/maps/maps/${name}.json?${hash}`)).json();
         return data;
     }
+
+    const data = await (await fetch(`https://esm.sh/gh/yolkorg/maps/maps/${name}.json?${hash}`)).json();
+    return data;
 }
 
 export const initKotcZones = (meshData) => {

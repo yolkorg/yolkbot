@@ -39,8 +39,8 @@ export class API {
                     resolve(resp);
                 } catch {
                     if (!this.suppressErrors) {
-                        console.error('queryServices: Bad API JSON response with call: ' + request.cmd + ' and data:', JSON.stringify(request));
-                        console.error('queryServices: Full data sent: ', JSON.stringify(request));
+                        console.error('queryServices: Bad API JSON response with call:', request.cmd, 'and data:', JSON.stringify(request));
+                        console.error('queryServices: Full data sent:', JSON.stringify(request));
                     }
 
                     resolve('bad_json');
@@ -88,10 +88,10 @@ export class API {
                 if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password);
                 if (!this.suppressErrors) console.error('loginWithCredentials: Error:', body || error);
                 return 'firebase_bad_request';
-            } else {
-                if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password, error);
-                return 'firebase_unknown_error';
             }
+
+            if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password, error);
+            return 'firebase_unknown_error';
         }
 
         if (!firebaseToken) {
@@ -139,10 +139,10 @@ export class API {
                 return 'firebase_network_failed';
             } else if (error.code === 'auth/missing-email') {
                 return 'firebase_no_credentials';
-            } else {
-                if (!this.suppressErrors) console.error('loginWithRefreshToken: Error:', error, refreshToken);
-                return 'firebase_unknown_error';
             }
+
+            if (!this.suppressErrors) console.error('loginWithRefreshToken: Error:', error, refreshToken);
+            return 'firebase_unknown_error';
         }
 
         if (!token) {
@@ -157,7 +157,7 @@ export class API {
     }
 
     loginAnonymously = async () => {
-        const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + FirebaseKey, {
+        const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FirebaseKey}`, {
             method: 'POST',
             body: JSON.stringify({ returnSecureToken: true }),
             headers: {
@@ -184,7 +184,7 @@ export class API {
     sendEmailVerification = async (idToken = this.idToken) => {
         if (!idToken) return 'no_idtoken_passed';
 
-        const req = await globals.fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FirebaseKey, {
+        const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FirebaseKey}`, {
             method: 'POST',
             body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken }),
             headers: {
@@ -207,7 +207,7 @@ export class API {
     verifyOobCode = async (oobCode) => {
         if (!oobCode) return 'no_oob_code_passed';
 
-        const req = await globals.fetch('https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=' + FirebaseKey, {
+        const req = await globals.fetch(`https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=${FirebaseKey}`, {
             method: 'POST',
             body: JSON.stringify({ oobCode }),
             headers: {

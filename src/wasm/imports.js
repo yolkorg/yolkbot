@@ -71,13 +71,15 @@ export const getImports = (wasm, exports) => {
                 if (iter <= 0) {
                     iter = 1;
                     return 0;
-                } else return iter;
+                }
+
+                return iter;
             },
             __wbg_length_e2d2a49132c1b256: (...args) => args[0].length,
             __wbg_movementX_1aa05f864931369b: (...args) => args[0].movementX,
             __wbg_movementY_8acfedb38a70e624: (...args) => args[0].movementY,
             __wbg_navigator_1577371c070c8947: (...args) => args[0].navigator,
-            __wbg_new_405e22f390576ce2: () => new Object(),
+            __wbg_new_405e22f390576ce2: () => { },
             __wbg_newnoargs_105ed471475aaf50: () => { },
             __wbg_nodeType_5e1153141daac26a: () => 3,
             __wbg_now_807e54c39636c349: () => exports.processDate || Date.now(),
@@ -108,7 +110,7 @@ export const getImports = (wasm, exports) => {
                 dv.setInt32(arg0 + 4 * 1, len, true);
                 dv.setInt32(arg0 + 4 * 0, ptr, true);
             },
-            __wbindgen_is_undefined: (arg0) => arg0 === undefined ? 1 : 0,
+            __wbindgen_is_undefined: (arg0) => typeof arg0 === 'undefined' ? 1 : 0,
             __wbindgen_is_null: (arg0) => arg0 === null ? 1 : 0,
             __wbindgen_boolean_get: (arg0) => {
                 const v = arg0;
@@ -119,7 +121,7 @@ export const getImports = (wasm, exports) => {
             __wbindgen_closure_wrapper95: (arg0, arg1) => makeMutClosure(arg0, arg1, 31, __wbg_adapter_22),
             __wbindgen_number_get: (arg0, arg1) => {
                 const obj = arg1;
-                const ret = typeof (obj) === 'number' ? obj : undefined;
+                const ret = typeof (obj) === 'number' ? obj : null;
                 const dv = new DataView(wasm().memory.buffer);
                 dv.setFloat64(arg0 + 8 * 1, ret, true);
                 dv.setInt32(arg0 + 4 * 0, 1, true);

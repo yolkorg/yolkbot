@@ -300,7 +300,9 @@ export class Bot {
             if (dispatch.check(this)) dispatch.execute(this);
             else this.#dispatches.push(dispatch);
             return true;
-        } else return false;
+        }
+
+        return false;
     }
 
     async createAccount(email, pass) {
@@ -464,7 +466,7 @@ export class Bot {
                 if (msg.command === 'gameFound') return resolve(msg);
                 if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
 
-                this.processError('unknown matchmaker response ' + JSON.stringify(msg));
+                this.processError('unknown matchmaker response', JSON.stringify(msg));
             };
 
             this.matchmaker.on('msg', listener);
@@ -504,7 +506,7 @@ export class Bot {
                 if (msg.command === 'gameFound') return resolve(msg);
                 if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
 
-                this.processError('unknown matchmaker response ' + JSON.stringify(msg));
+                this.processError('unknown matchmaker response', JSON.stringify(msg));
             };
 
             this.matchmaker.on('msg', listener);
@@ -1854,10 +1856,10 @@ export class Bot {
             } else if (response.error === 'SESSION_EXPIRED') {
                 this.emit('sessionExpired');
                 return 'session_expired';
-            } else {
-                console.error('Unknown Chikn Winner response, report this on Github:', response);
-                return 'unknown_error';
             }
+
+            console.error('Unknown Chikn Winner response, report this on Github:', response);
+            return 'unknown_error';
         }
 
         if (response.reward) {
@@ -1981,7 +1983,9 @@ export class Bot {
                 eggsGiven: result.eggs_given,
                 itemIds: result.item_ids
             };
-        } else return result;
+        }
+
+        return result;
     }
 
     async claimURLReward(reward) {
@@ -2039,12 +2043,11 @@ export class Bot {
         return result;
     }
 
-    processError(error) {
+    processError(...params) {
+        const error = params.join(' ');
         if (this.#hooks.error && this.#hooks.error.length) this.emit('error', error);
-        else {
-            console.error(error);
-            if (!this.intents.includes(this.Intents.NO_EXIT_ON_ERROR)) process.exit(1);
-        }
+        else if (this.intents.includes(this.Intents.NO_EXIT_ON_ERROR)) console.error(error);
+        else throw new Error(error);
     }
 
     leave(code = CloseCode.mainMenu) {

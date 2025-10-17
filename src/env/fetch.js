@@ -1,7 +1,3 @@
-import dns from 'node:dns';
-import net from 'node:net';
-import tls from 'node:tls';
-
 const parseProxyUrl = (proxyUrl) => {
     if (!proxyUrl) return null;
     const u = new URL(proxyUrl);
@@ -24,7 +20,7 @@ const sendHttpRequest = (socket, { method, pathname, destHost, destPort, headers
         reqHeaders += `Content-Length: ${Buffer.byteLength(body)}\r\n`;
     }
 
-    let req = `${method} ${pathname} HTTP/1.1\r\nHost: ${destHost}${destPort !== 80 && destPort !== 443 ? ':' + destPort : ''}\r\n${reqHeaders}Connection: close\r\n\r\n`;
+    let req = `${method} ${pathname} HTTP/1.1\r\nHost: ${destHost}${destPort !== 80 && destPort !== 443 ? `:${destPort}` : ''}\r\n${reqHeaders}Connection: close\r\n\r\n`;
     if (body) req += body;
     socket.write(req);
 
@@ -36,9 +32,9 @@ const sendHttpRequest = (socket, { method, pathname, destHost, destPort, headers
         if (/transfer-encoding:\s*chunked/i.test(response)) {
             if (response.includes('\r\n0\r\n\r\n')) socket.end();
         } else {
-            const contentLengthMatch = response.match(/content-length:\s*(\d+)/i);
+            const contentLengthMatch = response.match(/content-length:\s*(?<len>\d+)/i);
             if (contentLengthMatch) {
-                const contentLength = parseInt(contentLengthMatch[1], 10);
+                const contentLength = parseInt(contentLengthMatch.groups.len, 10);
                 const bodyStart = response.indexOf('\r\n\r\n') + 4;
                 const body3 = response.slice(bodyStart);
                 if (body3.length >= contentLength) socket.end();
@@ -72,6 +68,12 @@ const sendHttpRequest = (socket, { method, pathname, destHost, destPort, headers
 };
 
 const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) => new Promise((resolve, reject) => {
+    if (typeof process === 'undefined' || !process.getBuiltinModule) throw new Error('iFetch can only be used in Node.js-like environments.');
+
+    const dns = process.getBuiltinModule('node:dns');
+    const net = process.getBuiltinModule('node:net');
+    const tls = process.getBuiltinModule('node:tls');
+
     const { hostname, port, pathname, protocol, search } = new URL(url);
     const isHttps = protocol === 'https:';
     const destPort = port ? parseInt(port) : (isHttps ? 443 : 80);
@@ -82,7 +84,7 @@ const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) 
     if (!proxyInfo) return dns.lookup(destHost, (err, address) => {
         if (err) throw err;
         const connectFn = isHttps ? tls.connect : net.connect;
-        const socket = connectFn(destPort, address, isHttps ? { servername: destHost } : undefined, () => {
+        const socket = connectFn(destPort, address, isHttps ? { servername: destHost } : null, () => {
             sendHttpRequest(socket, { method, pathname: fullPathname, destHost, destPort, headers, body }, resolve);
         });
         socket.on('error', (e) => { throw e });

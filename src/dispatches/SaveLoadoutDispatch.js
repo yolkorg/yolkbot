@@ -43,7 +43,7 @@ export class SaveLoadoutDispatch {
             for (let i = 0; i < 7; i++) {
                 const testingId = this.changes.primaryId[i];
 
-                if (!isType(testingId, ItemTypes.Primary) || (!isDefault(testingId) && !bot.account.ownedItemIds.includes(testingId))) {
+                if (!isType(testingId, ItemType.Primary) || (!isDefault(testingId) && !bot.account.ownedItemIds.includes(testingId))) {
                     return false;
                 }
             }
@@ -54,7 +54,7 @@ export class SaveLoadoutDispatch {
             for (let i = 0; i < 7; i++) {
                 const testingId = this.changes.secondaryId[i];
 
-                if (!isType(testingId, ItemTypes.Secondary) || (!isDefault(testingId) && !bot.account.ownedItemIds.includes(testingId))) {
+                if (!isType(testingId, ItemType.Secondary) || (!isDefault(testingId) && !bot.account.ownedItemIds.includes(testingId))) {
                     return false;
                 }
             }

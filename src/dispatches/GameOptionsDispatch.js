@@ -2,7 +2,7 @@ const gravityScale = Array.from({ length: 4 }, (_, i) => (i + 1) * 0.25);
 const damageScale = Array.from({ length: 9 }, (_, i) => i * 0.25);
 const regenScale = Array.from({ length: 17 }, (_, i) => i * 0.25);
 
-const whichever = (arg1, arg2) => typeof arg1 !== 'undefined' ? arg1 : arg2;
+const whichever = (arg1, arg2) => typeof arg1 === 'undefined' ? arg2 : arg1;
 
 export class GameOptionsDispatch {
     constructor(changes) {
