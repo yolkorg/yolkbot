@@ -9,8 +9,10 @@ const manifest = await fetch('https://data.yolkbot.xyz/manifest.json').then(res 
 const buildAndWrite = async (dest, code, forceMinify) => {
     const transpiler = new Bun.Transpiler({
         minify: forceMinify || !process.argv.includes('-nm'),
+        minifyWhitespace: true,
         target: 'browser',
-        loader: 'ts'
+        loader: 'ts',
+        inline: true
     });
 
     const transpileResult = transpiler.transformSync(code);
