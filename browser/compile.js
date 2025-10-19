@@ -36,7 +36,7 @@ fs.mkdirSync(buildDir);
 const build = async (module) => {
     await Bun.build({
         entryPoints: [path.join(import.meta.dirname, 'entry', `${module}.js`)],
-        outdir: path.join(buildDir),
+        outdir: buildDir,
 
         minify: !process.argv.includes('-nm'),
         bundle: true,

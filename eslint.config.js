@@ -122,7 +122,6 @@ export default [
             'no-new-wrappers': 'error',
             'no-new-native-nonconstructor': 'error',
             'no-nonoctal-decimal-escape': 'error',
-            'no-object-constructor': 'error',
             'no-obj-calls': 'error',
             'no-octal': 'error',
             'no-octal-escape': 'error',
