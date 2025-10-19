@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "1.3.12",
+    "version": "0.0.0-157",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -103,8 +103,16 @@
             "types": "./dist/types/socket.d.ts"
         },
         "./wasm": {
-            "import": "./dist/wasm/wrapper.js",
-            "types": "./dist/types/wasm/wrapper.d.ts"
+            "import": "./dist/wasm/class.js",
+            "types": "./dist/types/wasm/class.d.ts"
+        },
+        "./wasm/*": {
+            "import": "./dist/wasm/*.js",
+            "types": "./dist/types/wasm/*.d.ts"
+        },
+        "./wasm/*.js": {
+            "import": "./dist/wasm/*.js",
+            "types": "./dist/types/wasm/*.d.ts"
         }
     },
     "typesVersions": {
@@ -121,7 +129,8 @@
             "dispatch/*": ["dist/types/dispatches/*.d.ts"],
             "dispatches": ["dist/types/dispatches.d.ts"],
             "dispatches/*": ["dist/types/dispatches/*.d.ts"],
-            "wasm": ["dist/types/wasm/wrapper.d.ts"]
+            "wasm": ["dist/types/wasm/class.d.ts"],
+            "wasm/*": ["dist/types/wasm/*.d.ts"]
         }
     },
     "dependencies": {
