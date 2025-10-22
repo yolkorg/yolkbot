@@ -44,7 +44,7 @@ export default [
         }
     },
     {
-        ignores: ['browser/build', 'dist', 'node_modules']
+        ignores: ['browser/build', 'dist', 'node_modules', 'tests']
     },
     {
         rules: {

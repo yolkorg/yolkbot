@@ -122,8 +122,8 @@ export class WASM {
                 __wbg_static_accessor_SELF_995b214ae681ff99: () => this.addToExternrefTable({}),
                 __wbg_static_accessor_WINDOW_cde3890479c675ea: () => { },
                 __wbg_wbindgenbooleanget_3fe6f642c7d97746: (arg0) => {
-                    const ret = typeof (arg0) === 'boolean' ? arg0 : undefined;
-                    return !(!!ret) ? 0xFFFFFF : ret ? 1 : 0;
+                    if (typeof arg0 === 'boolean') return arg0 ? 1 : 0;
+                    return null;
                 },
                 __wbg_wbindgendebugstring_99ef257a3ddda34d: (arg0, arg1) => {
                     const str = this.getStringFromWasm(arg0, arg1);
@@ -149,8 +149,8 @@ export class WASM {
                 __wbindgen_init_externref_table: () => {
                     const table = this.wasm.__wbindgen_export_2;
                     const offset = table.grow(4);
-                    table.set(0, undefined);
-                    table.set(offset + 0, undefined);
+                    table.set(0, null);
+                    table.set(offset + 0, null);
                     table.set(offset + 1, null);
                     table.set(offset + 2, true);
                     table.set(offset + 3, false);
