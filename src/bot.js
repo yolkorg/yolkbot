@@ -33,7 +33,7 @@ import globals from './env/globals.js';
 
 import { NodeList } from './pathing/mapnode.js';
 
-import { getCoords } from './wasm/direct.js';
+import { coords } from './wasm/direct.js';
 import { fetchMap, initKotcZones } from './util.js';
 
 import { Challenges } from './constants/challenges.js';
@@ -693,7 +693,7 @@ export class Bot {
 
                     out.packInt8(keys);
                     out.packInt8(shots);
-                    out.packString(getCoords(yaw, pitch));
+                    out.packString(coords(yaw, pitch));
                     out.packInt8(100);
                 }
 

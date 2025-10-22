@@ -30,7 +30,7 @@ const mockLoadi8U = (addr) => {
     return base64Table.charCodeAt(addr - 1050359);
 }
 
-export const getCoords = (yaw11, pitch10) => {
+export const coords = (yaw11, pitch10) => {
     let local_9 = Math.round(yaw11 / (Math.PI * 2) * 65535);
     let local_4 = 0;
     const local_12 = Math.round((pitch10 + 1.5) / 3.0 * 32767);
@@ -98,7 +98,7 @@ export const getCoords = (yaw11, pitch10) => {
 
 const maxCharCodeChunkSize = 65536;
 
-export const process = (input) => {
+export const processJS = (input) => {
     const inputArray = new Uint8Array([...input].map(c => c.charCodeAt(0)));
     const xorKeyStart = 88;
     const decoded = new Uint8Array(inputArray.length);
