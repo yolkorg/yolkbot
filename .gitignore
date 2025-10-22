@@ -1,17 +1,12 @@
 # modules
 node_modules
-
-# lockfiles
-*.lock
-package-lock.json
+bun.lock
 
 # output
 dist
-tar
 
 # local dev
 tests
-.env
 
 # mac cache
 .DS_Store

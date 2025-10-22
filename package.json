@@ -21,7 +21,6 @@
     "type": "module",
     "files": [
         "browser/build/*.js",
-        "data/*.*",
         "dist/**/*",
         "package.json",
         "README.md"
