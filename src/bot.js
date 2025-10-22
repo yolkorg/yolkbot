@@ -1127,7 +1127,7 @@ export class Bot {
         const id = CommIn.unPackInt8U();
         const removedPlayer = { ...this.players[id] }; // creates a snapshot of the player since they'll be deleted
 
-        delete this.players[id.toString()];
+        delete this.players[id];
 
         this.emit('playerLeave', removedPlayer);
     }
@@ -1181,9 +1181,7 @@ export class Bot {
             this.game.teamScore[2] = CommIn.unPackInt16U();
         }
 
-        if (this.game.gameModeId !== GameMode.Spatula) {
-            delete this.game.spatula;
-        }
+        if (this.game.gameModeId !== GameMode.Spatula) delete this.game.spatula;
 
         if (this.game.gameModeId !== GameMode.KOTC) {
             delete this.game.stage;
@@ -1810,8 +1808,7 @@ export class Bot {
             lastCommand = Object.keys(CommCode).find(k => CommCode[k] === cmd);
             lastCode = cmd;
 
-            if (this.intents.includes(this.Intents.LOG_PACKETS))
-                console.log(`[LOG_PACKETS] Packet ${lastCommand}: ${lastCode}`);
+            if (this.intents.includes(this.Intents.LOG_PACKETS)) console.log(`[LOG_PACKETS] Packet ${lastCommand}: ${lastCode}`);
         }
     }
 
