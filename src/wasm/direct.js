@@ -95,3 +95,21 @@ export const getCoords = (yaw11, pitch10) => {
 
     return String.fromCharCode(...letters);
 }
+
+const maxCharCodeChunkSize = 65536;
+
+export const process = (input) => {
+    const inputArray = new Uint8Array([...input].map(c => c.charCodeAt(0)));
+    const xorKeyStart = 88;
+    const decoded = new Uint8Array(inputArray.length);
+
+    for (let i = 0; i < inputArray.length; i++) decoded[i] = inputArray[i] ^ ((xorKeyStart + i) & 0x7F);
+
+    let result = '';
+    for (let i = 0; i < decoded.length; i += maxCharCodeChunkSize) {
+        const chunk = decoded.subarray(i, Math.min(i + maxCharCodeChunkSize, decoded.length));
+        result += String.fromCharCode(...chunk);
+    }
+
+    return result;
+}
