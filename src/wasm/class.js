@@ -13,6 +13,8 @@ import { calculateMovements } from './util.js';
 export class WASM {
     wasm;
 
+    debug = false;
+
     canvasListeners = {};
     mockElement = { textContent: '' };
 
@@ -139,7 +141,7 @@ export class WASM {
                     dv.setFloat64(arg0 + 8 * 1, ret, true);
                     dv.setInt32(arg0 + 4 * 0, 1, true);
                 },
-                __wbg_wbindgenthrow_451ec1a8469d7eb6: () => { },
+                __wbg_wbindgenthrow_451ec1a8469d7eb6: (a, b) => this.debug && console.log('call 31', a, b),
                 __wbindgen_cast_01559742fdcca8af: (arg0, arg1) => makeMutClosure(arg0, arg1, 8, __wbg_adapter_6),
                 __wbindgen_cast_2241b6af4c4b2941: (arg0, arg1) => this.getStringFromWasm(arg0, arg1),
                 __wbindgen_cast_2495c10526b24646: (arg0, arg1) => makeMutClosure(arg0, arg1, 8, __wbg_adapter_6),
@@ -191,6 +193,8 @@ export class WASM {
     resetYawPitch = () => this.wasm.reset_yaw_pitch();
 
     coords(yaw, pitch) {
+        this.wasm.reset_yaw_pitch();
+
         const currentYP = this.wasm.get_yaw_pitch();
         const { movementX, movementY } = calculateMovements(currentYP.yaw, currentYP.pitch, yaw, pitch);
 
