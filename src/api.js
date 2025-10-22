@@ -26,7 +26,7 @@ export class API {
         ws.connectionTimeout = this.connectionTimeout;
 
         const didConnect = await ws.tryConnect(-2);
-        if (!didConnect || ws.socket.readyState !== ws.socket.OPEN) return 'websocket_connect_fail';
+        if (!didConnect || ws.socket.readyState !== 1) return 'websocket_connect_fail';
 
         return new Promise((resolve) => {
             let resolved = false;
