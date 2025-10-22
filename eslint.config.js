@@ -19,6 +19,10 @@ export default [
         languageOptions: { globals: { Buffer: 'readonly', process: 'readonly' } }
     },
     {
+        files: ['src/wasm/direct.js'],
+        languageOptions: { globals: { Buffer: 'readonly', crypto: 'readonly', process: 'readonly' } }
+    },
+    {
         files: ['src/wasm/bytes.js'],
         languageOptions: { globals: { Buffer: 'readonly', atob: 'readonly' } }
     },
@@ -86,7 +90,6 @@ export default [
             'no-else-return': 'error',
             'no-empty': ['error', { 'allowEmptyCatch': true }],
             'no-empty-character-class': 'error',
-            'no-empty-function': 'error',
             'no-empty-pattern': 'error',
             'no-empty-static-block': 'error',
             'no-eq-null': 'error',

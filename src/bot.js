@@ -1694,7 +1694,8 @@ export class Bot {
             else {
                 console.error(`processPacket: I got but couldn't identify a: ${Object.keys(CommCode).find(k => CommCode[k] === cmd)} ${cmd}`);
                 if (lastCommand) console.error(`processPacket: It may be a result of the ${lastCommand} command (${lastCode}).`);
-                abort = true
+                // eslint-disable-next-line no-useless-assignment
+                abort = true;
                 break;
             }
 
