@@ -11,7 +11,7 @@ interface MatchmakerParams {
     sessionId?: string;
     noExitOnError?: boolean;
     connectionTimeout?: number;
-};
+}
 
 export interface MatchmakerCommand {
     command: string;

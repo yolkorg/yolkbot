@@ -1,5 +1,5 @@
 import API from './api.js';
-import wasm from './wasm/class.js';
+import { validate } from './wasm/direct.js';
 
 import globals from './env/globals.js';
 import yolkws from './socket.js';
@@ -53,7 +53,7 @@ export class Matchmaker {
             const data = JSON.parse(e.data);
 
             if (data.command === 'validateUUID')
-                return this.ws.send(JSON.stringify({ command: 'validateUUID', hash: wasm.validate(data.uuid) }));
+                return this.ws.send(JSON.stringify({ command: 'validateUUID', hash: validate(data.uuid) }));
 
             this.#emit('msg', data);
         }

@@ -5,8 +5,6 @@
 // https://github.com/zastlx/shell-wasm-node
 // thanks zastix! yolkbot wouldn't be possible without your help <3
 
-import globals from '../env/globals.js';
-
 import { wasmBytes } from './bytes.js';
 import { calculateMovements } from './util.js';
 
@@ -205,9 +203,4 @@ export class WASM {
     }
 }
 
-const wasm = new WASM();
-
-if (globals.isBrowser) wasm.initWasm();
-else await wasm.initWasm();
-
-export default wasm;
+export default WASM;
