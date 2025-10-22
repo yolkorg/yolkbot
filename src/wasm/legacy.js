@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
- 
 /* eslint-disable no-underscore-dangle */
 
 // https://github.com/zastlx/shell-wasm-node
