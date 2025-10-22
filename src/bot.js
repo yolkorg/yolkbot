@@ -1635,11 +1635,52 @@ export class Bot {
         this.emit('playerInfo', player, playerIp, playerDBId);
     }
 
+    packetHandlers = {
+        [CommCode.syncThem]: () => this.#processSyncThemPacket(),
+        [CommCode.fire]: () => this.#processFirePacket(),
+        [CommCode.hitThem]: () => this.#processHitThemPacket(),
+        [CommCode.syncMe]: () => this.#processSyncMePacket(),
+        [CommCode.hitMe]: () => this.#processHitMePacket(),
+        [CommCode.swapWeapon]: () => this.#processSwapWeaponPacket(),
+        [CommCode.collectItem]: () => this.#processCollectPacket(),
+        [CommCode.respawn]: () => this.#processRespawnPacket(),
+        [CommCode.die]: () => this.#processDeathPacket(),
+        [CommCode.pause]: () => this.#processPausePacket(),
+        [CommCode.chat]: () => this.#processChatPacket(),
+        [CommCode.addPlayer]: () => this.#processAddPlayerPacket(),
+        [CommCode.removePlayer]: () => this.#processRemovePlayerPacket(),
+        [CommCode.eventModifier]: () => this.#processEventModifierPacket(),
+        [CommCode.metaGameState]: () => this.#processGameStatePacket(),
+        [CommCode.beginShellStreak]: () => this.#processBeginStreakPacket(),
+        [CommCode.endShellStreak]: () => this.#processEndStreakPacket(),
+        [CommCode.hitMeHardBoiled]: () => this.#processHitShieldPacket(),
+        [CommCode.gameOptions]: () => this.#processGameOptionsPacket(),
+        [CommCode.ping]: () => this.#processPingPacket(),
+        [CommCode.switchTeam]: () => this.#processSwitchTeamPacket(),
+        [CommCode.changeCharacter]: () => this.#processChangeCharacterPacket(),
+        [CommCode.reload]: () => this.#processReloadPacket(),
+        [CommCode.explode]: () => this.#processExplodePacket(),
+        [CommCode.throwGrenade]: () => this.#processThrowGrenadePacket(),
+        [CommCode.spawnItem]: () => this.#processSpawnItemPacket(),
+        [CommCode.melee]: () => this.#processMeleePacket(),
+        [CommCode.updateBalance]: () => this.#processUpdateBalancePacket(),
+        [CommCode.challengeCompleted]: () => this.#processChallengeCompletePacket(),
+        [CommCode.socketReady]: () => this.#processSocketReadyPacket(),
+        [CommCode.gameJoined]: () => this.#processGameJoinedPacket(),
+        [CommCode.gameAction]: () => this.#processGameActionPacket(),
+        [CommCode.requestGameOptions]: () => this.#processGameRequestOptionsPacket(),
+        [CommCode.respawnDenied]: () => this.#processRespawnDeniedPacket(),
+        [CommCode.playerInfo]: () => this.#processPlayerInfoPacket(),
+
+        [CommCode.expireUpgrade]: () => { },
+        [CommCode.clientReady]: () => { },
+        [CommCode.musicInfo]: () => CommIn.unPackLongString()
+    }
+
     processPacket(packet) {
         CommIn.init(packet);
 
-        if (this.intents.includes(this.Intents.PACKET_HOOK))
-            this.emit('packet', packet);
+        if (this.intents.includes(this.Intents.PACKET_HOOK)) this.emit('packet', packet);
 
         let lastCommand = 0;
         let lastCode = 0;
@@ -1647,162 +1688,14 @@ export class Bot {
 
         while (CommIn.isMoreDataAvailable() && !abort) {
             const cmd = CommIn.unPackInt8U();
+            const handler = this.packetHandlers[cmd];
 
-            switch (cmd) {
-                case CommCode.syncThem:
-                    this.#processSyncThemPacket();
-                    break;
-
-                case CommCode.fire:
-                    this.#processFirePacket();
-                    break;
-
-                case CommCode.hitThem:
-                    this.#processHitThemPacket();
-                    break;
-
-                case CommCode.syncMe:
-                    this.#processSyncMePacket();
-                    break;
-
-                case CommCode.hitMe:
-                    this.#processHitMePacket();
-                    break;
-
-                case CommCode.swapWeapon:
-                    this.#processSwapWeaponPacket();
-                    break;
-
-                case CommCode.collectItem:
-                    this.#processCollectPacket();
-                    break;
-
-                case CommCode.respawn:
-                    this.#processRespawnPacket();
-                    break;
-
-                case CommCode.die:
-                    this.#processDeathPacket();
-                    break;
-
-                case CommCode.pause:
-                    this.#processPausePacket();
-                    break;
-
-                case CommCode.chat:
-                    this.#processChatPacket();
-                    break;
-
-                case CommCode.addPlayer:
-                    this.#processAddPlayerPacket();
-                    break;
-
-                case CommCode.removePlayer:
-                    this.#processRemovePlayerPacket();
-                    break;
-
-                case CommCode.eventModifier:
-                    this.#processEventModifierPacket();
-                    break;
-
-                case CommCode.metaGameState:
-                    this.#processGameStatePacket();
-                    break;
-
-                case CommCode.beginShellStreak:
-                    this.#processBeginStreakPacket();
-                    break;
-
-                case CommCode.endShellStreak:
-                    this.#processEndStreakPacket();
-                    break;
-
-                case CommCode.hitMeHardBoiled:
-                    this.#processHitShieldPacket();
-                    break;
-
-                case CommCode.gameOptions:
-                    this.#processGameOptionsPacket();
-                    break;
-
-                case CommCode.ping:
-                    this.#processPingPacket();
-                    break;
-
-                case CommCode.switchTeam:
-                    this.#processSwitchTeamPacket();
-                    break;
-
-                case CommCode.changeCharacter:
-                    this.#processChangeCharacterPacket();
-                    break;
-
-                case CommCode.reload:
-                    this.#processReloadPacket();
-                    break;
-
-                case CommCode.explode:
-                    this.#processExplodePacket();
-                    break;
-
-                case CommCode.throwGrenade:
-                    this.#processThrowGrenadePacket();
-                    break;
-
-                case CommCode.spawnItem:
-                    this.#processSpawnItemPacket();
-                    break;
-
-                case CommCode.melee:
-                    this.#processMeleePacket();
-                    break;
-
-                case CommCode.updateBalance:
-                    this.#processUpdateBalancePacket();
-                    break;
-
-                case CommCode.challengeCompleted:
-                    this.#processChallengeCompletePacket();
-                    break;
-
-                case CommCode.socketReady:
-                    this.#processSocketReadyPacket();
-                    break;
-
-                case CommCode.gameJoined:
-                    this.#processGameJoinedPacket();
-                    break;
-
-                case CommCode.gameAction:
-                    this.#processGameActionPacket();
-                    break;
-
-                case CommCode.requestGameOptions:
-                    this.#processGameRequestOptionsPacket();
-                    break;
-
-                case CommCode.respawnDenied:
-                    this.#processRespawnDeniedPacket();
-                    break;
-
-                case CommCode.playerInfo:
-                    this.#processPlayerInfoPacket();
-                    break;
-
-                // useless to us
-                case CommCode.expireUpgrade:
-                case CommCode.clientReady:
-                    break;
-
-                case CommCode.musicInfo:
-                    CommIn.unPackLongString(); // rip background music
-                    break;
-
-                default:
-                    console.error(`processPacket: I got but couldn't identify a: ${Object.keys(CommCode).find(k => CommCode[k] === cmd)} ${cmd}`);
-                    if (lastCommand) console.error(`processPacket: It may be a result of the ${lastCommand} command (${lastCode}).`);
-                    abort = true
-                    break;
+            if (handler) handler();
+            else {
+                console.error(`processPacket: I got but couldn't identify a: ${Object.keys(CommCode).find(k => CommCode[k] === cmd)} ${cmd}`);
+                if (lastCommand) console.error(`processPacket: It may be a result of the ${lastCommand} command (${lastCode}).`);
+                abort = true
+                break;
             }
 
             lastCommand = Object.keys(CommCode).find(k => CommCode[k] === cmd);
