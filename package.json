@@ -103,8 +103,8 @@
             "types": "./dist/types/socket.d.ts"
         },
         "./wasm": {
-            "import": "./dist/wasm/class.js",
-            "types": "./dist/types/wasm/class.d.ts"
+            "import": "./dist/wasm/direct.js",
+            "types": "./dist/types/wasm/direct.d.ts"
         },
         "./wasm/*": {
             "import": "./dist/wasm/*.js",
@@ -129,7 +129,7 @@
             "dispatch/*": ["dist/types/dispatches/*.d.ts"],
             "dispatches": ["dist/types/dispatches.d.ts"],
             "dispatches/*": ["dist/types/dispatches/*.d.ts"],
-            "wasm": ["dist/types/wasm/class.d.ts"],
+            "wasm": ["dist/types/wasm/direct.d.ts"],
             "wasm/*": ["dist/types/wasm/*.d.ts"]
         }
     },

@@ -45,7 +45,7 @@ export class WASM {
     processDate: number | null;
     processListeners: Array<() => void>;
 
-    async initWasm(): Promise<void>;
+    initWasm(): Promise<void>;
 
     getStringFromWasm(ptr: number, len: number): string;
     passStringToWasm(str: string): { ptr: number; len: number; };
@@ -53,11 +53,11 @@ export class WASM {
 
     getImports(): WebAssembly.Imports;
 
-    process(string, customDate?: number): void;
-    validate(string): string;
+    process(string: string, customDate?: number): void;
+    validate(string: string): string;
     getYawPitch(): GetYawPitch;
     resetYawPitch(): void;
     coords(yaw: number, pitch: number): string;
 }
 
-export default new WASM();
+export default WASM;
