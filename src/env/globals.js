@@ -6,7 +6,7 @@ const isBrowser = typeof window !== 'undefined' && typeof HTMLElement !== 'undef
 const isWorker = typeof WebSocketPair !== 'undefined' && typeof Cloudflare !== 'undefined';
 
 const isNode = typeof process !== 'undefined' && process.moduleLoadList?.length > 0;
-const isDeno = typeof process !== 'undefined' && !!process.versions?.deno;
+const isDeno = typeof Deno !== 'undefined';
 const isBun = typeof process !== 'undefined' && !!process.versions?.bun;
 
 if (!isBrowser && !isWorker && !isNode && !isDeno && !isBun)
