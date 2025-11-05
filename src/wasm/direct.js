@@ -3,7 +3,7 @@
 // all of this code was written by me (villainsrule) from scratch
 // any resemblance to other code is purely coincidental :3
 
-const magicString = '3496afa51f2a553ea1fc5211400c000b';
+const magicString = '3496afb51f42553e31635211400c000b';
 
 const hexToUint8Array = (hex) => new Uint8Array(hex.match(/.{2}/g).map(b => parseInt(b, 16)));
 const encoder = new TextEncoder();
