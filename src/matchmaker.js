@@ -49,11 +49,11 @@ export class Matchmaker {
         const didConnect = await this.ws.tryConnect();
         if (!didConnect) return this.#processError('WebSocket did not connect...');
 
-        this.ws.onmessage = (e) => {
+        this.ws.onmessage = async (e) => {
             const data = JSON.parse(e.data);
 
             if (data.command === 'validateUUID')
-                return this.ws.send(JSON.stringify({ command: 'validateUUID', hash: validate(data.uuid) }));
+                return this.ws.send(JSON.stringify({ command: 'validateUUID', hash: await validate(data.uuid) }));
 
             this.#emit('msg', data);
         }
