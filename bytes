@@ -2,15 +2,17 @@
 
 file="$1"
 
-js_url="https://egg.dance/js/wasm_loader.js"
-wasm_loader_js=$(curl -s "$js_url")
-wasm_url_fragment=$(echo "$wasm_loader_js" | grep -o "URL('wasm_loader_[^']*\.wasm'" | sed "s/URL('\(.*\)'/\1/")
-wasm_url="https://egg.dance/js/$wasm_url_fragment"
-curl -s "$wasm_url" -o ./src/wasm/wasm_loader.wasm
-
 if [ $# -eq 0 ]; then
     file="./src/wasm/wasm_loader.wasm"
     echo "No file specified, using default: $file"
+    echo "This also means we will re-download the wasm file"
+
+    wasm_loader_js=$(curl -s "https://egg.dance/js/wasm_loader.js")
+    wasm_url_fragment=$(echo "$wasm_loader_js" | grep -o "URL('wasm_loader_[^']*\.wasm'" | sed "s/URL('\(.*\)'/\1/")
+    wasm_url="https://egg.dance/js/$wasm_url_fragment"
+    curl -s "$wasm_url" -o ./src/wasm/wasm_loader.wasm
+
+    echo "Downloaded wasm file!"
 fi
 
 if [ ! -f "$file" ]; then

@@ -4,7 +4,7 @@ import path from 'node:path';
 const srcDir = path.join(import.meta.dirname, '..', 'src');
 const distDir = path.join(import.meta.dirname, '..', 'dist');
 
-const manifest = await fetch('https://data.yolkbot.xyz/manifest.json').then(res => res.json());
+const manifest = await fetch('https://x.yolkbot.xyz/data/manifest.json').then(res => res.json());
 
 const buildAndWrite = async (dest, code, forceMinify) => {
     const transpiler = new Bun.Transpiler({
@@ -30,7 +30,7 @@ const handleConstants = async (src, dest, code) => {
         const manifestEntry = manifest[fileName];
         const serverPath = manifestEntry.path;
 
-        const serverResult = await fetch(`https://data.yolkbot.xyz${serverPath}`).then(res => res.text());
+        const serverResult = await fetch(`https://x.yolkbot.xyz/data${serverPath}`).then(res => res.text());
         const rewrittenCode = code.replace(/{}|\[\]/, serverResult);
         buildAndWrite(dest, rewrittenCode, true);
     } else buildAndWrite(dest, code);

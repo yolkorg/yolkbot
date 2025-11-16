@@ -142,6 +142,7 @@
         "eslint": "^9.31.0"
     },
     "scripts": {
-        "lint": "bunx --bun eslint . --fix"
+        "lint": "bunx --bun eslint . --fix",
+        "b": "bun cli/build"
     }
 }
