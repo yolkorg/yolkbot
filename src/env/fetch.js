@@ -55,7 +55,7 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
 };
 
 const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) => new Promise((resolve) => {
-    if (typeof process === 'undefined' || !process.getBuiltinModule) throw new Error('iFetch can only be used in Node.js-like environments.');
+    if (typeof process === 'undefined' || !process.getBuiltinModule) return fetch(url, { method, headers, body }).then(resolve);
 
     const dns = process.getBuiltinModule('node:dns');
     const net = process.getBuiltinModule('node:net');
