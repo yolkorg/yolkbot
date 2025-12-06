@@ -27,7 +27,10 @@
     ],
     "exports": {
         "./package.json": "./package.json",
-        ".": "./dist/index.js",
+        ".": {
+            "import": "./dist/bot.js",
+            "types": "./dist/types/bot.d.ts"
+        },
         "./api": {
             "import": "./dist/api.js",
             "types": "./dist/types/api.d.ts"
