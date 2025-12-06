@@ -1,17 +1,17 @@
 {
     "name": "yolkbot",
-    "description": "create a shell shockers bot in under 10 lines.",
+    "description": "yolkbot builds your dream shell shockers bot.",
     "version": "0.0.0-167",
     "keywords": [
         "shell shockers",
-        "shellshock.io",
+        "league bot",
         "blue wizard",
         "yolkbot"
     ],
     "homepage": "https://yolkbot.xyz",
     "bugs": {
         "url": "https://github.com/yolkorg/yolkbot/issues",
-        "email": "bugs@villainsrule.xyz"
+        "email": "hello@villainsrule.xyz"
     },
     "author": "1ust",
     "repository": {
@@ -119,8 +119,9 @@
     },
     "typesVersions": {
         "*": {
+            ".": ["dist/types/bot.d.ts"],
             "api": ["dist/types/api.d.ts"],
-            "comm": ["dist/types/comm/index.d.ts"],
+            "comm/*": ["dist/types/comm/*.d.ts"],
             "util": ["dist/types/util.d.ts"],
             "bot": ["dist/types/bot/*.d.ts"],
             "bot/*": ["dist/types/bot/*.d.ts"],
@@ -135,15 +136,11 @@
         }
     },
     "dependencies": {
-        "wwws": "^1.1.1"
+        "wwws": "^1.1.2"
     },
     "devDependencies": {
         "@stylistic/eslint-plugin": "^4.4.1",
         "@types/bun": "^1.3.3",
         "eslint": "^9.39.1"
-    },
-    "scripts": {
-        "lint": "bunx --bun eslint . --fix",
-        "b": "bun cli/build"
     }
 }

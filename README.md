@@ -4,7 +4,7 @@
     <source media="(prefers-color-scheme: light)" srcset="https://yolkbot.xyz/banners/light.png">
     <img src="https://yolkbot.xyz/banners/light.png" width="60%">
   </picture>
-  <h3>a simple, fast, multipurpose, & always working shell shockers bot library!</h3>
+  <h3>a fast, reliable, multipurpose, & always working shell shockers automation library!</h3>
   <p>
     <a href='https://github.com/yolkorg/yolkbot'>github</a> | 
     <a href='https://yolkbot.xyz/docs'>documentation</a> |
