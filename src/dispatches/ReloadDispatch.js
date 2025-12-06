@@ -27,7 +27,7 @@ export class ReloadDispatch {
             playerActiveWeapon.ammo.store -= newRounds;
         }
 
-        bot.emit('playerReload', bot.me, playerActiveWeapon);
+        bot.$emit('playerReload', bot.me, playerActiveWeapon);
 
         const activeWeapon = bot.me.weapons[bot.me.activeGun];
         const isLongTime = activeWeapon.ammo.rounds < 1;

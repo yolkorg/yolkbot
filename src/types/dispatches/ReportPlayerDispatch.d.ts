@@ -7,12 +7,14 @@ export interface CheatingReasons {
     other?: boolean;
 }
 
+export type Params = [idOrName: string, reasons?: CheatingReasons];
+
 export class ReportPlayerDispatch {
     irOrName: string;
     reasons: boolean[];
     reasonInt: number;
 
-    constructor(idOrName: string, reasons?: CheatingReasons);
+    constructor(...args: Params);
 
     check(bot: Bot): boolean;
     execute(bot: Bot): void;

@@ -22,30 +22,30 @@ import SwapWeaponDispatch from './SwapWeaponDispatch.js';
 import SwitchTeamDispatch from './SwitchTeamDispatch.js';
 import ThrowGrenadeDispatch from './ThrowGrenadeDispatch.js';
 
-export {
-    BanPlayerDispatch,
-    BootPlayerDispatch,
-    ChatDispatch,
-    FireDispatch,
-    GameOptionsDispatch,
-    GoToAmmoDispatch,
-    GoToCoopDispatch,
-    GoToGrenadeDispatch,
-    GoToPlayerDispatch,
-    GoToSpatulaDispatch,
-    LookAtDispatch,
-    LookAtPosDispatch,
-    MeleeDispatch,
-    MovementDispatch,
-    PauseDispatch,
-    ReloadDispatch,
-    ReportPlayerDispatch,
-    ResetGameDispatch,
-    SaveLoadoutDispatch,
-    SpawnDispatch,
-    SwapWeaponDispatch,
-    SwitchTeamDispatch,
-    ThrowGrenadeDispatch
+export const DispatchIndex = {
+    'banPlayer': BanPlayerDispatch,
+    'bootPlayer': BootPlayerDispatch,
+    'chat': ChatDispatch,
+    'fire': FireDispatch,
+    'gameOptions': GameOptionsDispatch,
+    'goToAmmo': GoToAmmoDispatch,
+    'goToCoop': GoToCoopDispatch,
+    'goToGrenade': GoToGrenadeDispatch,
+    'goToPlayer': GoToPlayerDispatch,
+    'goToSpatula': GoToSpatulaDispatch,
+    'lookAt': LookAtDispatch,
+    'lookAtPos': LookAtPosDispatch,
+    'melee': MeleeDispatch,
+    'movement': MovementDispatch,
+    'pause': PauseDispatch,
+    'reload': ReloadDispatch,
+    'reportPlayer': ReportPlayerDispatch,
+    'resetGame': ResetGameDispatch,
+    'saveLoadout': SaveLoadoutDispatch,
+    'spawn': SpawnDispatch,
+    'swapWeapon': SwapWeaponDispatch,
+    'switchTeam': SwitchTeamDispatch,
+    'throwGrenade': ThrowGrenadeDispatch
 }
 
 export default {

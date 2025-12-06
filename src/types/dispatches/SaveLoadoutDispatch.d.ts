@@ -11,7 +11,7 @@ export interface Changes {
     secondaryId?: number[];
 }
 
-export interface Opts {
+export interface LoadoutOptions {
     gunId?: number;
     hatId?: number;
     stampId?: number;
@@ -22,10 +22,12 @@ export interface Opts {
     secondaryIds?: number[];
 }
 
+export type Params = [loadoutOptions: LoadoutOptions];
+
 export class SaveLoadoutDispatch {
     changes: Changes;
 
-    constructor(opts: Opts);
+    constructor(...args: Params);
 
     validate(bot: Bot): boolean;
     check(bot: Bot): boolean;
