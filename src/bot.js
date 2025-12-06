@@ -76,7 +76,7 @@ export class Bot {
     #hooks = {};
     #globalHooks = [];
 
-    #matchmakerListeners = [];
+    matchmakerListeners = [];
 
     #initialAccount;
     #initialGame;
@@ -439,7 +439,7 @@ export class Bot {
             if (data.command === 'validateUUID')
                 return this.matchmaker.send(JSON.stringify({ command: 'validateUUID', hash: await validate(data.uuid) }));
 
-            this.#matchmakerListeners.forEach((listener) => listener(data));
+            this.matchmakerListeners.forEach((listener) => listener(data));
         }
 
         return false;
@@ -454,14 +454,14 @@ export class Bot {
         return new Promise((res) => {
             const listener = (data) => {
                 if (data.command === 'regionList') {
-                    this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
+                    this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
                     this.regionList = data.regionList;
 
                     res(this.regionList);
                 }
             };
 
-            this.#matchmakerListeners.push(listener);
+            this.matchmakerListeners.push(listener);
             this.matchmaker.send(JSON.stringify({ command: 'regionList' }));
         });
     }
@@ -496,7 +496,7 @@ export class Bot {
             const listener = (msg) => {
                 if (msg.command === 'notice') return;
 
-                this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
+                this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
 
                 if (msg.command === 'gameFound') return resolve(msg);
                 if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
@@ -504,7 +504,7 @@ export class Bot {
                 this.processError('unknown matchmaker response', JSON.stringify(msg));
             };
 
-            this.#matchmakerListeners.push(listener);
+            this.matchmakerListeners.push(listener);
 
             this.matchmaker.send(JSON.stringify({
                 command: 'findGame',
@@ -539,7 +539,7 @@ export class Bot {
             const listener = (msg) => {
                 if (msg.command === 'notice') return;
 
-                this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
+                this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
 
                 if (msg.command === 'gameFound') return resolve(msg);
                 if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
@@ -547,7 +547,7 @@ export class Bot {
                 this.processError('unknown matchmaker response', JSON.stringify(msg));
             };
 
-            this.#matchmakerListeners.push(listener);
+            this.matchmakerListeners.push(listener);
 
             this.matchmaker.send(JSON.stringify({
                 command: 'findGame',
@@ -575,7 +575,7 @@ export class Bot {
             const joinResult = await new Promise((resolve) => {
                 const listener = (message) => {
                     if (message.command === 'gameFound') {
-                        this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
+                        this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
 
                         this.game.raw = message;
                         this.game.code = message.id;
@@ -590,7 +590,7 @@ export class Bot {
                     }
                 };
 
-                this.#matchmakerListeners.push(listener);
+                this.matchmakerListeners.push(listener);
 
                 this.matchmaker.send(JSON.stringify({
                     command: 'joinGame',
