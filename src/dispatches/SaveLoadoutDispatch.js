@@ -2,6 +2,7 @@ import CommOut from '../comm/CommOut.js';
 import CommCode from '../constants/CommCode.js';
 
 import { findItemById, GunList, ItemType } from '../constants/index.js';
+import { createGun } from '../util.js';
 
 const isDefault = (itemId) => findItemById(itemId) && findItemById(itemId).unlock === 'default';
 const isType = (itemId, type) => findItemById(itemId) && findItemById(itemId).item_type_id === type;
@@ -69,9 +70,8 @@ export class SaveLoadoutDispatch {
     }
 
     execute(bot) {
-        if (bot.me && this.changes.classIdx && this.changes.classIdx !== bot.me.selectedGun) {
-            bot.me.weapons[0] = new GunList[this.changes.classIdx]();
-        }
+        if (bot.me && this.changes.classIdx && this.changes.classIdx !== bot.me.selectedGun)
+            bot.me.weapons[0] = createGun(GunList[this.changes.classIdx]);
 
         bot.state.weaponIdx = this.changes.classIdx || bot.state.weaponIdx;
 
