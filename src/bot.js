@@ -930,7 +930,7 @@ export class Bot {
             if (controlKeys & Movement.Scope) player.scoping = true;
             else player.scoping = false;
 
-            const oldView = { ...player.view };
+            const oldView = structuredClone(player.view);
 
             player.view.yaw = CommIn.unPackRadU();
             player.view.pitch = CommIn.unPackRad();
@@ -946,7 +946,7 @@ export class Bot {
         const climbingChanged = player.climbing !== climbing;
         const didChange = posChanged || climbingChanged;
 
-        const oldPosition = didChange ? { ...px } : null;
+        const oldPosition = didChange ? structuredClone(px) : null;
 
         if (px.x !== x) px.x = x;
         if (px.z !== z) px.z = z;
@@ -1017,7 +1017,7 @@ export class Bot {
         const killed = this.players[killedId];
         const killer = this.players[killerId];
 
-        const oldKilled = killed ? { ...killed } : null;
+        const oldKilled = killed ? structuredClone(killed) : null;
 
         if (killed) {
             if (killed.id === this.me.id) this.lastDeathTime = Date.now();
@@ -1171,7 +1171,7 @@ export class Bot {
 
     #processRemovePlayerPacket() {
         const id = CommIn.unPackInt8U();
-        const removedPlayer = { ...this.players[id] }; // creates a snapshot of the player since they'll be deleted
+        const removedPlayer = structuredClone(this.players[id]);
 
         delete this.players[id];
 
@@ -1180,7 +1180,7 @@ export class Bot {
 
     #processGameStatePacket() {
         if (this.game.gameModeId === GameMode.Spatula) {
-            const oldGame = { ...this.game };
+            const oldGame = structuredClone(this.game);
 
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
@@ -1198,7 +1198,7 @@ export class Bot {
 
             this.$emit('gameStateChange', oldGame, this.game);
         } else if (this.game.gameModeId === GameMode.KOTC) {
-            const oldGame = { ...this.game };
+            const oldGame = structuredClone(this.game);
 
             this.game.stage = CommIn.unPackInt8U(); // constants.CoopState
             this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
@@ -1334,7 +1334,7 @@ export class Bot {
     }
 
     #processGameOptionsPacket() {
-        const oldOptions = { ...this.game.options };
+        const oldOptions = structuredClone(this.game.options);
 
         let gravity = CommIn.unPackInt8U();
         let damage = CommIn.unPackInt8U();
@@ -1452,7 +1452,7 @@ export class Bot {
 
         const player = this.players[id];
         if (player) {
-            const oldCharacter = { ...player.character };
+            const oldCharacter = structuredClone(player.character);
             const oldWeaponIdx = player.selectedGun;
 
             player.character.eggColor = shellColor;
