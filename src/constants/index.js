@@ -1,5 +1,5 @@
 import globals from '../env/globals.js';
-import { AUG, CSG1, DozenGauge, Eggk47, M24, RPEGG, SMG } from './guns.js';
+import { AUG, CSG1, DozenGauge, EggK47, M24, RPEGG, SMG } from './guns.js';
 
 export { findItemById } from './findItemById.js';
 
@@ -87,7 +87,7 @@ export const GameOptionFlag = {
 
 export const GunEquipTime = 13;
 
-export const GunList = [Eggk47, DozenGauge, CSG1, RPEGG, SMG, M24, AUG];
+export const GunList = [EggK47, DozenGauge, CSG1, RPEGG, SMG, M24, AUG];
 
 export const ItemType = {
     Hat: 1,

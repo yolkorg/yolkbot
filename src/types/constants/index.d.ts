@@ -1,4 +1,4 @@
-import { AUG, CSG1, DozenGauge, Eggk47, M24, RPEGG, SMG } from './guns';
+import { Gun } from './guns';
 
 export { findItemById } from './findItemById';
 
@@ -86,7 +86,7 @@ export declare const GameOptionFlags: {
 
 export declare const GunEquipTime: number;
 
-export declare const GunList: Array<typeof Eggk47 | typeof DozenGauge | typeof CSG1 | typeof RPEGG | typeof SMG | typeof M24 | typeof AUG>;
+export declare const GunList: Array<Gun>;
 
 export declare const ItemType: {
     Hat: number;

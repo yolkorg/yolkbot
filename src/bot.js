@@ -34,7 +34,7 @@ import { DispatchIndex } from './dispatches/index.js';
 import { NodeList } from './pathing/mapnode.js';
 
 import { coords, validate } from './wasm/direct.js';
-import { fetchMap, initKotcZones } from './util.js';
+import { createGun, fetchMap, initKotcZones } from './util.js';
 
 import { Challenges } from './constants/challenges.js';
 import { Maps } from './constants/maps.js';
@@ -1467,7 +1467,7 @@ export class Bot {
             player.character.stampPos.y = stampPositionY;
 
             player.selectedGun = weaponIndex;
-            player.weapons[0] = new GunList[weaponIndex]();
+            player.weapons[0] = createGun(GunList[weaponIndex]);
 
             if (oldWeaponIdx !== player.selectedGun) this.$emit('playerChangeGun', player, oldWeaponIdx, player.selectedGun);
             if (oldCharacter !== player.character) this.$emit('playerChangeCharacter', player, oldCharacter, player.character);

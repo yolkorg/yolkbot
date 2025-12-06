@@ -1,5 +1,14 @@
 import globals from './env/globals.js';
 
+export const createGun = (baseGun) => {
+    const gun = structuredClone(baseGun);
+
+    gun.ammo.rounds = gun.ammo.capacity;
+    gun.ammo.store = gun.ammo.store;
+
+    return gun;
+}
+
 export const fetchMap = async (name, hash) => {
     if (!globals.isIsolated && typeof process !== 'undefined') {
         const { existsSync, mkdirSync, readFileSync, writeFileSync } = process.getBuiltinModule('node:fs');
