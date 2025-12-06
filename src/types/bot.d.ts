@@ -23,10 +23,10 @@ import { Challenge } from './constants/challenges';
 import { AnyGun } from './constants/guns';
 import { MapJSON } from './constants/maps';
 import { Item } from './constants/items';
+import { Region } from './constants/regions';
 import { ADispatch } from './dispatches/index';
 import { NodeList } from './pathing/mapnode';
 import { AnonError, API, LoginError, QueryServicesError } from './api';
-import { Matchmaker } from './matchmaker';
 import yolkws from './socket';
 
 export interface BotParams {
@@ -343,9 +343,11 @@ export interface FireBullet {
     dirZ: number;
 }
 
-type FindPublicErrors = 'no_region_passed' | 'invalid_region_passed' | 'no_mode_passed' | 'invalid_mode_passed' | 'matchmaker_init_fail' | 'internal_session_error';
-type CreatePrivateErrors = FindPublicErrors | 'invalid_map_passed';
-type BotLoginError = 'account_banned';
+type MatchmakerError = 'matchmaker_connect_failed';
+type FindPublicError = MatchmakerError | 'no_region_passed' | 'invalid_region_passed' | 'no_mode_passed' | 'invalid_mode_passed' | 'internal_session_error';
+type CreatePrivateError = FindPublicError | 'invalid_map_passed';
+type LoginError = 'account_banned';
+type InitSessionError =  LoginError | AnonError | MatchmakerError;
 
 export class Bot {
     static Intents: intents;
@@ -372,21 +374,24 @@ export class Bot {
     hasQuit: boolean;
 
     api: API;
-    matchmaker: Matchmaker | null;
+    matchmaker: yolkws | null;
 
     constructor(params?: BotParams);
 
-    loginAnonymously(): Promise<Account | BotLoginError | AnonError>;
-    loginWithRefreshToken(refreshToken: string): Promise<Account | BotLoginError | LoginError>;
-    login(email: string, pass: string): Promise<Account | BotLoginError | LoginError>;
-    createAccount(email: string, pass: string): Promise<Account | BotLoginError | LoginError>;
+    loginAnonymously(): Promise<Account | LoginError | AnonError>;
+    loginWithRefreshToken(refreshToken: string): Promise<Account | LoginError | LoginError>;
+    login(email: string, pass: string): Promise<Account | LoginError | LoginError>;
+    createAccount(email: string, pass: string): Promise<Account | LoginError | LoginError>;
 
-    initMatchmaker(): Promise<true | BotLoginError | AnonError | 'matchmaker_tryconnect_failed'>;
+    createMatchmaker(): Promise<false | MatchmakerError>;
+    getRegions(): Promise<Region[] | MatchmakerError>;
 
-    createPrivateGame(region: string, mode: number, map: string): Promise<RawGameData | FindPublicErrors>;
-    findPublicGame(region: string, mode: number): Promise<RawGameData | CreatePrivateErrors>;
+    initSession(): Promise<false | InitSessionError>;
 
-    join(botName: string, data: string | RawGameData): Promise<true | 'matchmaker_init_fail' | 'game_not_found' | 'websocket_tryconnect_fail' | 'invalid_game_object'>;
+    createPrivateGame(region: string, mode: number, map: string): Promise<RawGameData | FindPublicError>;
+    findPublicGame(region: string, mode: number): Promise<RawGameData | CreatePrivateError>;
+
+    join(botName: string, data: string | RawGameData): Promise<true | InitSessionError | 'game_not_found' | 'websocket_tryconnect_fail' | 'invalid_game_object'>;
 
     processPacket(data: number[]): void;
     dispatch(disp: ADispatch): boolean;

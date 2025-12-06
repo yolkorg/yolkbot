@@ -1,6 +1,17 @@
 type Data = string | Buffer | ArrayBuffer | Buffer[];
 
 declare class yolkws {
+    connected: boolean;
+    autoReconnect: boolean;
+
+    url: string;
+    proxy: string;
+
+    binaryType: string;
+
+    maxRetries: number;
+    connectionTimeout: number;
+
     constructor(url: string, proxy: string);
 
     tryConnect($tries?: number): Promise<void>;

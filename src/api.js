@@ -37,10 +37,11 @@ export class API {
                 try {
                     const resp = JSON.parse(mes.data);
                     resolve(resp);
-                } catch {
+                } catch (e) {
                     if (!this.suppressErrors) {
                         console.error('queryServices: Bad API JSON response with call:', request.cmd, 'and data:', JSON.stringify(request));
                         console.error('queryServices: Full data sent:', JSON.stringify(request));
+                        console.error(e);
                     }
 
                     resolve('bad_json');

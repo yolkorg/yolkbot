@@ -2,8 +2,6 @@ import { API } from '../../src/api.js';
 import { Bot } from '../../src/bot.js';
 import { GamePlayer } from '../../src/bot/GamePlayer.js';
 
-import { Matchmaker } from '../../src/matchmaker.js';
-
 import { default as Dispatches } from '../../src/dispatches/index.js';
 
 import * as Comm from '../../src/comm/index.js';
@@ -16,7 +14,6 @@ const yolkbot = {
     API,
     Bot,
     GamePlayer,
-    Matchmaker,
     Dispatches,
     Comm,
     Constants,
