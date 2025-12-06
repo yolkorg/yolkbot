@@ -5,7 +5,7 @@ export interface GunAmmo {
     pickup: number;
 }
 
-export interface Gun {
+export type Gun = {
     ammo: GunAmmo;
 
     longReloadTime: number;
@@ -23,24 +23,18 @@ export interface Gun {
     velocity: number;
 }
 
-declare const EggK47: Gun;
-declare const DozenGauge: Gun;
-declare const CSG1: Gun;
-declare const Cluck9mm: Gun;
-declare const RPEGG: Gun;
-declare const SMG: Gun;
-declare const M24: Gun;
-declare const AUG: Gun;
+export declare const EggK47: Gun;
+export declare const DozenGauge: Gun;
+export declare const CSG1: Gun;
+export declare const Cluck9mm: Gun;
+export declare const RPEGG: Gun;
+export declare const SMG: Gun;
+export declare const M24: Gun;
+export declare const AUG: Gun;
 
-export type AnyGun = EggK47 | DozenGauge | CSG1 | Cluck9mm | RPEGG | SMG | M24 | AUG;
-
-export {
-    EggK47,
-    DozenGauge,
-    CSG1,
-    Cluck9mm,
-    RPEGG,
-    SMG,
-    M24,
-    AUG
-}
+export type CreatedGun = Gun & {
+    ammo: {
+        rounds: number;
+        storeMax: number;
+    }
+};

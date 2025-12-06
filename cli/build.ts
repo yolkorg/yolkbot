@@ -6,10 +6,9 @@ const distDir = path.join(import.meta.dirname, '..', 'dist');
 
 const manifest = await fetch('https://x.yolkbot.xyz/data/manifest.json').then(res => res.json());
 
-const buildAndWrite = async (dest, code, forceMinify) => {
+const buildAndWrite = async (dest: string, code: string, forceMinify?: boolean) => {
     const transpiler = new Bun.Transpiler({
-        minify: forceMinify || !process.argv.includes('-nm'),
-        minifyWhitespace: true,
+        minifyWhitespace: forceMinify || !process.argv.includes('-nm'),
         target: 'browser',
         loader: 'ts',
         inline: true
@@ -20,7 +19,7 @@ const buildAndWrite = async (dest, code, forceMinify) => {
     return fs.writeFileSync(dest, transpileResult);
 }
 
-const handleConstants = async (src, dest, code) => {
+const handleConstants = async (src: string, dest: string, code: string) => {
     const fileName = path.parse(src).name;
 
     if (fileName === 'findItemById') return fs.cpSync(src, dest);
@@ -36,7 +35,7 @@ const handleConstants = async (src, dest, code) => {
     } else buildAndWrite(dest, code);
 }
 
-const copyAndMinify = async (src, dest) => {
+const copyAndMinify = async (src: string, dest: string) => {
     const stat = fs.statSync(src);
 
     if (stat.isDirectory()) {
@@ -60,7 +59,11 @@ const copyAndMinify = async (src, dest) => {
     if (src.endsWith('.d.ts')) return fs.copyFileSync(src, dest);
 
     const fileType = src.split('.').pop();
-    if (!['DS_Store', 'wasm'].includes(fileType)) console.log('unknown file type:', fileType);
+
+    if (
+        typeof fileType !== 'string' ||
+        !['DS_Store', 'wasm'].includes(fileType)
+    ) console.log('unknown file type:', fileType);
 }
 
 if (fs.existsSync(distDir)) fs.rmSync(distDir, { recursive: true });

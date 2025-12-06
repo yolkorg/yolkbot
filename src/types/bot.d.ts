@@ -20,7 +20,7 @@ type intents = {
 
 import { Character, GamePlayer, Position, View } from './bot/GamePlayer';
 import { Challenge } from './constants/challenges';
-import { AnyGun } from './constants/guns';
+import { CreatedGun } from './constants/guns';
 import { MapJSON } from './constants/maps';
 import { Item } from './constants/items';
 import { Region } from './constants/regions';
@@ -346,8 +346,8 @@ export interface FireBullet {
 type MatchmakerError = 'matchmaker_connect_failed';
 type FindPublicError = MatchmakerError | 'no_region_passed' | 'invalid_region_passed' | 'no_mode_passed' | 'invalid_mode_passed' | 'internal_session_error';
 type CreatePrivateError = FindPublicError | 'invalid_map_passed';
-type LoginError = 'account_banned';
-type InitSessionError = LoginError | AnonError | MatchmakerError;
+type ExpandedLoginError = LoginError | 'account_banned';
+type InitSessionError = ExpandedLoginError | AnonError | MatchmakerError;
 
 export class Bot {
     static Intents: intents;
@@ -425,13 +425,13 @@ export class Bot {
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerChangeCharacter', cb: (player: GamePlayer, oldCharacter: Character, newCharacter: Character) => void): void;
     on(event: 'playerChangeGun', cb: (player: GamePlayer, oldGunId: number, newGunId: number) => void): void;
-    on(event: 'playerCollectAmmo', cb: (player: GamePlayer, weapon: AnyGun, itemId: number) => void): void;
+    on(event: 'playerCollectAmmo', cb: (player: GamePlayer, weapon: CreatedGun, itemId: number) => void): void;
     on(event: 'playerCollectGrenade', cb: (player: GamePlayer, itemId: number) => void): void;
     on(event: 'playerDamage', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
     on(event: 'playerDeath', cb: (killed: GamePlayer, killer: GamePlayer, oldKilled: GamePlayer, damageInt: number) => void): void;
     on(event: 'playerEndStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerEnterZone', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun, bullet: FireBullet) => void): void;
+    on(event: 'playerFire', cb: (player: GamePlayer, weapon: CreatedGun, bullet: FireBullet) => void): void;
     on(event: 'playerJoin', cb: (player: GamePlayer) => void): void;
     on(event: 'playerInfo', cb: (player: GamePlayer, playerIP: string, playerDBId: string) => void): void;
     on(event: 'playerLeave', cb: (player: GamePlayer) => void): void;
@@ -439,7 +439,7 @@ export class Bot {
     on(event: 'playerMelee', cb: (player: GamePlayer) => void): void;
     on(event: 'playerMove', cb: (player: GamePlayer, oldPosition: Position, newPosition: Position) => void): void;
     on(event: 'playerPause', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerReload', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
+    on(event: 'playerReload', cb: (player: GamePlayer, weapon: CreatedGun) => void): void;
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
     on(event: 'playerRotate', cb: (player: GamePlayer, oldView: View, newView: View) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
