@@ -28,8 +28,8 @@ export class WASM {
         const [ptr, len] = this.passStringToWasm([...Array(14)].map(() => Math.random().toString(36)[2]).join(''));
         this.wasm.set_mouse_params(50, 1, 1, false, ptr, len);
 
-        const movementX = Math.floor(Math.random() * 10) + 1;
-        const movementY = Math.floor(Math.random() * 10) + 1;
+        const movementX = Math.random() * 10 + 100;
+        const movementY = Math.random() * 10 + 100;
 
         this.canvasListeners.pointermove({ movementX, movementY });
     }

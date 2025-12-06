@@ -92,8 +92,6 @@ class yolkws {
         })
     }
 
-    // methods
-
     send(data) {
         return this.socket?.send(data);
     }
