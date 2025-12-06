@@ -1,3 +1,5 @@
 import { Items } from './items.js';
 
-export const findItemById = (id) => Items.find(item => item.id === id);
+const itemsMap = new Map(Items.map(item => [item.id, item]));
+
+export const findItemById = (id) => itemsMap.get(id);
