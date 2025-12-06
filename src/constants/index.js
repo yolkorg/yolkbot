@@ -1,4 +1,3 @@
-import globals from '../env/globals.js';
 import { AUG, CSG1, DozenGauge, EggK47, M24, RPEGG, SMG } from './guns.js';
 
 export { findItemById } from './findItemById.js';
@@ -151,5 +150,4 @@ export const Team = {
     Red: 2
 }
 
-export const UserAgent = globals.isBrowser ? null :
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
+export const UserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'

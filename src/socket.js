@@ -19,7 +19,7 @@ class yolkws {
     onerror = () => {};
 
     constructor(url, proxy) {
-        if (globals.isBrowser && proxy) throw new Error('You cannot pass a proxy to a WebSocket in a browser.');
+        if (typeof process === 'undefined' && proxy) throw new Error('You cannot pass a proxy to a WebSocket in this environment.');
 
         this.url = url;
         this.proxy = proxy;
@@ -34,7 +34,7 @@ class yolkws {
         }
 
         try {
-            this.socket = globals.isBrowser ? new globals.WebSocket(this.url) : new globals.WebSocket(this.url, {
+            this.socket = typeof process === 'undefined' ? new globals.WebSocket(this.url) : new globals.WebSocket(this.url, {
                 proxy: this.proxy || null,
                 headers: {
                     'accept-encoding': 'gzip, deflate, br, zstd',

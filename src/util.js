@@ -1,5 +1,3 @@
-import globals from './env/globals.js';
-
 export const createGun = (baseGun) => {
     const gun = structuredClone(baseGun);
 
@@ -10,7 +8,7 @@ export const createGun = (baseGun) => {
 }
 
 export const fetchMap = async (name, hash) => {
-    if (!globals.isIsolated && typeof process !== 'undefined') {
+    if (typeof process !== 'undefined') {
         const { existsSync, mkdirSync, readFileSync, writeFileSync } = process.getBuiltinModule('node:fs');
         const { join } = process.getBuiltinModule('node:path');
         const { homedir } = process.getBuiltinModule('node:os');

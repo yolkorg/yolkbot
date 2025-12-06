@@ -5,7 +5,7 @@ import { FirebaseKey, UserAgent } from './constants/index.js';
 
 const baseHeaders = {
     'origin': 'https://shellshock.io',
-    'user-agent': UserAgent,
+    'user-agent': typeof process === 'undefined' ? null : UserAgent,
     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
     'x-firebase-locale': 'en'
 }
