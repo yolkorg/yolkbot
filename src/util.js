@@ -26,53 +26,91 @@ export const fetchMap = async (name, hash) => {
 }
 
 export const initKotcZones = (meshData) => {
-    let numCaptureZones = 0;
-    const mapData = {};
-    const zones = [];
+    const len = meshData.length;
+    if (!len) return [];
 
-    for (const cell of meshData) {
-        if (!mapData[cell.x]) mapData[cell.x] = {};
-        if (!mapData[cell.x][cell.y]) mapData[cell.x][cell.y] = {};
-        mapData[cell.x][cell.y][cell.z] = { zone: null };
+    let minX = Infinity, minY = Infinity, minZ = Infinity;
+    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+
+    for (let i = 0; i < len; i++) {
+        const { x, y, z } = meshData[i];
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+        if (z < minZ) minZ = z;
+        if (z > maxZ) maxZ = z;
     }
 
-    const offsets = [
-        { x: -1, z: 0 },
-        { x: 1, z: 0 },
-        { x: 0, z: -1 },
-        { x: 0, z: 1 }
-    ];
+    const sizeX = (maxX - minX + 1) | 0;
+    const sizeY = (maxY - minY + 1) | 0;
+    const sizeZ = (maxZ - minZ + 1) | 0;
+    const strideY = sizeX;
+    const strideZ = sizeX * sizeY;
 
-    const getMapCellAt = (x, y, z) => mapData[x] && mapData[x][y] && mapData[x][y][z] ? mapData[x][y][z] : null;
+    const cellIndex = new Int32Array(sizeX * sizeY * sizeZ).fill(-1);
+    const zoneIds = new Uint16Array(len);
 
-    for (const cellA of meshData) {
-        if (!mapData[cellA.x][cellA.y][cellA.z].zone) {
-            cellA.zone = ++numCaptureZones;
-            mapData[cellA.x][cellA.y][cellA.z].zone = cellA.zone;
+    const queue = new Uint32Array(len);
 
-            const currentZone = [cellA];
-            let hits;
+    for (let i = 0; i < len; i++) {
+        const { x, y, z } = meshData[i];
+        cellIndex[((x - minX) | 0) + ((y - minY) | 0) * strideY + ((z - minZ) | 0) * strideZ] = i;
+    }
 
-            do {
-                hits = 0;
-                for (const cellB of meshData) {
-                    if (!mapData[cellB.x][cellB.y][cellB.z].zone) {
-                        for (const o of offsets) {
-                            const cell = getMapCellAt(cellB.x + o.x, cellB.y, cellB.z + o.z);
-                            if (cell && cell.zone === cellA.zone) {
-                                hits++;
-                                cellB.zone = cellA.zone;
-                                mapData[cellB.x][cellB.y][cellB.z].zone = cellA.zone;
-                                currentZone.push(cellB);
-                                break;
-                            }
-                        }
-                    }
-                }
-            } while (hits > 0);
+    const zones = [];
+    let zoneId = 0;
 
-            zones.push(currentZone);
+    const offsets = [-1, strideY, -strideY, strideZ, -strideZ];
+    offsets[0] = -1; // x-1
+    offsets[1] = 1; // x+1
+    offsets[2] = -strideZ; // z-1
+    offsets[3] = strideZ; // z+1
+
+    for (let i = 0; i < len; i++) {
+        if (zoneIds[i]) continue;
+
+        const zone = ++zoneId;
+        const currentZone = [];
+
+        let head = 0, tail = 0;
+        queue[tail++] = i;
+        zoneIds[i] = zone;
+
+        while (head < tail) {
+            const idx = queue[head++];
+            const cell = meshData[idx];
+            cell.zone = zone;
+            currentZone[currentZone.length] = cell;
+
+            const { x, y, z } = cell;
+            const flatIdx = ((x - minX) | 0) + ((y - minY) | 0) * strideY + ((z - minZ) | 0) * strideZ;
+
+            let nIdx, nFlat;
+
+            // x - 1
+            if (x > minX && (nIdx = cellIndex[nFlat = flatIdx - 1]) !== -1 && !zoneIds[nIdx]) {
+                zoneIds[nIdx] = zone;
+                queue[tail++] = nIdx;
+            }
+            // x + 1
+            if (x < maxX && (nIdx = cellIndex[nFlat = flatIdx + 1]) !== -1 && !zoneIds[nIdx]) {
+                zoneIds[nIdx] = zone;
+                queue[tail++] = nIdx;
+            }
+            // z - 1
+            if (z > minZ && (nIdx = cellIndex[nFlat = flatIdx - strideZ]) !== -1 && !zoneIds[nIdx]) {
+                zoneIds[nIdx] = zone;
+                queue[tail++] = nIdx;
+            }
+            // z + 1
+            if (z < maxZ && (nIdx = cellIndex[nFlat = flatIdx + strideZ]) !== -1 && !zoneIds[nIdx]) {
+                zoneIds[nIdx] = zone;
+                queue[tail++] = nIdx;
+            }
         }
+
+        zones[zones.length] = currentZone;
     }
 
     return zones;
