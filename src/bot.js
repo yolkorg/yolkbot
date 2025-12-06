@@ -69,6 +69,8 @@ export class Bot {
     static Intents = intents;
     Intents = intents;
 
+    regionList = [];
+
     #dispatches = [];
 
     #hooks = {};
@@ -453,7 +455,9 @@ export class Bot {
             const listener = (data) => {
                 if (data.command === 'regionList') {
                     this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
-                    res(data.regionList);
+                    this.regionList = data.regionList;
+
+                    res(this.regionList);
                 }
             };
 
@@ -478,7 +482,9 @@ export class Bot {
 
     async findPublicGame(region, modeId) {
         if (typeof region !== 'string') return 'no_region_passed';
-        if (!Regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
+
+        const regions = this.regionList.length ? this.regionList : Regions;
+        if (!regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
 
         if (typeof modeId !== 'number') return 'no_mode_passed';
         if (Object.values(GameMode).indexOf(modeId) === -1) return 'invalid_mode_passed';
@@ -514,7 +520,9 @@ export class Bot {
 
     async createPrivateGame(region, modeId, map) {
         if (typeof region !== 'string') return 'no_region_passed';
-        if (!Regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
+
+        const regions = this.regionList.length ? this.regionList : Regions;
+        if (!regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
 
         if (typeof modeId !== 'number') return 'no_mode_passed';
         if (Object.values(GameMode).indexOf(modeId) === -1) return 'invalid_mode_passed';
