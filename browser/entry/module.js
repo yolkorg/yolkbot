@@ -4,7 +4,10 @@ export { GamePlayer } from '../../src/bot/GamePlayer.js';
 
 export { default as Dispatches } from '../../src/dispatches/index.js';
 
-export * as Comm from '../../src/comm/index.js';
+import { CommIn } from '../../src/comm/CommIn.js';
+import { CommOut } from '../../src/comm/CommOut.js';
+
+export const Comm = { CommIn, CommOut };
 
 export * as Constants from '../../src/constants/index.js';
 export * as Guns from '../../src/constants/guns.js';

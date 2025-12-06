@@ -2,7 +2,8 @@ export class CommOut {
     constructor(size = 16384) {
         this.idx = 0;
         this.arrayBuffer = new ArrayBuffer(size);
-        this.buffer = new Uint8Array(this.arrayBuffer, 0, size);
+        this.view = new DataView(this.arrayBuffer);
+        this.buffer = new Uint8Array(this.arrayBuffer);
     }
 
     send(ws2) {
@@ -11,28 +12,23 @@ export class CommOut {
     }
 
     packInt8(val) {
-        this.buffer[this.idx] = val & 255;
+        this.view.setInt8(this.idx, val);
         this.idx++;
     }
 
     packInt16(val) {
-        this.buffer[this.idx] = val & 255;
-        this.buffer[this.idx + 1] = val >> 8 & 255;
+        this.view.setInt16(this.idx, val, true);
         this.idx += 2;
     }
 
     packInt24(val) {
-        this.buffer[this.idx] = val & 255;
-        this.buffer[this.idx + 1] = val >> 8 & 255;
-        this.buffer[this.idx + 2] = val >> 16 & 255;
+        this.view.setInt16(this.idx, val & 0xFFFF, true);
+        this.view.setInt8(this.idx + 2, (val >> 16) & 0xFF);
         this.idx += 3;
     }
 
     packInt32(val) {
-        this.buffer[this.idx] = val & 255;
-        this.buffer[this.idx + 1] = val >> 8 & 255;
-        this.buffer[this.idx + 2] = val >> 16 & 255;
-        this.buffer[this.idx + 3] = val >> 24 & 255;
+        this.view.setInt32(this.idx, val, true);
         this.idx += 4;
     }
 
@@ -55,13 +51,13 @@ export class CommOut {
     packString(str) {
         if (typeof str !== 'string') str = '';
         this.packInt8(str.length);
-        for (let i2 = 0; i2 < str.length; i2++) this.packInt16(str.charCodeAt(i2));
+        for (let i = 0; i < str.length; i++) this.packInt16(str.charCodeAt(i));
     }
 
     packLongString(str) {
         if (typeof str !== 'string') str = '';
         this.packInt16(str.length);
-        for (let i2 = 0; i2 < str.length; i2++) this.packInt16(str.charCodeAt(i2));
+        for (let i = 0; i < str.length; i++) this.packInt16(str.charCodeAt(i));
     }
 }
 

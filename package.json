@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "0.0.0-165",
+    "version": "0.0.0-166",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -35,9 +35,13 @@
         "./browser": "./browser/build/module.js",
         "./browser/*": "./browser/build/*.js",
         "./browser/*.js": "./browser/build/*.js",
-        "./comm": {
-            "import": "./dist/comm/index.js",
-            "types": "./dist/types/comm/index.d.ts"
+        "./comm/*": {
+            "import": "./dist/comm/*.js",
+            "types": "./dist/types/comm/*.d.ts"
+        },
+        "./comm/*.js": {
+            "import": "./dist/comm/*.js",
+            "types": "./dist/types/comm/*.d.ts"
         },
         "./util": {
             "import": "./dist/util.js",
