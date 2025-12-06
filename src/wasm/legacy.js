@@ -5,7 +5,8 @@
 // thanks zastix! yolkbot wouldn't be possible without your help <3
 
 import { wasmBytes } from './bytes.js';
-import { calculateMovements } from './util.js';
+
+const normalizeYaw = (yaw) => ((yaw % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
 
 export class WASM {
     wasm;
@@ -189,11 +190,19 @@ export class WASM {
     getYawPitch = () => this.wasm.get_yaw_pitch();
     resetYawPitch = () => this.wasm.reset_yaw_pitch();
 
-    coords(yaw, pitch) {
-        this.wasm.reset_yaw_pitch();
+    coords(targetYaw, targetPitch) {
+        this.wasm.reset_yaw_pitch()
 
-        const currentYP = this.wasm.get_yaw_pitch();
-        const { movementX, movementY } = calculateMovements(currentYP.yaw, currentYP.pitch, yaw, pitch);
+        const current = this.wasm.get_yaw_pitch();
+
+        const normalizedCurrentYaw = normalizeYaw(current.yaw);
+        const normalizedTargetYaw = normalizeYaw(targetYaw);
+
+        const yawDiff = ((normalizedTargetYaw - normalizedCurrentYaw) + Math.PI) % (2 * Math.PI) - Math.PI;
+        const pitchDiff = targetPitch - current.pitch;
+
+        const movementX = Math.round(-yawDiff / 0.0025);
+        const movementY = Math.round(-pitchDiff / 0.0025);
 
         this.canvasListeners.pointermove({ movementX, movementY });
 
