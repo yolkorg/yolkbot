@@ -354,6 +354,8 @@ export class Bot {
     Intents: intents;
     intents: number[];
 
+    regionList: Region[];
+
     proxy: string;
     instance: string;
     protocol: string;
