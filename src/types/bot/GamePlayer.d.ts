@@ -1,4 +1,4 @@
-import { AnyGun, Cluck9mm } from '../constants/guns';
+import { CreatedGun } from '../constants/guns';
 import { Item } from '../constants/items';
 
 export interface Position {
@@ -87,7 +87,7 @@ export interface Social {
     active: boolean;
 }
 
-export type PlayerWeapons = [AnyGun, Cluck9mm];
+export type PlayerWeapons = [CreatedGun, CreatedGun];
 
 export interface PlayerAdminData {
     ip: string;

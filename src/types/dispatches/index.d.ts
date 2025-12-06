@@ -74,53 +74,32 @@ export declare const DispatchIndex: {
     'throwGrenade': ThrowGrenadeDispatch
 }
 
-export default {
-    BanPlayerDispatch,
-    BootPlayerDispatch,
-    ChatDispatch,
-    FireDispatch,
-    GameOptionsDispatch,
-    GoToAmmoDispatch,
-    GoToCoopDispatch,
-    GoToGrenadeDispatch,
-    GoToPlayerDispatch,
-    GoToSpatulaDispatch,
-    LookAtDispatch,
-    LookAtPosDispatch,
-    MeleeDispatch,
-    MovementDispatch,
-    PauseDispatch,
-    ReloadDispatch,
-    ReportPlayerDispatch,
-    ResetGameDispatch,
-    SaveLoadoutDispatch,
-    SpawnDispatch,
-    SwapWeaponDispatch,
-    SwitchTeamDispatch,
-    ThrowGrenadeDispatch
+declare const _default: {
+    BanPlayerDispatch: typeof BanPlayerDispatch,
+    BootPlayerDispatch: typeof BootPlayerDispatch,
+    ChatDispatch: typeof ChatDispatch,
+    FireDispatch: typeof FireDispatch,
+    GameOptionsDispatch: typeof GameOptionsDispatch,
+    GoToAmmoDispatch: typeof GoToAmmoDispatch,
+    GoToCoopDispatch: typeof GoToCoopDispatch,
+    GoToGrenadeDispatch: typeof GoToGrenadeDispatch,
+    GoToPlayerDispatch: typeof GoToPlayerDispatch,
+    GoToSpatulaDispatch: typeof GoToSpatulaDispatch,
+    LookAtDispatch: typeof LookAtDispatch,
+    LookAtPosDispatch: typeof LookAtPosDispatch,
+    MeleeDispatch: typeof MeleeDispatch,
+    MovementDispatch: typeof MovementDispatch,
+    PauseDispatch: typeof PauseDispatch,
+    ReloadDispatch: typeof ReloadDispatch,
+    ReportPlayerDispatch: typeof ReportPlayerDispatch,
+    ResetGameDispatch: typeof ResetGameDispatch,
+    SaveLoadoutDispatch: typeof SaveLoadoutDispatch,
+    SpawnDispatch: typeof SpawnDispatch,
+    SwapWeaponDispatch: typeof SwapWeaponDispatch,
+    SwitchTeamDispatch: typeof SwitchTeamDispatch,
+    ThrowGrenadeDispatch: typeof ThrowGrenadeDispatch
 };
 
-export type ADispatch =
-    | BanPlayerDispatch
-    | BootPlayerDispatch
-    | ChatDispatch
-    | FireDispatch
-    | GameOptionsDispatch
-    | GoToAmmoDispatch
-    | GoToCoopDispatch
-    | GoToGrenadeDispatch
-    | GoToPlayerDispatch
-    | GoToSpatulaDispatch
-    | LookAtDispatch
-    | LookAtPosDispatch
-    | MeleeDispatch
-    | MovementDispatch
-    | PauseDispatch
-    | ReloadDispatch
-    | ReportPlayerDispatch
-    | ResetGameDispatch
-    | SaveLoadoutDispatch
-    | SpawnDispatch
-    | SwapWeaponDispatch
-    | SwitchTeamDispatch
-    | ThrowGrenadeDispatch;
+export default _default;
+
+export type ADispatch = typeof DispatchIndex[keyof typeof DispatchIndex];

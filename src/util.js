@@ -4,7 +4,7 @@ export const createGun = (baseGun) => {
     const gun = structuredClone(baseGun);
 
     gun.ammo.rounds = gun.ammo.capacity;
-    gun.ammo.store = gun.ammo.store;
+    gun.ammo.storeMax = gun.ammo.store;
 
     return gun;
 }
@@ -95,25 +95,25 @@ export const initKotcZones = (meshData) => {
             const { x, y, z } = cell;
             const flatIdx = ((x - minX) | 0) + ((y - minY) | 0) * strideY + ((z - minZ) | 0) * strideZ;
 
-            let nIdx, nFlat;
+            let nIdx;
 
             // x - 1
-            if (x > minX && (nIdx = cellIndex[nFlat = flatIdx - 1]) !== -1 && !zoneIds[nIdx]) {
+            if (x > minX && (nIdx = cellIndex[flatIdx - 1]) !== -1 && !zoneIds[nIdx]) {
                 zoneIds[nIdx] = zone;
                 queue[tail++] = nIdx;
             }
             // x + 1
-            if (x < maxX && (nIdx = cellIndex[nFlat = flatIdx + 1]) !== -1 && !zoneIds[nIdx]) {
+            if (x < maxX && (nIdx = cellIndex[flatIdx + 1]) !== -1 && !zoneIds[nIdx]) {
                 zoneIds[nIdx] = zone;
                 queue[tail++] = nIdx;
             }
             // z - 1
-            if (z > minZ && (nIdx = cellIndex[nFlat = flatIdx - strideZ]) !== -1 && !zoneIds[nIdx]) {
+            if (z > minZ && (nIdx = cellIndex[flatIdx - strideZ]) !== -1 && !zoneIds[nIdx]) {
                 zoneIds[nIdx] = zone;
                 queue[tail++] = nIdx;
             }
             // z + 1
-            if (z < maxZ && (nIdx = cellIndex[nFlat = flatIdx + strideZ]) !== -1 && !zoneIds[nIdx]) {
+            if (z < maxZ && (nIdx = cellIndex[flatIdx + strideZ]) !== -1 && !zoneIds[nIdx]) {
                 zoneIds[nIdx] = zone;
                 queue[tail++] = nIdx;
             }
