@@ -27,30 +27,27 @@ export default class AStar {
         this.list.clean();
 
         const heap = new BinaryHeap(node => node.f);
-        const closedSet = [];
+        const closedSet = new Set();
 
         start.h = this.heuristic(start, end);
         start.g = 0;
         start.f = start.g + start.h;
+        start.visited = true;
 
         heap.push(start);
 
         while (heap.size() !== 0) {
             const current = heap.pop();
+            if (current === end) return this.reversePath(current);
 
-            if (current === end) {
-                const val = this.reversePath(current);
-                return val;
-            }
-
-            closedSet.push(current);
+            closedSet.add(current);
 
             const neighbors = current.links;
 
             for (let i = 0; i < neighbors.length; i++) {
                 const neighbor = neighbors[i];
 
-                if (closedSet.includes(neighbor)) continue;
+                if (closedSet.has(neighbor)) continue;
 
                 const tentativeGScore = current.g + 1;
                 const visited = neighbor.visited;
@@ -68,6 +65,6 @@ export default class AStar {
             }
         }
 
-        return null
+        return null;
     }
 }
