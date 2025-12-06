@@ -150,6 +150,4 @@ export declare const Team: {
     Red: number;
 };
 
-export declare const URLRewards: string[];
-
 export declare const UserAgent: string;
