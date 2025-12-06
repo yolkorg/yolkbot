@@ -1,5 +1,7 @@
 import Bot from '../bot';
 
+export type Params = [];
+
 export class GoToCoopDispatch {
     validate(bot: Bot): boolean;
     check(bot: Bot): boolean;

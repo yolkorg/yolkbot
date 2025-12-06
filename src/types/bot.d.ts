@@ -24,7 +24,7 @@ import { AnyGun } from './constants/guns';
 import { MapJSON } from './constants/maps';
 import { Item } from './constants/items';
 import { Region } from './constants/regions';
-import { ADispatch } from './dispatches/index';
+import { ADispatch, DispatchParams } from './dispatches/index';
 import { NodeList } from './pathing/mapnode';
 import { AnonError, API, LoginError, QueryServicesError } from './api';
 import yolkws from './socket';
@@ -347,7 +347,7 @@ type MatchmakerError = 'matchmaker_connect_failed';
 type FindPublicError = MatchmakerError | 'no_region_passed' | 'invalid_region_passed' | 'no_mode_passed' | 'invalid_mode_passed' | 'internal_session_error';
 type CreatePrivateError = FindPublicError | 'invalid_map_passed';
 type LoginError = 'account_banned';
-type InitSessionError =  LoginError | AnonError | MatchmakerError;
+type InitSessionError = LoginError | AnonError | MatchmakerError;
 
 export class Bot {
     static Intents: intents;
@@ -396,7 +396,6 @@ export class Bot {
     join(botName: string, data: string | RawGameData): Promise<true | InitSessionError | 'game_not_found' | 'websocket_tryconnect_fail' | 'invalid_game_object'>;
 
     processPacket(data: number[]): void;
-    dispatch(disp: ADispatch): boolean;
     update(): void;
 
     canSee(player: GamePlayer): boolean;
@@ -453,6 +452,9 @@ export class Bot {
     on(event: 'sessionExpired', cb: () => void): void;
     on(event: 'spawnItem', cb: (itemType: number, itemPosition: Position, itemId: number) => void): void;
     on(event: 'tick', cb: () => void): void;
+
+    dispatch(disp: ADispatch): boolean;
+    emit<K extends keyof DispatchParams>(type: K, ...args: DispatchParams[K]): boolean;
 
     checkChiknWinner(): Promise<ChiknWinnerStatus | QueryServicesError>;
     playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | QueryServicesError | 'hit_daily_limit' | 'on_cooldown' | 'session_expired' | 'unknown_error'>;

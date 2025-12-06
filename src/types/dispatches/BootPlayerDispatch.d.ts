@@ -1,9 +1,11 @@
 import Bot from '../bot';
 
+export type Params = [uniqueId: string];
+
 export declare class BootPlayerDispatch {
     uniqueId: string;
 
-    constructor(uniqueId: string);
+    constructor(...args: Params);
 
     validate(bot: Bot): boolean;
     check(bot: Bot): boolean;
