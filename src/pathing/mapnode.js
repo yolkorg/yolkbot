@@ -5,7 +5,6 @@ class MapNode {
         this.z = data.z;
 
         this.positionStr = `${this.x},${this.y},${this.z}`;
-
         this.position = { x: this.x, y: this.y, z: this.z };
         this.meshType = meshType.split('.').pop();
 
@@ -17,10 +16,7 @@ class MapNode {
         this.closed = null;
         this.links = [];
 
-        if (this.isStair()) {
-            if (data.ry) this.ry = data.ry;
-            else this.ry = 0;
-        }
+        if (this.meshType === 'wedge' && data.ry !== undefined) this.ry = data.ry ?? 0;
     }
 
     isFull() {
@@ -69,38 +65,27 @@ class MapNode {
             3: { x: 1, z: 0 }
         };
 
-        switch (this.meshType) {
-            case 'none':
-                if (dy0 === 1 && node.canWalkThrough()) return true;
-                if (belowMe.canWalkOn() || belowMe.isLadder()) {
-                    if (node.meshType === 'none' || (node.meshType === 'ladder' && dy === 0) || (node.meshType === 'wedge' && dy0 === 0 && dx0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].x && dz0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].z)) {
-                        return true;
-                    }
+        if (this.meshType === 'none') {
+            if (dy0 === 1 && node.canWalkThrough()) return true;
+            if (belowMe.canWalkOn() || belowMe.isLadder()) {
+                if (node.meshType === 'none' || (node.meshType === 'ladder' && dy === 0) || (node.meshType === 'wedge' && dy0 === 0 && dx0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].x && dz0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].z)) {
+                    return true;
                 }
-                return false;
-
-            case 'ladder':
-                if (dy === 1 && node.canWalkThrough()) return true;
-                if (dy === 0 && belowMe.canWalkOn()) return true;
-                if (node.meshType === 'ladder' && (dy === 1 || (belowMe.canWalkOn() && belowOther.canWalkOn()))) return true;
-                return false;
-
-            case 'wedge':
-                if (this.x + FORWARD_RY_WEDGE_MAPPING[this.ry].x === node.x && this.z + FORWARD_RY_WEDGE_MAPPING[this.ry].z === node.z && this.y + 1 === node.y) return true;
-                if (this.x - FORWARD_RY_WEDGE_MAPPING[this.ry].x === node.x && this.z - FORWARD_RY_WEDGE_MAPPING[this.ry].z === node.z && (this.y === node.y || this.y - 1 === node.y)) return true;
-                return false;
-
-            default:
-                return false;
+            }
+            return false;
+        } else if (this.meshType === 'ladder') {
+            if (dy === 1 && node.canWalkThrough()) return true;
+            if (dy === 0 && belowMe.canWalkOn()) return true;
+            return node.meshType === 'ladder' && (dy === 1 || (belowMe.canWalkOn() && belowOther.canWalkOn()));
+        } else if (this.meshType === 'wedge') {
+            if (this.x + FORWARD_RY_WEDGE_MAPPING[this.ry].x === node.x && this.z + FORWARD_RY_WEDGE_MAPPING[this.ry].z === node.z && this.y + 1 === node.y) return true;
+            return this.x - FORWARD_RY_WEDGE_MAPPING[this.ry].x === node.x && this.z - FORWARD_RY_WEDGE_MAPPING[this.ry].z === node.z && (this.y === node.y || this.y - 1 === node.y);
         }
+        return false;
     }
 
     flatCenter() {
-        return {
-            x: this.x + 0.5,
-            y: this.y + 0,
-            z: this.z + 0.5
-        }
+        return { x: this.x + 0.5, y: this.y, z: this.z + 0.5 };
     }
 
     flatRadialDistance(position) {
@@ -111,55 +96,40 @@ class MapNode {
 
 class NodeList {
     list = [];
+    nodeMap = null;
 
     constructor(raw) {
-        const addedPositions = {};
+        const addedPositions = new Set();
 
-        for (const meshName of Object.keys(raw.data))
+        for (const meshName of Object.keys(raw.data)) {
             for (const nodeData of raw.data[meshName]) {
-                addedPositions[((nodeData.x << 16) | (nodeData.y << 8) | (nodeData.z))] = true;
+                addedPositions.add((nodeData.x << 16) | (nodeData.y << 8) | nodeData.z);
                 this.list.push(new MapNode(meshName, nodeData));
             }
+        }
 
         for (let x = 0; x < raw.width; x++)
             for (let y = 0; y < raw.height; y++)
                 for (let z = 0; z < raw.depth; z++)
-                    if (!addedPositions[((x << 16) | (y << 8) | (z))])
+                    if (!addedPositions.has((x << 16) | (y << 8) | z))
                         this.list.push(new MapNode('SPECIAL.air.none', { x, y, z }));
 
-        const nodeMap = new Map();
-        for (const node of this.list) nodeMap.set(node.positionStr, node);
+        this.nodeMap = new Map();
+        for (const node of this.list) this.nodeMap.set(node.positionStr, node);
+
+        const NEIGHBOR_OFFSETS = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
 
         for (const node of this.list) {
-            const neighbors = [
-                { x: node.x + 1, y: node.y, z: node.z },
-                { x: node.x - 1, y: node.y, z: node.z },
-                { x: node.x, y: node.y + 1, z: node.z },
-                { x: node.x, y: node.y - 1, z: node.z },
-                { x: node.x, y: node.y, z: node.z + 1 },
-                { x: node.x, y: node.y, z: node.z - 1 }
-            ];
-
-            for (const neighborPos of neighbors) {
-                const neighborKey = `${neighborPos.x},${neighborPos.y},${neighborPos.z}`;
-                const neighborNode = nodeMap.get(neighborKey);
+            for (const [dx, dy, dz] of NEIGHBOR_OFFSETS) {
+                const neighborKey = `${node.x + dx},${node.y + dy},${node.z + dz}`;
+                const neighborNode = this.nodeMap.get(neighborKey);
                 if (neighborNode && node.canLink(neighborNode, this)) node.links.push(neighborNode);
             }
         }
     }
 
     at(x, y, z) {
-        if (!this.nodeMap) {
-            this.nodeMap = new Map();
-
-            for (const node of this.list) {
-                const key = `${node.x},${node.y},${node.z}`;
-                this.nodeMap.set(key, node);
-            }
-        }
-
-        const key = `${x},${y},${z}`;
-        return this.nodeMap.get(key);
+        return this.nodeMap?.get(`${x},${y},${z}`);
     }
 
     clean() {
@@ -190,7 +160,7 @@ class NodeList {
 
         for (let i = 0; i <= steps; i++) {
             const node = this.at(Math.round(x), Math.round(y), Math.round(z));
-            if (node && node.isFull()) return false;
+            if (node?.isFull()) return false;
             x += xStep;
             y += yStep;
             z += zStep;
