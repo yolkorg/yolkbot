@@ -6,7 +6,6 @@ import CloseCode from './constants/CloseCode.js';
 import CommCode from './constants/CommCode.js';
 
 import GamePlayer from './bot/GamePlayer.js';
-import Matchmaker from './matchmaker.js';
 import yolkws from './socket.js';
 
 import {
@@ -33,7 +32,7 @@ import globals from './env/globals.js';
 
 import { NodeList } from './pathing/mapnode.js';
 
-import { coords } from './wasm/direct.js';
+import { coords, validate } from './wasm/direct.js';
 import { fetchMap, initKotcZones } from './util.js';
 
 import { Challenges } from './constants/challenges.js';
@@ -74,6 +73,8 @@ export class Bot {
 
     #hooks = {};
     #globalHooks = [];
+
+    #matchmakerListeners = [];
 
     #initialAccount;
     #initialGame;
@@ -127,7 +128,7 @@ export class Bot {
         this.me = new GamePlayer({})
 
         this.game = {
-            raw: {}, // matchmaker response
+            raw: {}, // raw response
             code: '',
             socket: null,
 
@@ -421,31 +422,58 @@ export class Bot {
         }
     }
 
-    async initMatchmaker() {
+    async createMatchmaker() {
+        const matchmaker = new yolkws(`${this.protocol}://${this.instance}/matchmaker/`, this.proxy);
+        matchmaker.autoReconnect = true;
+
+        const didConnect = await matchmaker.tryConnect();
+        if (!didConnect) return 'matchmaker_connect_failed';
+
+        this.matchmaker = matchmaker;
+
+        this.matchmaker.onmessage = async (e) => {
+            const data = JSON.parse(e.data);
+
+            if (data.command === 'validateUUID')
+                return this.matchmaker.send(JSON.stringify({ command: 'validateUUID', hash: await validate(data.uuid) }));
+
+            this.#matchmakerListeners.forEach((listener) => listener(data));
+        }
+
+        return false;
+    }
+
+    async getRegions() {
+        if (!this.matchmaker) {
+            const mmError = await this.createMatchmaker();
+            if (mmError) return mmError;
+        }
+
+        return new Promise((res) => {
+            const listener = (data) => {
+                if (data.command === 'regionList') {
+                    this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
+                    res(data.regionList);
+                }
+            };
+
+            this.#matchmakerListeners.push(listener);
+            this.matchmaker.send(JSON.stringify({ command: 'regionList' }));
+        });
+    }
+
+    async initSession() {
         if (!this.account.sessionId && !this.intents.includes(this.Intents.NO_LOGIN)) {
             const anonLogin = await this.loginAnonymously();
             if (typeof anonLogin !== 'object') return anonLogin;
         }
 
         if (!this.matchmaker) {
-            this.matchmaker = new Matchmaker({
-                api: this.api,
-                proxy: this.proxy,
-                protocol: this.protocol,
-                instance: this.instance,
-                sessionId: this.account.sessionId,
-                connectionTimeout: this.connectionTimeout,
-                noLogin: this.intents.includes(this.Intents.NO_LOGIN)
-            });
-
-            const didConnect = await this.matchmaker.ws.tryConnect();
-            if (!didConnect) return 'matchmaker_tryconnect_failed';
-
-            this.matchmaker.on('authFail', (data) => this.emit('authFail', data));
-            this.matchmaker.on('error', (data) => this.processError(data));
+            const mmError = await this.createMatchmaker();
+            if (mmError) return mmError;
         }
 
-        return true;
+        return false;
     }
 
     async findPublicGame(region, modeId) {
@@ -455,13 +483,14 @@ export class Bot {
         if (typeof modeId !== 'number') return 'no_mode_passed';
         if (Object.values(GameMode).indexOf(modeId) === -1) return 'invalid_mode_passed';
 
-        if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
+        const initError = await this.initSession();
+        if (initError) return initError;
 
         const game = await new Promise((resolve) => {
             const listener = (msg) => {
                 if (msg.command === 'notice') return;
 
-                this.matchmaker.off('msg', listener);
+                this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
 
                 if (msg.command === 'gameFound') return resolve(msg);
                 if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
@@ -469,15 +498,15 @@ export class Bot {
                 this.processError('unknown matchmaker response', JSON.stringify(msg));
             };
 
-            this.matchmaker.on('msg', listener);
+            this.#matchmakerListeners.push(listener);
 
-            this.matchmaker.send({
+            this.matchmaker.send(JSON.stringify({
                 command: 'findGame',
                 region,
                 playType: PlayType.JoinPublic,
                 gameType: modeId,
                 sessionId: this.account.sessionId
-            });
+            }));
         });
 
         return game;
@@ -495,13 +524,14 @@ export class Bot {
         const mapIdx = Maps.findIndex(m => m.name.toLowerCase() === map.toLowerCase());
         if (mapIdx === -1) return 'invalid_map_passed';
 
-        if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
+        const initError = await this.initSession();
+        if (initError) return initError;
 
         const game = await new Promise((resolve) => {
             const listener = (msg) => {
                 if (msg.command === 'notice') return;
 
-                this.matchmaker.off('msg', listener);
+                this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
 
                 if (msg.command === 'gameFound') return resolve(msg);
                 if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
@@ -509,9 +539,9 @@ export class Bot {
                 this.processError('unknown matchmaker response', JSON.stringify(msg));
             };
 
-            this.matchmaker.on('msg', listener);
+            this.#matchmakerListeners.push(listener);
 
-            this.matchmaker.send({
+            this.matchmaker.send(JSON.stringify({
                 command: 'findGame',
                 region,
                 playType: PlayType.CreatePrivate,
@@ -519,7 +549,7 @@ export class Bot {
                 sessionId: this.account.sessionId,
                 noobLobby: false,
                 map: mapIdx
-            });
+            }));
         });
 
         return game;
@@ -531,12 +561,13 @@ export class Bot {
         if (typeof data === 'string') {
             if (data.includes('#')) data = data.split('#')[1];
 
-            if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
+            const initError = await this.initSession();
+            if (initError) return initError;
 
             const joinResult = await new Promise((resolve) => {
                 const listener = (message) => {
                     if (message.command === 'gameFound') {
-                        this.matchmaker.off('msg', listener);
+                        this.#matchmakerListeners.splice(this.#matchmakerListeners.indexOf(listener), 1);
 
                         this.game.raw = message;
                         this.game.code = message.id;
@@ -551,14 +582,14 @@ export class Bot {
                     }
                 };
 
-                this.matchmaker.on('msg', listener);
+                this.#matchmakerListeners.push(listener);
 
-                this.matchmaker.send({
+                this.matchmaker.send(JSON.stringify({
                     command: 'joinGame',
                     id: data,
                     observe: false,
                     sessionId: this.account.sessionId
-                });
+                }));
             });
 
             if (joinResult === 'gameNotFound') return 'game_not_found';

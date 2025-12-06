@@ -2,6 +2,9 @@ import globals from './env/globals.js';
 import { UserAgent } from './constants/index.js';
 
 class yolkws {
+    connected = false;
+    autoReconnect = false;
+
     url = '';
     proxy = '';
 
@@ -9,6 +12,11 @@ class yolkws {
 
     maxRetries = 5;
     connectionTimeout = 5000;
+
+    onopen = () => {};
+    onmessage = () => {};
+    onclose = () => {};
+    onerror = () => {};
 
     constructor(url, proxy) {
         if (globals.isBrowser && proxy) throw new Error('You cannot pass a proxy to a WebSocket in a browser.');
@@ -35,7 +43,6 @@ class yolkws {
                     'connection': 'Upgrade',
                     'origin': url.origin.replace('ws', 'http'),
                     'pragma': 'no-cache',
-                    'sec-websocket-extensions': 'permessage-deflate; client_max_window_bits',
                     'user-agent': UserAgent
                 }
             });
@@ -62,41 +69,27 @@ class yolkws {
 
             this.socket.addEventListener('open', async () => {
                 clearTimeout(timeout);
+                this.connected = true;
+
                 this.socket.removeEventListener('error', errorListener);
+
+                this.socket.addEventListener('open', (...data) => this.onopen(...data));
+                this.socket.addEventListener('message', (...data) => this.onmessage(...data));
+                this.socket.addEventListener('close', (...data) => this.onclose(...data));
+                this.socket.addEventListener('error', (...data) => this.onerror(...data));
+
                 resolve(true);
             });
 
             this.socket.addEventListener('error', errorListener);
+
+            this.socket.addEventListener('close', () => {
+                if (this.connected) {
+                    this.connected = false;
+                    if (this.autoReconnect) setTimeout(() => this.tryConnect(), 250);
+                }
+            });
         })
-    }
-
-    // listeners
-
-    get onmessage() {
-        return this.socket?.onmessage;
-    }
-
-    set onmessage(handler) {
-        if (this.socket) this.socket.onmessage = handler;
-        else console.error('set onmessage before socket existed');
-    }
-
-    get onclose() {
-        return this.socket?.onclose;
-    }
-
-    set onclose(handler) {
-        if (this.socket) this.socket.onclose = handler;
-        else console.error('set onclose before socket existed');
-    }
-
-    get onerror() {
-        return this.socket?.onerror;
-    }
-
-    set onerror(handler) {
-        if (this.socket) this.socket.onerror = handler;
-        else console.error('set onclose before socket existed');
     }
 
     // methods
@@ -106,6 +99,7 @@ class yolkws {
     }
 
     close(data) {
+        this.autoReconnect = false;
         return this.socket?.close(data);
     }
 }
