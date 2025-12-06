@@ -28,8 +28,6 @@ import {
 import LookAtPosDispatch from './dispatches/LookAtPosDispatch.js';
 import MovementDispatch from './dispatches/MovementDispatch.js';
 
-import globals from './env/globals.js';
-
 import { DispatchIndex } from './dispatches/index.js';
 import { NodeList } from './pathing/mapnode.js';
 
@@ -83,7 +81,7 @@ export class Bot {
     #initialGame;
 
     constructor(params = {}) {
-        if (params.proxy && globals.isBrowser) this.processError('proxies do not work and hence are not supported in the browser');
+        if (params.proxy && typeof process === 'undefined') this.processError('proxies do not work in this environment');
 
         this.intents = params.intents || [];
 

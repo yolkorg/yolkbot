@@ -52,8 +52,8 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
                 headersParsed = true;
                 bodyStart += 4;
                 const headersText = response.slice(0, bodyStart - 4);
-                const contentLengthMatch = headersText.match(/content-length:\s*(\d+)/i);
-                if (contentLengthMatch) contentLength = parseInt(contentLengthMatch[1], 10);
+                const contentLengthMatch = headersText.match(/content-length:\s*(?<length>\d+)/i);
+                if (contentLengthMatch) contentLength = parseInt(contentLengthMatch.groups.length, 10);
             }
         }
 
@@ -92,7 +92,7 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
 const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null, timeout = 30000 } = {}) => new Promise((resolve, reject) => {
     try {
         if (typeof process === 'undefined' || !process.getBuiltinModule)
-            return fetch(url, { method, headers, body }).then(resolve).catch(reject);
+            return globalThis.fetch(url, { method, headers, body }).then(resolve).catch(reject);
 
         const dns = process.getBuiltinModule('node:dns');
         const net = process.getBuiltinModule('node:net');
