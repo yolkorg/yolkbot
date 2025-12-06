@@ -42,6 +42,7 @@ export default [
                 console: 'readonly',
                 setInterval: 'readonly',
                 setTimeout: 'readonly',
+                structuredClone: 'readonly',
                 URL: 'readonly',
                 URLSearchParams: 'readonly'
             }

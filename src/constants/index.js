@@ -1,5 +1,4 @@
-import globals from '../env/globals.js';
-import { AUG, CSG1, DozenGauge, Eggk47, M24, RPEGG, SMG } from './guns.js';
+import { AUG, CSG1, DozenGauge, EggK47, M24, RPEGG, SMG } from './guns.js';
 
 export { findItemById } from './findItemById.js';
 
@@ -87,7 +86,7 @@ export const GameOptionFlag = {
 
 export const GunEquipTime = 13;
 
-export const GunList = [Eggk47, DozenGauge, CSG1, RPEGG, SMG, M24, AUG];
+export const GunList = [EggK47, DozenGauge, CSG1, RPEGG, SMG, M24, AUG];
 
 export const ItemType = {
     Hat: 1,
@@ -151,15 +150,4 @@ export const Team = {
     Red: 2
 }
 
-export const URLRewards = [
-    'giveBasketBrosReward',
-    'mercZoneFinalGift',
-    'midMonthGiveMeEggs',
-    'newYolkerSignupReward',
-    'newYolkerItemReward',
-    'newYolkerWelcomeBack',
-    'WelcomeBack'
-]
-
-export const UserAgent = globals.isBrowser ? null :
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
+export const UserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'

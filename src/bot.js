@@ -6,7 +6,6 @@ import CloseCode from './constants/CloseCode.js';
 import CommCode from './constants/CommCode.js';
 
 import GamePlayer from './bot/GamePlayer.js';
-import Matchmaker from './matchmaker.js';
 import yolkws from './socket.js';
 
 import {
@@ -29,12 +28,11 @@ import {
 import LookAtPosDispatch from './dispatches/LookAtPosDispatch.js';
 import MovementDispatch from './dispatches/MovementDispatch.js';
 
-import globals from './env/globals.js';
-
+import { DispatchIndex } from './dispatches/index.js';
 import { NodeList } from './pathing/mapnode.js';
 
-import { coords } from './wasm/direct.js';
-import { fetchMap, initKotcZones } from './util.js';
+import { coords, validate } from './wasm/direct.js';
+import { createGun, fetchMap, initKotcZones } from './util.js';
 
 import { Challenges } from './constants/challenges.js';
 import { Maps } from './constants/maps.js';
@@ -70,16 +68,20 @@ export class Bot {
     static Intents = intents;
     Intents = intents;
 
+    regionList = [];
+
     #dispatches = [];
 
     #hooks = {};
     #globalHooks = [];
 
+    matchmakerListeners = [];
+
     #initialAccount;
     #initialGame;
 
     constructor(params = {}) {
-        if (params.proxy && globals.isBrowser) this.processError('proxies do not work and hence are not supported in the browser');
+        if (params.proxy && typeof process === 'undefined') this.processError('proxies do not work in this environment');
 
         this.intents = params.intents || [];
 
@@ -127,7 +129,7 @@ export class Bot {
         this.me = new GamePlayer({})
 
         this.game = {
-            raw: {}, // matchmaker response
+            raw: {}, // raw response
             code: '',
             socket: null,
 
@@ -339,17 +341,17 @@ export class Bot {
 
     processLoginData(loginData) {
         if (typeof loginData !== 'object') {
-            this.emit('authFail', loginData);
+            this.$emit('authFail', loginData);
             return loginData;
         }
 
         if (loginData.banRemaining) {
-            this.emit('banned', loginData.banRemaining);
+            this.$emit('banned', loginData.banRemaining);
             return 'account_banned';
         }
 
         if (!loginData.playerOutput) {
-            this.emit('authFail', loginData);
+            this.$emit('authFail', loginData);
             return loginData;
         }
 
@@ -379,7 +381,7 @@ export class Bot {
         if (this.intents.includes(this.Intents.CHALLENGES))
             this.#importChallenges(loginData.challenges);
 
-        this.emit('authSuccess', this.account);
+        this.$emit('authSuccess', this.account);
 
         if (this.intents.includes(this.Intents.RENEW_SESSION)) {
             this.renewSessionInterval = setInterval(async () => {
@@ -390,7 +392,7 @@ export class Bot {
                     sessionId: this.account.sessionId
                 });
 
-                if (res.data !== 'renewed') this.emit('sessionExpired');
+                if (res.data !== 'renewed') this.$emit('sessionExpired');
             }, 600000); // 10 minutes
         }
 
@@ -421,47 +423,79 @@ export class Bot {
         }
     }
 
-    async initMatchmaker() {
+    async createMatchmaker() {
+        const matchmaker = new yolkws(`${this.protocol}://${this.instance}/matchmaker/`, this.proxy);
+        matchmaker.autoReconnect = true;
+
+        const didConnect = await matchmaker.tryConnect();
+        if (!didConnect) return 'matchmaker_connect_failed';
+
+        this.matchmaker = matchmaker;
+
+        this.matchmaker.onmessage = async (e) => {
+            const data = JSON.parse(e.data);
+
+            if (data.command === 'validateUUID')
+                return this.matchmaker.send(JSON.stringify({ command: 'validateUUID', hash: await validate(data.uuid) }));
+
+            this.matchmakerListeners.forEach((listener) => listener(data));
+        }
+
+        return false;
+    }
+
+    async getRegions() {
+        if (!this.matchmaker) {
+            const mmError = await this.createMatchmaker();
+            if (mmError) return mmError;
+        }
+
+        return new Promise((res) => {
+            const listener = (data) => {
+                if (data.command === 'regionList') {
+                    this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
+                    this.regionList = data.regionList;
+
+                    res(this.regionList);
+                }
+            };
+
+            this.matchmakerListeners.push(listener);
+            this.matchmaker.send(JSON.stringify({ command: 'regionList' }));
+        });
+    }
+
+    async initSession() {
         if (!this.account.sessionId && !this.intents.includes(this.Intents.NO_LOGIN)) {
             const anonLogin = await this.loginAnonymously();
             if (typeof anonLogin !== 'object') return anonLogin;
         }
 
         if (!this.matchmaker) {
-            this.matchmaker = new Matchmaker({
-                api: this.api,
-                proxy: this.proxy,
-                protocol: this.protocol,
-                instance: this.instance,
-                sessionId: this.account.sessionId,
-                connectionTimeout: this.connectionTimeout,
-                noLogin: this.intents.includes(this.Intents.NO_LOGIN)
-            });
-
-            const didConnect = await this.matchmaker.ws.tryConnect();
-            if (!didConnect) return 'matchmaker_tryconnect_failed';
-
-            this.matchmaker.on('authFail', (data) => this.emit('authFail', data));
-            this.matchmaker.on('error', (data) => this.processError(data));
+            const mmError = await this.createMatchmaker();
+            if (mmError) return mmError;
         }
 
-        return true;
+        return false;
     }
 
     async findPublicGame(region, modeId) {
         if (typeof region !== 'string') return 'no_region_passed';
-        if (!Regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
+
+        const regions = this.regionList.length ? this.regionList : Regions;
+        if (!regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
 
         if (typeof modeId !== 'number') return 'no_mode_passed';
         if (Object.values(GameMode).indexOf(modeId) === -1) return 'invalid_mode_passed';
 
-        if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
+        const initError = await this.initSession();
+        if (initError) return initError;
 
         const game = await new Promise((resolve) => {
             const listener = (msg) => {
                 if (msg.command === 'notice') return;
 
-                this.matchmaker.off('msg', listener);
+                this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
 
                 if (msg.command === 'gameFound') return resolve(msg);
                 if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
@@ -469,15 +503,15 @@ export class Bot {
                 this.processError('unknown matchmaker response', JSON.stringify(msg));
             };
 
-            this.matchmaker.on('msg', listener);
+            this.matchmakerListeners.push(listener);
 
-            this.matchmaker.send({
+            this.matchmaker.send(JSON.stringify({
                 command: 'findGame',
                 region,
                 playType: PlayType.JoinPublic,
                 gameType: modeId,
                 sessionId: this.account.sessionId
-            });
+            }));
         });
 
         return game;
@@ -485,7 +519,9 @@ export class Bot {
 
     async createPrivateGame(region, modeId, map) {
         if (typeof region !== 'string') return 'no_region_passed';
-        if (!Regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
+
+        const regions = this.regionList.length ? this.regionList : Regions;
+        if (!regions.find(r => r.id === region) && !this.intents.includes(this.Intents.NO_REGION_CHECK)) return 'invalid_region_passed';
 
         if (typeof modeId !== 'number') return 'no_mode_passed';
         if (Object.values(GameMode).indexOf(modeId) === -1) return 'invalid_mode_passed';
@@ -495,13 +531,14 @@ export class Bot {
         const mapIdx = Maps.findIndex(m => m.name.toLowerCase() === map.toLowerCase());
         if (mapIdx === -1) return 'invalid_map_passed';
 
-        if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
+        const initError = await this.initSession();
+        if (initError) return initError;
 
         const game = await new Promise((resolve) => {
             const listener = (msg) => {
                 if (msg.command === 'notice') return;
 
-                this.matchmaker.off('msg', listener);
+                this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
 
                 if (msg.command === 'gameFound') return resolve(msg);
                 if (msg.error === 'sessionNotFound') return resolve('internal_session_error');
@@ -509,9 +546,9 @@ export class Bot {
                 this.processError('unknown matchmaker response', JSON.stringify(msg));
             };
 
-            this.matchmaker.on('msg', listener);
+            this.matchmakerListeners.push(listener);
 
-            this.matchmaker.send({
+            this.matchmaker.send(JSON.stringify({
                 command: 'findGame',
                 region,
                 playType: PlayType.CreatePrivate,
@@ -519,7 +556,7 @@ export class Bot {
                 sessionId: this.account.sessionId,
                 noobLobby: false,
                 map: mapIdx
-            });
+            }));
         });
 
         return game;
@@ -531,12 +568,13 @@ export class Bot {
         if (typeof data === 'string') {
             if (data.includes('#')) data = data.split('#')[1];
 
-            if (!await this.initMatchmaker()) return 'matchmaker_init_fail';
+            const initError = await this.initSession();
+            if (initError) return initError;
 
             const joinResult = await new Promise((resolve) => {
                 const listener = (message) => {
                     if (message.command === 'gameFound') {
-                        this.matchmaker.off('msg', listener);
+                        this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
 
                         this.game.raw = message;
                         this.game.code = message.id;
@@ -551,14 +589,14 @@ export class Bot {
                     }
                 };
 
-                this.matchmaker.on('msg', listener);
+                this.matchmakerListeners.push(listener);
 
-                this.matchmaker.send({
+                this.matchmaker.send(JSON.stringify({
                     command: 'joinGame',
                     id: data,
                     observe: false,
                     sessionId: this.account.sessionId
-                });
+                }));
             });
 
             if (joinResult === 'gameNotFound') return 'game_not_found';
@@ -587,7 +625,7 @@ export class Bot {
             this.game.socket.onclose = (e) => {
                 if (this.state.left) this.state.left = false;
                 else {
-                    this.emit('close', e.code);
+                    this.$emit('close', e.code);
                     this.leave(-1);
                 }
             }
@@ -669,7 +707,7 @@ export class Bot {
             this.state.shotsFired = 0;
 
             if (this.lastUpdateTick >= 2) {
-                this.emit('tick');
+                this.$emit('tick');
 
                 const out = new CommOut();
 
@@ -745,11 +783,17 @@ export class Bot {
         else this.#hooks[event] = [];
     }
 
-    emit(event, ...args) {
+    $emit(event, ...args) {
         if (this.hasQuit) return;
 
         if (this.#hooks[event]) for (const cb of this.#hooks[event]) cb(...args);
         for (const cb of this.#globalHooks) cb(event, ...args);
+    }
+
+    emit(event, ...args) {
+        const dispatch = DispatchIndex[event];
+        if (dispatch) this.dispatch(new dispatch(...args));
+        else this.processError(`no event found for "${event}"`);
     }
 
     #processChatPacket() {
@@ -759,7 +803,7 @@ export class Bot {
 
         const player = this.players[id];
 
-        this.emit('chat', player, text, msgFlags);
+        this.$emit('chat', player, text, msgFlags);
     }
 
     #processAddPlayerPacket() {
@@ -818,11 +862,11 @@ export class Bot {
         const player = new GamePlayer(playerData, this.game.gameMode === GameMode.KOTC ? this.game.activeZone : null);
         if (!this.players[playerData.id]) this.players[playerData.id] = player;
 
-        this.emit('playerJoin', player);
+        this.$emit('playerJoin', player);
 
         if (this.me.id === playerData.id) {
             this.me = player;
-            this.emit('botJoin', this.me);
+            this.$emit('botJoin', this.me);
         }
     }
 
@@ -853,7 +897,7 @@ export class Bot {
 
             player.spawnShield = 120;
 
-            this.emit('playerRespawn', player);
+            this.$emit('playerRespawn', player);
         }
     }
 
@@ -884,13 +928,13 @@ export class Bot {
             if (controlKeys & Movement.Scope) player.scoping = true;
             else player.scoping = false;
 
-            const oldView = { ...player.view };
+            const oldView = structuredClone(player.view);
 
             player.view.yaw = CommIn.unPackRadU();
             player.view.pitch = CommIn.unPackRad();
 
             if (player.view.yaw !== oldView.yaw || player.view.pitch !== oldView.pitch)
-                this.emit('playerRotate', player, oldView, player.view);
+                this.$emit('playerRotate', player, oldView, player.view);
 
             player.scale = CommIn.unPackInt8U();
         }
@@ -900,7 +944,7 @@ export class Bot {
         const climbingChanged = player.climbing !== climbing;
         const didChange = posChanged || climbingChanged;
 
-        const oldPosition = didChange ? { ...px } : null;
+        const oldPosition = didChange ? structuredClone(px) : null;
 
         if (px.x !== x) px.x = x;
         if (px.z !== z) px.z = z;
@@ -909,7 +953,7 @@ export class Bot {
 
         if (!didChange) return;
 
-        this.emit('playerMove', player, oldPosition, px);
+        this.$emit('playerMove', player, oldPosition, px);
 
         if (this.game.gameModeId !== GameMode.KOTC) return;
 
@@ -918,7 +962,7 @@ export class Bot {
 
         if (!zone && wasIn) {
             player.inKotcZone = false;
-            this.emit('playerLeaveZone', player);
+            this.$emit('playerLeaveZone', player);
             return;
         }
 
@@ -927,7 +971,7 @@ export class Bot {
         const nowIn = !!player.inKotcZone;
         if (wasIn !== nowIn) {
             player.inKotcZone = nowIn;
-            this.emit(nowIn ? 'playerEnterZone' : 'playerLeaveZone', player);
+            this.$emit(nowIn ? 'playerEnterZone' : 'playerLeaveZone', player);
         }
     }
 
@@ -939,11 +983,11 @@ export class Bot {
             player.playing = false;
             if (player.streakRewards) player.streakRewards = [];
 
-            this.emit('playerPause', player);
+            this.$emit('playerPause', player);
 
             if (player.inKotcZone) {
                 player.inKotcZone = false;
-                this.emit('playerLeaveZone', player);
+                this.$emit('playerLeaveZone', player);
             }
         }
     }
@@ -955,7 +999,7 @@ export class Bot {
 
         if (player) {
             player.activeGun = newWeaponId;
-            this.emit('playerSwapWeapon', player, newWeaponId);
+            this.$emit('playerSwapWeapon', player, newWeaponId);
         }
     }
 
@@ -971,7 +1015,7 @@ export class Bot {
         const killed = this.players[killedId];
         const killer = this.players[killerId];
 
-        const oldKilled = killed ? { ...killed } : null;
+        const oldKilled = killed ? structuredClone(killed) : null;
 
         if (killed) {
             if (killed.id === this.me.id) this.lastDeathTime = Date.now();
@@ -984,7 +1028,7 @@ export class Bot {
             killed.stats.totalDeaths++;
 
             killed.inKotcZone = false;
-            this.emit('playerLeaveZone', killed);
+            this.$emit('playerLeaveZone', killed);
         }
 
         if (killer) {
@@ -994,7 +1038,7 @@ export class Bot {
             if (killer.streak > killer.stats.bestStreak) killer.stats.bestStreak = killer.streak;
         }
 
-        this.emit('playerDeath', killed, killer, oldKilled, damageCauseInt);
+        this.$emit('playerDeath', killed, killer, oldKilled, damageCauseInt);
     }
 
     #processFirePacket() {
@@ -1016,7 +1060,7 @@ export class Bot {
 
         if (playerWeapon && playerWeapon.ammo) {
             playerWeapon.ammo.rounds--;
-            this.emit('playerFire', player, playerWeapon, bullet);
+            this.$emit('playerFire', player, playerWeapon, bullet);
         }
     }
 
@@ -1029,7 +1073,7 @@ export class Bot {
 
         this.game.collectables[type].push({ id, x, y, z });
 
-        this.emit('spawnItem', type, { x, y, z }, id);
+        this.$emit('spawnItem', type, { x, y, z }, id);
     }
 
     #processCollectPacket() {
@@ -1047,7 +1091,7 @@ export class Bot {
             const playerWeapon = player.weapons[applyToWeaponIdx];
             if (playerWeapon && playerWeapon.ammo) {
                 playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
-                this.emit('playerCollectAmmo', player, playerWeapon, id);
+                this.$emit('playerCollectAmmo', player, playerWeapon, id);
             }
         }
 
@@ -1055,7 +1099,7 @@ export class Bot {
             player.grenades++;
             if (player.grenades > 3) player.grenades = 3;
 
-            this.emit('playerCollectGrenade', player, id);
+            this.$emit('playerCollectGrenade', player, id);
         }
     }
 
@@ -1069,7 +1113,7 @@ export class Bot {
         const oldHealth = player.hp;
         player.hp = hp;
 
-        this.emit('playerDamage', player, oldHealth, player.hp);
+        this.$emit('playerDamage', player, oldHealth, player.hp);
     }
 
     #processHitMePacket() {
@@ -1081,7 +1125,7 @@ export class Bot {
         const oldHealth = this.me.hp;
         this.me.hp = hp;
 
-        this.emit('playerDamage', this.me, oldHealth, this.me.hp);
+        this.$emit('playerDamage', this.me, oldHealth, this.me.hp);
     }
 
     #processSyncMePacket() {
@@ -1114,7 +1158,7 @@ export class Bot {
         player.position.z = newZ;
 
         if (oldX !== newX || oldY !== newY || oldZ !== newZ)
-            this.emit('playerMove', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
+            this.$emit('playerMove', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
     }
 
     #processEventModifierPacket() {
@@ -1125,16 +1169,16 @@ export class Bot {
 
     #processRemovePlayerPacket() {
         const id = CommIn.unPackInt8U();
-        const removedPlayer = { ...this.players[id] }; // creates a snapshot of the player since they'll be deleted
+        const removedPlayer = structuredClone(this.players[id]);
 
         delete this.players[id];
 
-        this.emit('playerLeave', removedPlayer);
+        this.$emit('playerLeave', removedPlayer);
     }
 
     #processGameStatePacket() {
         if (this.game.gameModeId === GameMode.Spatula) {
-            const oldGame = { ...this.game };
+            const oldGame = structuredClone(this.game);
 
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
@@ -1150,9 +1194,9 @@ export class Bot {
 
             this.game.spatula = { coords: spatulaCoords, controlledBy, controlledByTeam };
 
-            this.emit('gameStateChange', oldGame, this.game);
+            this.$emit('gameStateChange', oldGame, this.game);
         } else if (this.game.gameModeId === GameMode.KOTC) {
-            const oldGame = { ...this.game };
+            const oldGame = structuredClone(this.game);
 
             this.game.stage = CommIn.unPackInt8U(); // constants.CoopState
             this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
@@ -1172,10 +1216,10 @@ export class Bot {
 
             if (this.game.numCapturing <= 0) Object.values(this.players).forEach((player) => {
                 player.inKotcZone = false;
-                this.emit('playerLeaveZone', player);
+                this.$emit('playerLeaveZone', player);
             });
 
-            this.emit('gameStateChange', oldGame, this.game, oldPlayersOnZone);
+            this.$emit('gameStateChange', oldGame, this.game, oldPlayersOnZone);
         } else if (this.game.gameModeId === GameMode.Team) {
             this.game.teamScore[1] = CommIn.unPackInt16U();
             this.game.teamScore[2] = CommIn.unPackInt16U();
@@ -1245,7 +1289,7 @@ export class Bot {
                 break;
         }
 
-        this.emit('playerBeginStreak', player, ksType);
+        this.$emit('playerBeginStreak', player, ksType);
     }
 
     #processEndStreakPacket() {
@@ -1267,7 +1311,7 @@ export class Bot {
 
         if (ksType === ShellStreak.MiniEgg) player.scale = 1;
 
-        this.emit('playerEndStreak', player, ksType);
+        this.$emit('playerEndStreak', player, ksType);
     }
 
     #processHitShieldPacket() {
@@ -1283,12 +1327,12 @@ export class Bot {
 
         if (this.me.shieldHp <= 0) {
             this.me.streakRewards = this.me.streakRewards.filter((r) => r !== ShellStreak.HardBoiled);
-            this.emit('selfShieldLost', this.me.hp, { dx, dz });
-        } else this.emit('selfShieldHit', this.me.shieldHp, this.me.hp, { dx, dz });
+            this.$emit('selfShieldLost', this.me.hp, { dx, dz });
+        } else this.$emit('selfShieldHit', this.me.shieldHp, this.me.hp, { dx, dz });
     }
 
     #processGameOptionsPacket() {
-        const oldOptions = { ...this.game.options };
+        const oldOptions = structuredClone(this.game.options);
 
         let gravity = CommIn.unPackInt8U();
         let damage = CommIn.unPackInt8U();
@@ -1312,14 +1356,14 @@ export class Bot {
         this.game.options.weaponsDisabled = Array.from({ length: 7 }, () => CommIn.unPackInt8U() === 1);
         this.game.options.mustUseSecondary = this.game.options.weaponsDisabled.every((v) => v);
 
-        this.emit('gameOptionsChange', oldOptions, this.game.options);
+        this.$emit('gameOptionsChange', oldOptions, this.game.options);
     }
 
     #processGameActionPacket() {
         const action = CommIn.unPackInt8U();
 
         if (action === GameAction.Pause) {
-            this.emit('gameForcePause');
+            this.$emit('gameForcePause');
             setTimeout(() => this.me.playing = false, 3000);
         }
 
@@ -1344,7 +1388,7 @@ export class Bot {
                 this.game.capturePercent = 0.0;
             }
 
-            this.emit('gameReset');
+            this.$emit('gameReset');
         }
     }
 
@@ -1355,7 +1399,7 @@ export class Bot {
 
         this.ping = Date.now() - this.lastPingTime;
 
-        this.emit('pingUpdate', oldPing, this.ping);
+        this.$emit('pingUpdate', oldPing, this.ping);
 
         setTimeout(() => {
             const out = new CommOut();
@@ -1377,7 +1421,7 @@ export class Bot {
         player.team = toTeam;
         player.streak = 0;
 
-        this.emit('playerSwitchTeam', player, oldTeam, toTeam);
+        this.$emit('playerSwitchTeam', player, oldTeam, toTeam);
     }
 
     #processChangeCharacterPacket() {
@@ -1406,7 +1450,7 @@ export class Bot {
 
         const player = this.players[id];
         if (player) {
-            const oldCharacter = { ...player.character };
+            const oldCharacter = structuredClone(player.character);
             const oldWeaponIdx = player.selectedGun;
 
             player.character.eggColor = shellColor;
@@ -1421,10 +1465,10 @@ export class Bot {
             player.character.stampPos.y = stampPositionY;
 
             player.selectedGun = weaponIndex;
-            player.weapons[0] = new GunList[weaponIndex]();
+            player.weapons[0] = createGun(GunList[weaponIndex]);
 
-            if (oldWeaponIdx !== player.selectedGun) this.emit('playerChangeGun', player, oldWeaponIdx, player.selectedGun);
-            if (oldCharacter !== player.character) this.emit('playerChangeCharacter', player, oldCharacter, player.character);
+            if (oldWeaponIdx !== player.selectedGun) this.$emit('playerChangeGun', player, oldWeaponIdx, player.selectedGun);
+            if (oldCharacter !== player.character) this.$emit('playerChangeCharacter', player, oldCharacter, player.character);
         }
     }
 
@@ -1433,19 +1477,19 @@ export class Bot {
         const oldBalance = this.account.eggBalance;
 
         this.account.eggBalance = newBalance;
-        this.emit('balanceUpdate', oldBalance, newBalance);
+        this.$emit('balanceUpdate', oldBalance, newBalance);
     }
 
     #processRespawnDeniedPacket() {
         this.me.playing = false;
-        this.emit('respawnDenied');
+        this.$emit('respawnDenied');
     }
 
     #processMeleePacket() {
         const id = CommIn.unPackInt8U();
         const player = this.players[id];
 
-        if (player) this.emit('playerMelee', player);
+        if (player) this.$emit('playerMelee', player);
     }
 
     #processReloadPacket() {
@@ -1466,7 +1510,7 @@ export class Bot {
             playerActiveWeapon.ammo.store -= newRounds;
         }
 
-        this.emit('playerReload', player, playerActiveWeapon);
+        this.$emit('playerReload', player, playerActiveWeapon);
     }
 
     updateGameOptions() {
@@ -1507,8 +1551,8 @@ export class Bot {
         if (this.intents.includes(this.Intents.COSMETIC_DATA))
             item = findItemById(item);
 
-        if (itemType === ItemType.Grenade) this.emit('grenadeExplode', item, { x, y, z }, damage, radius);
-        else this.emit('rocketHit', { x, y, z }, damage, radius);
+        if (itemType === ItemType.Grenade) this.$emit('grenadeExplode', item, { x, y, z }, damage, radius);
+        else this.$emit('rocketHit', { x, y, z }, damage, radius);
     }
 
     #processThrowGrenadePacket() {
@@ -1524,7 +1568,7 @@ export class Bot {
 
         if (player) {
             player.grenades--;
-            this.emit('playerThrowGrenade', player, { x, y, z }, { x: dx, y: dy, z: dz });
+            this.$emit('playerThrowGrenade', player, { x, y, z }, { x: dx, y: dy, z: dz });
         }
     }
 
@@ -1536,10 +1580,10 @@ export class Bot {
         if (!player) return;
 
         if (!this.intents.includes(this.Intents.CHALLENGES))
-            return this.emit('challengeComplete', player, challengeId);
+            return this.$emit('challengeComplete', player, challengeId);
 
         const challenge = this.account.challenges.find(c => c.id === challengeId);
-        this.emit('challengeComplete', player, challenge);
+        this.$emit('challengeComplete', player, challenge);
 
         if (player.id === this.me.id) this.refreshChallenges();
     }
@@ -1577,7 +1621,7 @@ export class Bot {
         if (this.intents.includes(this.Intents.LOAD_MAP) || this.intents.includes(this.Intents.PATHFINDING)) {
             this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
 
-            this.emit('mapLoad', this.game.map.raw);
+            this.$emit('mapLoad', this.game.map.raw);
 
             if (this.game.gameModeId === GameMode.KOTC) {
                 const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
@@ -1616,7 +1660,7 @@ export class Bot {
             }
         }, 15000);
 
-        this.emit('gameReady');
+        this.$emit('gameReady');
     }
 
     #processPlayerInfoPacket() {
@@ -1632,7 +1676,7 @@ export class Bot {
             dbId: playerDBId
         };
 
-        this.emit('playerInfo', player, playerIp, playerDBId);
+        this.$emit('playerInfo', player, playerIp, playerDBId);
     }
 
     packetHandlers = {
@@ -1680,7 +1724,7 @@ export class Bot {
     processPacket(packet) {
         CommIn.init(packet);
 
-        if (this.intents.includes(this.Intents.PACKET_HOOK)) this.emit('packet', packet);
+        if (this.intents.includes(this.Intents.PACKET_HOOK)) this.$emit('packet', packet);
 
         let lastCommand = 0;
         let lastCode = 0;
@@ -1745,7 +1789,7 @@ export class Bot {
                 await this.checkChiknWinner();
                 return 'on_cooldown';
             } else if (response.error === 'SESSION_EXPIRED') {
-                this.emit('sessionExpired');
+                this.$emit('sessionExpired');
                 return 'session_expired';
             }
 
@@ -1936,7 +1980,7 @@ export class Bot {
 
     processError(...params) {
         const error = params.join(' ');
-        if (this.#hooks.error && this.#hooks.error.length) this.emit('error', error);
+        if (this.#hooks.error && this.#hooks.error.length) this.$emit('error', error);
         else if (this.intents.includes(this.Intents.NO_EXIT_ON_ERROR)) console.error(error);
         else throw new Error(error);
     }
@@ -1947,7 +1991,7 @@ export class Bot {
         if (code > -1) {
             this.game?.socket?.close(code);
             this.state.left = true;
-            this.emit('leave', code);
+            this.$emit('leave', code);
         }
 
         clearInterval(this.updateIntervalId);

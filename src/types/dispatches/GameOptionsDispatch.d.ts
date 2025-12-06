@@ -19,10 +19,12 @@ export interface GameOptionChanges {
     rawWeaponsDisabled?: boolean[];
 }
 
+export type Params = [changes: GameOptionChanges];
+
 export declare class GameOptionsDispatch {
     changes: GameOptionChanges;
 
-    constructor(changes: GameOptionChanges);
+    constructor(...args: Params);
 
     validate(bot: Bot): boolean;
     check(bot: Bot): boolean;

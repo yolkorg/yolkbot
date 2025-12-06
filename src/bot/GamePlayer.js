@@ -1,5 +1,6 @@
 import { GunList, Movement, ShellStreak, SocialMedia } from '../constants/index.js';
 import { Cluck9mm } from '../constants/guns.js';
+import { createGun } from '../util.js';
 
 const RSocialMedia = Object.fromEntries(Object.entries(SocialMedia).map(([key, value]) => [value, key.toLowerCase()]));
 
@@ -68,8 +69,8 @@ export class GamePlayer {
         this.weapons = [];
 
         if (this.character.primaryGun) {
-            this.weapons[0] = new GunList[this.selectedGun]();
-            this.weapons[1] = new Cluck9mm();
+            this.weapons[0] = createGun(GunList[this.selectedGun]);
+            this.weapons[1] = createGun(Cluck9mm);
         }
 
         this.grenades = 1;

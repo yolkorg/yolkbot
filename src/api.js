@@ -5,7 +5,7 @@ import { FirebaseKey, UserAgent } from './constants/index.js';
 
 const baseHeaders = {
     'origin': 'https://shellshock.io',
-    'user-agent': UserAgent,
+    'user-agent': typeof process === 'undefined' ? null : UserAgent,
     'x-client-version': 'Chrome/JsCore/9.17.2/FirebaseCore-web',
     'x-firebase-locale': 'en'
 }
@@ -37,10 +37,11 @@ export class API {
                 try {
                     const resp = JSON.parse(mes.data);
                     resolve(resp);
-                } catch {
+                } catch (e) {
                     if (!this.suppressErrors) {
                         console.error('queryServices: Bad API JSON response with call:', request.cmd, 'and data:', JSON.stringify(request));
                         console.error('queryServices: Full data sent:', JSON.stringify(request));
+                        console.error(e);
                     }
 
                     resolve('bad_json');

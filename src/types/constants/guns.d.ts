@@ -1,14 +1,11 @@
 export interface GunAmmo {
-    rounds: number;
     capacity: number;
     reload: number;
     store: number;
-    storeMax: number;
     pickup: number;
 }
 
-declare class Gun {
-    // base props
+export type Gun = {
     ammo: GunAmmo;
 
     longReloadTime: number;
@@ -18,47 +15,26 @@ declare class Gun {
     internalName: string;
     standardMeshName: string;
 
-    automatic: boolean;
     damage: number;
     range: number;
     recoil: number;
     rof: number;
     totalDamage: number;
     velocity: number;
-
-    accuracyMin: number;
-    accuracyMax: number;
-    accuracyLoss: number;
-    accuracyRecover: number;
-
-    // optional props
-    adsMod: number;
-    burst: number;
-    burstRof: number;
-    movementAccuracyMod: number;
-    radius: number;
-    reloadBloom: boolean;
-    reloadTimeMod: number;
-    tracer: number;
 }
 
-declare class Eggk47 extends Gun { }
-declare class DozenGauge extends Gun { }
-declare class CSG1 extends Gun { }
-declare class Cluck9mm extends Gun { }
-declare class RPEGG extends Gun { }
-declare class M24 extends Gun { }
-declare class AUG extends Gun { }
+export declare const EggK47: Gun;
+export declare const DozenGauge: Gun;
+export declare const CSG1: Gun;
+export declare const Cluck9mm: Gun;
+export declare const RPEGG: Gun;
+export declare const SMG: Gun;
+export declare const M24: Gun;
+export declare const AUG: Gun;
 
-export type AnyGun = Eggk47 | DozenGauge | CSG1 | Cluck9mm | RPEGG | SMG | M24 | AUG;
-
-export {
-    Eggk47,
-    DozenGauge,
-    CSG1,
-    Cluck9mm,
-    RPEGG,
-    SMG,
-    M24,
-    AUG
-}
+export type CreatedGun = Gun & {
+    ammo: {
+        rounds: number;
+        storeMax: number;
+    }
+};

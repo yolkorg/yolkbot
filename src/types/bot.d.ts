@@ -20,13 +20,13 @@ type intents = {
 
 import { Character, GamePlayer, Position, View } from './bot/GamePlayer';
 import { Challenge } from './constants/challenges';
-import { AnyGun } from './constants/guns';
+import { CreatedGun } from './constants/guns';
 import { MapJSON } from './constants/maps';
 import { Item } from './constants/items';
-import { ADispatch } from './dispatches/index';
+import { Region } from './constants/regions';
+import { ADispatch, DispatchParams } from './dispatches/index';
 import { NodeList } from './pathing/mapnode';
 import { AnonError, API, LoginError, QueryServicesError } from './api';
-import { Matchmaker } from './matchmaker';
 import yolkws from './socket';
 
 export interface BotParams {
@@ -343,14 +343,18 @@ export interface FireBullet {
     dirZ: number;
 }
 
-type FindPublicErrors = 'no_region_passed' | 'invalid_region_passed' | 'no_mode_passed' | 'invalid_mode_passed' | 'matchmaker_init_fail' | 'internal_session_error';
-type CreatePrivateErrors = FindPublicErrors | 'invalid_map_passed';
-type BotLoginError = 'account_banned';
+type MatchmakerError = 'matchmaker_connect_failed';
+type FindPublicError = MatchmakerError | 'no_region_passed' | 'invalid_region_passed' | 'no_mode_passed' | 'invalid_mode_passed' | 'internal_session_error';
+type CreatePrivateError = FindPublicError | 'invalid_map_passed';
+type ExpandedLoginError = LoginError | 'account_banned';
+type InitSessionError = ExpandedLoginError | AnonError | MatchmakerError;
 
 export class Bot {
     static Intents: intents;
     Intents: intents;
     intents: number[];
+
+    regionList: Region[];
 
     proxy: string;
     instance: string;
@@ -372,24 +376,26 @@ export class Bot {
     hasQuit: boolean;
 
     api: API;
-    matchmaker: Matchmaker | null;
+    matchmaker: yolkws | null;
 
     constructor(params?: BotParams);
 
-    loginAnonymously(): Promise<Account | BotLoginError | AnonError>;
-    loginWithRefreshToken(refreshToken: string): Promise<Account | BotLoginError | LoginError>;
-    login(email: string, pass: string): Promise<Account | BotLoginError | LoginError>;
-    createAccount(email: string, pass: string): Promise<Account | BotLoginError | LoginError>;
+    loginAnonymously(): Promise<Account | LoginError | AnonError>;
+    loginWithRefreshToken(refreshToken: string): Promise<Account | LoginError | LoginError>;
+    login(email: string, pass: string): Promise<Account | LoginError | LoginError>;
+    createAccount(email: string, pass: string): Promise<Account | LoginError | LoginError>;
 
-    initMatchmaker(): Promise<true | BotLoginError | AnonError | 'matchmaker_tryconnect_failed'>;
+    createMatchmaker(): Promise<false | MatchmakerError>;
+    getRegions(): Promise<Region[] | MatchmakerError>;
 
-    createPrivateGame(region: string, mode: number, map: string): Promise<RawGameData | FindPublicErrors>;
-    findPublicGame(region: string, mode: number): Promise<RawGameData | CreatePrivateErrors>;
+    initSession(): Promise<false | InitSessionError>;
 
-    join(botName: string, data: string | RawGameData): Promise<true | 'matchmaker_init_fail' | 'game_not_found' | 'websocket_tryconnect_fail' | 'invalid_game_object'>;
+    createPrivateGame(region: string, mode: number, map: string): Promise<RawGameData | FindPublicError>;
+    findPublicGame(region: string, mode: number): Promise<RawGameData | CreatePrivateError>;
+
+    join(botName: string, data: string | RawGameData): Promise<true | InitSessionError | 'game_not_found' | 'websocket_tryconnect_fail' | 'invalid_game_object'>;
 
     processPacket(data: number[]): void;
-    dispatch(disp: ADispatch): boolean;
     update(): void;
 
     canSee(player: GamePlayer): boolean;
@@ -419,13 +425,13 @@ export class Bot {
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerChangeCharacter', cb: (player: GamePlayer, oldCharacter: Character, newCharacter: Character) => void): void;
     on(event: 'playerChangeGun', cb: (player: GamePlayer, oldGunId: number, newGunId: number) => void): void;
-    on(event: 'playerCollectAmmo', cb: (player: GamePlayer, weapon: AnyGun, itemId: number) => void): void;
+    on(event: 'playerCollectAmmo', cb: (player: GamePlayer, weapon: CreatedGun, itemId: number) => void): void;
     on(event: 'playerCollectGrenade', cb: (player: GamePlayer, itemId: number) => void): void;
     on(event: 'playerDamage', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
     on(event: 'playerDeath', cb: (killed: GamePlayer, killer: GamePlayer, oldKilled: GamePlayer, damageInt: number) => void): void;
     on(event: 'playerEndStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerEnterZone', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerFire', cb: (player: GamePlayer, weapon: AnyGun, bullet: FireBullet) => void): void;
+    on(event: 'playerFire', cb: (player: GamePlayer, weapon: CreatedGun, bullet: FireBullet) => void): void;
     on(event: 'playerJoin', cb: (player: GamePlayer) => void): void;
     on(event: 'playerInfo', cb: (player: GamePlayer, playerIP: string, playerDBId: string) => void): void;
     on(event: 'playerLeave', cb: (player: GamePlayer) => void): void;
@@ -433,7 +439,7 @@ export class Bot {
     on(event: 'playerMelee', cb: (player: GamePlayer) => void): void;
     on(event: 'playerMove', cb: (player: GamePlayer, oldPosition: Position, newPosition: Position) => void): void;
     on(event: 'playerPause', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerReload', cb: (player: GamePlayer, weapon: AnyGun) => void): void;
+    on(event: 'playerReload', cb: (player: GamePlayer, weapon: CreatedGun) => void): void;
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
     on(event: 'playerRotate', cb: (player: GamePlayer, oldView: View, newView: View) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
@@ -446,6 +452,9 @@ export class Bot {
     on(event: 'sessionExpired', cb: () => void): void;
     on(event: 'spawnItem', cb: (itemType: number, itemPosition: Position, itemId: number) => void): void;
     on(event: 'tick', cb: () => void): void;
+
+    dispatch(disp: ADispatch): boolean;
+    emit<K extends keyof DispatchParams>(type: K, ...args: DispatchParams[K]): boolean;
 
     checkChiknWinner(): Promise<ChiknWinnerStatus | QueryServicesError>;
     playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | QueryServicesError | 'hit_daily_limit' | 'on_cooldown' | 'session_expired' | 'unknown_error'>;

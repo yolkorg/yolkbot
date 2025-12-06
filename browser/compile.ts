@@ -6,7 +6,7 @@ const buildDir = path.join(import.meta.dirname, 'build');
 if (fs.existsSync(buildDir)) fs.rmSync(buildDir, { recursive: true });
 fs.mkdirSync(buildDir);
 
-const replaceBrowserFiles = {
+const replaceBrowserFiles: Bun.BunPlugin = {
     name: 'replaceBrowserFiles',
 
     setup(build) {
@@ -33,13 +33,12 @@ const replaceBrowserFiles = {
 fs.rmSync(buildDir, { recursive: true });
 fs.mkdirSync(buildDir);
 
-const build = async (module) => {
+const build = async (module: 'global' | 'module') => {
     await Bun.build({
-        entryPoints: [path.join(import.meta.dirname, 'entry', `${module}.js`)],
+        entrypoints: [path.join(import.meta.dirname, 'entry', `${module}.js`)],
         outdir: buildDir,
 
         minify: !process.argv.includes('-nm'),
-        bundle: true,
         target: 'browser',
         format: 'esm',
         plugins: [replaceBrowserFiles]
