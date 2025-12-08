@@ -6,15 +6,12 @@ const distDir = path.join(import.meta.dirname, '..', 'dist');
 
 const manifest = await fetch('https://x.yolkbot.xyz/data/manifest.json').then(res => res.json());
 
-const buildAndWrite = async (dest: string, code: string, forceMinify?: boolean) => {
-    const transpiler = new Bun.Transpiler({
-        minifyWhitespace: forceMinify || !process.argv.includes('-nm'),
-        target: 'browser',
-        loader: 'ts',
-        inline: true
-    });
+const minifiedTranspiler = new Bun.Transpiler({ minifyWhitespace: true, target: 'browser', loader: 'ts', inline: true });
+const cleanTranspiler = new Bun.Transpiler({ minifyWhitespace: false, target: 'browser', loader: 'ts', inline: true });
 
-    const transpileResult = transpiler.transformSync(code);
+const buildAndWrite = async (dest: string, code: string, forceMinify?: boolean) => {
+    const transpiler = forceMinify || !process.argv.includes('-nm') ? minifiedTranspiler : cleanTranspiler;
+    const transpileResult = await transpiler.transform(code);
 
     return fs.writeFileSync(dest, transpileResult);
 }

@@ -1,3 +1,5 @@
+import { Intents } from '../enums.js';
+
 export class GoToPlayerDispatch {
     idOrName;
 
@@ -6,7 +8,7 @@ export class GoToPlayerDispatch {
     }
 
     validate(bot) {
-        if (!bot.intents.includes(bot.Intents.PATHFINDING)) return false;
+        if (!bot.intents.includes(Intents.PATHFINDING)) return false;
         if (!this.idOrName) return false;
 
         const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);

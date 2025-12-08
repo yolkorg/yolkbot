@@ -1,6 +1,8 @@
+import { Intents } from '../enums.js';
+
 export class GoToAmmoDispatch {
     validate(bot) {
-        return bot.intents.includes(bot.Intents.PATHFINDING)
+        return bot.intents.includes(Intents.PATHFINDING)
     }
 
     check(bot) {

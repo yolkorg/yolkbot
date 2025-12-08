@@ -1,6 +1,8 @@
 import CommOut from '../comm/CommOut.js';
 import CommCode from '../constants/CommCode.js';
 
+import { Intents } from '../enums.js';
+
 export class SpawnDispatch {
     validate() {
         return true;
@@ -9,7 +11,7 @@ export class SpawnDispatch {
     check(bot) {
         if (bot.me.playing) return false;
         if ((bot.lastDeathTime + 6000) < Date.now()) return false;
-        if (bot.intents.includes(bot.Intents.OBSERVE_GAME)) return false;
+        if (bot.intents.includes(Intents.OBSERVE_GAME)) return false;
 
         return true;
     }

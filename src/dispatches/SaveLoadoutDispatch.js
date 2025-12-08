@@ -2,6 +2,7 @@ import CommOut from '../comm/CommOut.js';
 import CommCode from '../constants/CommCode.js';
 
 import { findItemById, GunList, ItemType } from '../constants/index.js';
+import { Intents } from '../enums.js';
 import { createGun } from '../util.js';
 
 const isDefault = (itemId) => findItemById(itemId) && findItemById(itemId).unlock === 'default';
@@ -98,7 +99,7 @@ export class SaveLoadoutDispatch {
                 out.send(bot.game.socket);
             }
 
-            const findCosmetics = bot.intents.includes(bot.Intents.COSMETIC_DATA);
+            const findCosmetics = bot.intents.includes(Intents.COSMETIC_DATA);
 
             // apply changes to the bot
             Object.entries(this.changes).forEach(([changeKey, changeValue]) => {
