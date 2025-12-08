@@ -1,5 +1,3 @@
-import AStar from '../pathing/astar.js';
-
 export class GoToSpatulaDispatch {
     validate(bot) {
         return bot.intents.includes(bot.Intents.PATHFINDING);
@@ -13,18 +11,13 @@ export class GoToSpatulaDispatch {
     }
 
     execute(bot) {
-        this.pather = new AStar(bot.pathing.nodeList);
+        const myNode = bot.pathing.nodeList.atObject(bot.me.position);
+        const targetNode = bot.pathing.nodeList.atObject(bot.game.spatula.coords);
 
-        const position = Object.entries(bot.me.position).map(entry => Math.floor(entry[1]));
-        const targetPos = Object.entries(bot.game.spatula.coords).map(entry => Math.floor(entry[1]));
+        bot.pathing.activePath = bot.pathing.astar.path(myNode, targetNode);
 
-        const myNode = bot.pathing.nodeList.at(...position);
-        const targetNode = bot.pathing.nodeList.at(...targetPos);
-
-        bot.pathing.activePath = this.pather.path(myNode, targetNode);
-
-        if (!bot.pathing.activePath) return bot.processError('no path found');
-        if (bot.pathing.activePath.length < 2) return bot.processError('path too short');
+        if (!bot.pathing.activePath) return bot.$emit('pathfindError', 'no path found');
+        if (bot.pathing.activePath.length < 2) return bot.$emit('pathfindError', 'path too short');
 
         bot.pathing.followingPath = true;
         bot.pathing.activeNode = bot.pathing.activePath[1];

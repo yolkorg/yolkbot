@@ -1,6 +1,9 @@
 import globals from './env/globals.js';
 import yolkws from './socket.js';
 
+import { APIError } from './enums.js';
+import { createError } from './util.js';
+
 import { FirebaseKey, UserAgent } from './constants/index.js';
 
 const baseHeaders = {
@@ -16,8 +19,6 @@ export class API {
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
 
-        this.maxRetries = params.maxRetries || 5;
-        this.suppressErrors = params.suppressErrors || false;
         this.connectionTimeout = params.connectionTimeout || 5000;
     }
 
@@ -25,8 +26,8 @@ export class API {
         const ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.proxy);
         ws.connectionTimeout = this.connectionTimeout;
 
-        const didConnect = await ws.tryConnect(-2);
-        if (!didConnect || ws.socket.readyState !== 1) return 'websocket_connect_fail';
+        const didConnect = await ws.tryConnect();
+        if (!didConnect || ws.socket.readyState !== 1) return createError(APIError.WebSocketConnectFail);
 
         return new Promise((resolve) => {
             let resolved = false;
@@ -36,40 +37,39 @@ export class API {
 
                 try {
                     const resp = JSON.parse(mes.data);
-                    resolve(resp);
+                    resolve({ ok: true, ...resp });
                 } catch (e) {
-                    if (!this.suppressErrors) {
-                        console.error('queryServices: Bad API JSON response with call:', request.cmd, 'and data:', JSON.stringify(request));
-                        console.error('queryServices: Full data sent:', JSON.stringify(request));
-                        console.error(e);
-                    }
-
-                    resolve('bad_json');
+                    console.error('queryServices: error! command:', request.cmd, 'and data:', request, e);
+                    resolve(createError(APIError.InternalError));
                 }
 
                 ws.close();
             };
 
-            ws.onerror = () => !resolved && resolve('unknown_socket_error');
-            ws.onclose = () => !resolved && resolve('services_closed_early');
+            ws.onerror = () => !resolved && resolve(createError(APIError.InternalError));
+
+            ws.onclose = () => {
+                if (resolved) return;
+
+                console.log('queryServices: services closed before sending back message');
+                console.log('queryServices: command:', request.cmd, 'and data:', request);
+
+                resolve(createError(APIError.ServicesClosedEarly));
+            };
 
             ws.send(JSON.stringify(request));
         });
     }
 
     #authWithEmailPass = async (email, password, endpoint) => {
-        if (!email || !password) return 'firebase_no_credentials';
+        if (!email || !password) return createError(APIError.MissingParams);
 
-        let body, firebaseToken;
+        let body;
 
         try {
             const request = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
                 method: 'POST',
-                body: JSON.stringify({
-                    email,
-                    password,
-                    returnSecureToken: true
-                }),
+                body: JSON.stringify({ email, password, returnSecureToken: true }),
                 headers: {
                     ...baseHeaders,
                     'content-type': 'application/json'
@@ -78,48 +78,41 @@ export class API {
             });
 
             body = await request.json();
-            firebaseToken = body.idToken;
         } catch (error) {
             if (error.code === 'auth/network-request-failed') {
-                if (!this.suppressErrors) console.error('loginWithCredentials: Network req failed (auth/network-request-failed)');
-                return 'firebase_network_failed';
-            } else if (error.code === 'auth/missing-email') {
-                return 'firebase_no_credentials';
+                console.error('authWithEmailPass: network error', body || error);
+                return createError(APIError.NetworkFail);
             } else if (error.code === 'ERR_BAD_REQUEST') {
-                if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password);
-                if (!this.suppressErrors) console.error('loginWithCredentials: Error:', body || error);
-                return 'firebase_bad_request';
+                console.error('authWithEmailPass: bad request', body || error);
+                return createError(APIError.InternalError);
             }
 
-            if (!this.suppressErrors) console.error('loginWithCredentials: Error:', email, password, error);
-            return 'firebase_unknown_error';
+            console.error('authWithEmailPass: unknown error:', email, password, error);
+            return createError(APIError.InternalError);
         }
 
-        if (!firebaseToken) {
-            if (!this.suppressErrors) console.error('loginWithCredentials: the game sent no idToken', body);
-            return 'firebase_no_token';
+        if (!body.idToken) {
+            console.error('authWithEmailPass: missing idToken', body);
+            return createError(APIError.InternalError);
         }
 
-        this.idToken = firebaseToken;
+        this.idToken = body.idToken;
 
-        const servicesQuery = await this.queryServices({ cmd: 'auth', firebaseToken });
-        return typeof servicesQuery === 'object' ? { firebase: body, ...servicesQuery } : servicesQuery;
+        const servicesQuery = await this.queryServices({ cmd: 'auth', firebaseToken: body.idToken });
+        return servicesQuery.ok ? { firebase: body, ...servicesQuery } : servicesQuery;
     }
 
-    createAccount = async (email, password) =>
-        await this.#authWithEmailPass(email, password, 'signUp');
-
-    loginWithCredentials = async (email, password) =>
-        await this.#authWithEmailPass(email, password, 'signInWithPassword');
+    createAccount = (email, password) => this.#authWithEmailPass(email, password, 'signUp');
+    loginWithCredentials = (email, password) => this.#authWithEmailPass(email, password, 'signInWithPassword');
 
     loginWithRefreshToken = async (refreshToken) => {
-        if (!refreshToken) return 'firebase_no_credentials';
+        if (!refreshToken) return createError(APIError.MissingParams);
 
         const formData = new URLSearchParams();
         formData.append('grant_type', 'refresh_token');
         formData.append('refresh_token', refreshToken);
 
-        let body, token;
+        let body;
 
         try {
             const request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
@@ -133,28 +126,25 @@ export class API {
             });
 
             body = await request.json();
-            token = body.id_token;
         } catch (error) {
             if (error.code === 'auth/network-request-failed') {
-                if (!this.suppressErrors) console.error('loginWithRefreshToken: Network req failed (auth/network-request-failed)');
-                return 'firebase_network_failed';
-            } else if (error.code === 'auth/missing-email') {
-                return 'firebase_no_credentials';
+                console.error('loginWithRefreshToken: network error', body || error);
+                return createError(APIError.NetworkFail);
             }
 
-            if (!this.suppressErrors) console.error('loginWithRefreshToken: Error:', error, refreshToken);
-            return 'firebase_unknown_error';
+            console.error('loginWithRefreshToken: unknown error:', body, error);
+            return createError(APIError.InternalError);
         }
 
-        if (!token) {
-            if (!this.suppressErrors) console.error('loginWithRefreshToken: the game sent no idToken', body);
-            return 'firebase_no_token';
+        if (!body.id_token) {
+            console.error('loginWithRefreshToken: missing idToken', body);
+            return createError(APIError.InternalError);
         }
 
-        this.idToken = token;
+        this.idToken = body.id_token;
 
-        const response = await this.queryServices({ cmd: 'auth', firebaseToken: token });
-        return typeof response === 'object' ? { firebase: body, ...response } : response;
+        const response = await this.queryServices({ cmd: 'auth', firebaseToken: body.id_token });
+        return response.ok ? { firebase: body, ...response } : response;
     }
 
     loginAnonymously = async () => {
@@ -169,21 +159,20 @@ export class API {
         });
 
         const body = await req.json();
-        const firebaseToken = body.idToken;
 
-        if (!firebaseToken) {
-            if (!this.suppressErrors) console.error('loginAnonymously: the game sent no idToken', body);
-            return 'firebase_no_token';
+        if (!body.idToken) {
+            console.error('loginAnonymously: missing idToken', body);
+            return createError(APIError.InternalError);
         }
 
-        this.idToken = firebaseToken;
+        this.idToken = body.idToken;
 
-        const query = await this.queryServices({ cmd: 'auth', firebaseToken });
-        return typeof query === 'object' ? { firebase: body, ...query } : query;
+        const query = await this.queryServices({ cmd: 'auth', firebaseToken: body.idToken });
+        return query.ok ? { firebase: body, ...query } : query;
     }
 
     sendEmailVerification = async (idToken = this.idToken) => {
-        if (!idToken) return 'no_idtoken_passed';
+        if (!idToken) return createError(APIError.MissingParams);
 
         const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FirebaseKey}`, {
             method: 'POST',
@@ -198,15 +187,15 @@ export class API {
         const body = await req.json();
 
         if (body.kind !== 'identitytoolkit#GetOobConfirmationCodeResponse') {
-            if (!this.suppressErrors) console.error('sendEmailVerification: the game sent an invalid response', body);
-            return 'firebase_invalid_response';
+            console.error('sendEmailVerification: the game sent an invalid response', body);
+            return createError(APIError.InternalError);
         }
 
-        return { email: body.email };
+        return { ok: true, email: body.email };
     }
 
     verifyOobCode = async (oobCode) => {
-        if (!oobCode) return 'no_oob_code_passed';
+        if (!oobCode) return createError(APIError.MissingParams);
 
         const req = await globals.fetch(`https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=${FirebaseKey}`, {
             method: 'POST',
@@ -223,11 +212,11 @@ export class API {
         const body = await req.json();
 
         if (!body.emailVerified) {
-            if (!this.suppressErrors) console.error('verifyOobCode: the game sent an invalid response', body);
-            return 'firebase_invalid_response';
+            console.error('verifyOobCode: the game sent an invalid response', body);
+            return createError(APIError.InternalError);
         }
 
-        return body.email;
+        return { ok: true, email: body.email };
     }
 }
 

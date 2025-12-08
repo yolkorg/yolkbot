@@ -7,6 +7,8 @@ export const createGun = (baseGun) => {
     return gun;
 }
 
+export const createError = (errorEnum) => ({ ok: false, error: errorEnum });
+
 export const fetchMap = async (name, hash) => {
     if (typeof process !== 'undefined') {
         const { existsSync, mkdirSync, readFileSync, writeFileSync } = process.getBuiltinModule('node:fs');

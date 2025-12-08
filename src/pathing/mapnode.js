@@ -132,6 +132,10 @@ class NodeList {
         return this.nodeMap?.get(`${x},${y},${z}`);
     }
 
+    atObject({ x, y, z }) {
+        return this.nodeMap?.get(`${Math.floor(x)},${Math.floor(y)},${Math.floor(z)}`);
+    }
+
     clean() {
         for (const node of this.list) {
             node.f = 0;
