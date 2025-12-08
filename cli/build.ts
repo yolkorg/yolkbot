@@ -68,11 +68,4 @@ fs.mkdirSync(distDir);
 
 copyAndMinify(srcDir, distDir);
 
-const rootTypesDir = path.join(import.meta.dirname, '..', 'types');
-const distTypesDir = path.join(distDir, 'types');
-
-if (fs.existsSync(rootTypesDir)) {
-    copyAndMinify(rootTypesDir, distTypesDir);
-}
-
 console.log('\x1b[32m✓ built node\x1b[0m');
