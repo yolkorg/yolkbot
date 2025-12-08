@@ -16,7 +16,7 @@ class MapNode {
         this.closed = null;
         this.links = [];
 
-        if (this.meshType === 'wedge' && data.ry !== undefined) this.ry = data.ry ?? 0;
+        if (this.meshType === 'wedge' && typeof data.ry !== 'undefined') this.ry = data.ry ?? 0;
     }
 
     isFull() {

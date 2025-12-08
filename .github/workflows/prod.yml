@@ -24,7 +24,7 @@ jobs:
         run: bun run cli/build
 
       - name: build browser
-        run: bun run browser/compile
+        run: bun run browser/build
 
       - name: install npm
         run: bun install -g npm@latest

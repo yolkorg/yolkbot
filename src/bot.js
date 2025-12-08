@@ -485,7 +485,8 @@ export class Bot {
 
         if (typeof mode === 'number') {
             if (Object.values(GameMode).indexOf(mode) === -1) return createError(GameFindError.InvalidMode);
-            else computedModeId = mode;
+            
+            computedModeId = mode;
         } else if (typeof mode === 'string') {
             const modeEntry = Object.keys(GameMode).find((key) => key.toLowerCase() === mode.toLowerCase());
             if (!modeEntry) return createError(GameFindError.InvalidMode);
@@ -533,7 +534,8 @@ export class Bot {
 
         if (typeof mode === 'number') {
             if (Object.values(GameMode).indexOf(mode) === -1) return createError(GameFindError.InvalidMode);
-            else computedModeId = mode;
+            
+            computedModeId = mode;
         } else if (typeof mode === 'string') {
             const modeEntry = Object.keys(GameMode).find((key) => key.toLowerCase() === mode.toLowerCase());
             if (!modeEntry) return createError(GameFindError.InvalidMode);

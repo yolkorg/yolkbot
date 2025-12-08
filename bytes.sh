@@ -1,5 +1,3 @@
-#!/bin/bash
-
 file="$1"
 
 if [ $# -eq 0 ]; then
