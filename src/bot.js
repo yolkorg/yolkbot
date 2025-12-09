@@ -10,15 +10,10 @@ import yolkws from './socket.js';
 
 import {
     ChiknWinnerDailyLimit,
-    CollectType,
     CoopState,
     findItemById,
     FramesBetweenSyncs,
-    GameAction,
     GameMode,
-    GameOptionFlag,
-    GunList,
-    ItemType,
     Movement,
     PlayType,
     ShellStreak,
@@ -30,11 +25,8 @@ import MovementDispatch from './dispatches/MovementDispatch.js';
 
 import { DispatchIndex } from './dispatches/index.js';
 
-import AStar from './pathing/astar.js';
-import { NodeList } from './pathing/mapnode.js';
-
 import { coords, validate } from './wasm/direct.js';
-import { createError, createGun, fetchMap, initKotcZones } from './util.js';
+import { createError } from './util.js';
 
 import { Challenges } from './constants/challenges.js';
 import { Maps } from './constants/maps.js';
@@ -55,9 +47,39 @@ import {
     RedeemCodeError
 } from './enums.js';
 
-const GameModeById = Object.fromEntries(Object.entries(GameMode).map(([key, value]) => [value, key]));
-
-const CCGameOptionFlag = Object.fromEntries(Object.entries(GameOptionFlag).map(([k, v]) => [k[0].toLowerCase() + k.slice(1), v]));
+import processAddPlayerPacket from './packets/addPlayer.js';
+import processBeginShellStreakPacket from './packets/beginShellStreak.js';
+import processChallengeCompletedPacket from './packets/challengeCompleted.js';
+import processChangeCharacterPacket from './packets/changeCharacter.js';
+import processChatPacket from './packets/chat.js';
+import processCollectItemPacket from './packets/collectItem.js';
+import processDiePacket from './packets/die.js';
+import processEndShellStreakPacket from './packets/endShellStreak.js';
+import processEventModifierPacket from './packets/eventModifier.js';
+import processExplodePacket from './packets/explode.js';
+import processFirePacket from './packets/fire.js';
+import processGameActionPacket from './packets/gameAction.js';
+import processGameJoinedPacket from './packets/gameJoined.js';
+import processGameOptionsPacket from './packets/gameOptions.js';
+import processHitMeHardBoiledPacket from './packets/hitMeHardBoiled.js';
+import processHitMePacket from './packets/hitMe.js';
+import processHitThemPacket from './packets/hitThem.js';
+import processMeleePacket from './packets/melee.js';
+import processMetaGameStatePacket from './packets/metaGameState.js';
+import processPausePacket from './packets/pause.js';
+import processPingPacket from './packets/ping.js';
+import processPlayerInfoPacket from './packets/playerInfo.js';
+import processReloadPacket from './packets/reload.js';
+import processRemovePlayerPacket from './packets/removePlayer.js';
+import processRespawnPacket from './packets/respawn.js';
+import processSocketReadyPacket from './packets/socketReady.js';
+import processSpawnItemPacket from './packets/spawnItem.js';
+import processSwitchTeamPacket from './packets/switchTeam.js';
+import processSyncMePacket from './packets/syncMe.js';
+import processSyncThemPacket from './packets/syncThem.js';
+import processThrowGrenadePacket from './packets/throwGrenade.js';
+import processUpdateBalancePacket from './packets/updateBalance.js';
+import processSwapWeaponPacket from './packets/swapWeapon.js';
 
 const mod = (n, m) => ((n % m) + m) % m;
 
@@ -128,7 +150,7 @@ export class Bot {
 
             // data given on sign in
             gameModeId: 0, // assume ffa
-            gameMode: GameModeById[0], // assume ffa
+            gameMode: 'ffa', // assume ffa
             mapIdx: 0,
             map: {
                 filename: '',
@@ -807,722 +829,6 @@ export class Bot {
         else throw new Error(`no event found for "${event}"`);
     }
 
-    #processChatPacket() {
-        const id = CommIn.unPackInt8U();
-        const msgFlags = CommIn.unPackInt8U();
-        const text = CommIn.unPackString().valueOf();
-
-        const player = this.players[id];
-
-        this.$emit('chat', player, text, msgFlags);
-    }
-
-    #processAddPlayerPacket() {
-        const id = CommIn.unPackInt8U();
-        const findCosmetics = this.intents.includes(Intents.COSMETIC_DATA);
-
-        const playerData = {
-            id,
-            uniqueId: CommIn.unPackString(),
-            name: CommIn.unPackString(),
-            safeName: CommIn.unPackString(),
-            charClass: CommIn.unPackInt8U(),
-            team: CommIn.unPackInt8U(),
-            primaryWeaponItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            secondaryWeaponItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            shellColor: CommIn.unPackInt8U(),
-            hatItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            stampItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            stampPosX: CommIn.unPackInt8(),
-            stampPosY: CommIn.unPackInt8(),
-            grenadeItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            meleeItem: findCosmetics ? findItemById(CommIn.unPackInt16U()) : CommIn.unPackInt16U(),
-            x: CommIn.unPackFloat(),
-            y: CommIn.unPackFloat(),
-            z: CommIn.unPackFloat(),
-            $dx: CommIn.unPackFloat(),
-            $dy: CommIn.unPackFloat(),
-            $dz: CommIn.unPackFloat(),
-            yaw: CommIn.unPackRadU(),
-            pitch: CommIn.unPackRad(),
-            score: CommIn.unPackInt32U(),
-            // the following are all stats
-            $kills: CommIn.unPackInt16U(),
-            $deaths: CommIn.unPackInt16U(),
-            $streak: CommIn.unPackInt16U(),
-            totalKills: CommIn.unPackInt32U(),
-            totalDeaths: CommIn.unPackInt32U(),
-            bestStreak: CommIn.unPackInt16U(),
-            $bestOverallStreak: CommIn.unPackInt16U(),
-            // end stats
-            shield: CommIn.unPackInt8U(),
-            hp: CommIn.unPackInt8U(),
-            playing: CommIn.unPackInt8U(),
-            weaponIdx: CommIn.unPackInt8U(),
-            $controlKeys: CommIn.unPackInt8U(),
-            upgradeProductId: CommIn.unPackInt8U(),
-            activeShellStreaks: CommIn.unPackInt8U(),
-            social: CommIn.unPackLongString(),
-            hideBadge: CommIn.unPackInt8U()
-        };
-
-        this.game.mapIdx = CommIn.unPackInt8U();
-        this.game.isPrivate = CommIn.unPackInt8U() === 1;
-        this.game.gameModeId = CommIn.unPackInt8U();
-
-        const player = new GamePlayer(playerData, this.game.gameMode === GameMode.KOTC ? this.game.activeZone : null);
-        if (!this.players[playerData.id]) this.players[playerData.id] = player;
-
-        this.$emit('playerJoin', player);
-
-        if (this.me.id === playerData.id) {
-            this.me = player;
-            this.$emit('botJoin', this.me);
-        }
-    }
-
-    #processRespawnPacket() {
-        const id = CommIn.unPackInt8U();
-        const seed = CommIn.unPackInt16U();
-        const x = CommIn.unPackFloat();
-        const y = CommIn.unPackFloat();
-        const z = CommIn.unPackFloat();
-        const primaryRounds = CommIn.unPackInt8U();
-        const primaryStore = CommIn.unPackInt8U();
-        const secondaryRounds = CommIn.unPackInt8U();
-        const secondaryStore = CommIn.unPackInt8U();
-        const grenades = CommIn.unPackInt8U();
-        const player = this.players[id];
-
-        if (player) {
-            player.playing = true;
-            player.randomSeed = seed;
-
-            if (player.weapons[0] && player.weapons[0].ammo) player.weapons[0].ammo.rounds = primaryRounds;
-            if (player.weapons[0] && player.weapons[0].ammo) player.weapons[0].ammo.store = primaryStore;
-            if (player.weapons[1] && player.weapons[1].ammo) player.weapons[1].ammo.rounds = secondaryRounds;
-            if (player.weapons[1] && player.weapons[1].ammo) player.weapons[1].ammo.store = secondaryStore;
-
-            player.grenades = grenades;
-            player.position = { x, y, z };
-
-            player.spawnShield = 120;
-
-            this.$emit('playerRespawn', player);
-        }
-    }
-
-    #processSyncThemPacket() {
-        const id = CommIn.unPackInt8U();
-        const x = CommIn.unPackFloat();
-        const y = CommIn.unPackFloat();
-        const z = CommIn.unPackFloat();
-        const climbing = CommIn.unPackInt8U();
-
-        const player = this.players[id];
-        if (!player || player.id === this.me.id) {
-            for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
-                CommIn.unPackInt8U();
-                CommIn.unPackRadU();
-                CommIn.unPackRad();
-                CommIn.unPackInt8U();
-            }
-            return; // syncMe has a job
-        }
-
-        for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
-            const controlKeys = CommIn.unPackInt8U();
-
-            if (controlKeys & Movement.Jump) player.jumping = true;
-            else player.jumping = false;
-
-            if (controlKeys & Movement.Scope) player.scoping = true;
-            else player.scoping = false;
-
-            const oldView = structuredClone(player.view);
-
-            player.view.yaw = CommIn.unPackRadU();
-            player.view.pitch = CommIn.unPackRad();
-
-            if (player.view.yaw !== oldView.yaw || player.view.pitch !== oldView.pitch)
-                this.$emit('playerRotate', player, oldView, player.view);
-
-            player.scale = CommIn.unPackInt8U();
-        }
-
-        const px = player.position;
-        const posChanged = px.x !== x || px.y !== y || px.z !== z;
-        const climbingChanged = player.climbing !== climbing;
-        const didChange = posChanged || climbingChanged;
-
-        const oldPosition = didChange ? structuredClone(px) : null;
-
-        if (px.x !== x) px.x = x;
-        if (px.z !== z) px.z = z;
-        if (!player.jumping || Math.abs(px.y - y) > 0.5) px.y = y;
-        if (climbingChanged) player.climbing = climbing;
-
-        if (!didChange) return;
-
-        this.$emit('playerMove', player, oldPosition, px);
-
-        if (this.game.gameModeId !== GameMode.KOTC) return;
-
-        const zone = this.game.activeZone;
-        const wasIn = !!player.inKotcZone;
-
-        if (!zone && wasIn) {
-            player.inKotcZone = false;
-            this.$emit('playerLeaveZone', player);
-            return;
-        }
-
-        player.updateKotcZone(zone);
-
-        const nowIn = !!player.inKotcZone;
-        if (wasIn !== nowIn) {
-            player.inKotcZone = nowIn;
-            this.$emit(nowIn ? 'playerEnterZone' : 'playerLeaveZone', player);
-        }
-    }
-
-    #processPausePacket() {
-        const id = CommIn.unPackInt8U();
-        const player = this.players[id];
-
-        if (player) {
-            player.playing = false;
-            if (player.streakRewards) player.streakRewards = [];
-
-            this.$emit('playerPause', player);
-
-            if (player.inKotcZone) {
-                player.inKotcZone = false;
-                this.$emit('playerLeaveZone', player);
-            }
-        }
-    }
-
-    #processSwapWeaponPacket() {
-        const id = CommIn.unPackInt8U();
-        const newWeaponId = CommIn.unPackInt8U();
-        const player = this.players[id];
-
-        if (player) {
-            player.activeGun = newWeaponId;
-            this.$emit('playerSwapWeapon', player, newWeaponId);
-        }
-    }
-
-    #processDeathPacket() {
-        const killedId = CommIn.unPackInt8U();
-        const killerId = CommIn.unPackInt8U();
-
-        CommIn.unPackInt8U(); // timeUntilRespawn
-        CommIn.unPackInt8U(); // killerLastDamageCause
-
-        const damageCauseInt = CommIn.unPackInt8U();
-
-        const killed = this.players[killedId];
-        const killer = this.players[killerId];
-
-        const oldKilled = killed ? structuredClone(killed) : null;
-
-        if (killed) {
-            if (killed.id === this.me.id) this.lastDeathTime = Date.now();
-
-            killed.playing = false;
-            killed.streak = 0;
-            killed.hp = 100;
-            killed.spawnShield = 0;
-
-            killed.stats.totalDeaths++;
-
-            killed.inKotcZone = false;
-            this.$emit('playerLeaveZone', killed);
-        }
-
-        if (killer) {
-            killer.streak++;
-            killer.stats.totalKills++;
-
-            if (killer.streak > killer.stats.bestStreak) killer.stats.bestStreak = killer.streak;
-        }
-
-        this.$emit('playerDeath', killed, killer, oldKilled, damageCauseInt);
-    }
-
-    #processFirePacket() {
-        const id = CommIn.unPackInt8U();
-
-        const bullet = {
-            posX: CommIn.unPackFloat(),
-            posY: CommIn.unPackFloat(),
-            posZ: CommIn.unPackFloat(),
-            dirX: CommIn.unPackFloat(),
-            dirY: CommIn.unPackFloat(),
-            dirZ: CommIn.unPackFloat()
-        };
-
-        const player = this.players[id];
-        if (!player) return;
-
-        const playerWeapon = player.weapons[player.activeGun];
-
-        if (playerWeapon && playerWeapon.ammo) {
-            playerWeapon.ammo.rounds--;
-            this.$emit('playerFire', player, playerWeapon, bullet);
-        }
-    }
-
-    #processSpawnItemPacket() {
-        const id = CommIn.unPackInt16U();
-        const type = CommIn.unPackInt8U();
-        const x = CommIn.unPackFloat();
-        const y = CommIn.unPackFloat();
-        const z = CommIn.unPackFloat();
-
-        this.game.collectables[type].push({ id, x, y, z });
-
-        this.$emit('spawnItem', type, { x, y, z }, id);
-    }
-
-    #processCollectPacket() {
-        const playerId = CommIn.unPackInt8U();
-        const type = CommIn.unPackInt8U();
-        const applyToWeaponIdx = CommIn.unPackInt8U();
-        const id = CommIn.unPackInt16U();
-
-        const player = this.players[playerId];
-        if (!player) return;
-
-        this.game.collectables[type] = this.game.collectables[type].filter(c => c.id !== id);
-
-        if (type === CollectType.Ammo) {
-            const playerWeapon = player.weapons[applyToWeaponIdx];
-            if (playerWeapon && playerWeapon.ammo) {
-                playerWeapon.ammo.store = Math.min(playerWeapon.ammo.storeMax, playerWeapon.ammo.store + playerWeapon.ammo.pickup);
-                this.$emit('playerCollectAmmo', player, playerWeapon, id);
-            }
-        }
-
-        if (type === CollectType.Grenade) {
-            player.grenades++;
-            if (player.grenades > 3) player.grenades = 3;
-
-            this.$emit('playerCollectGrenade', player, id);
-        }
-    }
-
-    #processHitThemPacket() {
-        const id = CommIn.unPackInt8U();
-        const hp = CommIn.unPackInt8U();
-
-        const player = this.players[id];
-        if (!player) return;
-
-        const oldHealth = player.hp;
-        player.hp = hp;
-
-        this.$emit('playerDamage', player, oldHealth, player.hp);
-    }
-
-    #processHitMePacket() {
-        const hp = CommIn.unPackInt8U();
-
-        CommIn.unPackFloat();
-        CommIn.unPackFloat();
-
-        const oldHealth = this.me.hp;
-        this.me.hp = hp;
-
-        this.$emit('playerDamage', this.me, oldHealth, this.me.hp);
-    }
-
-    #processSyncMePacket() {
-        const id = CommIn.unPackInt8U();
-        const player = this.players[id];
-
-        CommIn.unPackInt8U(); // stateIdx
-
-        const serverStateIdx = CommIn.unPackInt8U();
-
-        const newX = CommIn.unPackFloat();
-        const newY = CommIn.unPackFloat();
-        const newZ = CommIn.unPackFloat();
-
-        this.me.climbing = !!CommIn.unPackInt8U();
-
-        CommIn.unPackInt8U(); // rounds
-        CommIn.unPackInt8U(); // store
-
-        if (!player) return;
-
-        this.state.serverStateIdx = serverStateIdx;
-
-        const oldX = player.position.x;
-        const oldY = player.position.y;
-        const oldZ = player.position.z;
-
-        player.position.x = newX;
-        player.position.y = newY;
-        player.position.z = newZ;
-
-        if (oldX !== newX || oldY !== newY || oldZ !== newZ)
-            this.$emit('playerMove', player, { x: oldX, y: oldY, z: oldZ }, { x: newX, y: newY, z: newZ });
-    }
-
-    #processEventModifierPacket() {
-        const out = new CommOut();
-        out.packInt8(CommCode.eventModifier);
-        out.send(this.game.socket);
-    }
-
-    #processRemovePlayerPacket() {
-        const id = CommIn.unPackInt8U();
-        const removedPlayer = structuredClone(this.players[id]);
-
-        delete this.players[id];
-
-        this.$emit('playerLeave', removedPlayer);
-    }
-
-    #processGameStatePacket() {
-        if (this.game.gameModeId === GameMode.Spatula) {
-            const oldGame = structuredClone(this.game);
-
-            this.game.teamScore[1] = CommIn.unPackInt16U();
-            this.game.teamScore[2] = CommIn.unPackInt16U();
-
-            const spatulaCoords = {
-                x: CommIn.unPackFloat(),
-                y: CommIn.unPackFloat(),
-                z: CommIn.unPackFloat()
-            };
-
-            const controlledBy = CommIn.unPackInt8U();
-            const controlledByTeam = CommIn.unPackInt8U();
-
-            this.game.spatula = { coords: spatulaCoords, controlledBy, controlledByTeam };
-
-            this.$emit('gameStateChange', oldGame, this.game);
-        } else if (this.game.gameModeId === GameMode.KOTC) {
-            const oldGame = structuredClone(this.game);
-
-            this.game.stage = CommIn.unPackInt8U(); // constants.CoopState
-            this.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
-            this.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
-            this.game.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
-            this.game.numCapturing = CommIn.unPackInt8U(); // number of players capturing - number/1000
-            this.game.teamScore[1] = CommIn.unPackInt8U(); // team 1 (blue) score
-            this.game.teamScore[2] = CommIn.unPackInt8U(); // team 2 (red) score
-
-            this.game.capturePercent = this.game.captureProgress / 1000; // progress of the capture as a percentage
-            this.game.activeZone = this.game.map.zones ? this.game.map.zones[this.game.zoneNumber - 1] : null;
-
-            const oldPlayersOnZone = Object.values(this.players).filter((p) => p.inKotcZone && p.playing);
-
-            if (this.game.activeZone) Object.values(this.players).forEach((player) => player.updateKotcZone(this.game.activeZone));
-
-            if (this.game.numCapturing <= 0) Object.values(this.players).forEach((player) => {
-                player.inKotcZone = false;
-                this.$emit('playerLeaveZone', player);
-            });
-
-            this.$emit('gameStateChange', oldGame, this.game, oldPlayersOnZone);
-        } else if (this.game.gameModeId === GameMode.Team) {
-            this.game.teamScore[1] = CommIn.unPackInt16U();
-            this.game.teamScore[2] = CommIn.unPackInt16U();
-        }
-
-        if (this.game.gameModeId !== GameMode.Spatula) delete this.game.spatula;
-
-        if (this.game.gameModeId !== GameMode.KOTC) {
-            delete this.game.stage;
-            delete this.game.zoneNumber;
-            delete this.game.capturing;
-            delete this.game.captureProgress;
-            delete this.game.numCapturing;
-            delete this.game.numCapturing;
-            delete this.game.activeZone;
-        }
-
-        if (this.game.gameModeId === GameMode.FFA) delete this.game.teamScore;
-    }
-
-    #processBeginStreakPacket() {
-        const id = CommIn.unPackInt8U();
-        const ksType = CommIn.unPackInt8U();
-
-        const player = this.players[id];
-        if (!player) return;
-
-        switch (ksType) {
-            case ShellStreak.HardBoiled:
-                if (id === this.me.id) this.me.shieldHp = 100;
-                player.streakRewards.push(ShellStreak.HardBoiled);
-                break;
-
-            case ShellStreak.EggBreaker:
-                player.streakRewards.push(ShellStreak.EggBreaker);
-                break;
-
-            case ShellStreak.Restock: {
-                player.grenades = 3;
-
-                // main weapon
-                if (player.weapons[0] && player.weapons[0].ammo) {
-                    player.weapons[0].ammo.rounds = player.weapons[0].ammo.capacity;
-                    player.weapons[0].ammo.store = player.weapons[0].ammo.storeMax;
-                }
-
-                // secondary, always cluck9mm
-                if (player.weapons[1] && player.weapons[1].ammo) {
-                    player.weapons[1].ammo.rounds = player.weapons[1].ammo.capacity;
-                    player.weapons[1].ammo.store = player.weapons[1].ammo.storeMax;
-                }
-                break;
-            }
-
-            case ShellStreak.OverHeal:
-                player.hp = Math.min(200, player.hp + 100);
-                player.streakRewards.push(ShellStreak.OverHeal);
-                break;
-
-            case ShellStreak.DoubleEggs:
-                player.streakRewards.push(ShellStreak.DoubleEggs);
-                break;
-
-            case ShellStreak.MiniEgg:
-                player.scale = 0.5;
-                player.streakRewards.push(ShellStreak.MiniEgg);
-                break;
-        }
-
-        this.$emit('playerBeginStreak', player, ksType);
-    }
-
-    #processEndStreakPacket() {
-        const id = CommIn.unPackInt8U();
-        const ksType = CommIn.unPackInt8U();
-
-        const player = this.players[id];
-        if (!player) return;
-
-        const streaks = [
-            ShellStreak.EggBreaker,
-            ShellStreak.OverHeal,
-            ShellStreak.DoubleEggs,
-            ShellStreak.MiniEgg
-        ];
-
-        if (streaks.includes(ksType) && player.streakRewards.includes(ksType))
-            player.streakRewards = player.streakRewards.filter((r) => r !== ksType);
-
-        if (ksType === ShellStreak.MiniEgg) player.scale = 1;
-
-        this.$emit('playerEndStreak', player, ksType);
-    }
-
-    #processHitShieldPacket() {
-        const shieldHealth = CommIn.unPackInt8U();
-        const playerHealth = CommIn.unPackInt8U();
-        const dx = CommIn.unPackFloat();
-        const dz = CommIn.unPackFloat();
-
-        if (!this.me) return;
-
-        this.me.shieldHp = shieldHealth;
-        this.me.hp = playerHealth;
-
-        if (this.me.shieldHp <= 0) {
-            this.me.streakRewards = this.me.streakRewards.filter((r) => r !== ShellStreak.HardBoiled);
-            this.$emit('selfShieldLost', this.me.hp, { dx, dz });
-        } else this.$emit('selfShieldHit', this.me.shieldHp, this.me.hp, { dx, dz });
-    }
-
-    #processGameOptionsPacket() {
-        const oldOptions = structuredClone(this.game.options);
-
-        let gravity = CommIn.unPackInt8U();
-        let damage = CommIn.unPackInt8U();
-        let healthRegen = CommIn.unPackInt8U();
-
-        if (gravity < 1 || gravity > 4) gravity = 4;
-        if (damage < 0 || damage > 8) damage = 4;
-        if (healthRegen > 16) healthRegen = 4;
-
-        this.game.options.gravity = gravity / 4;
-        this.game.options.damage = damage / 4;
-        this.game.options.healthRegen = healthRegen / 4;
-
-        const rawFlags = CommIn.unPackInt8U();
-
-        Object.keys(CCGameOptionFlag).forEach((optionFlagName) => {
-            const value = rawFlags & CCGameOptionFlag[optionFlagName] ? 1 : 0;
-            this.game.options[optionFlagName] = value;
-        });
-
-        this.game.options.weaponsDisabled = Array.from({ length: 7 }, () => CommIn.unPackInt8U() === 1);
-        this.game.options.mustUseSecondary = this.game.options.weaponsDisabled.every((v) => v);
-
-        this.$emit('gameOptionsChange', oldOptions, this.game.options);
-    }
-
-    #processGameActionPacket() {
-        const action = CommIn.unPackInt8U();
-
-        if (action === GameAction.Pause) {
-            this.$emit('gameForcePause');
-            setTimeout(() => this.me.playing = false, 3000);
-        }
-
-        if (action === GameAction.Reset) {
-            Object.values(this.players).forEach((player) => player.streak = 0);
-
-            if (this.game.gameModeId !== GameMode.FFA) this.game.teamScore = [0, 0, 0];
-
-            if (this.game.gameModeId === GameMode.Spatula) {
-                this.game.spatula.controlledBy = 0;
-                this.game.spatula.controlledByTeam = 0;
-                this.game.spatula.coords = { x: 0, y: 0, z: 0 };
-            }
-
-            if (this.game.gameModeId === GameMode.KOTC) {
-                this.game.stage = CoopState.Capturing;
-                this.game.zoneNumber = 0;
-                this.game.activeZone = null;
-                this.game.capturing = 0;
-                this.game.captureProgress = 0;
-                this.game.numCapturing = 0;
-                this.game.capturePercent = 0.0;
-            }
-
-            this.$emit('gameReset');
-        }
-    }
-
-    #processPingPacket() {
-        if (!this.intents.includes(Intents.PING)) return;
-
-        const oldPing = this.ping;
-
-        this.ping = Date.now() - this.lastPingTime;
-
-        this.$emit('pingUpdate', oldPing, this.ping);
-
-        setTimeout(() => {
-            const out = new CommOut();
-            out.packInt8(CommCode.ping);
-            out.send(this.game.socket);
-            this.lastPingTime = Date.now();
-        }, 1000);
-    }
-
-    #processSwitchTeamPacket() {
-        const id = CommIn.unPackInt8U();
-        const toTeam = CommIn.unPackInt8U();
-
-        const player = this.players[id];
-        if (!player) return;
-
-        const oldTeam = player.team;
-
-        player.team = toTeam;
-        player.streak = 0;
-
-        this.$emit('playerSwitchTeam', player, oldTeam, toTeam);
-    }
-
-    #processChangeCharacterPacket() {
-        const id = CommIn.unPackInt8U();
-        const weaponIndex = CommIn.unPackInt8U();
-
-        const primaryWeaponIdx = CommIn.unPackInt16U();
-        const secondaryWeaponIdx = CommIn.unPackInt16U();
-        const shellColor = CommIn.unPackInt8U();
-        const hatIdx = CommIn.unPackInt16U();
-        const stampIdx = CommIn.unPackInt16U();
-        const grenadeIdx = CommIn.unPackInt16U();
-        const meleeIdx = CommIn.unPackInt16U();
-
-        const stampPositionX = CommIn.unPackInt8();
-        const stampPositionY = CommIn.unPackInt8();
-
-        const findCosmetics = this.intents.includes(Intents.COSMETIC_DATA);
-
-        const primaryWeaponItem = findCosmetics ? findItemById(primaryWeaponIdx) : primaryWeaponIdx;
-        const secondaryWeaponItem = findCosmetics ? findItemById(secondaryWeaponIdx) : secondaryWeaponIdx;
-        const hatItem = findCosmetics ? findItemById(hatIdx) : hatIdx;
-        const stampItem = findCosmetics ? findItemById(stampIdx) : stampIdx;
-        const grenadeItem = findCosmetics ? findItemById(grenadeIdx) : grenadeIdx;
-        const meleeItem = findCosmetics ? findItemById(meleeIdx) : meleeIdx;
-
-        const player = this.players[id];
-        if (player) {
-            const oldCharacter = structuredClone(player.character);
-            const oldWeaponIdx = player.selectedGun;
-
-            player.character.eggColor = shellColor;
-            player.character.primaryGun = primaryWeaponItem;
-            player.character.secondaryGun = secondaryWeaponItem;
-            player.character.stamp = stampItem;
-            player.character.hat = hatItem;
-            player.character.grenade = grenadeItem;
-            player.character.melee = meleeItem;
-
-            player.character.stampPos.x = stampPositionX;
-            player.character.stampPos.y = stampPositionY;
-
-            player.selectedGun = weaponIndex;
-            player.weapons[0] = createGun(GunList[weaponIndex]);
-
-            if (oldWeaponIdx !== player.selectedGun) this.$emit('playerChangeGun', player, oldWeaponIdx, player.selectedGun);
-            if (oldCharacter !== player.character) this.$emit('playerChangeCharacter', player, oldCharacter, player.character);
-        }
-    }
-
-    #processUpdateBalancePacket() {
-        const newBalance = CommIn.unPackInt32U();
-        const oldBalance = this.account.eggBalance;
-
-        this.account.eggBalance = newBalance;
-        this.$emit('balanceUpdate', oldBalance, newBalance);
-    }
-
-    #processRespawnDeniedPacket() {
-        this.me.playing = false;
-        this.$emit('respawnDenied');
-    }
-
-    #processMeleePacket() {
-        const id = CommIn.unPackInt8U();
-        const player = this.players[id];
-
-        if (player) this.$emit('playerMelee', player);
-    }
-
-    #processReloadPacket() {
-        const id = CommIn.unPackInt8U();
-        const player = this.players[id];
-
-        if (!player) return;
-
-        const playerActiveWeapon = player.weapons[player.activeGun];
-
-        if (playerActiveWeapon.ammo) {
-            const newRounds = Math.min(
-                Math.min(playerActiveWeapon.ammo.capacity, playerActiveWeapon.ammo.reload) - playerActiveWeapon.ammo.rounds,
-                playerActiveWeapon.ammo.store
-            );
-
-            playerActiveWeapon.ammo.rounds += newRounds;
-            playerActiveWeapon.ammo.store -= newRounds;
-        }
-
-        this.$emit('playerReload', player, playerActiveWeapon);
-    }
-
     updateGameOptions() {
         const out = new CommOut();
         out.packInt8(CommCode.gameOptions);
@@ -1544,189 +850,49 @@ export class Bot {
         out.send(this.game.socket);
     }
 
-    #processGameRequestOptionsPacket() {
-        this.game.isPrivate = true;
-        this.updateGameOptions();
-    }
-
-    #processExplodePacket() {
-        const itemType = CommIn.unPackInt8U();
-        let item = CommIn.unPackInt16U();
-        const x = CommIn.unPackFloat();
-        const y = CommIn.unPackFloat();
-        const z = CommIn.unPackFloat();
-        const damage = CommIn.unPackInt8U();
-        const radius = CommIn.unPackFloat();
-
-        if (this.intents.includes(Intents.COSMETIC_DATA))
-            item = findItemById(item);
-
-        if (itemType === ItemType.Grenade) this.$emit('grenadeExplode', item, { x, y, z }, damage, radius);
-        else this.$emit('rocketHit', { x, y, z }, damage, radius);
-    }
-
-    #processThrowGrenadePacket() {
-        const id = CommIn.unPackInt8U();
-        const x = CommIn.unPackFloat();
-        const y = CommIn.unPackFloat();
-        const z = CommIn.unPackFloat();
-        const dx = CommIn.unPackFloat();
-        const dy = CommIn.unPackFloat();
-        const dz = CommIn.unPackFloat();
-
-        const player = this.players[id];
-
-        if (player) {
-            player.grenades--;
-            this.$emit('playerThrowGrenade', player, { x, y, z }, { x: dx, y: dy, z: dz });
-        }
-    }
-
-    #processChallengeCompletePacket() {
-        const id = CommIn.unPackInt8U();
-        const challengeId = CommIn.unPackInt8U();
-
-        const player = this.players[id];
-        if (!player) return;
-
-        if (!this.intents.includes(Intents.CHALLENGES))
-            return this.$emit('challengeComplete', player, challengeId);
-
-        const challenge = this.account.challenges.find(c => c.id === challengeId);
-        this.$emit('challengeComplete', player, challenge);
-
-        if (player.id === this.me.id) this.refreshChallenges();
-    }
-
-    #processSocketReadyPacket() {
-        const out = new CommOut();
-        out.packInt8(this.intents.includes(Intents.OBSERVE_GAME) ? CommCode.observeGame : CommCode.joinGame);
-
-        out.packString(this.game.raw.uuid);
-        out.packInt8(+this.intents.includes(Intents.VIP_HIDE_BADGE));
-        out.packInt8(this.state.weaponIdx || this.account?.loadout?.classIdx || 0);
-        out.packString(this.state.name);
-
-        out.packInt32(this.account.session);
-        out.packString(this.account.sessionId);
-        out.packString(this.account.firebaseId);
-
-        out.send(this.game.socket);
-    }
-
-    async #processGameJoinedPacket() {
-        this.me.id = CommIn.unPackInt8U();
-        this.me.team = CommIn.unPackInt8U();
-        this.game.gameModeId = CommIn.unPackInt8U(); // aka gameType
-        this.game.gameMode = GameModeById[this.game.gameModeId];
-        this.game.mapIdx = CommIn.unPackInt8U();
-        this.game.map = Maps[this.game.mapIdx];
-
-        this.game.playerLimit = CommIn.unPackInt8U();
-        this.game.isGameOwner = CommIn.unPackInt8U() === 1;
-        this.game.isPrivate = CommIn.unPackInt8U() === 1 || this.game.isGameOwner;
-
-        CommIn.unPackInt8U(); // abTestBucket, unused
-
-        if (this.intents.includes(Intents.LOAD_MAP) || this.intents.includes(Intents.PATHFINDING)) {
-            this.game.map.raw = await fetchMap(this.game.map.filename, this.game.map.hash);
-
-            this.$emit('mapLoad', this.game.map.raw);
-
-            if (this.game.gameModeId === GameMode.KOTC) {
-                const meshData = this.game.map.raw.data['DYNAMIC.capture-zone.none'];
-                if (meshData) {
-                    this.game.map.zones = initKotcZones(meshData);
-                    if (!this.game.activeZone) this.game.activeZone = this.game.map.zones[this.game.zoneNumber - 1];
-                } else delete this.game.map.zones;
-            }
-
-            if (this.intents.includes(Intents.PATHFINDING)) {
-                this.pathing.nodeList = new NodeList(this.game.map.raw);
-                this.pathing.astar = new AStar(this.pathing.nodeList);
-            }
-        }
-
-        this.state.inGame = true;
-        this.lastDeathTime = Date.now();
-
-        const out = new CommOut();
-        out.packInt8(CommCode.clientReady);
-        out.send(this.game.socket);
-
-        this.updateIntervalId = setInterval(() => this.update(), 100 / 3);
-
-        if (this.intents.includes(Intents.PING)) {
-            this.lastPingTime = Date.now();
-
-            const out2 = new CommOut();
-            out2.packInt8(CommCode.ping);
-            out2.send(this.game.socket);
-        }
-
-        if (this.intents.includes(Intents.NO_AFK_KICK)) this.afkKickInterval = setInterval(() => {
-            if (this.state.inGame && !this.me.playing && (Date.now() - this.lastDeathTime) >= 15000) {
-                const out3 = new CommOut();
-                out3.packInt8(CommCode.keepAlive);
-                out3.send(this.game.socket);
-            }
-        }, 15000);
-
-        this.$emit('gameReady');
-    }
-
-    #processPlayerInfoPacket() {
-        const playerId = CommIn.unPackInt8U();
-        const playerDBId = CommIn.unPackString(128);
-        const playerIp = CommIn.unPackString(32);
-
-        const player = this.players[playerId];
-        if (!player) return;
-
-        player.admin = {
-            ip: playerIp,
-            dbId: playerDBId
-        };
-
-        this.$emit('playerInfo', player, playerIp, playerDBId);
-    }
-
     packetHandlers = {
-        [CommCode.syncThem]: () => this.#processSyncThemPacket(),
-        [CommCode.fire]: () => this.#processFirePacket(),
-        [CommCode.hitThem]: () => this.#processHitThemPacket(),
-        [CommCode.syncMe]: () => this.#processSyncMePacket(),
-        [CommCode.hitMe]: () => this.#processHitMePacket(),
-        [CommCode.swapWeapon]: () => this.#processSwapWeaponPacket(),
-        [CommCode.collectItem]: () => this.#processCollectPacket(),
-        [CommCode.respawn]: () => this.#processRespawnPacket(),
-        [CommCode.die]: () => this.#processDeathPacket(),
-        [CommCode.pause]: () => this.#processPausePacket(),
-        [CommCode.chat]: () => this.#processChatPacket(),
-        [CommCode.addPlayer]: () => this.#processAddPlayerPacket(),
-        [CommCode.removePlayer]: () => this.#processRemovePlayerPacket(),
-        [CommCode.eventModifier]: () => this.#processEventModifierPacket(),
-        [CommCode.metaGameState]: () => this.#processGameStatePacket(),
-        [CommCode.beginShellStreak]: () => this.#processBeginStreakPacket(),
-        [CommCode.endShellStreak]: () => this.#processEndStreakPacket(),
-        [CommCode.hitMeHardBoiled]: () => this.#processHitShieldPacket(),
-        [CommCode.gameOptions]: () => this.#processGameOptionsPacket(),
-        [CommCode.ping]: () => this.#processPingPacket(),
-        [CommCode.switchTeam]: () => this.#processSwitchTeamPacket(),
-        [CommCode.changeCharacter]: () => this.#processChangeCharacterPacket(),
-        [CommCode.reload]: () => this.#processReloadPacket(),
-        [CommCode.explode]: () => this.#processExplodePacket(),
-        [CommCode.throwGrenade]: () => this.#processThrowGrenadePacket(),
-        [CommCode.spawnItem]: () => this.#processSpawnItemPacket(),
-        [CommCode.melee]: () => this.#processMeleePacket(),
-        [CommCode.updateBalance]: () => this.#processUpdateBalancePacket(),
-        [CommCode.challengeCompleted]: () => this.#processChallengeCompletePacket(),
-        [CommCode.socketReady]: () => this.#processSocketReadyPacket(),
-        [CommCode.gameJoined]: () => this.#processGameJoinedPacket(),
-        [CommCode.gameAction]: () => this.#processGameActionPacket(),
-        [CommCode.requestGameOptions]: () => this.#processGameRequestOptionsPacket(),
-        [CommCode.respawnDenied]: () => this.#processRespawnDeniedPacket(),
-        [CommCode.playerInfo]: () => this.#processPlayerInfoPacket(),
+        [CommCode.syncThem]: processSyncThemPacket.bind(null, this),
+        [CommCode.fire]: processFirePacket.bind(null, this),
+        [CommCode.hitThem]: processHitThemPacket.bind(null, this),
+        [CommCode.syncMe]: processSyncMePacket.bind(null, this),
+        [CommCode.hitMe]: processHitMePacket.bind(null, this),
+        [CommCode.swapWeapon]: processSwapWeaponPacket.bind(null, this),
+        [CommCode.collectItem]: processCollectItemPacket.bind(null, this),
+        [CommCode.respawn]: processRespawnPacket.bind(null, this),
+        [CommCode.die]: processDiePacket.bind(null, this),
+        [CommCode.pause]: processPausePacket.bind(null, this),
+        [CommCode.chat]: processChatPacket.bind(null, this),
+        [CommCode.addPlayer]: processAddPlayerPacket.bind(null, this),
+        [CommCode.removePlayer]: processRemovePlayerPacket.bind(null, this),
+        [CommCode.eventModifier]: processEventModifierPacket.bind(null, this),
+        [CommCode.metaGameState]: processMetaGameStatePacket.bind(null, this),
+        [CommCode.beginShellStreak]: processBeginShellStreakPacket.bind(null, this),
+        [CommCode.endShellStreak]: processEndShellStreakPacket.bind(null, this),
+        [CommCode.hitMeHardBoiled]: processHitMeHardBoiledPacket.bind(null, this),
+        [CommCode.gameOptions]: processGameOptionsPacket.bind(null, this),
+        [CommCode.ping]: processPingPacket.bind(null, this),
+        [CommCode.switchTeam]: processSwitchTeamPacket.bind(null, this),
+        [CommCode.changeCharacter]: processChangeCharacterPacket.bind(null, this),
+        [CommCode.reload]: processReloadPacket.bind(null, this),
+        [CommCode.explode]: processExplodePacket.bind(null, this),
+        [CommCode.throwGrenade]: processThrowGrenadePacket.bind(null, this),
+        [CommCode.spawnItem]: processSpawnItemPacket.bind(null, this),
+        [CommCode.melee]: processMeleePacket.bind(null, this),
+        [CommCode.updateBalance]: processUpdateBalancePacket.bind(null, this),
+        [CommCode.challengeCompleted]: processChallengeCompletedPacket.bind(null, this),
+        [CommCode.gameAction]: processGameActionPacket.bind(null, this),
+        [CommCode.socketReady]: processSocketReadyPacket.bind(null, this),
+        [CommCode.gameJoined]: processGameJoinedPacket.bind(null, this),
+        [CommCode.playerInfo]: processPlayerInfoPacket.bind(null, this),
+
+        [CommCode.respawnDenied]: () => {
+            this.me.playing = false;
+            this.$emit('respawnDenied');
+        },
+        [CommCode.requestGameOptions]: () => {
+            this.game.isPrivate = true;
+            this.updateGameOptions();
+        },
 
         [CommCode.expireUpgrade]: () => { },
         [CommCode.clientReady]: () => { },
