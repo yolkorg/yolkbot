@@ -504,7 +504,7 @@ export class Bot {
             else return createError(GameFindError.InvalidMode);
         } else if (typeof mode === 'string') {
             const modeEntry = Object.keys(GameMode).find((key) => key.toLowerCase() === mode.toLowerCase());
-            if (modeEntry) computedModeId = modeEntry[1];
+            if (modeEntry) computedModeId = GameMode[modeEntry];
             else return createError(GameFindError.InvalidMode);
         } else return createError(GameFindError.InvalidMode);
 
@@ -551,7 +551,7 @@ export class Bot {
             else return createError(GameFindError.InvalidMode);
         } else if (typeof mode === 'string') {
             const modeEntry = Object.keys(GameMode).find((key) => key.toLowerCase() === mode.toLowerCase());
-            if (modeEntry) computedModeId = modeEntry[1];
+            if (modeEntry) computedModeId = GameMode[modeEntry];
             else return createError(GameFindError.InvalidMode);
         } else return createError(GameFindError.InvalidMode);
 
@@ -833,9 +833,7 @@ export class Bot {
 
         out.packInt8(flags);
 
-        this.game.options.weaponsDisabled.forEach((v) => {
-            out.packInt8(v ? 1 : 0);
-        });
+        this.game.options.weaponsDisabled.forEach((v) => out.packInt8(v ? 1 : 0));
 
         out.send(this.game.socket);
     }
