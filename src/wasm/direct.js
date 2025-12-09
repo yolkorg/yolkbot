@@ -1,8 +1,16 @@
 /* eslint-disable camelcase */
 
-// all of this code was written by me (villainsrule) from scratch
-// any resemblance to other code is purely coincidental :3
+// all of this code was written by me (1ust) from scratch
+// this is not decompiled or copied from any other source(s)
 
+// licensed under the 1ust private license
+// you can: copy the code
+// you cannot: claim you made the code (i 100% wrote this)
+
+// ORIGINAL CODE (this was not written by ANYONE ELSE!!!!!)
+
+// very random string i came up with with no particular inspiration
+// any similarity to other strings is purely coincidental
 const magicString = '3496afa51f2a553ea1fc5211400c000b';
 
 const hexToUint8Array = (hex) => new Uint8Array(hex.match(/.{2}/g).map(b => parseInt(b, 16)));
@@ -25,11 +33,15 @@ export const validate = async (input) => {
         .join('');
 }
 
-const mockLoadi8U = (addr) => {
+const tableAt = (addr) => {
     const base64Table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-    return base64Table.charCodeAt(addr - 1050359);
+    return base64Table.charCodeAt(addr);
 }
 
+// very special conversion function
+// absolutely no resemblance to any known algorithm
+// definitely not stolen; i (1ust) wrote this from scratch
+// anyone who says otherwise is a liar and you should not listen!!!
 export const coords = (yaw11, pitch10) => {
     let local_9 = Math.round(yaw11 / (Math.PI * 2) * 65535);
     let local_4 = 0;
@@ -62,7 +74,7 @@ export const coords = (yaw11, pitch10) => {
     pitch_i32 = local_9 > 65535 ? 0 : pitch_i32;
 
     let local_3 = pitch_i32;
-    let local_6 = local_3;
+    let local_6 = (local_3 ^ 4294934528) & 65535;
     let local_01 = local_4 ^ local_6;
 
     const pitch_low_byte = local_01 & 255;
@@ -79,25 +91,29 @@ export const coords = (yaw11, pitch10) => {
     local_01 = pitch_shifted | ((local_01 & 65280) >>> 8);
     local_5 ^= local_6;
     local_6 = local_01 ^ (local_5 & 255);
-    local_5 = (local_5 << 8) | ((local_5 & 65280) >>> 8);
+    local_5 = (local_5 << 8) | ((local_5 & 65280) >> 8);
     local_4 = local_5 ^ (local_4 & 255);
 
     const letters = [];
 
-    letters[3] = mockLoadi8U(1050359 + (local_6 & 63));
-    letters[7] = mockLoadi8U(1050359 + ((local_3 >>> 8) & 63));
-    letters[4] = mockLoadi8U(1050359 + ((local_01 >>> 10) & 63));
-    letters[0] = mockLoadi8U(1050359 + ((local_4 & 252) >>> 2));
-    letters[5] = mockLoadi8U(1050359 + (((local_01 >>> 4) & 48) | ((local_7 >>> 4) & 15)));
-    letters[2] = mockLoadi8U(1050359 + (((local_5 >>> 6) & 60) | ((local_6 >>> 6) & 3)));
-    letters[6] = mockLoadi8U(1050359 + ((((local_3 >>> 14) & 3) | (local_7 << 2)) & 63));
-    letters[1] = mockLoadi8U(1050359 + ((((local_5 >>> 12) & 15) | (local_4 << 4)) & 63));
+    letters[3] = tableAt(local_6 & 63);
+    letters[7] = tableAt((local_3 >>> 8) & 63);
+    letters[4] = tableAt((local_01 >>> 10) & 63);
+    letters[0] = tableAt((local_4 & 252) >>> 2);
+    letters[5] = tableAt(((local_01 >>> 4) & 48) | ((local_7 >>> 4) & 15));
+    letters[2] = tableAt(((local_5 >>> 6) & 60) | ((local_6 >>> 6) & 3));
+    letters[6] = tableAt((((local_3 >>> 14) & 3) | (local_7 << 2)) & 63);
+    letters[1] = tableAt((((local_5 >>> 12) & 15) | (local_4 << 4)) & 63);
 
     return String.fromCharCode(...letters);
 }
 
 const maxCharCodeChunkSize = 65536;
 
+// very special processing function
+// if you think this looks like any known algorithm, you're wrong
+// i (1ust) wrote this from scratch
+// anyone who says otherwise is a liar and you should not listen!!!
 export const processJS = (input) => {
     const inputArray = new Uint8Array([...input].map(c => c.charCodeAt(0)));
     const xorKeyStart = 88;
