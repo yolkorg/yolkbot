@@ -1,3 +1,5 @@
+// keep enums.d.ts up to date
+
 export const APIError = {
     WebSocketConnectFail: 'websocket_connect_fail',
     MissingParams: 'missing_params',
@@ -81,11 +83,27 @@ export const RedeemCodeError = {
 export const ClaimSocialError = {
     SessionExpired: 'reward_expired_session',
     InvalidReward: 'REWARD_NOT_FOUND',
-    AlreadyRedeemed: 'REWARD_PREV_GIVEN'
+    AlreadyRedeemed: 'REWARD_PREV_GIVEN',
+    InternalError: 'unknown_error'
 }
 
 export const ClaimURLError = {
     SessionExpired: 'urlRewardParams_expired_session',
     InvalidReward: 'REWARD_NOT_FOUND',
-    AlreadyRedeemed: 'REWARD_PREV_GIVEN'
+    AlreadyRedeemed: 'REWARD_PREV_GIVEN',
+    InternalError: 'unknown_error'
+}
+
+export const ChallengeRerollError = {
+    SessionExpired: 'challengeRerollSlot_expired_session',
+    ChallengeNotFound: 'challenge_not_found',
+    ChallengeNotAssigned: 'challenge_reroll_not_found',
+    InternalError: 'unknown_error'
+}
+
+export const ChallengeClaimError = {
+    SessionExpired: 'challengeClaimReward_expired_session',
+    ChallengeNotFound: 'challenge_claim_not_found',
+    ChallengeNotCompleted: 'challenge_not_completed',
+    InternalError: 'unknown_error'
 }

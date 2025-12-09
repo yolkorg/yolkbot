@@ -42,6 +42,8 @@ import { Regions } from './constants/regions.js';
 
 import {
     BuyItemError,
+    ChallengeClaimError,
+    ChallengeRerollError,
     ChicknWinnerError,
     ClaimSocialError,
     ClaimURLError,
@@ -485,7 +487,7 @@ export class Bot {
 
         if (typeof mode === 'number') {
             if (Object.values(GameMode).indexOf(mode) === -1) return createError(GameFindError.InvalidMode);
-            
+
             computedModeId = mode;
         } else if (typeof mode === 'string') {
             const modeEntry = Object.keys(GameMode).find((key) => key.toLowerCase() === mode.toLowerCase());
@@ -534,7 +536,7 @@ export class Bot {
 
         if (typeof mode === 'number') {
             if (Object.values(GameMode).indexOf(mode) === -1) return createError(GameFindError.InvalidMode);
-            
+
             computedModeId = mode;
         } else if (typeof mode === 'string') {
             const modeEntry = Object.keys(GameMode).find((key) => key.toLowerCase() === mode.toLowerCase());
@@ -575,7 +577,7 @@ export class Bot {
             }));
         });
 
-        return game;
+        return { ok: true, region: game.region, subdomain: game.subdomain, id: game.id, private: game.private, raw: game };
     }
 
     async join(name, data) {
@@ -1810,7 +1812,7 @@ export class Bot {
 
             await this.checkChiknWinner();
 
-            return { ok: true, reward: response.reward };
+            return { ok: true, ...response.reward };
         }
 
         console.error('Unknown Chikn Winner response, report this on Github:', response);
@@ -1867,9 +1869,16 @@ export class Bot {
 
         if (!result.ok) return result;
 
-        this.#importChallenges(result);
+        if (result['0']) {
+            this.#importChallenges(Object.values(result));
+            return { ok: true, challenges: this.account.challenges };
+        }
 
-        return { ok: true, challenges: this.account.challenges };
+        const isInEnum = Object.values(ChallengeRerollError).includes(result.error);
+        if (isInEnum) return { ok: false, error: result.error };
+
+        console.error('rerollChallenge: unknown error response', result);
+        return { ok: false, error: ChallengeRerollError.InternalError };
     }
 
     async claimChallenge(challengeId) {
@@ -1881,15 +1890,17 @@ export class Bot {
 
         if (!result.ok) return result;
 
-        this.#importChallenges(result.challenges);
-
-        if (result.reward > 0) this.account.eggBalance += result.reward;
-
-        return {
-            ok: true,
-            eggReward: result.reward,
-            updatedChallenges: this.account.challenges
+        if (result.reward) {
+            this.#importChallenges(result.challenges);
+            if (result.reward > 0) this.account.eggBalance += result.reward;
+            return { ok: true, eggReward: result.reward, updatedChallenges: this.account.challenges }
         }
+
+        const isInEnum = Object.values(ChallengeClaimError).includes(result.error);
+        if (isInEnum) return { ok: false, error: result.error };
+
+        console.error('claimChallenge: unknown error response', result);
+        return { ok: false, error: ChallengeClaimError.InternalError };
     }
 
     async refreshBalance() {
@@ -1923,7 +1934,6 @@ export class Bot {
 
             return {
                 ok: true,
-                rawResult: result,
                 eggsGiven: result.eggs_given,
                 itemIds: result.item_ids
             };

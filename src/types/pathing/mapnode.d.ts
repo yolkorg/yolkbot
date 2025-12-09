@@ -36,6 +36,8 @@ declare class NodeList {
     constructor(raw: { data: Record<string, Array<{ x: number; y: number; z: number; ry?: number }>>, width: number, height: number, depth: number });
 
     at(x: number, y: number, z: number): MapNode | undefined;
+    atObject(position: Position): MapNode | undefined;
+
     clean(): void;
     hasLineOfSight(bot: Position, target: Position): boolean;
 }

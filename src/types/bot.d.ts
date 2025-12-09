@@ -1,40 +1,39 @@
-type intents = {
-    CHALLENGES: 1,
-    BOT_STATS: 2,
-    PATHFINDING: 3,
-    PING: 5,
-    COSMETIC_DATA: 6,
-    PLAYER_HEALTH: 7,
-    PACKET_HOOK: 8,
-    LOG_PACKETS: 10,
-    NO_LOGIN: 11,
-    DEBUG_BUFFER: 12,
-    NO_AFK_KICK: 16,
-    LOAD_MAP: 17,
-    OBSERVE_GAME: 18,
-    NO_REGION_CHECK: 19,
-    NO_EXIT_ON_ERROR: 20,
-    RENEW_SESSION: 21,
-    VIP_HIDE_BADGE: 22
-}
-
 import { Character, GamePlayer, Position, View } from './bot/GamePlayer';
+
 import { Challenge } from './constants/challenges';
 import { CreatedGun } from './constants/guns';
 import { MapJSON } from './constants/maps';
 import { Item } from './constants/items';
 import { Region } from './constants/regions';
+
 import { ADispatch, DispatchParams } from './dispatches/index';
+
+import AStar from './pathing/astar';
 import { NodeList } from './pathing/mapnode';
-import { AnonError, API, LoginError, QueryServicesError } from './api';
+
+import { API, AuthResponse, RawFirebase, ReturnError } from './api';
 import yolkws from './socket';
+
+import {
+    APIError,
+    BuyItemError,
+    ChallengeRerollError,
+    ChicknWinnerError,
+    ClaimSocialError,
+    ClaimURLError,
+    GameFindError,
+    GameJoinError,
+    Intents,
+    LoginError,
+    MatchmakerError,
+    RedeemCodeError
+} from './enums';
 
 export interface BotParams {
     intents?: number[];
     proxy?: string;
     instance?: string;
     protocol?: string;
-    apiMaxRetries?: number;
     connectionTimeout?: number;
 }
 
@@ -183,16 +182,9 @@ export interface RawLoginData {
     }
 }
 
-export interface AccountFirebase {
-    idToken: string;
-    refeshToken: string;
-    expiresIn: string;
-    localId: string;
-}
-
 export interface Account {
     id: number;
-    firebase: AccountFirebase;
+    firebase: RawFirebase;
     firebaseId: string;
     sessionId: string;
     session: string;
@@ -272,6 +264,15 @@ export interface RawGameData {
     noobLobby: boolean;
 }
 
+export interface FindGameResponse {
+    ok: true;
+    region: string;
+    subdomain: string;
+    id: string;
+    private: boolean;
+    raw: RawGameData;
+}
+
 export interface Game {
     raw: RawGameData;
     code: string;
@@ -298,6 +299,7 @@ export interface Game {
 
 export interface Pathing {
     nodeList: NodeList | null;
+    astar: AStar | null;
     followingPath: boolean;
     activePath: any;
     activeNode: any;
@@ -329,6 +331,7 @@ export interface BotState {
 }
 
 export interface ChiknWinnerResponse {
+    ok: true;
     eggsGiven: number;
     itemIds: number[];
     rewardTier: number;
@@ -343,18 +346,17 @@ export interface FireBullet {
     dirZ: number;
 }
 
-type MatchmakerError = 'matchmaker_connect_failed';
-type FindPublicError = MatchmakerError | 'no_region_passed' | 'invalid_region_passed' | 'no_mode_passed' | 'invalid_mode_passed' | 'internal_session_error';
-type CreatePrivateError = FindPublicError | 'invalid_map_passed';
-type ExpandedLoginError = LoginError | 'account_banned';
-type InitSessionError = ExpandedLoginError | AnonError | MatchmakerError;
+export interface LoginResponse {
+    ok: true;
+    account: Account;
+}
 
 export class Bot {
-    static Intents: intents;
-    Intents: intents;
+    static Intents: Intents;
     intents: number[];
 
     regionList: Region[];
+    matchmakerListeners: Function[];
 
     proxy: string;
     instance: string;
@@ -380,25 +382,23 @@ export class Bot {
 
     constructor(params?: BotParams);
 
-    loginAnonymously(): Promise<Account | LoginError | AnonError>;
-    loginWithRefreshToken(refreshToken: string): Promise<Account | LoginError | LoginError>;
-    login(email: string, pass: string): Promise<Account | LoginError | LoginError>;
-    createAccount(email: string, pass: string): Promise<Account | LoginError | LoginError>;
+    loginAnonymously(): Promise<LoginResponse | LoginError>;
+    loginWithRefreshToken(refreshToken: string): Promise<LoginResponse | LoginError>;
+    login(email: string, pass: string): Promise<LoginResponse | LoginError>;
+    createAccount(email: string, pass: string): Promise<LoginResponse | LoginError>;
+    processLoginData: (data: AuthResponse | ReturnError) => LoginResponse | LoginError;
 
-    createMatchmaker(): Promise<false | MatchmakerError>;
-    getRegions(): Promise<Region[] | MatchmakerError>;
+    createMatchmaker(): Promise<{ ok: true } | MatchmakerError>;
+    getRegions(): Promise<{ ok: true, regionList: Region[] } | MatchmakerError>;
 
-    initSession(): Promise<false | InitSessionError>;
+    initSession(): Promise<{ ok: true } | LoginError | MatchmakerError>;
 
-    createPrivateGame(region: string, mode: number, map: string): Promise<RawGameData | FindPublicError>;
-    findPublicGame(region: string, mode: number): Promise<RawGameData | CreatePrivateError>;
+    findPublicGame(region: string, mode: string | number): Promise<FindGameResponse | GameFindError | LoginError | MatchmakerError>;
+    createPrivateGame(region: string, mode: string | number, map: string): Promise<FindGameResponse | GameFindError | LoginError | MatchmakerError>;
 
-    join(botName: string, data: string | RawGameData): Promise<true | InitSessionError | 'game_not_found' | 'websocket_tryconnect_fail' | 'invalid_game_object'>;
+    join(botName: string, data: string | FindGameResponse | RawGameData): Promise<{ ok: true } | LoginError | MatchmakerError | GameJoinError>;
 
-    processPacket(data: number[]): void;
     update(): void;
-
-    canSee(player: GamePlayer): boolean;
 
     onAny(cb: Function): void;
     off(event: string, cb: Function): void;
@@ -456,19 +456,24 @@ export class Bot {
     dispatch(disp: ADispatch): boolean;
     emit<K extends keyof DispatchParams>(type: K, ...args: DispatchParams[K]): boolean;
 
-    checkChiknWinner(): Promise<ChiknWinnerStatus | QueryServicesError>;
-    playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | QueryServicesError | 'hit_daily_limit' | 'on_cooldown' | 'session_expired' | 'unknown_error'>;
-    resetChiknWinner(): Promise<ChiknWinnerStatus | QueryServicesError | 'not_enough_eggs' | 'not_at_limit' | 'unknown_error'>;
+    packetHandlers: Record<number, () => void>;
+    processPacket(data: number[]): void;
 
-    refreshChallenges(): Promise<Challenges[] | QueryServicesError>;
-    claimChallenge(challengeId: number): Promise<{ eggReward: number, updatedChallenges: Challenges[] } | QueryServicesError>;
-    rerollChallenge(challengeId: number): Promise<Challenges[] | QueryServicesError>;
+    checkChiknWinner(): Promise<{ ok: true, cw: ChiknWinnerStatus } | APIError>;
+    playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | APIError | ChicknWinnerError>;
+    resetChiknWinner(): Promise<{ ok: true, cw: ChiknWinnerStatus } | APIError | ChicknWinnerError>;
 
-    refreshBalance(): Promise<number | QueryServicesError>;
-    redeemCode(code: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; } | QueryServicesError>;
-    claimURLReward(reward: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; } | QueryServicesError>;
-    claimSocialReward(rewardTag: string): Promise<{ result: string; eggsGiven: number; itemIds: number[]; } | QueryServicesError>;
-    buyItem(itemId: number): Promise<{ result: string; currentBalance: number; itemId: number; } | QueryServicesError>;
+    canSee(player: GamePlayer): boolean;
+
+    refreshChallenges(): Promise<{ ok: true, challenges: Challenges[] } | APIError>;
+    rerollChallenge(challengeId: number): Promise<{ ok: true, challenges: Challenges[] } | APIError | ChallengeRerollError>;
+    claimChallenge(challengeId: number): Promise<{ ok: true, eggReward: number, updatedChallenges: Challenges[] } | APIError>;
+
+    refreshBalance(): Promise<{ ok: true, currentBalance: number } | APIError>;
+    redeemCode(code: string): Promise<{ ok: true; eggsGiven: number; itemIds: number[]; } | APIError | RedeemCodeError>;
+    claimURLReward(reward: string): Promise<{ ok: true; eggsGiven: number; itemIds: number[]; } | APIError | ClaimURLError>;
+    claimSocialReward(rewardTag: string): Promise<{ ok: true; eggsGiven: number; itemIds: number[]; } | APIError | ClaimSocialError>;
+    buyItem(itemId: number): Promise<{ ok: true; currentBalance: number; itemId: number; } | APIError | BuyItemError>;
 
     leave(code?: number): void;
     logout(): void;
