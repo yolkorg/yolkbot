@@ -130,3 +130,8 @@ export enum ChallengeClaimErrorEnum {
 }
 
 export type ChallengeClaimError = { ok: false, error: ChallengeClaimErrorEnum };
+
+export enum PathfindError {
+    NoPathFound = 'no_path_found',
+    PathTooShort = 'path_too_short'
+}

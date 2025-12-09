@@ -107,3 +107,8 @@ export const ChallengeClaimError = {
     ChallengeNotCompleted: 'challenge_not_completed',
     InternalError: 'unknown_error'
 }
+
+export const PathfindError = {
+    NoPathFound: 'no_path_found',
+    PathTooShort: 'path_too_short'
+}

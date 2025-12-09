@@ -1,4 +1,4 @@
-import { Intents } from '../enums.js';
+import { Intents, PathfindError } from '../enums.js';
 
 export class GoToAmmoDispatch {
     validate(bot) {
@@ -31,8 +31,8 @@ export class GoToAmmoDispatch {
 
         bot.pathing.activePath = bot.pathing.astar.path(myNode, targetNode);
 
-        if (!bot.pathing.activePath) return bot.$emit('pathfindError', 'no path found');
-        if (bot.pathing.activePath.length < 2) return bot.$emit('pathfindError', 'path too short');
+        if (!bot.pathing.activePath) return bot.$emit('pathfindError', PathfindError.NoPathFound);
+        if (bot.pathing.activePath.length < 2) return bot.$emit('pathfindError', PathfindError.PathTooShort);
 
         bot.pathing.followingPath = true;
         bot.pathing.activeNode = bot.pathing.activePath[1];

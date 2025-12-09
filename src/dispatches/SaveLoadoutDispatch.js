@@ -2,8 +2,9 @@ import CommOut from '../comm/CommOut.js';
 import CommCode from '../constants/CommCode.js';
 
 import { findItemById, GunList, ItemType } from '../constants/index.js';
-import { Intents } from '../enums.js';
 import { createGun } from '../util.js';
+
+import { Intents } from '../enums.js';
 
 const isDefault = (itemId) => findItemById(itemId) && findItemById(itemId).unlock === 'default';
 const isType = (itemId, type) => findItemById(itemId) && findItemById(itemId).item_type_id === type;

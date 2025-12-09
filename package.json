@@ -35,6 +35,10 @@
             "import": "./dist/api.js",
             "types": "./dist/types/api.d.ts"
         },
+        "./enums": {
+            "import": "./dist/enums.js",
+            "types": "./dist/types/enums.d.ts"
+        },
         "./browser": "./browser/build/module.js",
         "./browser/*": "./browser/build/*.js",
         "./browser/*.js": "./browser/build/*.js",

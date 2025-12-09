@@ -26,6 +26,7 @@ import {
     Intents,
     LoginError,
     MatchmakerError,
+    PathfindError,
     RedeemCodeError
 } from './enums';
 
@@ -411,7 +412,6 @@ export class Bot {
     on(event: 'challengeComplete', cb: (player: GamePlayer, challengeId: number) => void): void;
     on(event: 'chat', cb: (player: GamePlayer | undefined, message: string, flags: number) => void): void;
     on(event: 'close', cb: (code: number) => void): void;
-    on(event: 'error', cb: (error: string) => void): void;
     on(event: 'gameForcePause', cb: () => void): void;
     on(event: 'gameOptionsChange', cb: (oldOptions: GameOptions, newOptions: GameOptions) => void): void;
     on(event: 'gameReady', cb: () => void): void;
@@ -421,6 +421,7 @@ export class Bot {
     on(event: 'leave', cb: (closeCode: number) => void): void;
     on(event: 'mapLoad', cb: (map: MapJSON) => void): void;
     on(event: 'packet', cb: (packet: ArrayBuffer) => void): void;
+    on(event: 'pathfindError', cb: (error: PathfindError) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerChangeCharacter', cb: (player: GamePlayer, oldCharacter: Character, newCharacter: Character) => void): void;
