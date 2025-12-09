@@ -245,12 +245,7 @@ export class Bot {
                 classIdx: 0,
                 colorIdx: 0,
                 grenadeId: 0,
-                primaryId: [
-                    3100, 3600,
-                    3400, 3800,
-                    4000, 4200,
-                    4500
-                ],
+                primaryId: [3100, 3600, 3400, 3800, 4000, 4200, 4500],
                 secondaryId: new Array(7).fill(3000),
                 stampPositionX: 0,
                 stampPositionY: 0
@@ -269,14 +264,11 @@ export class Bot {
             eggBalance: 0,
             isDoubleEggWeeknd: () => {
                 const day = new Date().getUTCDay();
-                const hours = new Date().getUTCHours();
-                return (day >= 5 && hours >= 20) || day === 6 || day === 0;
+                return (day >= 5 && new Date().getUTCHours() >= 20) || day === 6 || day === 0;
             }
         }
 
         this.#initialAccount = this.account;
-
-        this.matchmaker = null;
 
         this.api = new API({
             proxy: this.proxy,
@@ -305,12 +297,16 @@ export class Bot {
         if (this.intents.includes(Intents.RENEW_SESSION)) this.renewSessionInterval = 0;
     }
 
-    dispatch(dispatch) {
+    dispatch(dispatch, isEmit) {
         if (dispatch.validate(this)) {
             if (dispatch.check(this)) dispatch.execute(this);
             else this.#dispatches.push(dispatch);
             return true;
         }
+
+        console.error(`${isEmit ? 'emit' : 'dispatch'}: validation failed for dispatch ${dispatch.constructor.name}`);
+        console.error('this means the dispatch will NEVER RUN!');
+        console.error('make sure all parameters are valid and that any player IDs are in the game');
 
         return false;
     }
@@ -354,7 +350,7 @@ export class Bot {
             if (loginData.ok && !loginData.playerOutput)
                 console.error('processLoginData: missing playerOutput but is ok', loginData);
 
-            return { ...loginData, ok: false };
+            return { ...loginData, error: LoginError.InternalError, ok: false };
         }
 
         if (loginData.banRemaining) {
@@ -393,11 +389,7 @@ export class Bot {
             this.renewSessionInterval = setInterval(async () => {
                 if (!this.account?.sessionId) return clearInterval(this.renewSessionInterval);
 
-                const res = await this.api.queryServices({
-                    cmd: 'renewSession',
-                    sessionId: this.account.sessionId
-                });
-
+                const res = await this.api.queryServices({ cmd: 'renewSession', sessionId: this.account.sessionId });
                 if (res.data !== 'renewed') this.$emit('sessionExpired');
             }, 600000); // 10 minutes
         }
@@ -438,24 +430,24 @@ export class Bot {
 
         this.matchmaker = matchmaker;
 
-        let didTakeLastUUID = false;
+        let uuidTimeouts = [];
 
         this.matchmaker.onmessage = async (e) => {
             const data = JSON.parse(e.data);
 
             if (data.command === 'validateUUID') {
-                setTimeout(() => {
-                    if (!didTakeLastUUID) {
-                        console.error('createMatchmaker: the matchmaker did not respond to our validateUUID')
-                        console.error('createMatchmaker: this means yolkbot is broken, please report this on Github');
-                        console.error('createMatchmaker: https://github.com/yolkorg/yolkbot (or join the Discord)');
-                    }
+                const timeout = setTimeout(() => {
+                    console.error('createMatchmaker: the matchmaker did not respond to our validateUUID')
+                    console.error('createMatchmaker: this means yolkbot is broken, please report this on Github');
+                    console.error('createMatchmaker: https://github.com/yolkorg/yolkbot (or join the Discord)');
                 }, 5000);
+
+                uuidTimeouts.push(timeout);
 
                 return this.matchmaker.send(JSON.stringify({ command: 'validateUUID', hash: await validate(data.uuid) }));
             }
 
-            if (data.command === 'gameFound') didTakeLastUUID = true;
+            if (data.command === 'gameFound') uuidTimeouts.forEach((t) => clearTimeout(t));
 
             this.matchmakerListeners.forEach((listener) => listener(data));
         }
@@ -508,14 +500,12 @@ export class Bot {
         let computedModeId;
 
         if (typeof mode === 'number') {
-            if (Object.values(GameMode).indexOf(mode) === -1) return createError(GameFindError.InvalidMode);
-
-            computedModeId = mode;
+            if (Object.values(GameMode).indexOf(mode) > -1) computedModeId = mode;
+            else return createError(GameFindError.InvalidMode);
         } else if (typeof mode === 'string') {
             const modeEntry = Object.keys(GameMode).find((key) => key.toLowerCase() === mode.toLowerCase());
-            if (!modeEntry) return createError(GameFindError.InvalidMode);
-
-            computedModeId = modeEntry[1];
+            if (modeEntry) computedModeId = modeEntry[1];
+            else return createError(GameFindError.InvalidMode);
         } else return createError(GameFindError.InvalidMode);
 
         const initInfo = await this.initSession();
@@ -557,14 +547,12 @@ export class Bot {
         let computedModeId;
 
         if (typeof mode === 'number') {
-            if (Object.values(GameMode).indexOf(mode) === -1) return createError(GameFindError.InvalidMode);
-
-            computedModeId = mode;
+            if (Object.values(GameMode).indexOf(mode) > -1) computedModeId = mode;
+            else return createError(GameFindError.InvalidMode);
         } else if (typeof mode === 'string') {
             const modeEntry = Object.keys(GameMode).find((key) => key.toLowerCase() === mode.toLowerCase());
-            if (!modeEntry) return createError(GameFindError.InvalidMode);
-
-            computedModeId = modeEntry[1];
+            if (modeEntry) computedModeId = modeEntry[1];
+            else return createError(GameFindError.InvalidMode);
         } else return createError(GameFindError.InvalidMode);
 
         const mapIdx = Maps.findIndex(m => m.name.toLowerCase() === map.toLowerCase());
@@ -646,7 +634,7 @@ export class Bot {
         }
 
         if (typeof data === 'object') {
-            if (!data.id || !data.subdomain || !data.uuid) return createError(GameJoinError.InvalidObject);
+            if (!data.id || !data.subdomain || !data.uuid || !data.region) return createError(GameJoinError.InvalidObject);
 
             if (this.account.id === 0) {
                 const anonAttempt = await this.loginAnonymously();
@@ -717,8 +705,7 @@ export class Bot {
     update() {
         if (this.hasQuit) return;
 
-        if (this.pathing.followingPath && this.intents.includes(Intents.PATHFINDING))
-            this.#processPathfinding();
+        if (this.pathing.followingPath && this.intents.includes(Intents.PATHFINDING)) this.#processPathfinding();
 
         for (let i = 0; i < this.#dispatches.length; i++) {
             const disp = this.#dispatches[i];
@@ -755,7 +742,7 @@ export class Bot {
                 const out = new CommOut();
 
                 out.packInt8(CommCode.syncMe);
-                out.packInt8(this.state.stateIdx); // stateIdx
+                out.packInt8(this.state.stateIdx);
                 out.packInt8(this.state.serverStateIdx);
 
                 const startIdx = mod(this.state.stateIdx - FramesBetweenSyncs + 1, StateBufferSize);
@@ -790,12 +777,15 @@ export class Bot {
         if (!this.intents.includes(Intents.PLAYER_HEALTH)) return;
 
         const regen = 0.1 * (this.game.isPrivate ? this.game.options.healthRegen : 1);
+        const players = Object.values(this.players);
 
-        for (const player of Object.values(this.players)) {
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+
             if (player.playing && player.hp > 0) {
-                const overHeal = player.streakRewards.includes(ShellStreak.OverHeal);
-                player.hp += overHeal ? -regen : regen;
-                player.hp = overHeal ? Math.max(100, player.hp) : Math.min(100, player.hp);
+                const hasOverHeal = player.streakRewards.includes(ShellStreak.OverHeal);
+                player.hp += hasOverHeal ? -regen : regen;
+                player.hp = hasOverHeal ? Math.max(100, player.hp) : Math.min(100, player.hp);
             }
 
             if (player.spawnShield > 0) player.spawnShield -= 6;
@@ -825,7 +815,7 @@ export class Bot {
 
     emit(event, ...args) {
         const dispatch = DispatchIndex[event];
-        if (dispatch) this.dispatch(new dispatch(...args));
+        if (dispatch) this.dispatch(new dispatch(...args), true);
         else throw new Error(`no event found for "${event}"`);
     }
 
@@ -968,7 +958,7 @@ export class Bot {
                 return createError(ChicknWinnerError.SessionExpired);
             }
 
-            console.error('Unknown Chikn Winner response, report this on Github:', response);
+            console.error('unknown Chikn Winner response, report this on Github:', response);
             return createError(ChicknWinnerError.InternalError);
         }
 
@@ -981,7 +971,7 @@ export class Bot {
             return { ok: true, ...response.reward };
         }
 
-        console.error('Unknown Chikn Winner response, report this on Github:', response);
+        console.error('unknown Chikn Winner response, report this on Github:', response);
         return createError(ChicknWinnerError.InternalError);
     }
 
@@ -997,7 +987,7 @@ export class Bot {
         if (!response.ok) return response;
 
         if (response.result !== 'SUCCESS') {
-            console.error('Unknown Chikn Winner reset response, report this on Github:', response);
+            console.error('unknown Chikn Winner reset response, report this on Github:', response);
             return createError(ChicknWinnerError.InternalError);
         }
 
@@ -1098,11 +1088,7 @@ export class Bot {
             this.account.eggBalance = result.eggs_given;
             result.item_ids.forEach((id) => this.account.ownedItemIds.push(id));
 
-            return {
-                ok: true,
-                eggsGiven: result.eggs_given,
-                itemIds: result.item_ids
-            };
+            return { ok: true, eggsGiven: result.eggs_given, itemIds: result.item_ids };
         }
 
         const isInEnum = Object.values(RedeemCodeError).includes(result.result);
