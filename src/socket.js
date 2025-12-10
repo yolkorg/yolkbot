@@ -86,7 +86,14 @@ class yolkws {
             this.socket.addEventListener('close', () => {
                 if (this.connected) {
                     this.connected = false;
-                    if (this.autoReconnect) setTimeout(() => this.tryConnect(), 250);
+                    if (this.autoReconnect) setTimeout(async () => {
+                        const didConnect = await this.tryConnect();
+                        if (!didConnect) {
+                            if (this.onclose) this.onclose();
+                            console.error('tryConnect: failed to reconnect to', this.url, 'after 5 attempts.');
+                            console.error('tryConnect: please check your internet connection & ensure your IP isn\'t blocked.');
+                        }
+                    }, 250);
                 }
             });
         })
