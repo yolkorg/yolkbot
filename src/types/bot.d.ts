@@ -27,7 +27,8 @@ import {
     LoginError,
     MatchmakerError,
     PathfindError,
-    RedeemCodeError
+    RedeemCodeError,
+    ZoneLeaveReason
 } from './enums';
 
 export interface BotParams {
@@ -301,7 +302,6 @@ export interface Game {
 export interface Pathing {
     nodeList: NodeList | null;
     astar: AStar | null;
-    followingPath: boolean;
     activePath: any;
     activeNode: any;
     activeNodeIdx: number;
@@ -436,7 +436,7 @@ export class Bot {
     on(event: 'playerJoin', cb: (player: GamePlayer) => void): void;
     on(event: 'playerInfo', cb: (player: GamePlayer, playerIP: string, playerDBId: string) => void): void;
     on(event: 'playerLeave', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerLeaveZone', cb: (player: GamePlayer) => void): void;
+    on(event: 'playerLeaveZone', cb: (player: GamePlayer, leaveReason: ZoneLeaveReason) => void): void;
     on(event: 'playerMelee', cb: (player: GamePlayer) => void): void;
     on(event: 'playerMove', cb: (player: GamePlayer, oldPosition: Position, newPosition: Position) => void): void;
     on(event: 'playerPause', cb: (player: GamePlayer) => void): void;

@@ -117,7 +117,7 @@ export class API {
         try {
             const request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
                 method: 'POST',
-                body: formData,
+                body: formData.toString(),
                 headers: {
                     ...baseHeaders,
                     'content-type': 'application/x-www-form-urlencoded'

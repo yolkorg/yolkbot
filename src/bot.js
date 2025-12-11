@@ -285,7 +285,6 @@ export class Bot {
 
         this.pathing = {
             nodeList: null,
-            followingPath: false,
             activePath: null,
             activeNode: null,
             activeNodeIdx: 0
@@ -631,9 +630,7 @@ export class Bot {
                 console.error('join: invalid game data received from matchmaker:', this.game.raw);
                 return createError(GameJoinError.InternalError);
             }
-        }
-
-        if (typeof data === 'object') {
+        } else if (typeof data === 'object') {
             if (!data.id || !data.subdomain || !data.uuid || !data.region) return createError(GameJoinError.InvalidObject);
 
             if (this.account.id === 0) {
@@ -644,7 +641,7 @@ export class Bot {
             this.game.raw = data;
             this.game.code = this.game.raw.id;
             this.game.region = this.game.raw.region;
-        }
+        } else return createError(GameJoinError.MissingParams);
 
         const host = this.game.raw.host || (this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`);
         this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
@@ -669,10 +666,15 @@ export class Bot {
     }
 
     #processPathfinding() {
-        const myPositionStr = Object.entries(this.me.position).map(entry => Math.floor(entry[1])).join(',');
+        const pathLen = this.pathing.activePath.length;
+        const lastNode = this.pathing.activePath[pathLen - 1];
+        const myPos = this.me.position;
+        const myFloorY = Math.floor(myPos.y);
+        const myX = Math.floor(myPos.x);
+        const myY = Math.floor(myPos.y);
+        const myZ = Math.floor(myPos.z);
 
-        if (myPositionStr === this.pathing.activePath[this.pathing.activePath.length - 1].positionStr) {
-            this.pathing.followingPath = false;
+        if (myX === lastNode.x && myY === lastNode.y && myZ === lastNode.z) {
             this.pathing.activePath = null;
             this.pathing.activeNode = null;
             this.pathing.activeNodeIdx = 0;
@@ -680,7 +682,7 @@ export class Bot {
             this.dispatch(new MovementDispatch(0));
         } else {
             let positionTarget;
-            if (this.pathing.activeNodeIdx < this.pathing.activePath.length - 1) {
+            if (this.pathing.activeNodeIdx < pathLen - 1) {
                 positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx + 1].flatCenter();
                 this.dispatch(new LookAtPosDispatch(positionTarget));
             } else {
@@ -688,24 +690,58 @@ export class Bot {
                 this.dispatch(new LookAtPosDispatch(positionTarget));
             }
 
-            for (const node of this.pathing.activePath) {
-                if (node.flatRadialDistance(this.me.position) < 0.1 && node.position.y === Math.floor(this.me.position.y)) {
-                    if (this.pathing.activePath.indexOf(node) >= this.pathing.activeNodeIdx) {
-                        this.pathing.activeNodeIdx = this.pathing.activePath.indexOf(node) + 1;
-                        this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
-                        break;
-                    }
+            for (let i = this.pathing.activeNodeIdx; i < pathLen; i++) {
+                const node = this.pathing.activePath[i];
+                if (node.flatRadialDistance(myPos) < 0.1 && node.y === myFloorY) {
+                    this.pathing.activeNodeIdx = i + 1;
+                    this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
+                    break;
                 }
             }
 
-            if (!(this.state.controlKeys & Movement.Forward)) this.dispatch(new MovementDispatch(Movement.Forward));
+            let shouldJump = false;
+            const currentNode = this.pathing.activePath[this.pathing.activeNodeIdx];
+
+            if (currentNode && this.pathing.activeNodeIdx < pathLen - 1) {
+                const nextNode = this.pathing.activePath[this.pathing.activeNodeIdx + 1];
+
+                const dx = Math.abs(currentNode.x - nextNode.x);
+                const dz = Math.abs(currentNode.z - nextNode.z);
+
+                const isParkourJump =
+                    (dx === 2 && dz === 0) || // 2 block
+                    (dx === 0 && dz === 2) || // 2 block
+                    (dx === 2 && dz === 1) || // L
+                    (dx === 1 && dz === 2); // L
+
+                if (isParkourJump) {
+                    const localX = myPos.x - Math.floor(myPos.x);
+                    const localZ = myPos.z - Math.floor(myPos.z);
+
+                    const headingX = nextNode.x > currentNode.x ? 1 : (nextNode.x < currentNode.x ? -1 : 0);
+                    const headingZ = nextNode.z > currentNode.z ? 1 : (nextNode.z < currentNode.z ? -1 : 0);
+
+                    let distToEdge = 0;
+                    if (headingX > 0) distToEdge = 1 - localX;
+                    else if (headingX < 0) distToEdge = localX;
+                    else if (headingZ > 0) distToEdge = 1 - localZ;
+                    else if (headingZ < 0) distToEdge = localZ;
+
+                    if (distToEdge <= 0.15) shouldJump = true;
+                }
+            }
+
+            const movementKeys = Movement.Forward | (shouldJump ? Movement.Jump : 0);
+
+            if (!(this.state.controlKeys & Movement.Forward)) this.dispatch(new MovementDispatch(movementKeys));
+            else if (shouldJump && !(this.state.controlKeys & Movement.Jump)) this.dispatch(new MovementDispatch(movementKeys));
         }
     }
 
     update() {
         if (this.hasQuit) return;
 
-        if (this.pathing.followingPath && this.intents.includes(Intents.PATHFINDING)) this.#processPathfinding();
+        if (this.pathing.activePath && this.intents.includes(Intents.PATHFINDING)) this.#processPathfinding();
 
         for (let i = 0; i < this.#dispatches.length; i++) {
             const disp = this.#dispatches[i];
@@ -1204,7 +1240,6 @@ export class Bot {
 
         this.pathing = {
             nodeList: null,
-            followingPath: false,
             activePath: null,
             activeNode: null,
             activeNodeIdx: 0

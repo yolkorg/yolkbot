@@ -1,6 +1,7 @@
 import CommIn from '../comm/CommIn.js';
 
 import { GameMode } from '../constants/index.js';
+import { ZoneLeaveReason } from '../enums.js';
 
 const processMetaGameStatePacket = (bot) => {
     if (bot.game.gameModeId === GameMode.Spatula) {
@@ -40,8 +41,10 @@ const processMetaGameStatePacket = (bot) => {
         if (bot.game.activeZone) Object.values(bot.players).forEach((player) => player.updateKotcZone(bot.game.activeZone));
 
         if (bot.game.numCapturing <= 0) Object.values(bot.players).forEach((player) => {
-            player.inKotcZone = false;
-            bot.$emit('playerLeaveZone', player);
+            if (player.inKotcZone) {
+                player.inKotcZone = false;
+                bot.$emit('playerLeaveZone', player, ZoneLeaveReason.RoundEnded);
+            }
         });
 
         bot.$emit('gameStateChange', oldGame, bot.game, oldPlayersOnZone);

@@ -21,10 +21,10 @@ export class ReportPlayerDispatch {
     }
 
     validate(bot) {
+        if (typeof this.idOrName !== 'string' && typeof this.idOrName !== 'number') return false;
         if (this.reasons.every(reason => reason === false)) return false;
 
-        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
-        if (!target) return false;
+        if (!bot.players[this.idOrName.toString()] && !bot.players.find(player => player.name === this.idOrName)) return false;
 
         return true;
     }

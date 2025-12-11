@@ -14,6 +14,8 @@ export class LookAtDispatch {
     }
 
     validate(bot) {
+        if (typeof this.idOrName !== 'string' && typeof this.idOrName !== 'number') return false;
+
         const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
         return !!target;
     }

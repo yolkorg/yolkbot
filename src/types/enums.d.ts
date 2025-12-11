@@ -135,3 +135,9 @@ export enum PathfindError {
     NoPathFound = 'no_path_found',
     PathTooShort = 'path_too_short'
 }
+
+export enum ZoneLeaveReason {
+    Despawned = 'despawned',
+    Killed = 'killed',
+    WalkedOut = 'exited'
+}

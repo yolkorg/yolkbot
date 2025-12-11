@@ -1,5 +1,7 @@
 import CommIn from '../comm/CommIn.js';
 
+import { ZoneLeaveReason } from '../enums.js';
+
 const processDiePacket = (bot) => {
     const killedId = CommIn.unPackInt8U();
     const killerId = CommIn.unPackInt8U();
@@ -25,7 +27,7 @@ const processDiePacket = (bot) => {
         killed.stats.totalDeaths++;
 
         killed.inKotcZone = false;
-        bot.$emit('playerLeaveZone', killed);
+        bot.$emit('playerLeaveZone', killed, ZoneLeaveReason.Killed);
     }
 
     if (killer) {
@@ -33,6 +35,12 @@ const processDiePacket = (bot) => {
         killer.stats.totalKills++;
 
         if (killer.streak > killer.stats.bestStreak) killer.stats.bestStreak = killer.streak;
+    }
+
+    if (bot.pathing.activePath) {
+        this.pathing.activePath = null;
+        this.pathing.activeNode = null;
+        this.pathing.activeNodeIdx = 0;
     }
 
     bot.$emit('playerDeath', killed, killer, oldKilled, damageCauseInt);

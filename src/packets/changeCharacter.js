@@ -1,6 +1,6 @@
 import CommIn from '../comm/CommIn.js';
 
-import { createGun } from '../util';
+import { createGun } from '../util.js';
 import { findItemById } from '../constants/findItemById.js';
 
 import { GunList } from '../constants/index.js';

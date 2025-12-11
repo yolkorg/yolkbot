@@ -34,7 +34,6 @@ export class GoToAmmoDispatch {
         if (!bot.pathing.activePath) return bot.$emit('pathfindError', PathfindError.NoPathFound);
         if (bot.pathing.activePath.length < 2) return bot.$emit('pathfindError', PathfindError.PathTooShort);
 
-        bot.pathing.followingPath = true;
         bot.pathing.activeNode = bot.pathing.activePath[1];
         bot.pathing.activeNodeIdx = 1;
     }

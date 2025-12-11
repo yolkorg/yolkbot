@@ -9,7 +9,7 @@ export class GoToPlayerDispatch {
 
     validate(bot) {
         if (!bot.intents.includes(Intents.PATHFINDING)) return false;
-        if (!this.idOrName) return false;
+        if (typeof this.idOrName !== 'string' && typeof this.idOrName !== 'number') return false;
 
         const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
         return !!target;
@@ -33,7 +33,6 @@ export class GoToPlayerDispatch {
         if (!bot.pathing.activePath) return bot.$emit('pathfindError', PathfindError.NoPathFound);
         if (bot.pathing.activePath.length < 2) return bot.$emit('pathfindError', PathfindError.PathTooShort);
 
-        bot.pathing.followingPath = true;
         bot.pathing.activeNode = bot.pathing.activePath[1];
         bot.pathing.activeNodeIdx = 1;
     }

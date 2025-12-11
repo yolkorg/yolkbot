@@ -112,3 +112,10 @@ export const PathfindError = {
     NoPathFound: 'no_path_found',
     PathTooShort: 'path_too_short'
 }
+
+export const ZoneLeaveReason = {
+    Despawned: 'despawned',
+    Killed: 'killed',
+    WalkedOut: 'exited',
+    RoundEnded: 'round_ended'
+}

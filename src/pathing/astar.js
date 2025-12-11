@@ -1,14 +1,15 @@
-// this is a generic A* pathfinding algorithm implementation
-
-import { BinaryHeap } from './binaryheap.js';
-
 export default class AStar {
     constructor(list) {
         this.list = list;
     }
 
     heuristic(pos1, pos2) {
-        return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y) + Math.abs(pos1.z - pos2.z);
+        const dx = Math.abs(pos1.x - pos2.x);
+        const dy = Math.abs(pos1.y - pos2.y);
+        const dz = Math.abs(pos1.z - pos2.z);
+
+        const dxz = Math.max(dx, dz);
+        return dy + dxz;
     }
 
     reversePath(node) {
@@ -26,41 +27,53 @@ export default class AStar {
     path(start, end) {
         this.list.clean();
 
-        const heap = new BinaryHeap(node => node.f);
+        const openSet = [start];
         const closedSet = new Set();
 
         start.h = this.heuristic(start, end);
         start.g = 0;
-        start.f = start.g + start.h;
+        start.f = start.h;
         start.visited = true;
 
-        heap.push(start);
+        let current;
+        while (openSet.length > 0) {
+            let lowestIdx = 0;
+            let lowestF = openSet[0].f;
+            let lowestG = openSet[0].g;
 
-        while (heap.size() !== 0) {
-            const current = heap.pop();
+            for (let i = 1; i < openSet.length; i++) {
+                const node = openSet[i];
+                if (node.f < lowestF || (node.f === lowestF && node.g > lowestG)) {
+                    lowestF = node.f;
+                    lowestG = node.g;
+                    lowestIdx = i;
+                }
+            }
+
+            current = openSet[lowestIdx];
             if (current === end) return this.reversePath(current);
 
+            openSet[lowestIdx] = openSet[openSet.length - 1];
+            openSet.pop();
             closedSet.add(current);
 
             const neighbors = current.links;
-
             for (let i = 0; i < neighbors.length; i++) {
                 const neighbor = neighbors[i];
 
                 if (closedSet.has(neighbor)) continue;
 
                 const tentativeGScore = current.g + 1;
-                const visited = neighbor.visited;
 
-                if (!visited || tentativeGScore < neighbor.g) {
+                if (!neighbor.visited || tentativeGScore < neighbor.g) {
+                    const isNew = !neighbor.visited;
                     neighbor.visited = true;
                     neighbor.parent = current;
                     neighbor.g = tentativeGScore;
-                    neighbor.h = this.heuristic(neighbor.position, end.position);
+                    neighbor.h = this.heuristic(neighbor, end);
                     neighbor.f = neighbor.g + neighbor.h;
 
-                    if (visited) heap.rescoreElement(neighbor);
-                    else heap.push(neighbor);
+                    if (isNew) openSet.push(neighbor);
                 }
             }
         }

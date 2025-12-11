@@ -62,7 +62,7 @@ const processSyncThemPacket = (bot) => {
 
     if (!zone && wasIn) {
         player.inKotcZone = false;
-        bot.$emit('playerLeaveZone', player);
+        bot.$emit('playerLeaveZone', player, ZoneLeaveReason.RoundEnded);
         return;
     }
 
@@ -71,7 +71,7 @@ const processSyncThemPacket = (bot) => {
     const nowIn = !!player.inKotcZone;
     if (wasIn !== nowIn) {
         player.inKotcZone = nowIn;
-        bot.$emit(nowIn ? 'playerEnterZone' : 'playerLeaveZone', player);
+        bot.$emit(nowIn ? 'playerEnterZone' : 'playerLeaveZone', player, nowIn ? null : ZoneLeaveReason.WalkedOut);
     }
 }
 
