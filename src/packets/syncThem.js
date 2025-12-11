@@ -57,7 +57,7 @@ const processSyncThemPacket = (bot) => {
 
     if (bot.game.gameModeId !== GameMode.KOTC) return;
 
-    const zone = bot.game.activeZone;
+    const zone = bot.game.kotc.activeZone;
     const wasIn = !!player.inKotcZone;
 
     if (!zone && wasIn) {

@@ -59,7 +59,7 @@ const processAddPlayerPacket = (bot) => {
     bot.game.isPrivate = CommIn.unPackInt8U() === 1;
     bot.game.gameModeId = CommIn.unPackInt8U();
 
-    const player = new GamePlayer(playerData, bot.game.gameMode === GameMode.KOTC ? bot.game.activeZone : null);
+    const player = new GamePlayer(playerData, bot.game.gameMode === GameMode.KOTC ? bot.game.kotc.activeZone : null);
     if (!bot.players[playerData.id]) bot.players[playerData.id] = player;
 
     bot.$emit('playerJoin', player);

@@ -17,7 +17,17 @@ const processDiePacket = (bot) => {
     const oldKilled = killed ? structuredClone(killed) : null;
 
     if (killed) {
-        if (killed.id === bot.me.id) bot.lastDeathTime = Date.now();
+        if (killed.id === bot.me.id) {
+            bot.lastDeathTime = Date.now();
+
+            if (bot.pathing.activePath) {
+                bot.pathing.activePath = null;
+                bot.pathing.activeNode = null;
+                bot.pathing.activeNodeIdx = 0;
+            }
+
+            bot.state.controlKeys = 0;
+        }
 
         killed.playing = false;
         killed.streak = 0;
@@ -35,12 +45,6 @@ const processDiePacket = (bot) => {
         killer.stats.totalKills++;
 
         if (killer.streak > killer.stats.bestStreak) killer.stats.bestStreak = killer.streak;
-    }
-
-    if (bot.pathing.activePath) {
-        this.pathing.activePath = null;
-        this.pathing.activeNode = null;
-        this.pathing.activeNodeIdx = 0;
     }
 
     bot.$emit('playerDeath', killed, killer, oldKilled, damageCauseInt);

@@ -37,7 +37,7 @@ const processGameJoinedPacket = async (bot) => {
             const meshData = bot.game.map.raw.data['DYNAMIC.capture-zone.none'];
             if (meshData) {
                 bot.game.map.zones = initKotcZones(meshData);
-                if (!bot.game.activeZone) bot.game.activeZone = bot.game.map.zones[bot.game.zoneNumber - 1];
+                if (!bot.game.kotc.activeZone) bot.game.kotc.activeZone = bot.game.map.zones[bot.game.kotc.zoneNumber - 1];
             } else delete bot.game.map.zones;
         }
 

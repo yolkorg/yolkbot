@@ -5,7 +5,8 @@ import { ZoneLeaveReason } from '../enums.js';
 
 const processMetaGameStatePacket = (bot) => {
     if (bot.game.gameModeId === GameMode.Spatula) {
-        const oldGame = structuredClone(bot.game);
+        const oldTeamScores = structuredClone(bot.game.teamScore);
+        const oldSpatula = structuredClone(bot.game.spatula);
 
         bot.game.teamScore[1] = CommIn.unPackInt16U();
         bot.game.teamScore[2] = CommIn.unPackInt16U();
@@ -21,50 +22,44 @@ const processMetaGameStatePacket = (bot) => {
 
         bot.game.spatula = { coords: spatulaCoords, controlledBy, controlledByTeam };
 
-        bot.$emit('gameStateChange', oldGame, bot.game);
+        bot.$emit('gameStateChange', { teamScore: { before: oldTeamScores, after: bot.game.teamScore }, spatula: { before: oldSpatula, after: bot.game.spatula } });
     } else if (bot.game.gameModeId === GameMode.KOTC) {
-        const oldGame = structuredClone(bot.game);
+        const oldTeamScores = structuredClone(bot.game.teamScore);
+        const oldKOTC = structuredClone(bot.game.kotc);
+        const oldPlayersOnZone = Object.values(bot.players).filter((p) => p.inKotcZone && p.playing);
 
-        bot.game.stage = CommIn.unPackInt8U(); // constants.CoopState
-        bot.game.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
-        bot.game.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
-        bot.game.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
-        bot.game.numCapturing = CommIn.unPackInt8U(); // number of players capturing - number/1000
+        bot.game.kotc.stage = CommIn.unPackInt8U(); // constants.CoopState
+        bot.game.kotc.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
+        bot.game.kotc.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
+        bot.game.kotc.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
+        bot.game.kotc.numCapturing = CommIn.unPackInt8U(); // number of players capturing - number/1000
         bot.game.teamScore[1] = CommIn.unPackInt8U(); // team 1 (blue) score
         bot.game.teamScore[2] = CommIn.unPackInt8U(); // team 2 (red) score
 
-        bot.game.capturePercent = bot.game.captureProgress / 1000; // progress of the capture as a percentage
-        bot.game.activeZone = bot.game.map.zones ? bot.game.map.zones[bot.game.zoneNumber - 1] : null;
+        bot.game.kotc.capturePercent = bot.game.kotc.captureProgress / 1000; // progress of the capture as a percentage
+        bot.game.kotc.activeZone = bot.game.map.zones ? bot.game.map.zones[bot.game.kotc.zoneNumber - 1] : null;
 
-        const oldPlayersOnZone = Object.values(bot.players).filter((p) => p.inKotcZone && p.playing);
+        if (bot.game.kotc.activeZone) Object.values(bot.players).forEach((player) => player.updateKotcZone(bot.game.kotc.activeZone));
 
-        if (bot.game.activeZone) Object.values(bot.players).forEach((player) => player.updateKotcZone(bot.game.activeZone));
-
-        if (bot.game.numCapturing <= 0) Object.values(bot.players).forEach((player) => {
+        if (bot.game.kotc.numCapturing <= 0) Object.values(bot.players).forEach((player) => {
             if (player.inKotcZone) {
                 player.inKotcZone = false;
                 bot.$emit('playerLeaveZone', player, ZoneLeaveReason.RoundEnded);
             }
-        });
+        })
 
-        bot.$emit('gameStateChange', oldGame, bot.game, oldPlayersOnZone);
+        bot.$emit('gameStateChange', { teamScore: { before: oldTeamScores, after: bot.game.teamScore }, kotc: { before: oldKOTC, after: bot.game.kotc }, playersOnZone: { before: oldPlayersOnZone } });
     } else if (bot.game.gameModeId === GameMode.Team) {
+        const oldTeamScores = structuredClone(bot.game.teamScore);
+
         bot.game.teamScore[1] = CommIn.unPackInt16U();
         bot.game.teamScore[2] = CommIn.unPackInt16U();
+
+        bot.$emit('gameStateChange', { teamScore: { before: oldTeamScores, after: bot.game.teamScore } });
     }
 
     if (bot.game.gameModeId !== GameMode.Spatula) delete bot.game.spatula;
-
-    if (bot.game.gameModeId !== GameMode.KOTC) {
-        delete bot.game.stage;
-        delete bot.game.zoneNumber;
-        delete bot.game.capturing;
-        delete bot.game.captureProgress;
-        delete bot.game.numCapturing;
-        delete bot.game.numCapturing;
-        delete bot.game.activeZone;
-    }
-
+    if (bot.game.gameModeId !== GameMode.KOTC) delete bot.game.kotc;
     if (bot.game.gameModeId === GameMode.FFA) delete bot.game.teamScore;
 }
 

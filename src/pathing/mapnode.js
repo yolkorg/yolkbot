@@ -61,23 +61,26 @@ class MapNode {
         const dy = Math.abs(dy0);
         const dz = Math.abs(dz0);
 
-        if (dx + dy + dz === 0 || (dx + dz > 1 && !((dx === 2 && dz === 1) || (dx === 1 && dz === 2))) || this.isFull() || node.isFull()) return false;
+        if (
+            dx + dy + dz === 0 ||
+            (dx + dz > 1 && !((dx === 2 && dz === 1) || (dx === 1 && dz === 2) || (dx === 2 && dz === 2))) ||
+            this.isFull() || node.isFull()
+        ) return false;
 
         const belowMe = list.at(this.x, this.y - 1, this.z);
         const belowOther = list.at(node.x, node.y - 1, node.z);
         if (!belowMe || !belowOther) return false;
 
         // parkour!
-        if (dy <= 2 && belowMe.isFull() && belowOther.isFull()) {
+        if (dy === 0 && belowMe.isFull() && belowOther.isFull()) {
             // 2 block jumps
             if ((dx === 2 && dz === 0) || (dx === 0 && dz === 2)) {
                 const midX = (this.x + node.x) / 2;
                 const midZ = (this.z + node.z) / 2;
-                const maxY = Math.max(this.y, node.y);
 
-                const midNode = list.at(midX, maxY, midZ);
-                const midBelow = list.at(midX, maxY - 1, midZ);
-                const midAbove = list.at(midX, maxY + 1, midZ);
+                const midNode = list.at(midX, this.y, midZ);
+                const midBelow = list.at(midX, this.y - 1, midZ);
+                const midAbove = list.at(midX, this.y + 1, midZ);
 
                 if (midBelow && midBelow.isAir()) {
                     if (midNode && midNode.isAir() && midAbove && midAbove.isAir()) {
@@ -91,20 +94,19 @@ class MapNode {
             }
             // L jumps
             else if ((dx === 2 && dz === 1) || (dx === 1 && dz === 2)) {
-                const maxY = Math.max(this.y, node.y);
                 const xDir = dx0 > 0 ? -1 : 1;
                 const zDir = dz0 > 0 ? -1 : 1;
 
                 const checks = dx === 2 ?
                     [
-                        [this.x + xDir, maxY, this.z],
-                        [this.x + (2 * xDir), maxY, this.z],
-                        [this.x + xDir, maxY, this.z + zDir]
+                        [this.x + xDir, this.y, this.z],
+                        [this.x + (2 * xDir), this.y, this.z],
+                        [this.x + xDir, this.y, this.z + zDir]
                     ] :
                     [
-                        [this.x, maxY, this.z + zDir],
-                        [this.x, maxY, this.z + (2 * zDir)],
-                        [this.x + xDir, maxY, this.z + zDir]
+                        [this.x, this.y, this.z + zDir],
+                        [this.x, this.y, this.z + (2 * zDir)],
+                        [this.x + xDir, this.y, this.z + zDir]
                     ];
 
                 let allClear = true;
@@ -126,7 +128,42 @@ class MapNode {
                     if (startHead && startHead.isAir() && endHead && endHead.isAir()) return true;
                 }
             }
+            // diagonal gap jumps
+            else if (dx === 2 && dz === 2) {
+                const xDir = dx0 > 0 ? -1 : 1;
+                const zDir = dz0 > 0 ? -1 : 1;
 
+                const checks = [
+                    // first step diagonal
+                    [this.x + xDir, this.y, this.z + zDir],
+                    // center gap (should be air below)
+                    [this.x + xDir, this.y, this.z + zDir],
+                    // second step diagonal (destination)
+                    [this.x + (2 * xDir), this.y, this.z + (2 * zDir)]
+                ];
+
+                let allClear = true;
+                for (const [x, y, z] of checks) {
+                    const block = list.at(x, y, z);
+                    const blockBelow = list.at(x, y - 1, z);
+                    const blockAbove = list.at(x, y + 1, z);
+
+                    if (!block || !block.isAir() || !blockBelow || !blockBelow.isAir() ||
+                        !blockAbove || !blockAbove.isAir()) {
+                        allClear = false;
+                        break;
+                    }
+                }
+
+                if (allClear) {
+                    const startHead = list.at(this.x, this.y + 1, this.z);
+                    const endHead = list.at(node.x, node.y + 1, node.z);
+                    if (startHead && startHead.isAir() && endHead && endHead.isAir()) return true;
+                }
+            }
+        }
+
+        if (dy <= 2 && belowMe.isFull() && belowOther.isFull()) {
             if (this.meshType === 'none') {
                 if (dy0 === 1 && node.canWalkThrough()) return true;
                 if (belowMe.canWalkOn() || belowMe.isLadder()) {
@@ -138,8 +175,6 @@ class MapNode {
                 if (dy === 0 && belowMe.canWalkOn()) return true;
                 return node.meshType === 'ladder' && (dy === 1 || (belowMe.canWalkOn() && belowOther.canWalkOn()));
             } else if (this.meshType === 'wedge') {
-                if (!FORWARD_RY_WEDGE_MAPPING[this.ry]) console.log('what the fuck is this ry', this.ry);
-
                 const forward = FORWARD_RY_WEDGE_MAPPING[this.ry];
                 const backward = { x: -forward.x, z: -forward.z };
 
@@ -179,13 +214,11 @@ const NEIGHBOR_OFFSETS = [
     [1, -1, 0], [-1, -1, 0], [0, -1, 1], [0, -1, -1],
     // parkour 2 block
     [2, 0, 0], [-2, 0, 0], [0, 0, 2], [0, 0, -2],
-    [2, 1, 0], [-2, 1, 0], [0, 1, 2], [0, 1, -2],
-    [2, -1, 0], [-2, -1, 0], [0, -1, 2], [0, -1, -2],
-    [2, 2, 0], [-2, 2, 0], [0, 2, 2], [0, 2, -2],
-    [2, -2, 0], [-2, -2, 0], [0, -2, 2], [0, -2, -2],
     // parkour L shape
     [2, 0, 1], [2, 0, -1], [-2, 0, 1], [-2, 0, -1],
-    [1, 0, 2], [1, 0, -2], [-1, 0, 2], [-1, 0, -2]
+    [1, 0, 2], [1, 0, -2], [-1, 0, 2], [-1, 0, -2],
+    // diagonal gap jumps
+    [2, 0, 2], [2, 0, -2], [-2, 0, 2], [-2, 0, -2]
 ];
 
 class NodeList {

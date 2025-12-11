@@ -256,6 +256,16 @@ export interface GameSpatula {
     controlledByTeam: number;
 }
 
+export interface GameKOTC {
+    stage: number;
+    zoneNumber: number;
+    activeZone: Zone[];
+    capturing: number;
+    captureProgress: number;
+    numCapturing: number;
+    capturePercent: number;
+}
+
 export interface RawGameData {
     command: 'gameFound';
     region: string;
@@ -290,13 +300,7 @@ export interface Game {
     collectables: Collectable[][];
     teamScore: number[];
     spatula: GameSpatula;
-    stage: number;
-    zoneNumber: number;
-    activeZone: Zone[];
-    capturing: number;
-    captureProgress: number;
-    numCapturing: number;
-    capturePercent: number;
+    kotc: GameKOTC;
 }
 
 export interface Pathing {
@@ -350,6 +354,13 @@ export interface FireBullet {
 export interface LoginResponse {
     ok: true;
     account: Account;
+}
+
+export interface GameStateChanges {
+    teamScore: { before: number[], after: number[] };
+    kotc?: { before: GameKOTC, after: GameKOTC };
+    spatula?: { before: GameSpatula, after: GameSpatula };
+    playersOnZone?: { before: GamePlayer[] };
 }
 
 export class Bot {
@@ -416,7 +427,7 @@ export class Bot {
     on(event: 'gameOptionsChange', cb: (oldOptions: GameOptions, newOptions: GameOptions) => void): void;
     on(event: 'gameReady', cb: () => void): void;
     on(event: 'gameReset', cb: () => void): void;
-    on(event: 'gameStateChange', cb: (oldState: Game, newState: Game, oldPlayersOnZone: GamePlayer[]) => void): void;
+    on(event: 'gameStateChange', cb: (changes: GameStateChanges) => void): void;
     on(event: 'grenadeExplode', cb: (item: Item | number, pos: Position, damage: number, radius: number) => void): void;
     on(event: 'leave', cb: (closeCode: number) => void): void;
     on(event: 'mapLoad', cb: (map: MapJSON) => void): void;

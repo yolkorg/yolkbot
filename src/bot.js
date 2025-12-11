@@ -200,14 +200,16 @@ export class Bot {
                 controlledByTeam: 0
             },
 
-            // data from kotc
-            stage: CoopState.Capturing, // this is shell default
-            zoneNumber: 0,
-            activeZone: [],
-            capturing: 0,
-            captureProgress: 0,
-            numCapturing: 0,
-            capturePercent: 0.0
+            kotc: {
+                // data from kotc
+                stage: CoopState.Capturing, // this is shell default
+                zoneNumber: 0,
+                activeZone: [],
+                capturing: 0,
+                captureProgress: 0,
+                numCapturing: 0,
+                capturePercent: 0.0
+            }
         }
 
         this.#initialGame = this.game;
@@ -446,7 +448,7 @@ export class Bot {
                 return this.matchmaker.send(JSON.stringify({ command: 'validateUUID', hash: await validate(data.uuid) }));
             }
 
-            if (data.command === 'gameFound') uuidTimeouts.forEach((t) => clearTimeout(t));
+            if (data.command === 'gameFound' || data.error) uuidTimeouts.forEach((t) => clearTimeout(t));
 
             this.matchmakerListeners.forEach((listener) => listener(data));
         }
@@ -610,8 +612,10 @@ export class Bot {
                         resolve(message.id);
                     }
 
-                    if (message.error && message.error === 'gameNotFound')
-                        return createError(GameJoinError.GameNotFound);
+                    if (message.error && message.error === 'gameNotFound') {
+                        this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
+                        resolve('gameNotFound');
+                    }
                 };
 
                 this.matchmakerListeners.push(listener);
@@ -684,10 +688,10 @@ export class Bot {
             let positionTarget;
             if (this.pathing.activeNodeIdx < pathLen - 1) {
                 positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx + 1].flatCenter();
-                this.dispatch(new LookAtPosDispatch(positionTarget));
+                if (!this.me.jumping) this.dispatch(new LookAtPosDispatch(positionTarget));
             } else {
                 positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx].flatCenter();
-                this.dispatch(new LookAtPosDispatch(positionTarget));
+                if (!this.me.jumping) this.dispatch(new LookAtPosDispatch(positionTarget));
             }
 
             for (let i = this.pathing.activeNodeIdx; i < pathLen; i++) {
@@ -727,7 +731,7 @@ export class Bot {
                     else if (headingZ > 0) distToEdge = 1 - localZ;
                     else if (headingZ < 0) distToEdge = localZ;
 
-                    if (distToEdge <= 0.15) shouldJump = true;
+                    if (distToEdge <= 0.05) shouldJump = true;
                 }
             }
 

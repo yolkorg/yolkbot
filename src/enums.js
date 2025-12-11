@@ -44,6 +44,7 @@ export const GameJoinError = {
     MissingParams: 'missing_params',
     InvalidObject: 'invalid_game_object',
     WebSocketConnectFail: 'websocket_connect_fail',
+    GameNotFound: 'game_not_found',
     InternalError: 'unknown_error'
 }
 

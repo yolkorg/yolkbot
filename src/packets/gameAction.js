@@ -22,13 +22,13 @@ const processGameActionPacket = (bot) => {
         }
 
         if (bot.game.gameModeId === GameMode.KOTC) {
-            bot.game.stage = CoopState.Capturing;
-            bot.game.zoneNumber = 0;
-            bot.game.activeZone = null;
-            bot.game.capturing = 0;
-            bot.game.captureProgress = 0;
-            bot.game.numCapturing = 0;
-            bot.game.capturePercent = 0.0;
+            bot.game.kotc.stage = CoopState.Capturing;
+            bot.game.kotc.zoneNumber = 0;
+            bot.game.kotc.activeZone = null;
+            bot.game.kotc.capturing = 0;
+            bot.game.kotc.captureProgress = 0;
+            bot.game.kotc.numCapturing = 0;
+            bot.game.kotc.capturePercent = 0.0;
         }
 
         bot.$emit('gameReset');
