@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "yolkbot builds your dream shell shockers bot.",
-    "version": "0.0.0-170",
+    "version": "0.0.0-174",
     "keywords": [
         "shell shockers",
         "league bot",
@@ -140,7 +140,7 @@
         }
     },
     "dependencies": {
-        "wwws": "^1.1.2"
+        "wwws": "^1.1.4"
     },
     "devDependencies": {
         "@stylistic/eslint-plugin": "^4.4.1",

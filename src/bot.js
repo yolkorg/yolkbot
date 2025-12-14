@@ -117,6 +117,7 @@ export class Bot {
             // kept for specifying various params
             name: 'yolkbot',
             weaponIdx: 0,
+            useAltGameURL: false,
 
             // wow!
             inGame: false,
@@ -521,7 +522,11 @@ export class Bot {
 
                 this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
 
-                if (msg.command === 'gameFound') return resolve(msg);
+                if (msg.command === 'gameFound') {
+                    if (msg.useAltGameURL) this.state.useAltGameURL = true;
+                    return resolve(msg);
+                }
+
                 if (msg.error === 'sessionNotFound') return resolve(createError(GameFindError.SessionExpired));
 
                 console.error('findPublicGame: unknown matchmaker response', JSON.stringify(msg));
@@ -571,7 +576,11 @@ export class Bot {
 
                 this.matchmakerListeners.splice(this.matchmakerListeners.indexOf(listener), 1);
 
-                if (msg.command === 'gameFound') return resolve(msg);
+                if (msg.command === 'gameFound') {
+                    if (msg.useAltGameURL) this.state.useAltGameURL = true;
+                    return resolve(msg);
+                }
+
                 if (msg.error === 'sessionNotFound') return resolve(createError(GameFindError.SessionExpired));
 
                 console.error('createPrivateGame: unknown matchmaker response', JSON.stringify(msg));
@@ -650,7 +659,9 @@ export class Bot {
             this.game.region = this.game.raw.region;
         } else return createError(GameJoinError.MissingParams);
 
-        const host = this.game.raw.host || (this.instance.startsWith('localhost:') ? this.instance : `${this.game.raw.subdomain}.${this.instance}`);
+        // useAltGameURL format: ${this.protocol}://${this.instance}/servers/${this.game.raw.subdomain}/game/${id}
+        // not useAltGameURL form: ${this.protocol}://${this.game.raw.subdomain}.${this.instance}/game/${id}
+        const host = this.state.useAltGameURL ? `${this.instance}/servers/${this.game.raw.subdomain}` : `${this.game.raw.subdomain}.${this.instance}`;
         this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
         this.game.socket.binaryType = 'arraybuffer';
         this.game.socket.connectionTimeout = this.connectionTimeout;
