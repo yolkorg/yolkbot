@@ -1,5 +1,7 @@
 import CommIn from '../comm/CommIn.js';
+
 import { FramesBetweenSyncs, GameMode, Movement } from '../constants/index.js';
+import { ZoneLeaveReason } from '../enums.js';
 
 const processSyncThemPacket = (bot) => {
     const id = CommIn.unPackInt8U();

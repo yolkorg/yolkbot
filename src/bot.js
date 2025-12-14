@@ -434,7 +434,7 @@ export class Bot {
 
         this.matchmaker = matchmaker;
 
-        let uuidTimeouts = [];
+        const uuidTimeouts = [];
 
         this.matchmaker.onmessage = async (e) => {
             const data = JSON.parse(e.data);
@@ -692,8 +692,8 @@ export class Bot {
 
         if (this.me.climbing) {
             /* todo: handle ladders
-            var cx = this.climbX;
-            var cz = this.climbZ;
+            let cx = this.climbX;
+            let cz = this.climbZ;
             this.climbing = false;
             this.capturing = false;
             cell = getMapCellAt(cx, Math.floor(this.me.position.y + 0.25), cz);
@@ -714,8 +714,7 @@ export class Bot {
         const myPos = this.me.position;
         const myFloorY = Math.floor(myPos.y);
 
-        const lastNodeCenter = lastNode.flatCenter();
-        const distToEndCenter = Math.hypot(myPos.x - lastNodeCenter.x, myPos.z - lastNodeCenter.z);
+        const distToEndCenter = Math.hypot(myPos.x - lastNode.flatCenter.x, myPos.z - lastNode.flatCenter.z);
 
         if (distToEndCenter < 0.3) {
             this.pathing.activePath = null;
@@ -758,9 +757,8 @@ export class Bot {
                 }
             }
 
-            let positionTarget;
             if (this.pathing.activeNodeIdx < pathLen) {
-                positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx].flatCenter();
+                const positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx].flatCenter;
                 if (this.state.onGround) this.dispatch(new LookAtPosDispatch(positionTarget));
             }
 
@@ -812,11 +810,11 @@ export class Bot {
             this.state.shotsFired = 0;
 
             if (this.intents.includes(Intents.SIMULATION)) {
-                var dx = 0;
-                var dy = 0;
-                var dz = 0;
+                let dx = 0;
+                let dy = 0;
+                let dz = 0;
 
-                var state = this.state.buffer[currentIdx];
+                const state = this.state.buffer[currentIdx];
 
                 if (state.controlKeys & Movement.Left) {
                     dx -= Math.cos(state.yaw);
@@ -871,9 +869,9 @@ export class Bot {
                     dy = this.state.dy - (this.game.options.gravity * 0.012);
                     dy = Math.max(-0.29, dy);
 
-                    var oldX = this.me.position.x;
-                    var oldY = this.me.position.y;
-                    var oldZ = this.me.position.z;
+                    const oldX = this.me.position.x;
+                    const oldY = this.me.position.y;
+                    const oldZ = this.me.position.z;
 
                     this.#processMovement(dx, dy, dz);
 
@@ -882,9 +880,8 @@ export class Bot {
                     dz = this.me.position.z - oldZ;
 
                     if (this.state.onGround && dy > 0) {
-                        const mag = Math.sqrt(dx * dx + dy * dy + dz * dz);
                         const normY = mag === 0 ? 0 : dy / mag;
-                        var n = 1 - normY * 0.5;
+                        const n = 1 - normY * 0.5;
                         dx *= n;
                         dz *= n;
                     }

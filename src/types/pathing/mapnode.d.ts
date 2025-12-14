@@ -14,6 +14,7 @@ declare class MapNode {
     parent: MapNode | null;
     closed: any | null;
     links: MapNode[];
+    flatCenter: Position;
     ry?: number;
 
     constructor(meshType: string, data: { x: number; y: number; z: number; ry?: number });
@@ -25,7 +26,6 @@ declare class MapNode {
     isStair(): boolean;
     isAir(): boolean;
     canLink(node: MapNode, list: NodeList): boolean;
-    flatCenter(): Position;
     flatRadialDistance(position: Position): number;
 }
 

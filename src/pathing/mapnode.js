@@ -23,7 +23,12 @@ class MapNode {
         this.parent = null;
         this.closed = null;
         this.links = [];
-        this._flatCenter = null;
+
+        this.flatCenter = {
+            x: this.x + 0.5,
+            y: this.y,
+            z: this.z + 0.5
+        }
 
         if (this.meshType === 'wedge') this.ry = data.ry ?? 0;
     }
@@ -77,8 +82,7 @@ class MapNode {
 
         // parkour!
         if (dy === 0 && belowMe.isFull() && belowOther.isFull()) {
-            // 2 block jumps
-            if ((dx === 2 && dz === 0) || (dx === 0 && dz === 2)) {
+            if ((dx === 2 && dz === 0) || (dx === 0 && dz === 2)) { // 2 block jumps
                 const midX = (this.x + node.x) / 2;
                 const midZ = (this.z + node.z) / 2;
 
@@ -95,9 +99,7 @@ class MapNode {
                         }
                     }
                 }
-            }
-            // L jumps
-            else if ((dx === 2 && dz === 1) || (dx === 1 && dz === 2)) {
+            } else if ((dx === 2 && dz === 1) || (dx === 1 && dz === 2)) { // L jumps
                 const xDir = dx0 > 0 ? -1 : 1;
                 const zDir = dz0 > 0 ? -1 : 1;
 
@@ -129,9 +131,7 @@ class MapNode {
                     const endHead = list.at(node.x, node.y + 1, node.z);
                     if (startHead && startHead.isAir() && endHead && endHead.isAir()) return true;
                 }
-            }
-            // diagonal gap jumps
-            else if (dx === 2 && dz === 2) {
+            } else if (dx === 2 && dz === 2) { // diagonal gap jumps
                 const xDir = dx0 > 0 ? -1 : 1;
                 const zDir = dz0 > 0 ? -1 : 1;
 
@@ -206,14 +206,8 @@ class MapNode {
         }
     }
 
-    flatCenter() {
-        if (!this._flatCenter) this._flatCenter = { x: this.x + 0.5, y: this.y, z: this.z + 0.5 };
-        return this._flatCenter;
-    }
-
     flatRadialDistance(position) {
-        const pos = this.flatCenter();
-        return Math.hypot(pos.x - position.x, pos.z - position.z);
+        return Math.hypot(this.flatCenter.x - position.x, this.flatCenter.z - position.z);
     }
 }
 
