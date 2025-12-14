@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "1.4.3",
+    "version": "1.4.4",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -133,7 +133,7 @@
         }
     },
     "dependencies": {
-        "wwws": "^1.1.1"
+        "wwws": "^1.1.4"
     },
     "devDependencies": {
         "@stylistic/eslint-plugin": "^4.4.1",
