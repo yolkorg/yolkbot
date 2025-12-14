@@ -61,15 +61,14 @@ export const Intents = {
     PLAYER_HEALTH: 7,
     PACKET_HOOK: 8,
     LOG_PACKETS: 10,
-    NO_LOGIN: 11,
+    SKIP_LOGIN: 11,
     DEBUG_BUFFER: 12,
     NO_AFK_KICK: 16,
     LOAD_MAP: 17,
     OBSERVE_GAME: 18,
-    NO_REGION_CHECK: 19,
-    NO_EXIT_ON_ERROR: 20,
     RENEW_SESSION: 21,
-    VIP_HIDE_BADGE: 22
+    VIP_HIDE_BADGE: 22,
+    SIMULATION: 23
 }
 
 export const RedeemCodeError = {

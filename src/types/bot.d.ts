@@ -326,6 +326,10 @@ export interface BotState {
     yaw: number;
     pitch: number;
     controlKeys: number;
+    onGround: number;
+    dx: number;
+    dy: number;
+    dz: number;
     reloading: boolean;
     swappingGun: boolean;
     usingMelee: boolean;
@@ -432,6 +436,7 @@ export class Bot {
     on(event: 'leave', cb: (closeCode: number) => void): void;
     on(event: 'mapLoad', cb: (map: MapJSON) => void): void;
     on(event: 'packet', cb: (packet: ArrayBuffer) => void): void;
+    on(event: 'pathfindComplete', cb: () => void): void;
     on(event: 'pathfindError', cb: (error: PathfindError) => void): void;
     on(event: 'pingUpdate', cb: (oldPing: number, newPing: number) => void): void;
     on(event: 'playerBeginStreak', cb: (player: GamePlayer, streakType: number) => void): void;

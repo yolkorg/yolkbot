@@ -31,8 +31,6 @@ const processGameJoinedPacket = async (bot) => {
         const map = await fetchMap(bot.game.map.filename, bot.game.map.hash);
         if (bot.game.map) bot.game.map.raw = map;
 
-        bot.$emit('mapLoad', bot.game.map.raw);
-
         if (bot.game.gameModeId === GameMode.KOTC) {
             const meshData = bot.game.map.raw.data['DYNAMIC.capture-zone.none'];
             if (meshData) {
@@ -45,6 +43,8 @@ const processGameJoinedPacket = async (bot) => {
             bot.pathing.nodeList = new NodeList(bot.game.map.raw);
             bot.pathing.astar = new AStar(bot.pathing.nodeList);
         }
+
+        bot.$emit('mapLoad', bot.game.map.raw);
     }
 
     bot.state.inGame = true;

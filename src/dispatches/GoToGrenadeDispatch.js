@@ -29,11 +29,12 @@ export class GoToGrenadeDispatch {
         const myNode = bot.pathing.nodeList.atObject(bot.me.position);
         const targetNode = bot.pathing.nodeList.atObject(closestGrenade);
 
-        bot.pathing.activePath = bot.pathing.astar.path(myNode, targetNode);
+        const path = bot.pathing.astar.path(myNode, targetNode);
 
-        if (!bot.pathing.activePath) return bot.$emit('pathfindError', PathfindError.NoPathFound);
-        if (bot.pathing.activePath.length < 2) return bot.$emit('pathfindError', PathfindError.PathTooShort);
+        if (!path) return bot.$emit('pathfindError', PathfindError.NoPathFound);
+        if (path.length < 2) return bot.$emit('pathfindError', PathfindError.PathTooShort);
 
+        bot.pathing.activePath = path;
         bot.pathing.activeNode = bot.pathing.activePath[1];
         bot.pathing.activeNodeIdx = 1;
     }

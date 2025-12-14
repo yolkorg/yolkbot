@@ -122,10 +122,14 @@ export class Bot {
             inGame: false,
             chatLines: 0,
 
-            // view
+            // movement
             yaw: 0,
             pitch: 0,
             controlKeys: 0,
+            onGround: 4,
+            dx: 0,
+            dy: 0,
+            dz: 0,
 
             // tracking for dispatch checks
             reloading: false,
@@ -166,7 +170,6 @@ export class Bot {
                 numPlayers: '18',
 
                 raw: {},
-                nodes: {},
                 zones: []
             },
             playerLimit: 0,
@@ -478,7 +481,7 @@ export class Bot {
     }
 
     async initSession() {
-        if (!this.account.sessionId && !this.intents.includes(Intents.NO_LOGIN)) {
+        if (!this.account.sessionId && !this.intents.includes(Intents.SKIP_LOGIN)) {
             const anonLogin = await this.loginAnonymously();
             if (!anonLogin.ok) return anonLogin;
         }
@@ -496,7 +499,7 @@ export class Bot {
         if (typeof mode !== 'number') return createError(GameFindError.MissingParams);
 
         const regions = this.regionList.length ? this.regionList : Regions;
-        if (!regions.find(r => r.id === region) && !this.intents.includes(Intents.NO_REGION_CHECK)) return createError(GameFindError.InvalidRegion);
+        if (!regions.find(r => r.id === region)) return createError(GameFindError.InvalidRegion);
 
         let computedModeId;
 
@@ -543,7 +546,7 @@ export class Bot {
         if (typeof region !== 'string') return createError(GameFindError.MissingParams);
 
         const regions = this.regionList.length ? this.regionList : Regions;
-        if (!regions.find(r => r.id === region) && !this.intents.includes(Intents.NO_REGION_CHECK)) return createError(GameFindError.InvalidRegion);
+        if (!regions.find(r => r.id === region)) return createError(GameFindError.InvalidRegion);
 
         let computedModeId;
 
@@ -669,44 +672,63 @@ export class Bot {
         return { ok: true };
     }
 
+    #processMovement(ndx, ndy, ndz) {
+        this.state.onGround = Math.max(--this.state.onGround, 0);
+
+        this.me.position.x += ndx;
+        this.me.position.y += ndy;
+        this.me.position.z += ndz;
+
+        const thisBlockX = Math.floor(this.me.position.x);
+        const thisBlockY = Math.floor(this.me.position.y);
+        const thisBlockZ = Math.floor(this.me.position.z);
+
+        const blockInMyHitbox = this.pathing.nodeList.at(thisBlockX, thisBlockY, thisBlockZ);
+        if (blockInMyHitbox && !blockInMyHitbox.isAir()) {
+            if (!this.climbing && blockInMyHitbox.isLadder()) {
+                // todo: handle ladders
+            }
+        }
+
+        if (this.me.climbing) {
+            /* todo: handle ladders
+            var cx = this.climbX;
+            var cz = this.climbZ;
+            this.climbing = false;
+            this.capturing = false;
+            cell = getMapCellAt(cx, Math.floor(this.me.position.y + 0.25), cz);
+            if (cell && Math.floor(cell.ry / Math.PI90) == this.climbRY && cell.mesh && cell.mesh.colliderType == "ladder") {
+                this.climbing = true;
+            }
+            */
+        } else if (blockInMyHitbox && blockInMyHitbox.isJumpPad()) {
+            this.me.position.y += 0.26;
+            this.me.jumping = true;
+            this.state.onGround = 0;
+        }
+    }
+
     #processPathfinding() {
         const pathLen = this.pathing.activePath.length;
         const lastNode = this.pathing.activePath[pathLen - 1];
         const myPos = this.me.position;
         const myFloorY = Math.floor(myPos.y);
-        const myX = Math.floor(myPos.x);
-        const myY = Math.floor(myPos.y);
-        const myZ = Math.floor(myPos.z);
 
-        if (myX === lastNode.x && myY === lastNode.y && myZ === lastNode.z) {
+        const lastNodeCenter = lastNode.flatCenter();
+        const distToEndCenter = Math.hypot(myPos.x - lastNodeCenter.x, myPos.z - lastNodeCenter.z);
+
+        if (distToEndCenter < 0.3) {
             this.pathing.activePath = null;
             this.pathing.activeNode = null;
             this.pathing.activeNodeIdx = 0;
 
             this.dispatch(new MovementDispatch(0));
+            this.$emit('pathfindComplete');
         } else {
-            let positionTarget;
-            if (this.pathing.activeNodeIdx < pathLen - 1) {
-                positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx + 1].flatCenter();
-                if (!this.me.jumping) this.dispatch(new LookAtPosDispatch(positionTarget));
-            } else {
-                positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx].flatCenter();
-                if (!this.me.jumping) this.dispatch(new LookAtPosDispatch(positionTarget));
-            }
-
-            for (let i = this.pathing.activeNodeIdx; i < pathLen; i++) {
-                const node = this.pathing.activePath[i];
-                if (node.flatRadialDistance(myPos) < 0.1 && node.y === myFloorY) {
-                    this.pathing.activeNodeIdx = i + 1;
-                    this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
-                    break;
-                }
-            }
-
             let shouldJump = false;
-            const currentNode = this.pathing.activePath[this.pathing.activeNodeIdx];
 
-            if (currentNode && this.pathing.activeNodeIdx < pathLen - 1) {
+            if (this.pathing.activeNodeIdx < pathLen - 1) {
+                const currentNode = this.pathing.activePath[this.pathing.activeNodeIdx];
                 const nextNode = this.pathing.activePath[this.pathing.activeNodeIdx + 1];
 
                 const dx = Math.abs(currentNode.x - nextNode.x);
@@ -716,7 +738,8 @@ export class Bot {
                     (dx === 2 && dz === 0) || // 2 block
                     (dx === 0 && dz === 2) || // 2 block
                     (dx === 2 && dz === 1) || // L
-                    (dx === 1 && dz === 2); // L
+                    (dx === 1 && dz === 2) || // L
+                    (dx === 2 && dz === 2); // diagonal 2 block
 
                 if (isParkourJump) {
                     const localX = myPos.x - Math.floor(myPos.x);
@@ -731,14 +754,27 @@ export class Bot {
                     else if (headingZ > 0) distToEdge = 1 - localZ;
                     else if (headingZ < 0) distToEdge = localZ;
 
-                    if (distToEdge <= 0.05) shouldJump = true;
+                    if (distToEdge <= 0.04) shouldJump = true;
+                }
+            }
+
+            let positionTarget;
+            if (this.pathing.activeNodeIdx < pathLen) {
+                positionTarget = this.pathing.activePath[this.pathing.activeNodeIdx].flatCenter();
+                if (this.state.onGround) this.dispatch(new LookAtPosDispatch(positionTarget));
+            }
+
+            for (let i = this.pathing.activeNodeIdx; i < pathLen; i++) {
+                const node = this.pathing.activePath[i];
+                if (node.flatRadialDistance(myPos) < 0.1 && node.y === myFloorY) {
+                    this.pathing.activeNodeIdx = i + 1;
+                    this.pathing.activeNode = this.pathing.activePath[this.pathing.activeNodeIdx];
+                    break;
                 }
             }
 
             const movementKeys = Movement.Forward | (shouldJump ? Movement.Jump : 0);
-
-            if (!(this.state.controlKeys & Movement.Forward)) this.dispatch(new MovementDispatch(movementKeys));
-            else if (shouldJump && !(this.state.controlKeys & Movement.Jump)) this.dispatch(new MovementDispatch(movementKeys));
+            this.dispatch(new MovementDispatch(movementKeys));
         }
     }
 
@@ -759,11 +795,9 @@ export class Bot {
 
         if (this.me.playing) {
             const currentIdx = this.state.stateIdx;
+            const isBufferDebug = this.intents.includes(Intents.DEBUG_BUFFER);
 
-            if (this.intents.includes(Intents.DEBUG_BUFFER)) {
-                console.log('setting buffer for idx', currentIdx);
-                console.log('checking...shotsFired', this.state.shotsFired);
-            }
+            if (isBufferDebug) console.log('setting buffer for idx', currentIdx);
 
             this.me.jumping = !!(this.state.controlKeys & Movement.Jump);
 
@@ -771,12 +805,101 @@ export class Bot {
                 controlKeys: this.state.controlKeys,
                 yaw: this.state.yaw,
                 pitch: this.state.pitch,
-                shotsFired: this.state.shotsFired
+                shotsFired: this.state.shotsFired,
+                position: isBufferDebug ? { ...this.me.position } : {}
             }
 
             this.state.shotsFired = 0;
 
-            if (this.lastUpdateTick >= 2) {
+            if (this.intents.includes(Intents.SIMULATION)) {
+                var dx = 0;
+                var dy = 0;
+                var dz = 0;
+
+                var state = this.state.buffer[currentIdx];
+
+                if (state.controlKeys & Movement.Left) {
+                    dx -= Math.cos(state.yaw);
+                    dz += Math.sin(state.yaw);
+                }
+
+                if (state.controlKeys & Movement.Right) {
+                    dx += Math.cos(state.yaw);
+                    dz -= Math.sin(state.yaw);
+                }
+
+                if (state.controlKeys & Movement.Forward) {
+                    if (this.me.climbing) dy += 1;
+                    else {
+                        dx -= Math.sin(state.yaw);
+                        dz -= Math.cos(state.yaw);
+                    }
+                }
+
+                if (state.controlKeys & Movement.Backward) {
+                    if (this.me.climbing) dy -= 1;
+                    else {
+                        dx += Math.sin(state.yaw);
+                        dz += Math.cos(state.yaw);
+                    }
+                }
+
+                if (state.controlKeys & Movement.Jump) this.state.controlKeys ^= this.state.controlKeys & Movement.Jump;
+
+                if (this.me.climbing) {
+                    this.me.jumping = false;
+
+                    dy += dy * 0.028;
+                    this.me.position.y += dy;
+                    dy *= 0.5;
+
+                    this.#processMovement(0, dy, 0);
+                } else {
+                    const mag = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    if (mag > 0) {
+                        const normDx = dx / mag;
+                        const normDz = dz / mag;
+
+                        dx = this.state.dx + normDx * 0.025;
+                        dz = this.state.dz + normDz * 0.025;
+                    } else {
+                        dx = this.state.dx;
+                        dz = this.state.dz;
+                    }
+
+                    dy = this.state.dy - (this.game.options.gravity * 0.012);
+                    dy = Math.max(-0.29, dy);
+
+                    var oldX = this.me.position.x;
+                    var oldY = this.me.position.y;
+                    var oldZ = this.me.position.z;
+
+                    this.#processMovement(dx, dy, dz);
+
+                    dx = this.me.position.x - oldX;
+                    dy = this.me.position.y - oldY;
+                    dz = this.me.position.z - oldZ;
+
+                    if (this.state.onGround && dy > 0) {
+                        const mag = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                        const normY = mag === 0 ? 0 : dy / mag;
+                        var n = 1 - normY * 0.5;
+                        dx *= n;
+                        dz *= n;
+                    }
+                }
+
+                dx *= 0.64;
+                dz *= 0.64;
+                if (this.me.climbing) dy *= 0.64;
+
+                this.state.dx = dx;
+                this.state.dy = dy;
+                this.state.dz = dz;
+            }
+
+            if ((this.state.stateIdx % FramesBetweenSyncs) === 0) {
                 this.$emit('tick');
 
                 const out = new CommOut();
@@ -787,6 +910,8 @@ export class Bot {
 
                 const startIdx = mod(this.state.stateIdx - FramesBetweenSyncs + 1, StateBufferSize);
 
+                if (isBufferDebug) console.log('--- START THIS SYNC LOGGING ---');
+
                 for (let i = 0; i < FramesBetweenSyncs; i++) {
                     const idx = mod(startIdx + i, StateBufferSize);
                     const frame = this.state.buffer[idx] || {};
@@ -795,8 +920,7 @@ export class Bot {
                     const yaw = frame.yaw ?? this.state.yaw;
                     const pitch = frame.pitch ?? this.state.pitch;
 
-                    if (this.intents.includes(Intents.DEBUG_BUFFER))
-                        console.log('going with', this.state.stateIdx, startIdx, idx, frame);
+                    if (isBufferDebug) console.log('adding', this.state.stateIdx, startIdx, idx, frame);
 
                     out.packInt8(keys);
                     out.packInt8(shots);
@@ -805,6 +929,8 @@ export class Bot {
                 }
 
                 out.send(this.game.socket);
+
+                if (isBufferDebug) console.log('--- END SYNC LOGGING ---');
 
                 this.state.buffer = [];
 
@@ -1259,6 +1385,7 @@ export class Bot {
 
     quit(noCleanup = false) {
         if (this.hasQuit) return;
+        this.hasQuit = true;
 
         this.leave();
 
@@ -1287,8 +1414,6 @@ export class Bot {
             this.#globalHooks = [];
             this.#dispatches = [];
         }
-
-        this.hasQuit = true;
     }
 }
 

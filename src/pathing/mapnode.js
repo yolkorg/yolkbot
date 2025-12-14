@@ -52,6 +52,10 @@ class MapNode {
         return this.meshType === 'none';
     }
 
+    isJumpPad() {
+        return this.meshType === 'jump-pad';
+    }
+
     canLink(node, list) {
         const dx0 = this.x - node.x;
         const dz0 = this.z - node.z;
@@ -100,12 +104,10 @@ class MapNode {
                 const checks = dx === 2 ?
                     [
                         [this.x + xDir, this.y, this.z],
-                        [this.x + (2 * xDir), this.y, this.z],
                         [this.x + xDir, this.y, this.z + zDir]
                     ] :
                     [
                         [this.x, this.y, this.z + zDir],
-                        [this.x, this.y, this.z + (2 * zDir)],
                         [this.x + xDir, this.y, this.z + zDir]
                     ];
 
@@ -163,11 +165,18 @@ class MapNode {
             }
         }
 
-        if (dy <= 2 && belowMe.isFull() && belowOther.isFull()) {
+        const meSupported = belowMe.isFull() || this.isStair();
+        const otherSupported = belowOther.isFull() || belowOther.isStair() || node.isStair();
+
+        if (dy <= 2 && meSupported && otherSupported) {
             if (this.meshType === 'none') {
                 if (dy0 === 1 && node.canWalkThrough()) return true;
-                if (belowMe.canWalkOn() || belowMe.isLadder()) {
-                    if (node.meshType === 'none' || (node.meshType === 'ladder' && dy === 0) || (node.meshType === 'wedge' && dy0 === 0 && dx0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].x && dz0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].z)) return true;
+                if (belowMe.canWalkOn() || belowMe.isLadder() || belowMe.isStair()) {
+                    if (
+                        node.meshType === 'none' ||
+                        (node.meshType === 'ladder' && dy === 0) ||
+                        (node.meshType === 'wedge' && dy0 === 0 && dx0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].x && dz0 === -FORWARD_RY_WEDGE_MAPPING[node.ry].z)
+                    ) return true;
                 }
                 return false;
             } else if (this.meshType === 'ladder') {
@@ -186,7 +195,11 @@ class MapNode {
 
                 if (this.x + backward.x === node.x && this.z + backward.z === node.z) {
                     if ((this.y === node.y || this.y - 1 === node.y) && node.canWalkThrough()) return true;
+                    if (this.y - 1 === node.y && (node.meshType === 'wedge' || (node.meshType === 'none' && belowOther.isFull()))) return true;
                 }
+
+                if (node.canWalkThrough() && (belowOther.isFull() || belowOther.isStair())) return true;
+                if (node.isStair()) return true;
 
                 return false;
             }
