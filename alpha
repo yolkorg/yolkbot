@@ -8,8 +8,8 @@ echo "publishing $new_version"
 
 bun pm pkg set "version=$new_version"
 
-bun cli/build -nm
-bun browser/build
+bun build/node.ts
+bun build/browser.ts
 
 npm publish --tag alpha
 

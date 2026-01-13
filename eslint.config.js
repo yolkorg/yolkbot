@@ -7,6 +7,10 @@ export default [
         languageOptions: { globals: { window: true } }
     },
     {
+        files: ['build/**'],
+        languageOptions: { globals: { Bun: 'readonly', fetch: 'readonly', process: 'readonly' } }
+    },
+    {
         files: ['src/wasm/**'],
         languageOptions: { globals: { TextEncoder: 'readonly', TextDecoder: 'readonly', WebAssembly: 'readonly' } }
     },

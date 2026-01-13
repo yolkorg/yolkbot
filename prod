@@ -7,8 +7,8 @@ fi
 
 bun pm pkg set "version=$new_version"
 
-bun cli/build
-bun browser/build
+bun build/node.ts
+bun build/browser.ts
 
 echo "\n\x1b[32m✓ version updated in package.json to $new_version\x1b[0m"
 echo "\x1b[33mi please visit the workflow to run secure publishing\x1b[0m"

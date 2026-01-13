@@ -21,10 +21,10 @@ jobs:
         run: bun install
 
       - name: build node
-        run: bun run cli/build
+        run: bun run build/node.ts
 
       - name: build browser
-        run: bun run browser/build
+        run: bun run build/browser.ts
 
       - name: install npm
         run: bun install -g npm@latest
