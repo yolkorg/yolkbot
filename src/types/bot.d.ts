@@ -182,6 +182,9 @@ export interface RawLoginData {
         limit?: number;
         reset?: number;
     }
+    cgAccountStatus: {
+        hasAccount: boolean;
+    }
 }
 
 export interface Account {
@@ -197,6 +200,7 @@ export interface Account {
     ownedItemIds: number[];
     vip: boolean;
     isAged: boolean;
+    isCG: boolean;
     emailVerified: boolean;
     eggBalance: number;
     stats: {

@@ -28,7 +28,7 @@ export default [
     },
     {
         files: ['src/env/globals.js'],
-        languageOptions: { globals: { process: 'readonly', Deno: 'readonly', self: 'readonly' } }
+        languageOptions: { globals: { process: 'readonly', Deno: 'readonly', self: 'readonly', window: 'readonly' } }
     },
     {
         files: ['src/util.js'],

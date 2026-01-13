@@ -6,9 +6,10 @@ export class ChatDispatch {
         this.msg = msg;
     }
 
-    validate() {
+    validate(bot) {
         if (typeof this.msg !== 'string') return false;
         if (this.msg.length < 1 || this.msg.length > 64) return false;
+        if (!bot.game.isPrivate && !bot.account.emailVerified && !bot.account.isAged && !bot.account.isCG) return false;
 
         return true;
     }
@@ -16,7 +17,6 @@ export class ChatDispatch {
     check(bot) {
         if (!bot.state?.inGame) return false;
         if (!bot.game.isPrivate && !bot.account.adminRoles && bot.state.chatLines >= 2) return false;
-        if (!bot.game.isPrivate && !bot.account.emailVerified && !bot.account.isAged) return false;
 
         return true;
     }

@@ -62,7 +62,7 @@ export class API {
         });
     }
 
-    #authWithEmailPass = async (email, password, endpoint) => {
+    #authWithEmailPass = async (email, password, customServicesParams, endpoint) => {
         if (!email || !password) return createError(APIError.MissingParams);
 
         let body;
@@ -103,12 +103,12 @@ export class API {
 
         this.idToken = body.idToken;
 
-        const servicesQuery = await this.queryServices({ cmd: 'auth', firebaseToken: body.idToken });
+        const servicesQuery = await this.queryServices({ cmd: 'auth', firebaseToken: body.idToken, ...customServicesParams });
         return servicesQuery.ok ? { firebase: body, ...servicesQuery } : servicesQuery;
     }
 
-    createAccount = (email, password) => this.#authWithEmailPass(email, password, 'signUp');
-    loginWithCredentials = (email, password) => this.#authWithEmailPass(email, password, 'signInWithPassword');
+    createAccount = (email, password, customServicesParams) => this.#authWithEmailPass(email, password, customServicesParams, 'signUp');
+    loginWithCredentials = (email, password, customServicesParams) => this.#authWithEmailPass(email, password, customServicesParams, 'signInWithPassword');
 
     loginWithRefreshToken = async (refreshToken) => {
         if (!refreshToken) return createError(APIError.MissingParams);

@@ -116,10 +116,6 @@ export class yolkws {
             } catch { }
         }
 
-        this.onListeners.clear();
-        this.onceListeners.clear();
-        this.onceConnected = [];
-
         return closeResponse;
     }
 }

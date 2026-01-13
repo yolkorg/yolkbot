@@ -36,6 +36,8 @@ interface APIParams {
 
 type ReturnError = { ok: false; error: APIError };
 
+type AnyObject = { [key: string]: any };
+
 export class API {
     proxy?: string;
     protocol: string;
@@ -47,10 +49,10 @@ export class API {
 
     queryServices(request: QueryRequest): Promise<QueryResponse | ReturnError>;
 
-    loginWithCredentials(email: string, password: string): Promise<AuthResponse | ReturnError>;
+    createAccount(email: string, password: string, customServicesParams: AnyObject): Promise<AuthResponse | ReturnError>;
+    loginWithCredentials(email: string, password: string, customServicesParams: AnyObject): Promise<AuthResponse | ReturnError>;
     loginWithRefreshToken(refreshToken: string): Promise<AuthResponse | ReturnError>;
     loginAnonymously(): Promise<AuthResponse | ReturnError>;
-    createAccount(email: string, password: string): Promise<AuthResponse | ReturnError>;
 
     sendEmailVerification(idToken?: string): Promise<EmailResponse | ReturnError>;
     verifyOobCode(oobCode: string): Promise<EmailResponse | ReturnError>;

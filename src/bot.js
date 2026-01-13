@@ -262,6 +262,7 @@ export class Bot {
             // used for chat checking
             emailVerified: false,
             isAged: false,
+            isCG: false,
 
             adminRoles: 0,
 
@@ -375,6 +376,7 @@ export class Bot {
         this.account.firebaseId = loginData.firebaseId;
         this.account.id = loginData.id;
         this.account.isAged = new Date(loginData.dateCreated).getTime() < 17145468e5;
+        this.account.isCG = loginData.cgAccountStatus.hasAccount;
         this.account.loadout = loginData.loadout;
         this.account.ownedItemIds = loginData.ownedItemIds;
         this.account.session = loginData.session;
