@@ -661,7 +661,11 @@ export class Bot {
 
         // useAltGameURL format: ${this.protocol}://${this.instance}/servers/${this.game.raw.subdomain}/game/${id}
         // not useAltGameURL form: ${this.protocol}://${this.game.raw.subdomain}.${this.instance}/game/${id}
-        const host = this.state.useAltGameURL ? `${this.instance}/servers/${this.game.raw.subdomain}` : `${this.game.raw.subdomain}.${this.instance}`;
+
+        const host = (this.state.useAltGameURL || this.host === 'proxy.yolkbot.xyz') ?
+            `${this.instance}/servers/${this.game.raw.subdomain}` :
+            `${this.game.raw.subdomain}.${this.instance}`;
+
         this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
         this.game.socket.binaryType = 'arraybuffer';
         this.game.socket.connectionTimeout = this.connectionTimeout;

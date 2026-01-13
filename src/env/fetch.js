@@ -1,5 +1,7 @@
 import { socksConnect } from 'wwws';
 
+import globals from './globals.js';
+
 const parseChunkedBody = (body) => {
     const chunks = [];
     let i = 0;
@@ -92,7 +94,7 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
 const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null, timeout = 30000 } = {}) => new Promise((resolve, reject) => {
     try {
         if (typeof process === 'undefined' || !process.getBuiltinModule)
-            return globalThis.fetch(url, { method, headers, body }).then(resolve).catch(reject);
+            return globals.fetch(url, { method, headers, body }).then(resolve).catch(reject);
 
         const dns = process.getBuiltinModule('node:dns');
         const net = process.getBuiltinModule('node:net');

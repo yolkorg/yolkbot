@@ -47,13 +47,13 @@ export class GameOptionsDispatch {
         if (!damageScale.includes(wouldBe.damage)) return false;
         if (!regenScale.includes(wouldBe.healthRegen)) return false;
 
-        if (typeof wouldBe.locked !== 'boolean') return false;
-        if (typeof wouldBe.noTeamChange !== 'boolean') return false;
-        if (typeof wouldBe.noTeamShuffle !== 'boolean') return false;
+        if (typeof wouldBe.locked !== 'number' && typeof wouldBe.locked !== 'boolean') return false;
+        if (typeof wouldBe.noTeamChange !== 'number' && typeof wouldBe.noTeamChange !== 'boolean') return false;
+        if (typeof wouldBe.noTeamShuffle !== 'number' && typeof wouldBe.noTeamShuffle !== 'boolean') return false;
 
         if (!Array.isArray(wouldBe.weaponsDisabled)) return false;
         if (wouldBe.weaponsDisabled.length !== 7) return false;
-        if (wouldBe.weaponsDisabled.some((weapon) => typeof weapon !== 'boolean')) return false;
+        if (wouldBe.weaponsDisabled.some((weapon) => typeof weapon !== 'number' && typeof weapon !== 'boolean')) return false;
 
         return true;
     }

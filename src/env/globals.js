@@ -14,7 +14,7 @@ if (!isBrowser && !isWorker && !isNode && !isDeno && !isBun)
 
 import { WWWebSocket } from 'wwws';
 
-globals.fetch = typeof process === 'undefined' ? globalThis.fetch : iFetch;
+globals.fetch = typeof process === 'undefined' ? (...args) => globalThis.fetch(...args) : iFetch;
 globals.WebSocket = typeof process === 'undefined' ? globalThis.WebSocket : WWWebSocket;
 
 export default globals;
