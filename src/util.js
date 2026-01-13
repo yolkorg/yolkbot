@@ -16,7 +16,8 @@ export const fetchMap = async (name, hash) => {
 
         if (existsSync(mapFile)) return JSON.parse(readFileSync(mapFile, 'utf-8'));
 
-        const data = await (await fetch(`https://esm.sh/gh/yolkorg/maps/maps/${name}.json?${hash}`)).json();
+        // was using esm.sh, but then esm.sh went down for 4 weeks while repo was down and i couldn't fix
+        const data = await (await fetch(`https://x.yolkbot.xyz/data/maps/full/${name}.json?${hash}`)).json();
         writeFileSync(mapFile, JSON.stringify(data, null, 4), { flag: 'w+' });
         return data;
     }

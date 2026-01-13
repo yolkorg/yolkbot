@@ -8,7 +8,7 @@ export class SpawnDispatch {
 
     check(bot) {
         if (bot.me.playing) return false;
-        if ((bot.lastDeathTime + 6000) < Date.now()) return false;
+        // if ((bot.lastDeathTime + 6000) < Date.now()) return false;
         if (bot.intents.includes(bot.Intents.OBSERVE_GAME)) return false;
 
         return true;

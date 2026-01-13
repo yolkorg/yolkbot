@@ -1,5 +1,7 @@
 import { socksConnect } from 'wwws';
 
+import globals from './globals.js';
+
 const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, body }, resolve) => {
     let reqHeaders = '';
     for (const [k, v] of Object.entries(headers)) reqHeaders += `${k}: ${v}\r\n`;
@@ -55,7 +57,7 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
 };
 
 const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) => new Promise((resolve) => {
-    if (typeof process === 'undefined' || !process.getBuiltinModule) return fetch(url, { method, headers, body }).then(resolve);
+    if (typeof process === 'undefined' || !process.getBuiltinModule) return globals.fetch(url, { method, headers, body }).then(resolve);
 
     const dns = process.getBuiltinModule('node:dns');
     const net = process.getBuiltinModule('node:net');
@@ -66,7 +68,7 @@ const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null } = {}) 
     const pathname = path + search;
     const port = rawPort ? parseInt(rawPort) : (isHttps ? 443 : 80);
 
-    if (!proxy) return dns.lookup(hostname, (err, host) => {
+    if (!proxy) return dns.lookup(hostname, { family: 4 }, (err, host) => {
         if (err) throw err;
 
         const socket = isHttps ? tls.connect({ port, host, servername: hostname }) : net.connect({ port, host });

@@ -17,7 +17,7 @@ globals.isIsolated = !isNode && !isDeno && !isBun;
 
 import { WWWebSocket } from 'wwws';
 
-globals.fetch = isBrowser || isWorker ? globalThis.fetch : iFetch;
+globals.fetch = isBrowser || isWorker ? (...args) => globalThis.fetch(...args) : iFetch;
 globals.WebSocket = isBrowser || isWorker ? globalThis.WebSocket : WWWebSocket;
 
 export default globals;
