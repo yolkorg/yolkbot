@@ -18,6 +18,7 @@ export class API {
         this.proxy = params.proxy;
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
+        this.customKey = params.customKey || null;
 
         this.connectionTimeout = params.connectionTimeout || 5000;
     }
@@ -67,7 +68,7 @@ export class API {
         let body;
 
         try {
-            const request = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FirebaseKey}`, {
+            const request = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${this.customKey || FirebaseKey}`, {
                 method: 'POST',
                 body: JSON.stringify({ email, password, returnSecureToken: true }),
                 headers: {
@@ -119,7 +120,7 @@ export class API {
         let body;
 
         try {
-            const request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${FirebaseKey}`, {
+            const request = await globals.fetch(`https://securetoken.googleapis.com/v1/token?key=${this.customKey || FirebaseKey}`, {
                 method: 'POST',
                 body: formData.toString(),
                 headers: {
@@ -159,7 +160,7 @@ export class API {
         let body;
 
         try {
-            const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FirebaseKey}`, {
+            const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${this.customKey || FirebaseKey}`, {
                 method: 'POST',
                 body: JSON.stringify({ returnSecureToken: true }),
                 headers: {
@@ -192,7 +193,7 @@ export class API {
     sendEmailVerification = async (idToken = this.idToken) => {
         if (!idToken) return createError(APIError.MissingParams);
 
-        const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FirebaseKey}`, {
+        const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${this.customKey || FirebaseKey}`, {
             method: 'POST',
             body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken }),
             headers: {
@@ -215,7 +216,7 @@ export class API {
     verifyOobCode = async (oobCode) => {
         if (!oobCode) return createError(APIError.MissingParams);
 
-        const req = await globals.fetch(`https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=${FirebaseKey}`, {
+        const req = await globals.fetch(`https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=${this.customKey || FirebaseKey}`, {
             method: 'POST',
             body: JSON.stringify({ oobCode }),
             headers: {

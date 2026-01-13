@@ -30,6 +30,7 @@ interface APIParams {
     proxy?: string;
     protocol?: string;
     instance?: string;
+    customKey?: string | null;
     connectionTimeout?: number;
 }
 
@@ -39,6 +40,7 @@ export class API {
     proxy?: string;
     protocol: string;
     instance: string;
+    customKey?: string | null;
     connectionTimeout: number;
 
     constructor(params?: APIParams);
