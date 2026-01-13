@@ -49,10 +49,10 @@ export class API {
 
     queryServices(request: QueryRequest): Promise<QueryResponse | ReturnError>;
 
-    createAccount(email: string, password: string, customServicesParams: AnyObject): Promise<AuthResponse | ReturnError>;
-    loginWithCredentials(email: string, password: string, customServicesParams: AnyObject): Promise<AuthResponse | ReturnError>;
-    loginWithRefreshToken(refreshToken: string): Promise<AuthResponse | ReturnError>;
-    loginAnonymously(): Promise<AuthResponse | ReturnError>;
+    createAccount(email: string, password: string, customServicesParams?: AnyObject): Promise<AuthResponse | ReturnError>;
+    loginWithCredentials(email: string, password: string, customServicesParams?: AnyObject): Promise<AuthResponse | ReturnError>;
+    loginWithRefreshToken(refreshToken: string, customServicesParams?: AnyObject): Promise<AuthResponse | ReturnError>;
+    loginAnonymously(customServicesParams?: AnyObject): Promise<AuthResponse | ReturnError>;
 
     sendEmailVerification(idToken?: string): Promise<EmailResponse | ReturnError>;
     verifyOobCode(oobCode: string): Promise<EmailResponse | ReturnError>;

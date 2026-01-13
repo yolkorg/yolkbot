@@ -110,7 +110,7 @@ export class API {
     createAccount = (email, password, customServicesParams) => this.#authWithEmailPass(email, password, customServicesParams, 'signUp');
     loginWithCredentials = (email, password, customServicesParams) => this.#authWithEmailPass(email, password, customServicesParams, 'signInWithPassword');
 
-    loginWithRefreshToken = async (refreshToken) => {
+    loginWithRefreshToken = async (refreshToken, customServicesParams) => {
         if (!refreshToken) return createError(APIError.MissingParams);
 
         const formData = new URLSearchParams();
@@ -152,11 +152,11 @@ export class API {
 
         this.idToken = body.id_token;
 
-        const response = await this.queryServices({ cmd: 'auth', firebaseToken: body.id_token });
+        const response = await this.queryServices({ cmd: 'auth', firebaseToken: body.id_token, ...customServicesParams });
         return response.ok ? { firebase: body, ...response } : response;
     }
 
-    loginAnonymously = async () => {
+    loginAnonymously = async (customServicesParams) => {
         let body;
 
         try {
@@ -186,7 +186,7 @@ export class API {
 
         this.idToken = body.idToken;
 
-        const query = await this.queryServices({ cmd: 'auth', firebaseToken: body.idToken });
+        const query = await this.queryServices({ cmd: 'auth', firebaseToken: body.idToken, ...customServicesParams });
         return query.ok ? { firebase: body, ...query } : query;
     }
 
