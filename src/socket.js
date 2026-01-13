@@ -13,10 +13,10 @@ class yolkws {
     maxRetries = 5;
     connectionTimeout = 5000;
 
-    onopen = () => {};
-    onmessage = () => {};
-    onclose = () => {};
-    onerror = () => {};
+    onopen = () => { };
+    onmessage = () => { };
+    onclose = () => { };
+    onerror = () => { };
 
     constructor(url, proxy) {
         if (typeof process === 'undefined' && proxy) throw new Error('You cannot pass a proxy to a WebSocket in this environment.');
@@ -104,8 +104,23 @@ class yolkws {
     }
 
     close(data) {
+        if (!this.socket) return;
+
         this.autoReconnect = false;
-        return this.socket?.close(data);
+
+        const closeResponse = this.socket.close(data);
+
+        if (this.socket.terminate) {
+            try {
+                this.socket.terminate();
+            } catch { }
+        }
+
+        this.onListeners.clear();
+        this.onceListeners.clear();
+        this.onceConnected = [];
+
+        return closeResponse;
     }
 }
 

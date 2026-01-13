@@ -54,7 +54,8 @@ const processGameJoinedPacket = async (bot) => {
     out.packInt8(CommCode.clientReady);
     out.send(bot.game.socket);
 
-    bot.updateIntervalId = setInterval(() => bot.update(), 100 / 3);
+    if (!bot.intents.includes(Intents.MANUAL_UPDATE))
+        bot.updateIntervalId = setInterval(() => bot.update(), 100 / 3);
 
     if (bot.intents.includes(Intents.PING)) {
         bot.lastPingTime = Date.now();

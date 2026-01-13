@@ -481,6 +481,7 @@ export class Bot {
     resetChiknWinner(): Promise<{ ok: true, cw: ChiknWinnerStatus } | APIError | ChicknWinnerError>;
 
     canSee(player: GamePlayer): boolean;
+    getBestTarget(): GamePlayer | null;
 
     refreshChallenges(): Promise<{ ok: true, challenges: Challenges[] } | APIError>;
     rerollChallenge(challengeId: number): Promise<{ ok: true, challenges: Challenges[] } | APIError | ChallengeRerollError>;

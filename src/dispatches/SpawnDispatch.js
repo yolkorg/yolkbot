@@ -9,8 +9,11 @@ export class SpawnDispatch {
     }
 
     check(bot) {
+        const respawnTime = bot.intents.FASTER_RESPAWN ? 5000 : 6000;
+
         if (bot.me.playing) return false;
         if (bot.intents.includes(Intents.OBSERVE_GAME)) return false;
+        if (bot.lastDeathTime > 0 && (bot.lastDeathTime + respawnTime) > Date.now()) return false;
 
         return true;
     }

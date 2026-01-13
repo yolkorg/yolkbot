@@ -82,7 +82,9 @@ export enum Intents {
     OBSERVE_GAME = 18,
     RENEW_SESSION = 21,
     VIP_HIDE_BADGE = 22,
-    SIMULATION = 23
+    SIMULATION = 23,
+    MANUAL_UPDATE = 24,
+    FASTER_RESPAWN = 25
 }
 
 export enum RedeemCodeErrorEnum {

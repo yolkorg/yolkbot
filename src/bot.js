@@ -1178,6 +1178,25 @@ export class Bot {
         return this.pathing.nodeList.hasLineOfSight(this.me.position, target.position);
     }
 
+    getBestTarget() {
+        const options = Object.values(this.players)
+            .filter((player) => player?.playing)
+            .filter((player) => player.hp > 0)
+            .filter((player) => player.id !== this.me.id)
+            .filter((player) => this.me.team === 0 || player.team !== this.me.team);
+
+        const distancePlayers = options.map(player => ({
+            player,
+            distance:
+                ((player.position.x - this.me.position.x) ** 2) + // x coord
+                (5 * (player.position.y - this.me.position.y) ** 2) + // y coord (5x pref for same Y)
+                ((player.position.z - this.me.position.z) ** 2)
+        })).sort((a, b) => a.distance - b.distance);
+
+        if (distancePlayers.length) return distancePlayers[0].player;
+        else return null;
+    }
+
     async refreshChallenges() {
         const result = await this.api.queryServices({
             cmd: 'challengeGetDaily',
@@ -1354,7 +1373,7 @@ export class Bot {
             this.$emit('leave', code);
         }
 
-        clearInterval(this.updateIntervalId);
+        if (this.updateIntervalId) clearInterval(this.updateIntervalId);
 
         this.#dispatches = [];
 

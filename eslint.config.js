@@ -86,7 +86,6 @@ export default [
             'no-dupe-keys': 'error',
             'no-duplicate-case': 'error',
             'no-duplicate-imports': 'error',
-            'no-else-return': 'error',
             'no-empty': ['error', { 'allowEmptyCatch': true }],
             'no-empty-character-class': 'error',
             'no-empty-pattern': 'error',
