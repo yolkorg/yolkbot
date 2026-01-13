@@ -7,7 +7,7 @@ export default [
         languageOptions: { globals: { window: true } }
     },
     {
-        files: ['cli/**', 'browser/compile.js'],
+        files: ['build/**'],
         languageOptions: { globals: { Bun: 'readonly', fetch: 'readonly', process: 'readonly' } }
     },
     {

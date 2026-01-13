@@ -9,8 +9,8 @@ echo "publishing $new_version"
 
 sed -i '' "s/$current_version/$new_version/g" package.json
 
-bun cli/build.js -nm
-bun browser/compile.js
+bun build/node.ts
+bun build/browser.ts
 
 npm publish --tag alpha
 
