@@ -19,11 +19,13 @@
         "url": "git+https://github.com/yolkorg/yolkbot.git"
     },
     "type": "module",
+    "license": "SEE LICENSE IN LICENSE.md",
     "files": [
         "browser/build/*.js",
         "dist/**/*",
         "package.json",
-        "README.md"
+        "README.md",
+        "LICENSE.md"
     ],
     "exports": {
         "./package.json": "./package.json",
