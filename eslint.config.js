@@ -3,7 +3,7 @@ import stylistic from '@stylistic/eslint-plugin';
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     {
-        files: ['browser/entry/global.js'],
+        files: ['browser/globalEntry.js'],
         languageOptions: { globals: { window: true } }
     },
     {

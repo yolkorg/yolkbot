@@ -1,7 +1,7 @@
 import globals from './env/globals.js';
 import { UserAgent } from './constants/index.js';
 
-class yolkws {
+export class yolkws {
     connected = false;
     autoReconnect = false;
 

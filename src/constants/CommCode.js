@@ -1,2 +1,2 @@
-const CommCode = {};
+export const CommCode = {};
 export default CommCode;

@@ -2,7 +2,7 @@ import { WWWebSocket } from 'wwws';
 
 import iFetch from './fetch.js';
 
-const globals = {};
+export const globals = {};
 
 const isBrowser = typeof window !== 'undefined' && typeof HTMLElement !== 'undefined';
 const isWebWorker = (typeof self !== 'undefined') && (self.constructor.name === 'DedicatedWorkerGlobalScope');

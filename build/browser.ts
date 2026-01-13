@@ -13,9 +13,16 @@ const findItemPath = path.join(import.meta.dirname, '../src/constants/findItemBy
 
 const files = await getFileObject();
 
-const build = async (module: string) => {
+interface Module {
+    name: string;
+    entry: string;
+}
+
+const rootDir = path.join(import.meta.dirname, '..');
+
+const build = async (module: Module) => {
     await Bun.build({
-        entrypoints: [path.join(import.meta.dirname, '..', 'browser', 'entry', `${module}.js`)],
+        entrypoints: [module.entry],
         outdir: buildDir,
 
         minify: {
@@ -33,8 +40,8 @@ const build = async (module: string) => {
         }
     });
 
-    console.log(`\x1b[32m✓ built browser/${module}\x1b[0m`);
+    console.log(`\x1b[32m✓ built browser/${module.name}\x1b[0m`);
 }
 
-build('global');
-build('module');
+build({ name: 'global', entry: path.join(rootDir, 'browser', 'globalEntry.js') });
+build({ name: 'module', entry: path.join(rootDir, 'src', 'index.js') });

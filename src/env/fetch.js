@@ -91,7 +91,7 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
     });
 };
 
-const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null, timeout = 30000 } = {}) => new Promise((resolve, reject) => {
+export const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null, timeout = 30000 } = {}) => new Promise((resolve, reject) => {
     try {
         if (typeof process === 'undefined' || !process.getBuiltinModule)
             return globals.fetch(url, { method, headers, body }).then(resolve).catch(reject);
