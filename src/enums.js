@@ -5,7 +5,8 @@ export const APIError = {
     MissingParams: 'missing_params',
     NetworkFail: 'firebase_network_failed',
     ServicesClosedEarly: 'services_closed_early',
-    InternalError: 'unknown_error'
+    InternalError: 'unknown_error',
+    FirebaseRateLimited: 'firebase_rate_limited'
 }
 
 export const LoginError = {

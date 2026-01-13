@@ -79,12 +79,16 @@ export class API {
 
             body = await request.json();
         } catch (error) {
-            if (error.code === 'auth/network-request-failed') {
+            if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
+            else if (error.code === 'auth/network-request-failed') {
                 console.error('authWithEmailPass: network error', body || error);
                 return createError(APIError.NetworkFail);
             } else if (error.code === 'ERR_BAD_REQUEST') {
                 console.error('authWithEmailPass: bad request', body || error);
                 return createError(APIError.InternalError);
+            } else if (error.code === 'ECONNREFUSED') {
+                console.error('authWithEmailPass: connection refused', body || error);
+                return createError(APIError.NetworkFail);
             }
 
             console.error('authWithEmailPass: unknown error:', email, password, error);
@@ -127,8 +131,12 @@ export class API {
 
             body = await request.json();
         } catch (error) {
-            if (error.code === 'auth/network-request-failed') {
+            if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
+            else if (error.code === 'auth/network-request-failed') {
                 console.error('loginWithRefreshToken: network error', body || error);
+                return createError(APIError.NetworkFail);
+            } else if (error.code === 'ECONNREFUSED') {
+                console.error('authWithEmailPass: connection refused', body || error);
                 return createError(APIError.NetworkFail);
             }
 
@@ -148,17 +156,27 @@ export class API {
     }
 
     loginAnonymously = async () => {
-        const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FirebaseKey}`, {
-            method: 'POST',
-            body: JSON.stringify({ returnSecureToken: true }),
-            headers: {
-                ...baseHeaders,
-                'content-type': 'application/json'
-            },
-            proxy: this.proxy
-        });
+        let body;
 
-        const body = await req.json();
+        try {
+            const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FirebaseKey}`, {
+                method: 'POST',
+                body: JSON.stringify({ returnSecureToken: true }),
+                headers: {
+                    ...baseHeaders,
+                    'content-type': 'application/json'
+                },
+                proxy: this.proxy
+            });
+
+            body = await req.json();
+        } catch (error) {
+            if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
+            else if (error.code === 'ECONNREFUSED') {
+                console.error('authWithEmailPass: connection refused', body || error);
+                return createError(APIError.NetworkFail);
+            }
+        }
 
         if (!body.idToken) {
             console.error('loginAnonymously: missing idToken', body);
