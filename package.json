@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "create a shell shockers bot in under 10 lines.",
-    "version": "1.4.6",
+    "version": "1.4.7",
     "keywords": [
         "shell shockers",
         "shellshock.io",
@@ -19,11 +19,13 @@
         "url": "git+https://github.com/yolkorg/yolkbot.git"
     },
     "type": "module",
+    "license": "SEE LICENSE IN LICENSE.md",
     "files": [
         "browser/build/*.js",
         "dist/**/*",
         "package.json",
-        "README.md"
+        "README.md",
+        "LICENSE.md"
     ],
     "exports": {
         "./package.json": "./package.json",
