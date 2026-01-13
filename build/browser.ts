@@ -9,7 +9,7 @@ if (fs.existsSync(buildDir)) fs.rmSync(buildDir, { recursive: true });
 fs.mkdirSync(buildDir);
 
 const iFetchPath = path.join(import.meta.dirname, '../src/env/fetch.js');
-const findItemPath = path.join(import.meta.dirname, '../src/constants/findItemById.js');
+const itemPath = path.join(import.meta.dirname, '../src/constants/items.js');
 
 const files = await getFileObject();
 
@@ -21,9 +21,8 @@ interface Module {
 const rootDir = path.join(import.meta.dirname, '..');
 
 const build = async (module: Module) => {
-    await Bun.build({
+    const results = await Bun.build({
         entrypoints: [module.entry],
-        outdir: buildDir,
 
         minify: {
             identifiers: false,
@@ -36,9 +35,12 @@ const build = async (module: Module) => {
         files: {
             ...files,
             [iFetchPath]: 'export const iFetch = globalThis.fetch;\nexport default iFetch;',
-            [findItemPath]: 'export const findItemById = () => null;'
+            [itemPath]: 'export const Items = [];'
         }
     });
+
+    for (const file of results.outputs)
+        Bun.write(path.join(buildDir, `${module.name}.js`), new Response(file));
 
     console.log(`\x1b[32m✓ built browser/${module.name}\x1b[0m`);
 }

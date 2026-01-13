@@ -6,21 +6,21 @@ import * as util from '../src/util.js';
 
 import { GamePlayer } from '../src/bot/GamePlayer.js';
 
-import * as Constants from './constants/index.js';
+import * as Constants from '../src/constants/index.js';
 
-import { Challenges } from './constants/challenges.js';
-import { CloseCode } from './constants/CloseCode.js';
-import { CommCode } from './constants/CommCode.js';
-import * as Guns from './constants/guns.js';
-import { Maps } from './constants/maps.js';
-import { Regions } from './constants/regions.js';
+import { Challenges } from '../src/constants/challenges.js';
+import { CloseCode } from '../src/constants/CloseCode.js';
+import { CommCode } from '../src/constants/CommCode.js';
+import * as Guns from '../src/constants/guns.js';
+import { Maps } from '../src/constants/maps.js';
+import { Regions } from '../src/constants/regions.js';
 
 import { CommIn } from '../src/comm/CommIn.js';
 import { CommOut } from '../src/comm/CommOut.js';
 
-import { default as Dispatches } from './dispatches/index.js';
+import { default as Dispatches } from '../src/dispatches/index.js';
 
-import * as WASM from './wasm/direct.js';
+import * as WASM from '../src/wasm/direct.js';
 
 const yolkbot = {
     API,
