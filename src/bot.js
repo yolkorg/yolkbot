@@ -293,7 +293,6 @@ export class Bot {
 
         this.lastPingTime = -1;
         this.lastDeathTime = -1;
-        this.lastUpdateTick = 0;
 
         this.pathing = {
             nodeList: null,
@@ -371,29 +370,29 @@ export class Bot {
 
         this.account.firebase = loginData.firebase;
 
-        loginData = loginData.playerOutput;
+        const output = loginData.playerOutput;
 
-        this.account.rawLoginData = loginData;
+        this.account.rawLoginData = output;
 
-        this.account.adminRoles = loginData.adminRoles || 0;
-        this.account.eggBalance = loginData.currentBalance;
-        this.account.emailVerified = loginData.emailVerified;
-        this.account.firebaseId = loginData.firebaseId;
-        this.account.id = loginData.id;
-        this.account.isAged = new Date(loginData.dateCreated).getTime() < 17145468e5;
-        this.account.isCG = loginData.cgAccountStatus.hasAccount;
-        this.account.loadout = loginData.loadout;
-        this.account.ownedItemIds = loginData.ownedItemIds;
-        this.account.session = loginData.session;
-        this.account.sessionId = loginData.sessionId;
-        this.account.vip = loginData.active_sub === 'IsVIP';
+        this.account.adminRoles = output.adminRoles || 0;
+        this.account.eggBalance = output.currentBalance;
+        this.account.emailVerified = output.emailVerified;
+        this.account.firebaseId = output.firebaseId;
+        this.account.id = output.id;
+        this.account.isAged = new Date(output.dateCreated).getTime() < 17145468e5;
+        this.account.isCG = output.cgAccountStatus.hasAccount;
+        this.account.loadout = output.loadout;
+        this.account.ownedItemIds = output.ownedItemIds;
+        this.account.session = output.session;
+        this.account.sessionId = output.sessionId;
+        this.account.vip = output.active_sub === 'IsVIP';
 
         if (this.intents.includes(Intents.BOT_STATS)) this.account.stats = {
-            lifetime: loginData.statsLifetime,
-            monthly: loginData.statsCurrent
+            lifetime: output.statsLifetime,
+            monthly: output.statsCurrent
         };
 
-        if (this.intents.includes(Intents.CHALLENGES)) this.#importChallenges(loginData.challenges);
+        if (this.intents.includes(Intents.CHALLENGES)) this.#importChallenges(output.challenges);
 
         this.$emit('authSuccess', this.account);
 
@@ -403,7 +402,7 @@ export class Bot {
 
                 const res = await this.api.queryServices({ cmd: 'renewSession', sessionId: this.account.sessionId });
                 if (res.data !== 'renewed') this.$emit('sessionExpired');
-            }, 600000); // 10 minutes
+            }, 10 * 60 * 1000);
         }
 
         return { ok: true, account: this.account };
@@ -607,7 +606,14 @@ export class Bot {
             }));
         });
 
-        return { ok: true, region: game.region, subdomain: game.subdomain, id: game.id, private: game.private, raw: game };
+        return {
+            ok: true,
+            raw: game,
+            id: game.id,
+            region: game.region,
+            private: game.private,
+            subdomain: game.subdomain
+        };
     }
 
     async join(name, data) {
@@ -952,9 +958,7 @@ export class Bot {
                 if (isBufferDebug) console.log('--- END SYNC LOGGING ---');
 
                 this.state.buffer = [];
-
-                this.lastUpdateTick = 0;
-            } else this.lastUpdateTick++;
+            }
 
             this.state.stateIdx = mod(this.state.stateIdx + 1, StateBufferSize);
         }
@@ -1197,7 +1201,7 @@ export class Bot {
             distance:
                 ((player.position.x - this.me.position.x) ** 2) + // x coord
                 (5 * (player.position.y - this.me.position.y) ** 2) + // y coord (5x pref for same Y)
-                ((player.position.z - this.me.position.z) ** 2)
+                ((player.position.z - this.me.position.z) ** 2) // z coord
         })).sort((a, b) => a.distance - b.distance);
 
         if (distancePlayers.length) return distancePlayers[0].player;
@@ -1404,7 +1408,6 @@ export class Bot {
 
         this.lastPingTime = -1;
         this.lastDeathTime = -1;
-        this.lastUpdateTick = 0;
 
         this.pathing = {
             nodeList: null,
