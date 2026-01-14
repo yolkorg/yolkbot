@@ -144,3 +144,9 @@ export enum ZoneLeaveReason {
     Killed = 'killed',
     WalkedOut = 'exited'
 }
+
+export enum CleanupLevel {
+    None = 0,
+    Partial = 1,
+    Full = 2
+}

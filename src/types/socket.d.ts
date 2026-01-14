@@ -1,5 +1,10 @@
 type Data = string | Buffer | ArrayBuffer | Buffer[];
 
+interface yolkwsParams {
+    proxy?: string;
+    errorLogger?: (...args: any[]) => void;
+}
+
 declare class yolkws {
     connected: boolean;
     autoReconnect: boolean;
@@ -12,7 +17,7 @@ declare class yolkws {
     maxRetries: number;
     connectionTimeout: number;
 
-    constructor(url: string, proxy: string);
+    constructor(url: string, params: yolkwsParams);
 
     tryConnect($tries?: number): Promise<void>;
 

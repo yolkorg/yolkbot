@@ -14,6 +14,8 @@ const baseHeaders = {
 }
 
 export class API {
+    errorLogger = (...args) => console.error(...args);
+
     constructor(params = {}) {
         this.proxy = params.proxy;
         this.instance = params.instance || 'shellshock.io';
@@ -21,10 +23,12 @@ export class API {
         this.customKey = params.customKey || null;
 
         this.connectionTimeout = params.connectionTimeout || 5000;
+
+        if (typeof params.errorLogger === 'function') this.errorLogger = params.errorLogger;
     }
 
     queryServices = async (request) => {
-        const ws = new yolkws(`${this.protocol}://${this.instance}/services/`, this.proxy);
+        const ws = new yolkws(`${this.protocol}://${this.instance}/services/`, { proxy: this.proxy, errorLogger: this.errorLogger });
         ws.connectionTimeout = this.connectionTimeout;
 
         const didConnect = await ws.tryConnect();
@@ -40,7 +44,7 @@ export class API {
                     const resp = JSON.parse(mes.data);
                     resolve({ ok: true, ...resp });
                 } catch (e) {
-                    console.error('queryServices: error! command:', request.cmd, 'and data:', request, e);
+                    this.errorLogger('queryServices: error! command:', request.cmd, 'and data:', request, e);
                     resolve(createError(APIError.InternalError));
                 }
 
@@ -52,8 +56,8 @@ export class API {
             ws.onclose = () => {
                 if (resolved) return;
 
-                console.log('queryServices: services closed before sending back message');
-                console.log('queryServices: command:', request.cmd, 'and data:', request);
+                this.errorLogger('queryServices: services closed before sending back message');
+                this.errorLogger('queryServices: command:', request.cmd, 'and data:', request);
 
                 resolve(createError(APIError.ServicesClosedEarly));
             };
@@ -82,22 +86,22 @@ export class API {
         } catch (error) {
             if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
             else if (error.code === 'auth/network-request-failed') {
-                console.error('authWithEmailPass: network error', body || error);
+                this.errorLogger('authWithEmailPass: network error', body || error);
                 return createError(APIError.NetworkFail);
             } else if (error.code === 'ERR_BAD_REQUEST') {
-                console.error('authWithEmailPass: bad request', body || error);
+                this.errorLogger('authWithEmailPass: bad request', body || error);
                 return createError(APIError.InternalError);
             } else if (error.code === 'ECONNREFUSED') {
-                console.error('authWithEmailPass: connection refused', body || error);
+                this.errorLogger('authWithEmailPass: connection refused', body || error);
                 return createError(APIError.NetworkFail);
             }
 
-            console.error('authWithEmailPass: unknown error:', email, password, error);
+            this.errorLogger('authWithEmailPass: unknown error:', email, password, error);
             return createError(APIError.InternalError);
         }
 
         if (!body.idToken) {
-            console.error('authWithEmailPass: missing idToken', body);
+            this.errorLogger('authWithEmailPass: missing idToken', body);
             return createError(APIError.InternalError);
         }
 
@@ -134,19 +138,19 @@ export class API {
         } catch (error) {
             if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
             else if (error.code === 'auth/network-request-failed') {
-                console.error('loginWithRefreshToken: network error', body || error);
+                this.errorLogger('loginWithRefreshToken: network error', body || error);
                 return createError(APIError.NetworkFail);
             } else if (error.code === 'ECONNREFUSED') {
-                console.error('authWithEmailPass: connection refused', body || error);
+                this.errorLogger('authWithEmailPass: connection refused', body || error);
                 return createError(APIError.NetworkFail);
             }
 
-            console.error('loginWithRefreshToken: unknown error:', body, error);
+            this.errorLogger('loginWithRefreshToken: unknown error:', body, error);
             return createError(APIError.InternalError);
         }
 
         if (!body.id_token) {
-            console.error('loginWithRefreshToken: missing idToken', body);
+            this.errorLogger('loginWithRefreshToken: missing idToken', body);
             return createError(APIError.InternalError);
         }
 
@@ -174,13 +178,13 @@ export class API {
         } catch (error) {
             if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
             else if (error.code === 'ECONNREFUSED') {
-                console.error('authWithEmailPass: connection refused', body || error);
+                this.errorLogger('authWithEmailPass: connection refused', body || error);
                 return createError(APIError.NetworkFail);
             }
         }
 
         if (!body.idToken) {
-            console.error('loginAnonymously: missing idToken', body);
+            this.errorLogger('loginAnonymously: missing idToken', body);
             return createError(APIError.InternalError);
         }
 
@@ -206,7 +210,7 @@ export class API {
         const body = await req.json();
 
         if (body.kind !== 'identitytoolkit#GetOobConfirmationCodeResponse') {
-            console.error('sendEmailVerification: the game sent an invalid response', body);
+            this.errorLogger('sendEmailVerification: the game sent an invalid response', body);
             return createError(APIError.InternalError);
         }
 
@@ -231,7 +235,7 @@ export class API {
         const body = await req.json();
 
         if (!body.emailVerified) {
-            console.error('verifyOobCode: the game sent an invalid response', body);
+            this.errorLogger('verifyOobCode: the game sent an invalid response', body);
             return createError(APIError.InternalError);
         }
 

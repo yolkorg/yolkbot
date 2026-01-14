@@ -13,16 +13,23 @@ export class yolkws {
     maxRetries = 5;
     connectionTimeout = 5000;
 
+    errorLogger = (...args) => console.error(...args);
+
     onopen = () => { };
     onmessage = () => { };
     onclose = () => { };
     onerror = () => { };
 
-    constructor(url, proxy) {
-        if (typeof process === 'undefined' && proxy) throw new Error('You cannot pass a proxy to a WebSocket in this environment.');
+    constructor(url, params = {}) {
+        if (typeof params !== 'object') params = {};
+
+        if (typeof process === 'undefined' && params.proxy)
+            throw new Error('You cannot pass a proxy to a WebSocket in this environment.');
 
         this.url = url;
-        this.proxy = proxy;
+        this.proxy = params.proxy;
+
+        if (typeof params.errorLogger === 'function') this.errorLogger = params.errorLogger;
     }
 
     async tryConnect(tries = 1) {
@@ -49,7 +56,7 @@ export class yolkws {
 
             if (this.binaryType) this.socket.binaryType = this.binaryType;
         } catch (e) {
-            console.error(`Failed to connect on try ${tries}, trying again...`, e);
+            this.errorLogger(`Failed to connect on try ${tries}, trying again...`, e);
             return await retryOrQuit();
         }
 
@@ -63,7 +70,7 @@ export class yolkws {
 
             const errorListener = async (e) => {
                 clearTimeout(timeout);
-                console.error('WebSocket error', e);
+                this.errorLogger('WebSocket error', e);
                 resolve(await retryOrQuit());
             };
 
@@ -90,8 +97,8 @@ export class yolkws {
                         const didConnect = await this.tryConnect();
                         if (!didConnect) {
                             if (this.onclose) this.onclose();
-                            console.error('tryConnect: failed to reconnect to', this.url, 'after 5 attempts.');
-                            console.error('tryConnect: please check your internet connection & ensure your IP isn\'t blocked.');
+                            this.errorLogger('tryConnect: failed to reconnect to', this.url, 'after 5 attempts.');
+                            this.errorLogger('tryConnect: please check your internet connection & ensure your IP isn\'t blocked.');
                         }
                     }, 250);
                 }
@@ -108,15 +115,13 @@ export class yolkws {
 
         this.autoReconnect = false;
 
-        const closeResponse = this.socket.close(data);
-
         if (this.socket.terminate) {
             try {
                 this.socket.terminate();
             } catch { }
-        }
 
-        return closeResponse;
+            return null;
+        } else return this.socket.close(data);
     }
 }
 

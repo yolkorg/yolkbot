@@ -32,6 +32,7 @@ interface APIParams {
     instance?: string;
     customKey?: string | null;
     connectionTimeout?: number;
+    errorLogger?: (...args: any[]) => void;
 }
 
 type ReturnError = { ok: false; error: APIError };

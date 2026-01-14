@@ -32,11 +32,12 @@ import {
 } from './enums';
 
 export interface BotParams {
-    intents?: number[];
     proxy?: string;
     instance?: string;
     protocol?: string;
+    intents?: number[];
     connectionTimeout?: number;
+    errorLogger?: (...args: any[]) => void;
 }
 
 export interface ChiknWinnerStatus {

@@ -122,3 +122,9 @@ export const ZoneLeaveReason = {
     WalkedOut: 'exited',
     RoundEnded: 'round_ended'
 }
+
+export const CleanupLevel = {
+    None: 0,
+    Partial: 1,
+    Full: 2
+}

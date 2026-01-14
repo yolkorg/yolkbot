@@ -39,6 +39,7 @@ import {
     ChicknWinnerError,
     ClaimSocialError,
     ClaimURLError,
+    CleanupLevel,
     GameFindError,
     GameJoinError,
     Intents,
@@ -97,6 +98,8 @@ export class Bot {
     #initialAccount;
     #initialGame;
 
+    errorLogger = (...args) => console.error(...args);
+
     constructor(params = {}) {
         if (params.proxy && typeof process === 'undefined') throw new Error('proxies do not work in this environment');
 
@@ -112,6 +115,8 @@ export class Bot {
         this.proxy = params.proxy || '';
 
         this.connectionTimeout = params.connectionTimeout || 5000;
+
+        if (typeof params.errorLogger === 'function') this.errorLogger = params.errorLogger;
 
         this.state = {
             // kept for specifying various params
@@ -310,9 +315,9 @@ export class Bot {
             return true;
         }
 
-        console.error(`${isEmit ? 'emit' : 'dispatch'}: validation failed for dispatch ${dispatch.constructor.name}`);
-        console.error('this means the dispatch will NEVER RUN!');
-        console.error('make sure all parameters are valid and that any player IDs are in the game');
+        this.errorLogger(`${isEmit ? 'emit' : 'dispatch'}: validation failed for dispatch ${dispatch.constructor.name}`);
+        this.errorLogger('this means the dispatch will NEVER RUN!');
+        this.errorLogger('make sure all parameters are valid and that any player IDs are in the game');
 
         return false;
     }
@@ -354,7 +359,7 @@ export class Bot {
             this.$emit('authFail', loginData);
 
             if (loginData.ok && !loginData.playerOutput)
-                console.error('processLoginData: missing playerOutput but is ok', loginData);
+                this.errorLogger('processLoginData: missing playerOutput but is ok', loginData);
 
             return { ...loginData, error: LoginError.InternalError, ok: false };
         }
@@ -429,7 +434,7 @@ export class Bot {
     }
 
     async createMatchmaker() {
-        const matchmaker = new yolkws(`${this.protocol}://${this.instance}/matchmaker/`, this.proxy);
+        const matchmaker = new yolkws(`${this.protocol}://${this.instance}/matchmaker/`, { proxy: this.proxy, errorLogger: this.errorLogger });
         matchmaker.autoReconnect = true;
 
         const didConnect = await matchmaker.tryConnect();
@@ -531,7 +536,7 @@ export class Bot {
 
                 if (msg.error === 'sessionNotFound') return resolve(createError(GameFindError.SessionExpired));
 
-                console.error('findPublicGame: unknown matchmaker response', JSON.stringify(msg));
+                this.errorLogger('findPublicGame: unknown matchmaker response', JSON.stringify(msg));
                 resolve(createError(GameFindError.InternalError));
             };
 
@@ -585,7 +590,7 @@ export class Bot {
 
                 if (msg.error === 'sessionNotFound') return resolve(createError(GameFindError.SessionExpired));
 
-                console.error('createPrivateGame: unknown matchmaker response', JSON.stringify(msg));
+                this.errorLogger('createPrivateGame: unknown matchmaker response', JSON.stringify(msg));
                 resolve(createError(GameFindError.InternalError));
             };
 
@@ -645,7 +650,7 @@ export class Bot {
             if (joinResult === 'gameNotFound') return createError(GameJoinError.GameNotFound);
 
             if (!this.game.raw.id) {
-                console.error('join: invalid game data received from matchmaker:', this.game.raw);
+                this.errorLogger('join: invalid game data received from matchmaker:', this.game.raw);
                 return createError(GameJoinError.InternalError);
             }
         } else if (typeof data === 'object') {
@@ -668,7 +673,7 @@ export class Bot {
             `${this.instance}/servers/${this.game.raw.subdomain}` :
             `${this.game.raw.subdomain}.${this.instance}`;
 
-        this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, this.proxy);
+        this.game.socket = new yolkws(`${this.protocol}://${host}/game/${this.game.raw.id}`, { proxy: this.proxy, errorLogger: this.errorLogger });
         this.game.socket.binaryType = 'arraybuffer';
         this.game.socket.connectionTimeout = this.connectionTimeout;
 
@@ -1136,7 +1141,7 @@ export class Bot {
                 return createError(ChicknWinnerError.SessionExpired);
             }
 
-            console.error('unknown Chikn Winner response, report this on Github:', response);
+            this.errorLogger('unknown Chikn Winner response, report this on Github:', response);
             return createError(ChicknWinnerError.InternalError);
         }
 
@@ -1149,7 +1154,7 @@ export class Bot {
             return { ok: true, ...response.reward };
         }
 
-        console.error('unknown Chikn Winner response, report this on Github:', response);
+        this.errorLogger('unknown Chikn Winner response, report this on Github:', response);
         return createError(ChicknWinnerError.InternalError);
     }
 
@@ -1165,7 +1170,7 @@ export class Bot {
         if (!response.ok) return response;
 
         if (response.result !== 'SUCCESS') {
-            console.error('unknown Chikn Winner reset response, report this on Github:', response);
+            this.errorLogger('unknown Chikn Winner reset response, report this on Github:', response);
             return createError(ChicknWinnerError.InternalError);
         }
 
@@ -1230,7 +1235,7 @@ export class Bot {
         const isInEnum = Object.values(ChallengeRerollError).includes(result.error);
         if (isInEnum) return { ok: false, error: result.error };
 
-        console.error('rerollChallenge: unknown error response', result);
+        this.errorLogger('rerollChallenge: unknown error response', result);
         return { ok: false, error: ChallengeRerollError.InternalError };
     }
 
@@ -1252,7 +1257,7 @@ export class Bot {
         const isInEnum = Object.values(ChallengeClaimError).includes(result.error);
         if (isInEnum) return { ok: false, error: result.error };
 
-        console.error('claimChallenge: unknown error response', result);
+        this.errorLogger('claimChallenge: unknown error response', result);
         return { ok: false, error: ChallengeClaimError.InternalError };
     }
 
@@ -1291,7 +1296,7 @@ export class Bot {
         const isInEnum = Object.values(RedeemCodeError).includes(result.result);
         if (isInEnum) return { ok: false, error: result.result };
 
-        console.error('redeemCode: unknown error response', result);
+        this.errorLogger('redeemCode: unknown error response', result);
         return { ok: false, error: RedeemCodeError.InternalError };
     }
 
@@ -1314,7 +1319,7 @@ export class Bot {
         const isInEnum = Object.values(ClaimURLError).includes(result.result);
         if (isInEnum) return { ok: false, error: result.result };
 
-        console.error('claimURLReward: unknown error response', result);
+        this.errorLogger('claimURLReward: unknown error response', result);
         return { ok: false, error: ClaimURLError.InternalError };
     }
 
@@ -1337,7 +1342,7 @@ export class Bot {
         const isInEnum = Object.values(ClaimSocialError).includes(result.result);
         if (isInEnum) return { ok: false, error: result.result };
 
-        console.error('claimSocialReward: unknown error response', result);
+        this.errorLogger('claimSocialReward: unknown error response', result);
         return { ok: false, error: ClaimSocialError.InternalError };
     }
 
@@ -1361,7 +1366,7 @@ export class Bot {
         const isInEnum = Object.values(BuyItemError).includes(result.result);
         if (isInEnum) return { ok: false, error: result.result };
 
-        console.error('buyItem: unknown error response', result);
+        this.errorLogger('buyItem: unknown error response', result);
         return { ok: false, error: BuyItemError.InternalError };
     }
 
@@ -1416,29 +1421,27 @@ export class Bot {
             clearInterval(this.renewSessionInterval);
     }
 
-    quit(noCleanup = false) {
+    quit(cleanupLevel = CleanupLevel.Partial) {
         if (this.hasQuit) return;
         this.hasQuit = true;
 
         this.leave();
 
         if (this.matchmaker) {
-            this.matchmaker.close();
-            if (!noCleanup) delete this.matchmaker;
+            try {
+                this.matchmaker.close();
+            } catch { }
+
+            if (cleanupLevel >= CleanupLevel.Partial) this.matchmaker = null;
         }
 
         if (this.intents.includes(Intents.NO_AFK_KICK)) clearInterval(this.afkKickInterval);
         if (this.intents.includes(Intents.RENEW_SESSION)) clearInterval(this.renewSessionInterval);
 
-        if (!noCleanup) {
-            delete this.account;
-            delete this.api;
-            delete this.game;
-            delete this.me;
-            delete this.pathing;
-            delete this.players;
-            delete this.state;
-            delete this.packetHandlers;
+        if (cleanupLevel >= CleanupLevel.Partial) {
+            this.api = null;
+            this.packetHandlers = null;
+            this.pathing = null;
 
             this.#initialAccount = {};
             this.#initialGame = {};
@@ -1446,6 +1449,16 @@ export class Bot {
             this.#hooks = {};
             this.#globalHooks = [];
             this.#dispatches = [];
+
+            this.matchmakerListeners = [];
+
+            if (cleanupLevel >= CleanupLevel.Full) {
+                this.account = null;
+                this.game = null;
+                this.me = null;
+                this.players = null;
+                this.state = null;
+            }
         }
     }
 }
