@@ -380,7 +380,7 @@ export class Bot {
         this.account.firebaseId = output.firebaseId;
         this.account.id = output.id;
         this.account.isAged = new Date(output.dateCreated).getTime() < 17145468e5;
-        this.account.isCG = output.cgAccountStatus.hasAccount;
+        this.account.isCG = output.cgAccountStatus?.hasAccount;
         this.account.loadout = output.loadout;
         this.account.ownedItemIds = output.ownedItemIds;
         this.account.session = output.session;
