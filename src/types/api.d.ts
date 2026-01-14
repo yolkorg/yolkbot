@@ -1,9 +1,10 @@
 import { APIError } from './enums';
 
 export interface RawFirebase {
+    kind: string;
     idToken: string;
-    refeshToken: string;
-    expiresIn: string;
+    refreshToken: string;
+    expiresIn: string; // in seconds
     localId: string;
 }
 
