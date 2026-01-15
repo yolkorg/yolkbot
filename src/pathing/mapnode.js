@@ -138,8 +138,8 @@ class MapNode {
                 const checks = [
                     // first step diagonal
                     [this.x + xDir, this.y, this.z + zDir],
-                    // center gap (should be air below)
-                    [this.x + xDir, this.y, this.z + zDir],
+                    // center gap - the midpoint of the diagonal
+                    [this.x + (2 * xDir), this.y, this.z + zDir],
                     // second step diagonal (destination)
                     [this.x + (2 * xDir), this.y, this.z + (2 * zDir)]
                 ];
