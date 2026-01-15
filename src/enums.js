@@ -101,6 +101,7 @@ export const ChallengeRerollError = {
     SessionExpired: 'challengeRerollSlot_expired_session',
     ChallengeNotFound: 'challenge_not_found',
     ChallengeNotAssigned: 'challenge_reroll_not_found',
+    NotEnoughEggs: 'insufficient_eggs',
     InternalError: 'unknown_error'
 }
 

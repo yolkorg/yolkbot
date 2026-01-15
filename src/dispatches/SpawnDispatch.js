@@ -9,7 +9,7 @@ export class SpawnDispatch {
     }
 
     check(bot) {
-        const respawnTime = bot.intents.FASTER_RESPAWN ? 5000 : 6000;
+        const respawnTime = bot.intents.includes(Intents.FASTER_RESPAWN) ? 5000 : 6000;
 
         if (bot.me.playing) return false;
         if (bot.intents.includes(Intents.OBSERVE_GAME)) return false;

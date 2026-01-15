@@ -9,12 +9,13 @@ const EggK47 = {
     shortReloadTime: 160,
     weaponName: 'EggK-47',
     internalName: 'Eggk47',
+    standardMeshName: 'eggk47',
     damage: 30,
     range: 20,
     rof: 3,
     totalDamage: 30,
     velocity: 1.5
-};
+}
 
 const DozenGauge = {
     ammo: {
@@ -27,6 +28,7 @@ const DozenGauge = {
     shortReloadTime: 155,
     weaponName: 'Scrambler',
     internalName: 'Dozen Gauge',
+    standardMeshName: 'dozenGauge',
     damage: 8.5,
     range: 8,
     rof: 8,
@@ -45,12 +47,13 @@ const CSG1 = {
     shortReloadTime: 165,
     weaponName: 'Free Ranger',
     internalName: 'CSG-1',
+    standardMeshName: 'csg1',
     damage: 105,
     range: 50,
     rof: 13,
     totalDamage: 105,
     velocity: 1.75
-};
+}
 
 const Cluck9mm = {
     ammo: {
@@ -63,12 +66,13 @@ const Cluck9mm = {
     shortReloadTime: 160,
     weaponName: 'Cluck 9mm',
     internalName: 'Cluck 9mm',
+    standardMeshName: 'cluck9mm',
     damage: 26,
     range: 15,
     rof: 4,
     totalDamage: 26,
     velocity: 1
-};
+}
 
 const RPEGG = {
     ammo: {
@@ -81,12 +85,13 @@ const RPEGG = {
     shortReloadTime: 170,
     weaponName: 'RPEGG',
     internalName: 'Eggsploder',
+    standardMeshName: 'rpegg',
     damage: 140,
     range: 45,
     rof: 40,
     totalDamage: 192.5,
     velocity: 0.4
-};
+}
 
 const SMG = {
     ammo: {
@@ -99,12 +104,13 @@ const SMG = {
     shortReloadTime: 190,
     weaponName: 'Whipper',
     internalName: 'SMEGG',
+    standardMeshName: 'smg',
     damage: 23,
     range: 20,
     rof: 2,
     totalDamage: 23,
     velocity: 1.25
-};
+}
 
 const M24 = {
     ammo: {
@@ -117,12 +123,13 @@ const M24 = {
     shortReloadTime: 144,
     weaponName: 'Crackshot',
     internalName: 'M2DZ',
+    standardMeshName: 'm24',
     damage: 170,
     range: 60,
     rof: 15,
     totalDamage: 170,
     velocity: 2
-};
+}
 
 const AUG = {
     ammo: {
@@ -135,12 +142,13 @@ const AUG = {
     shortReloadTime: 160,
     weaponName: 'Tri-Hard',
     internalName: 'AUG',
+    standardMeshName: 'aug',
     damage: 32,
     range: 20,
     rof: 15,
     totalDamage: 34,
     velocity: 1.5
-};
+}
 
 export {
     EggK47,

@@ -24,11 +24,8 @@ const processSyncThemPacket = (bot) => {
     for (let i2 = 0; i2 < FramesBetweenSyncs; i2++) {
         const controlKeys = CommIn.unPackInt8U();
 
-        if (controlKeys & Movement.Jump) player.jumping = true;
-        else player.jumping = false;
-
-        if (controlKeys & Movement.Scope) player.scoping = true;
-        else player.scoping = false;
+        player.jumping = !!(controlKeys & Movement.Jump);
+        player.scoping = !!(controlKeys & Movement.Scope);
 
         const oldView = structuredClone(player.view);
 

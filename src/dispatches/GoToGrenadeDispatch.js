@@ -10,7 +10,7 @@ export class GoToGrenadeDispatch {
     }
 
     execute(bot) {
-        let minDistance = 200;
+        let minDistance = 2000;
         let closestGrenade = null;
 
         for (const grenade of bot.game.collectables[1]) {
@@ -25,6 +25,8 @@ export class GoToGrenadeDispatch {
                 closestGrenade = grenade;
             }
         }
+
+        if (!closestGrenade) return;
 
         const myNode = bot.pathing.nodeList.atObject(bot.me.position);
         const targetNode = bot.pathing.nodeList.atObject(closestGrenade);

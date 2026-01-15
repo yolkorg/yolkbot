@@ -21,6 +21,7 @@ import {
     ChicknWinnerError,
     ClaimSocialError,
     ClaimURLError,
+    CleanupLevel,
     GameFindError,
     GameJoinError,
     Intents,
@@ -263,7 +264,7 @@ export interface GameSpatula {
 
 export interface GameKOTC {
     stage: number;
-    zoneNumber: number;
+    zoneIdx: number;
     activeZone: Zone[];
     capturing: number;
     captureProgress: number;
@@ -500,7 +501,7 @@ export class Bot {
 
     leave(code?: number): void;
     logout(): void;
-    quit(noCleanup?: boolean): void;
+    quit(cleanupLevel?: CleanupLevel): void;
 }
 
 export default Bot;

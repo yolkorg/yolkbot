@@ -191,7 +191,7 @@ export class WASM {
     resetYawPitch = () => this.wasm.reset_yaw_pitch();
 
     coords(targetYaw, targetPitch) {
-        this.wasm.reset_yaw_pitch()
+        this.wasm.reset_yaw_pitch();
 
         const current = this.wasm.get_yaw_pitch();
 

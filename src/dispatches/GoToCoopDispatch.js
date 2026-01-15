@@ -6,25 +6,27 @@ export class GoToCoopDispatch {
     }
 
     check(bot) {
-        return bot.me.playing && bot.game.kotc.zoneNumber && bot.game.kotc.activeZone;
+        return bot.me.playing && bot.game.kotc.zoneIdx && bot.game.kotc.activeZone;
     }
 
     execute(bot) {
-        let minDistance = 200;
+        let minDistance = 20000;
         let closestZone = null;
 
-        for (const zone of bot.game.kotc.activeZone) {
-            const dx = zone.x - bot.me.position.x;
-            const dy = zone.y - bot.me.position.y;
-            const dz = zone.z - bot.me.position.z;
+        for (const zoneCoords of bot.game.kotc.activeZone) {
+            const dx = zoneCoords.x - bot.me.position.x;
+            const dy = zoneCoords.y - bot.me.position.y;
+            const dz = zoneCoords.z - bot.me.position.z;
 
             const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
             if (distance < minDistance) {
                 minDistance = distance;
-                closestZone = zone;
+                closestZone = zoneCoords;
             }
         }
+
+        if (!closestZone) return;
 
         const myNode = bot.pathing.nodeList.atObject(bot.me.position);
         const targetNode = bot.pathing.nodeList.atObject(closestZone);

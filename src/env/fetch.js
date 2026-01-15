@@ -18,7 +18,7 @@ const parseChunkedBody = (body) => {
         }
 
         const size = parseInt(sizeHex, 16);
-        if (size === 0) break;
+        if (Number.isNaN(size) && size === 0) break;
 
         i = rnIdx + 2;
         chunks.push(body.slice(i, i + size));
@@ -31,7 +31,7 @@ const parseChunkedBody = (body) => {
 const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, body }, time, resolve, reject) => {
     const timeout = setTimeout(() => {
         socket.destroy();
-        reject(new Error('iFetch timed out to', `${method} ${hostname}:${port}${pathname}`));
+        reject(new Error(`iFetch timed out: ${method} ${hostname}:${port}${pathname}`));
     }, time);
 
     let reqHeaders = Object.entries(headers).map(([k, v]) => `${k}: ${v}\r\n`).join('');
@@ -62,10 +62,10 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
         if (headersParsed) {
             const isChunked = /transfer-encoding:\s*chunked/i.test(response);
             if (isChunked) {
-                if (response.includes('\r\n0\r\n\r\n')) socket.end();
+                if (response.includes('\r\n0\r\n\r\n')) socket.destroy();
             } else if (contentLength > 0) {
                 const bodyReceived = response.length - bodyStart;
-                if (bodyReceived >= contentLength) socket.end();
+                if (bodyReceived >= contentLength) socket.destroy();
             }
         }
     });
@@ -75,7 +75,7 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
         reject(err);
     });
 
-    socket.on('end', () => {
+    socket.on('close', () => {
         clearTimeout(timeout);
 
         const headerEnd = response.indexOf('\r\n\r\n');
@@ -91,7 +91,7 @@ const sendHttpRequest = (socket, { method, pathname, hostname, port, headers, bo
     });
 };
 
-export const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null, timeout = 30000 } = {}) => new Promise((resolve, reject) => {
+export const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null, timeout = 20000 } = {}) => new Promise((resolve, reject) => {
     try {
         if (typeof process === 'undefined' || !process.getBuiltinModule)
             return globals.fetch(url, { method, headers, body }).then(resolve).catch(reject);
@@ -106,7 +106,7 @@ export const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null, 
         const port = rawPort ? parseInt(rawPort, 10) : (isHttps ? 443 : 80);
 
         if (!proxy) {
-            return dns.lookup(hostname, (err, host) => {
+            return dns.lookup(hostname, { family: 4 }, (err, host) => {
                 if (err) return reject(err);
 
                 const socket = isHttps ? tls.connect({ port, host, servername: hostname }) : net.connect({ port, host });
@@ -130,9 +130,9 @@ export const iFetch = (url, { method = 'GET', proxy, headers = {}, body = null, 
             destPort: port,
             useTLS: isHttps,
             resolveDnsLocally: proxyInfo.protocol === 'socks5'
-        }).then((socket) =>
-            sendHttpRequest(socket, { method, pathname, hostname, port, headers, body }, timeout, resolve, reject)
-        ).catch(reject);
+        })
+            .then((socket) => sendHttpRequest(socket, { method, pathname, hostname, port, headers, body }, timeout, resolve, reject))
+            .catch(reject);
     } catch (err) {
         reject(err);
     }

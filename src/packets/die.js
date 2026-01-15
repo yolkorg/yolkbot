@@ -36,8 +36,10 @@ const processDiePacket = (bot) => {
 
         killed.stats.totalDeaths++;
 
-        killed.inKotcZone = false;
-        bot.$emit('playerLeaveZone', killed, ZoneLeaveReason.Killed);
+        if (killed.inKotcZone) {
+            killed.inKotcZone = false;
+            bot.$emit('playerLeaveZone', killed, ZoneLeaveReason.Killed);
+        }
     }
 
     if (killer) {

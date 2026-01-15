@@ -29,7 +29,7 @@ const processMetaGameStatePacket = (bot) => {
         const oldPlayersOnZone = Object.values(bot.players).filter((p) => p.inKotcZone && p.playing);
 
         bot.game.kotc.stage = CommIn.unPackInt8U(); // constants.CoopState
-        bot.game.kotc.zoneNumber = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
+        bot.game.kotc.zoneIdx = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
         bot.game.kotc.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
         bot.game.kotc.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
         bot.game.kotc.numCapturing = CommIn.unPackInt8U(); // number of players capturing - number/1000
@@ -37,7 +37,7 @@ const processMetaGameStatePacket = (bot) => {
         bot.game.teamScore[2] = CommIn.unPackInt8U(); // team 2 (red) score
 
         bot.game.kotc.capturePercent = bot.game.kotc.captureProgress / 1000; // progress of the capture as a percentage
-        bot.game.kotc.activeZone = bot.game.map.zones ? bot.game.map.zones[bot.game.kotc.zoneNumber - 1] : null;
+        bot.game.kotc.activeZone = bot.game.map?.zones ? bot.game.map.zones[bot.game.kotc.zoneIdx - 1] : null;
 
         if (bot.game.kotc.activeZone) Object.values(bot.players).forEach((player) => player.updateKotcZone(bot.game.kotc.activeZone));
 
@@ -46,16 +46,24 @@ const processMetaGameStatePacket = (bot) => {
                 player.inKotcZone = false;
                 bot.$emit('playerLeaveZone', player, ZoneLeaveReason.RoundEnded);
             }
-        })
+        });
 
-        bot.$emit('gameStateChange', { teamScore: { before: oldTeamScores, after: bot.game.teamScore }, kotc: { before: oldKOTC, after: bot.game.kotc }, playersOnZone: { before: oldPlayersOnZone } });
+        const newPlayersOnZone = Object.values(bot.players).filter((p) => p.inKotcZone && p.playing);
+
+        bot.$emit('gameStateChange', {
+            teamScore: { before: oldTeamScores, after: bot.game.teamScore },
+            kotc: { before: oldKOTC, after: bot.game.kotc },
+            playersOnZone: { before: oldPlayersOnZone, after: newPlayersOnZone }
+        });
     } else if (bot.game.gameModeId === GameMode.Team) {
         const oldTeamScores = structuredClone(bot.game.teamScore);
 
         bot.game.teamScore[1] = CommIn.unPackInt16U();
         bot.game.teamScore[2] = CommIn.unPackInt16U();
 
-        bot.$emit('gameStateChange', { teamScore: { before: oldTeamScores, after: bot.game.teamScore } });
+        bot.$emit('gameStateChange', {
+            teamScore: { before: oldTeamScores, after: bot.game.teamScore }
+        });
     }
 
     if (bot.game.gameModeId !== GameMode.Spatula) delete bot.game.spatula;

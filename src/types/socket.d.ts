@@ -10,16 +10,15 @@ declare class yolkws {
     autoReconnect: boolean;
 
     url: string;
-    proxy: string;
+    proxy: string | undefined;
 
     binaryType: string;
 
-    maxRetries: number;
     connectionTimeout: number;
 
-    constructor(url: string, params: yolkwsParams);
+    constructor(url: string, params?: yolkwsParams);
 
-    tryConnect($tries?: number): Promise<void>;
+    tryConnect($tries?: number): Promise<boolean>;
 
     onmessage: (data: Data) => void;
     onopen: () => void;

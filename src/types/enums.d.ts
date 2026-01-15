@@ -121,6 +121,7 @@ export enum ChallengeRerollErrorEnum {
     ChallengeNotFound = 'challenge_not_found',
     ChallengeNotAssigned = 'challenge_reroll_not_found',
     NotEnoughEggs = 'insufficient_eggs',
+    InternalError = 'unknown_error'
 }
 
 export type ChallengeRerollError = { ok: false, error: ChallengeRerollErrorEnum };
@@ -142,7 +143,8 @@ export enum PathfindError {
 export enum ZoneLeaveReason {
     Despawned = 'despawned',
     Killed = 'killed',
-    WalkedOut = 'exited'
+    WalkedOut = 'exited',
+    RoundEnded = 'round_ended'
 }
 
 export enum CleanupLevel {

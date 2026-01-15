@@ -5,7 +5,7 @@ import iFetch from './fetch.js';
 export const globals = {};
 
 const isBrowser = typeof window !== 'undefined' && typeof HTMLElement !== 'undefined';
-const isWebWorker = (typeof self !== 'undefined') && (self.constructor.name === 'DedicatedWorkerGlobalScope');
+const isWebWorker = typeof self !== 'undefined' && typeof DedicatedWorkerGlobalScope !== 'undefined' && self instanceof DedicatedWorkerGlobalScope;
 const isCloudflareWorker = typeof WebSocketPair !== 'undefined' && typeof Cloudflare !== 'undefined';
 
 const isUnsandboxedElectron = typeof process === 'object' && process.versions?.electron && process.versions?.node && typeof window !== 'undefined' && typeof window.require !== 'undefined';

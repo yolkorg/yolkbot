@@ -17,7 +17,6 @@ export type Gun = {
 
     damage: number;
     range: number;
-    recoil: number;
     rof: number;
     totalDamage: number;
     velocity: number;
@@ -33,7 +32,7 @@ export declare const M24: Gun;
 export declare const AUG: Gun;
 
 export type CreatedGun = Gun & {
-    ammo: {
+    ammo: GunAmmo & {
         rounds: number;
         storeMax: number;
     }

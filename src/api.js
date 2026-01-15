@@ -141,7 +141,7 @@ export class API {
                 this.errorLogger('loginWithRefreshToken: network error', body || error);
                 return createError(APIError.NetworkFail);
             } else if (error.code === 'ECONNREFUSED') {
-                this.errorLogger('authWithEmailPass: connection refused', body || error);
+                this.errorLogger('loginWithRefreshToken: connection refused', body || error);
                 return createError(APIError.NetworkFail);
             }
 
@@ -178,9 +178,12 @@ export class API {
         } catch (error) {
             if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
             else if (error.code === 'ECONNREFUSED') {
-                this.errorLogger('authWithEmailPass: connection refused', body || error);
+                this.errorLogger('loginAnonymously: connection refused', body || error);
                 return createError(APIError.NetworkFail);
             }
+
+            this.errorLogger('loginAnonymously: unknown error:', body, error);
+            return createError(APIError.InternalError);
         }
 
         if (!body.idToken) {
@@ -197,17 +200,33 @@ export class API {
     sendEmailVerification = async (idToken = this.idToken) => {
         if (!idToken) return createError(APIError.MissingParams);
 
-        const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${this.customKey || FirebaseKey}`, {
-            method: 'POST',
-            body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken }),
-            headers: {
-                ...baseHeaders,
-                'content-type': 'application/json'
-            },
-            proxy: this.proxy
-        });
+        let body;
 
-        const body = await req.json();
+        try {
+            const req = await globals.fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${this.customKey || FirebaseKey}`, {
+                method: 'POST',
+                body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken }),
+                headers: {
+                    ...baseHeaders,
+                    'content-type': 'application/json'
+                },
+                proxy: this.proxy
+            });
+
+            body = await req.json();
+        } catch (error) {
+            if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
+            else if (error.code === 'auth/network-request-failed') {
+                this.errorLogger('sendEmailVerification: network error', body || error);
+                return createError(APIError.NetworkFail);
+            } else if (error.code === 'ECONNREFUSED') {
+                this.errorLogger('sendEmailVerification: connection refused', body || error);
+                return createError(APIError.NetworkFail);
+            }
+
+            this.errorLogger('sendEmailVerification: unknown error:', idToken, error);
+            return createError(APIError.InternalError);
+        }
 
         if (body.kind !== 'identitytoolkit#GetOobConfirmationCodeResponse') {
             this.errorLogger('sendEmailVerification: the game sent an invalid response', body);
@@ -220,19 +239,35 @@ export class API {
     verifyOobCode = async (oobCode) => {
         if (!oobCode) return createError(APIError.MissingParams);
 
-        const req = await globals.fetch(`https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=${this.customKey || FirebaseKey}`, {
-            method: 'POST',
-            body: JSON.stringify({ oobCode }),
-            headers: {
-                ...baseHeaders,
-                'x-client-version': 'Chrome/JsCore/3.7.5/FirebaseCore-web',
-                'referer': 'https://shellshockio-181719.firebaseapp.com/',
-                'content-type': 'application/json'
-            },
-            proxy: this.proxy
-        });
+        let body;
 
-        const body = await req.json();
+        try {
+            const req = await globals.fetch(`https://www.googleapis.com/identitytoolkit/v3/relyingparty/setAccountInfo?key=${this.customKey || FirebaseKey}`, {
+                method: 'POST',
+                body: JSON.stringify({ oobCode }),
+                headers: {
+                    ...baseHeaders,
+                    'x-client-version': 'Chrome/JsCore/3.7.5/FirebaseCore-web',
+                    'referer': 'https://shellshockio-181719.firebaseapp.com/',
+                    'content-type': 'application/json'
+                },
+                proxy: this.proxy
+            });
+
+            body = await req.json();
+        } catch (error) {
+            if (error.code === 'auth/too-many-requests') return createError(APIError.FirebaseRateLimited);
+            else if (error.code === 'auth/network-request-failed') {
+                this.errorLogger('verifyOobCode: network error', body || error);
+                return createError(APIError.NetworkFail);
+            } else if (error.code === 'ECONNREFUSED') {
+                this.errorLogger('verifyOobCode: connection refused', body || error);
+                return createError(APIError.NetworkFail);
+            }
+
+            this.errorLogger('verifyOobCode: unknown error:', oobCode, error);
+            return createError(APIError.InternalError);
+        }
 
         if (!body.emailVerified) {
             this.errorLogger('verifyOobCode: the game sent an invalid response', body);

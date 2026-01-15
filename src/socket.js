@@ -10,7 +10,6 @@ export class yolkws {
 
     binaryType = '';
 
-    maxRetries = 5;
     connectionTimeout = 5000;
 
     errorLogger = (...args) => console.error(...args);
@@ -78,9 +77,10 @@ export class yolkws {
                 clearTimeout(timeout);
                 this.connected = true;
 
+                this.onopen();
+
                 this.socket.removeEventListener('error', errorListener);
 
-                this.socket.addEventListener('open', (...data) => this.onopen(...data));
                 this.socket.addEventListener('message', (...data) => this.onmessage(...data));
                 this.socket.addEventListener('close', (...data) => this.onclose(...data));
                 this.socket.addEventListener('error', (...data) => this.onerror(...data));
@@ -119,9 +119,7 @@ export class yolkws {
             try {
                 this.socket.terminate();
             } catch { }
-
-            return null;
-        } else return this.socket.close(data);
+        } else this.socket.close(data);
     }
 }
 

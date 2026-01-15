@@ -39,11 +39,11 @@ const build = async (module: Module) => {
         }
     });
 
-    for (const file of results.outputs)
-        Bun.write(path.join(buildDir, `${module.name}.js`), new Response(file));
+    const file = await results.outputs[0].text();
+    Bun.write(path.join(buildDir, `${module.name}.js`), new Response(file));
 
     console.log(`\x1b[32m✓ built browser/${module.name}\x1b[0m`);
 }
 
-build({ name: 'global', entry: path.join(rootDir, 'browser', 'globalEntry.js') });
-build({ name: 'module', entry: path.join(rootDir, 'src', 'index.js') });
+(async () => await build({ name: 'global', entry: path.join(rootDir, 'browser', 'globalEntry.js') }))();
+(async () => await build({ name: 'module', entry: path.join(rootDir, 'src', 'index.js') }))();

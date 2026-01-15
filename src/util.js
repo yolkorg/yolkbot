@@ -9,6 +9,19 @@ export const createGun = (baseGun) => {
 
 export const createError = (errorEnum) => ({ ok: false, error: errorEnum });
 
+const attemptFetch = async (url, options = {}, retries = 3, backoff = 300) => {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`failed to fetch map; status: ${response.status}`);
+        return response;
+    } catch (error) {
+        if (retries > 0) {
+            await new Promise(res => setTimeout(res, backoff));
+            return attemptFetch(url, options, retries - 1, backoff * 2);
+        } else throw error;
+    }
+}
+
 export const fetchMap = async (name, hash) => {
     if (typeof process !== 'undefined') {
         const { existsSync, mkdirSync, readFileSync, writeFileSync } = process.getBuiltinModule('node:fs');
@@ -25,12 +38,12 @@ export const fetchMap = async (name, hash) => {
 
         if (existsSync(mapFile)) return JSON.parse(readFileSync(mapFile, 'utf-8'));
 
-        const data = await (await fetch(`https://x.yolkbot.xyz/data/maps/full/${name}.json?${hash}`)).json();
+        const data = await (await attemptFetch(`https://x.yolkbot.xyz/data/maps/full/${name}.json?${hash}`)).json();
         writeFileSync(mapFile, JSON.stringify(data, null, 4), { flag: 'w+' });
         return data;
     }
 
-    const data = await (await fetch(`https://x.yolkbot.xyz/data/maps/full/${name}.json?${hash}`)).json();
+    const data = await (await attemptFetch(`https://x.yolkbot.xyz/data/maps/full/${name}.json?${hash}`)).json();
     return data;
 }
 
@@ -70,17 +83,11 @@ export const initKotcZones = (meshData) => {
     const zones = [];
     let zoneId = 0;
 
-    const offsets = [-1, strideY, -strideY, strideZ, -strideZ];
-    offsets[0] = -1; // x-1
-    offsets[1] = 1; // x+1
-    offsets[2] = -strideZ; // z-1
-    offsets[3] = strideZ; // z+1
-
     for (let i = 0; i < len; i++) {
         if (zoneIds[i]) continue;
 
         const zone = ++zoneId;
-        const currentZone = [];
+        const activeZone = [];
 
         let head = 0, tail = 0;
         queue[tail++] = i;
@@ -90,7 +97,7 @@ export const initKotcZones = (meshData) => {
             const idx = queue[head++];
             const cell = meshData[idx];
             cell.zone = zone;
-            currentZone[currentZone.length] = cell;
+            activeZone[activeZone.length] = cell;
 
             const { x, y, z } = cell;
             const flatIdx = ((x - minX) | 0) + ((y - minY) | 0) * strideY + ((z - minZ) | 0) * strideZ;
@@ -119,7 +126,7 @@ export const initKotcZones = (meshData) => {
             }
         }
 
-        zones[zones.length] = currentZone;
+        zones[zones.length] = activeZone;
     }
 
     return zones;

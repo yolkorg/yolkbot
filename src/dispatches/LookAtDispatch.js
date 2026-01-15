@@ -13,22 +13,23 @@ export class LookAtDispatch {
         this.idOrName = idOrName;
     }
 
-    validate(bot) {
-        if (typeof this.idOrName !== 'string' && typeof this.idOrName !== 'number') return false;
+    $grabPlayer(bot) {
+        return bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+    }
 
-        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
-        return !!target;
+    validate() {
+        return typeof this.idOrName === 'string' || typeof this.idOrName === 'number';
     }
 
     check(bot) {
         if (!bot.me.playing) return false;
 
-        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        const target = this.$grabPlayer(bot);
         return target && target.playing && target.position && target.position.x;
     }
 
     execute(bot) {
-        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        const target = this.$grabPlayer(bot);
 
         const directionVector = {
             x: target.position.x - bot.me.position.x,

@@ -12,7 +12,7 @@ const processThrowGrenadePacket = (bot) => {
     const player = bot.players[id];
 
     if (player) {
-        player.grenades--;
+        if (player.grenades > 0) player.grenades--;
         bot.$emit('playerThrowGrenade', player, { x, y, z }, { x: dx, y: dy, z: dz });
     }
 }

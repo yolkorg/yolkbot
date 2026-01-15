@@ -10,7 +10,7 @@ export class GoToAmmoDispatch {
     }
 
     execute(bot) {
-        let minDistance = 200;
+        let minDistance = 2000;
         let closestAmmo = null;
 
         for (const ammo of bot.game.collectables[0]) {
@@ -25,6 +25,8 @@ export class GoToAmmoDispatch {
                 closestAmmo = ammo;
             }
         }
+
+        if (!closestAmmo) return;
 
         const myNode = bot.pathing.nodeList.atObject(bot.me.position);
         const targetNode = bot.pathing.nodeList.atObject(closestAmmo);

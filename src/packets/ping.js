@@ -6,13 +6,13 @@ import { Intents } from '../enums.js';
 const processPingPacket = (bot) => {
     if (!bot.intents.includes(Intents.PING)) return;
 
-    const oldPing = bot.ping;
+    const oldPing = bot.ping ?? 0;
 
-    bot.ping = Date.now() - bot.lastPingTime;
+    bot.ping = bot.lastPingTime ? Date.now() - bot.lastPingTime : 0;
 
     bot.$emit('pingUpdate', oldPing, bot.ping);
 
-    setTimeout(() => {
+    bot.pingTimeoutId = setTimeout(() => {
         const out = new CommOut();
         out.packInt8(CommCode.ping);
         out.send(bot.game.socket);

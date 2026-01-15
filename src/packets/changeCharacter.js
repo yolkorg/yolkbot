@@ -50,7 +50,7 @@ const processChangeCharacterPacket = (bot) => {
         player.weapons[0] = createGun(GunList[weaponIndex]);
 
         if (oldWeaponIdx !== player.selectedGun) bot.$emit('playerChangeGun', player, oldWeaponIdx, player.selectedGun);
-        if (oldCharacter !== player.character) bot.$emit('playerChangeCharacter', player, oldCharacter, player.character);
+        if (JSON.stringify(oldCharacter) !== JSON.stringify(player.character)) bot.$emit('playerChangeCharacter', player, oldCharacter, player.character);
     }
 }
 

@@ -7,7 +7,10 @@ const processGameActionPacket = (bot) => {
 
     if (action === GameAction.Pause) {
         bot.$emit('gameForcePause');
-        setTimeout(() => bot.me.playing = false, 3000);
+
+        setTimeout(() => {
+            if (bot.me) bot.me.playing = false;
+        }, 3000);
     }
 
     if (action === GameAction.Reset) {
@@ -23,7 +26,7 @@ const processGameActionPacket = (bot) => {
 
         if (bot.game.gameModeId === GameMode.KOTC) {
             bot.game.kotc.stage = CoopState.Capturing;
-            bot.game.kotc.zoneNumber = 0;
+            bot.game.kotc.zoneIdx = 0;
             bot.game.kotc.activeZone = null;
             bot.game.kotc.capturing = 0;
             bot.game.kotc.captureProgress = 0;

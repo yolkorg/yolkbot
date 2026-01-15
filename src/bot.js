@@ -212,7 +212,7 @@ export class Bot {
             kotc: {
                 // data from kotc
                 stage: CoopState.Capturing, // this is shell default
-                zoneNumber: 0,
+                zoneIdx: 0,
                 activeZone: [],
                 capturing: 0,
                 captureProgress: 0,
@@ -503,7 +503,6 @@ export class Bot {
 
     async findPublicGame(region, mode) {
         if (typeof region !== 'string') return createError(GameFindError.MissingParams);
-        if (typeof mode !== 'number') return createError(GameFindError.MissingParams);
 
         const regions = this.regionList.length ? this.regionList : Regions;
         if (!regions.find(r => r.id === region)) return createError(GameFindError.InvalidRegion);
@@ -1077,6 +1076,8 @@ export class Bot {
     }
 
     processPacket(packet) {
+        if (this.hasQuit) return;
+
         CommIn.init(packet);
 
         if (this.intents.includes(Intents.PACKET_HOOK)) this.$emit('packet', packet);
@@ -1385,6 +1386,7 @@ export class Bot {
         }
 
         if (this.updateIntervalId) clearInterval(this.updateIntervalId);
+        if (this.pingTimeoutId) clearTimeout(this.pingTimeoutId);
 
         this.#dispatches = [];
 
@@ -1440,6 +1442,7 @@ export class Bot {
 
         if (this.intents.includes(Intents.NO_AFK_KICK)) clearInterval(this.afkKickInterval);
         if (this.intents.includes(Intents.RENEW_SESSION)) clearInterval(this.renewSessionInterval);
+        if (this.pingTimeoutId) clearTimeout(this.pingTimeoutId);
 
         if (cleanupLevel >= CleanupLevel.Partial) {
             this.api = null;

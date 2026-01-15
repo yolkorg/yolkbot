@@ -17,7 +17,7 @@ export const getFileObject = async (): Promise<Record<string, string>> => {
         const serverResult = await fetch(`https://x.yolkbot.xyz/data${serverPath}`).then(res => res.text());
         const localPath = path.join(constantsDir, `${fileName}.js`);
         const code = fs.readFileSync(localPath, 'utf8');
-        const rewrittenCode = code.replace(/{}|\[\]/, serverResult);
+        const rewrittenCode = code.replace(/\{\}|\[\]/, serverResult);
         fileObject[localPath] = rewrittenCode;
     }));
 

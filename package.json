@@ -56,8 +56,14 @@
             "import": "./dist/util.js",
             "types": "./dist/util.d.ts"
         },
-        "./pathing/*": "./dist/pathing/*.js",
-        "./pathing/*.js": "./dist/pathing/*.js",
+        "./pathing/*": {
+            "import": "./dist/pathing/*.js",
+            "types": "./dist/pathing/*.d.ts"
+        },
+        "./pathing/*.js": {
+            "import": "./dist/pathing/*.js",
+            "types": "./dist/pathing/*.d.ts"
+        },
         "./bot": {
             "import": "./dist/bot.js",
             "types": "./dist/bot.d.ts"
@@ -137,6 +143,7 @@
             "dispatch/*": ["dist/dispatches/*.d.ts"],
             "dispatches": ["dist/dispatches.d.ts"],
             "dispatches/*": ["dist/dispatches/*.d.ts"],
+            "pathing/*": ["dist/pathing/*.d.ts"],
             "wasm": ["dist/wasm/direct.d.ts"],
             "wasm/*": ["dist/wasm/*.d.ts"]
         }

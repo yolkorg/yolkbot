@@ -10,7 +10,7 @@ export interface CheatingReasons {
 export type Params = [idOrName: string, reasons?: CheatingReasons];
 
 export class ReportPlayerDispatch {
-    irOrName: string;
+    idOrName: string;
     reasons: boolean[];
     reasonInt: number;
 

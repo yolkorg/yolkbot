@@ -20,11 +20,13 @@ export class ReportPlayerDispatch {
                 this.reasonInt |= (1 << i);
     }
 
-    validate(bot) {
+    $grabPlayer(bot) {
+        return bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+    }
+
+    validate() {
         if (typeof this.idOrName !== 'string' && typeof this.idOrName !== 'number') return false;
         if (this.reasons.every(reason => reason === false)) return false;
-
-        if (!bot.players[this.idOrName.toString()] && !bot.players.find(player => player.name === this.idOrName)) return false;
 
         return true;
     }
@@ -32,12 +34,12 @@ export class ReportPlayerDispatch {
     check(bot) {
         if (!bot.state.inGame) return false;
 
-        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        const target = this.$grabPlayer(bot);
         return !!target;
     }
 
     execute(bot) {
-        const target = bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        const target = this.$grabPlayer(bot);
 
         const out = new CommOut();
         out.packInt8(CommCode.reportPlayer);

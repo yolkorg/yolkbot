@@ -11,24 +11,24 @@ export default [
         languageOptions: { globals: { Bun: 'readonly', fetch: 'readonly', process: 'readonly' } }
     },
     {
-        files: ['src/wasm/**'],
-        languageOptions: { globals: { TextEncoder: 'readonly', TextDecoder: 'readonly', WebAssembly: 'readonly' } }
-    },
-    {
         files: ['src/env/fetch.js'],
         languageOptions: { globals: { Buffer: 'readonly', process: 'readonly' } }
     },
     {
-        files: ['src/wasm/direct.js'],
-        languageOptions: { globals: { Buffer: 'readonly', crypto: 'readonly', process: 'readonly' } }
+        files: ['src/env/globals.js'],
+        languageOptions: { globals: { process: 'readonly', Deno: 'readonly', self: 'readonly', window: 'readonly', DedicatedWorkerGlobalScope: 'readonly' } }
+    },
+    {
+        files: ['src/wasm/**'],
+        languageOptions: { globals: { TextEncoder: 'readonly', TextDecoder: 'readonly', WebAssembly: 'readonly' } }
     },
     {
         files: ['src/wasm/bytes.js'],
         languageOptions: { globals: { Buffer: 'readonly', atob: 'readonly' } }
     },
     {
-        files: ['src/env/globals.js'],
-        languageOptions: { globals: { process: 'readonly', Deno: 'readonly', self: 'readonly', window: 'readonly' } }
+        files: ['src/wasm/direct.js'],
+        languageOptions: { globals: { Buffer: 'readonly', crypto: 'readonly', process: 'readonly' } }
     },
     {
         files: ['src/util.js'],

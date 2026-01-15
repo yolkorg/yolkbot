@@ -204,6 +204,8 @@ class MapNode {
                 return false;
             }
         }
+
+        return false;
     }
 
     flatRadialDistance(position) {

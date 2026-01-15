@@ -9,7 +9,7 @@ const processSocketReadyPacket = (bot) => {
 
     out.packString(bot.game.raw.uuid);
     out.packInt8(+bot.intents.includes(Intents.VIP_HIDE_BADGE));
-    out.packInt8(bot.state.weaponIdx || bot.account?.loadout?.classIdx || 0);
+    out.packInt8(bot.state.weaponIdx || bot.account.loadout?.classIdx || 0);
     out.packString(bot.state.name);
 
     out.packInt32(bot.account.session);

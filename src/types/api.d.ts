@@ -1,4 +1,4 @@
-import { APIError } from './enums';
+import { APIErrorEnum } from './enums';
 
 export interface RawFirebase {
     kind: string;
@@ -36,7 +36,7 @@ interface APIParams {
     errorLogger?: (...args: any[]) => void;
 }
 
-type ReturnError = { ok: false; error: APIError };
+type ReturnError = { ok: false; error: APIErrorEnum };
 
 type AnyObject = { [key: string]: any };
 
