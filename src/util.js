@@ -12,7 +12,9 @@ export const fetchMap = async (name, hash) => {
         const mapCache = join(yolkbotCache, 'maps');
         if (!existsSync(mapCache)) mkdirSync(mapCache);
 
-        const mapFile = join(mapCache, `${name}-${hash}.json`);
+        const safeName = String(name).replace(/[^a-z0-9_-]/gi, '_');
+        const safeHash = String(hash).replace(/[^a-z0-9_-]/gi, '_');
+        const mapFile = join(mapCache, `${safeName}-${safeHash}.json`);
 
         if (existsSync(mapFile)) return JSON.parse(readFileSync(mapFile, 'utf-8'));
 
