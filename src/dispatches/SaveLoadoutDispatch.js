@@ -23,7 +23,9 @@ export class SaveLoadoutDispatch {
         };
 
         // filter out undefined
-        this.changes = Object.fromEntries(Object.entries(this.changes).filter(([, v]) => !!v));
+        this.changes = Object.fromEntries(
+            Object.entries(this.changes).filter(([, v]) => typeof v !== 'undefined')
+        );
     }
 
     validate(bot) {
@@ -72,10 +74,10 @@ export class SaveLoadoutDispatch {
     }
 
     execute(bot) {
-        if (bot.me && this.changes.classIdx && this.changes.classIdx !== bot.me.selectedGun)
+        if (bot.me && typeof this.changes.classIdx !== 'undefined' && this.changes.classIdx !== bot.me.selectedGun)
             bot.me.weapons[0] = createGun(GunList[this.changes.classIdx]);
 
-        bot.state.weaponIdx = this.changes.classIdx || bot.state.weaponIdx;
+        bot.state.weaponIdx = this.changes.classIdx ?? bot.state.weaponIdx;
 
         const loadout = {
             ...bot.account.loadout,
@@ -96,7 +98,7 @@ export class SaveLoadoutDispatch {
             if (bot.state.inGame) {
                 const out = new CommOut();
                 out.packInt8(CommCode.changeCharacter);
-                out.packInt8(this.changes?.classIdx || bot.me.selectedGun);
+                out.packInt8(this.changes?.classIdx ?? bot.me.selectedGun);
                 out.send(bot.game.socket);
             }
 

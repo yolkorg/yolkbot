@@ -13,7 +13,7 @@ export class WASM {
 
     debug = false;
 
-    canvasListeners = {};
+    canvasListeners = { pointermove: () => { } };
     mockElement = { textContent: '' };
 
     processDate = null;
@@ -42,7 +42,7 @@ export class WASM {
     }
 
     passStringToWasm = (str) => {
-        if (!this.wasm) return;
+        if (!this.wasm) return [];
 
         const buf = (new TextEncoder()).encode(str);
         const ptr = this.wasm.__wbindgen_malloc(buf.length, 1) >>> 0;
@@ -114,6 +114,7 @@ export class WASM {
                 __wbg_settextContent_b55fe2f5f1399466: async (...args) => {
                     this.mockElement.textContent = this.getStringFromWasm(args[1], args[2]);
                     this.processListeners.forEach((listener) => listener(this.mockElement.textContent));
+                    this.processListeners = [];
                 },
                 __wbg_static_accessor_GLOBAL_8921f820c2ce3f12: () => { },
                 __wbg_static_accessor_GLOBAL_THIS_f0a4409105898184: () => { },

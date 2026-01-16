@@ -17,15 +17,15 @@ export class MeleeDispatch {
         out.packInt8(CommCode.melee);
         out.send(bot.game.socket);
 
-        bot.usingMelee = true;
+        bot.state.usingMelee = true;
 
         // gameloop every 33.33 (repeating) ms, 17 ticks
         setTimeout(() => {
-            bot.usingMelee = false
-            bot.swappingGun = true
+            bot.state.usingMelee = false
+            bot.state.swappingGun = true
 
             setTimeout(() => {
-                bot.swappingGun = false
+                bot.state.swappingGun = false
             }, 0.5 * GunEquipTime)
         }, (100 / 3) * 17);
     }

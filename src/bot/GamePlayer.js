@@ -16,8 +16,17 @@ export class GamePlayer {
 
         this.playing = playerData.playing;
 
-        this.socials = playerData.social && JSON.parse(playerData.social);
-        if (this.socials) this.socials.forEach((social) => social.type = RSocialMedia[social.id]);
+        this.socials = [];
+        if (typeof playerData.social === 'string' && playerData.social.length) {
+            try {
+                const parsed = JSON.parse(playerData.social);
+                if (Array.isArray(parsed)) this.socials = parsed;
+            } catch (e) {
+                console.error('Error parsing socials:', e);
+                console.error('Report this on Github!');
+            }
+        }
+        this.socials.forEach((social) => social.type = RSocialMedia[social.id]);
 
         this.isVip = playerData.upgradeProductId > 0;
         this.showBadge = !playerData.hideBadge || false;

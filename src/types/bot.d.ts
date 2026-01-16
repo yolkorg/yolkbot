@@ -226,7 +226,7 @@ export interface GameOptions {
     mustUseSecondary: boolean;
 }
 
-export interface Collectable {
+export interface Collectible {
     id: number;
     x: number;
     y: number;
@@ -303,7 +303,7 @@ export interface Game {
     isGameOwner: boolean;
     isPrivate: boolean;
     options: GameOptions;
-    collectables: Collectable[][];
+    collectibles: Collectible[][];
     teamScore: number[];
     spatula: GameSpatula;
     kotc: GameKOTC;

@@ -26,7 +26,5 @@ jobs:
       - name: build browser
         run: bun run build/browser.ts
 
-      - name: install npm
-        run: bun install -g npm@latest
-
-      - run: npm publish
+      - name: publish to npm
+        run: npm publish

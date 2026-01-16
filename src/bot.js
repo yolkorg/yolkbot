@@ -197,7 +197,7 @@ export class Bot {
             },
 
             // ammos/grenades on the ground that can be picked up
-            collectables: [[], []],
+            collectibles: [[], []],
 
             // data from metaGame
             teamScore: [0, 0, 0], // [0, blue, red] - no clue what 1st index is for
@@ -808,7 +808,7 @@ export class Bot {
 
         if (this.pathing.activePath && this.intents.includes(Intents.PATHFINDING)) this.#processPathfinding();
 
-        for (let i = 0; i < this.#dispatches.length; i++) {
+        for (let i = this.#dispatches.length - 1; i >= 0; i--) {
             const disp = this.#dispatches[i];
             if (disp.check(this)) {
                 disp.execute(this);
@@ -1292,7 +1292,7 @@ export class Bot {
         if (!result.ok) return result;
 
         if (result.result === 'SUCCESS') {
-            this.account.eggBalance = result.eggs_given;
+            this.account.eggBalance += result.eggs_given;
             result.item_ids.forEach((id) => this.account.ownedItemIds.push(id));
 
             return { ok: true, eggsGiven: result.eggs_given, itemIds: result.item_ids };

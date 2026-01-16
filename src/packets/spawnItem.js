@@ -7,7 +7,7 @@ const processSpawnItemPacket = (bot) => {
     const y = CommIn.unPackFloat();
     const z = CommIn.unPackFloat();
 
-    bot.game.collectables[type].push({ id, x, y, z });
+    bot.game.collectibles[type].push({ id, x, y, z });
     bot.$emit('spawnItem', type, { x, y, z }, id);
 }
 

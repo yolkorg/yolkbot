@@ -25,7 +25,7 @@ export class LookAtDispatch {
         if (!bot.me.playing) return false;
 
         const target = this.$grabPlayer(bot);
-        return target && target.playing && target.position && target.position.x;
+        return target && target.playing && target.position && Number.isFinite(target.position.x);
     }
 
     execute(bot) {

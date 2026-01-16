@@ -1,3 +1,5 @@
+#!/bin/sh
+
 file="$1"
 
 if [ $# -eq 0 ]; then
@@ -31,6 +33,7 @@ elif [ "$os" = "Darwin" ]; then
     base64 -i "$file" -o bytes.txt
 else
     echo "Could not identify OS \"$os\""
+    exit 1
 fi
 
 bytesContent=$(cat bytes.txt)

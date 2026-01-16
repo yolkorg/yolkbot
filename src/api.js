@@ -96,7 +96,7 @@ export class API {
                 return createError(APIError.NetworkFail);
             }
 
-            this.errorLogger('authWithEmailPass: unknown error:', email, password, error);
+            this.errorLogger('authWithEmailPass: unknown error:', email, error);
             return createError(APIError.InternalError);
         }
 

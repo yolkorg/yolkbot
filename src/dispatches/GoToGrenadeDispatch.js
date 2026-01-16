@@ -6,14 +6,14 @@ export class GoToGrenadeDispatch {
     }
 
     check(bot) {
-        return bot.me.playing && bot.game.collectables[1].length;
+        return bot.me.playing && bot.game.collectibles[1].length;
     }
 
     execute(bot) {
         let minDistance = 2000;
         let closestGrenade = null;
 
-        for (const grenade of bot.game.collectables[1]) {
+        for (const grenade of bot.game.collectibles[1]) {
             const dx = grenade.x - bot.me.position.x;
             const dy = grenade.y - bot.me.position.y;
             const dz = grenade.z - bot.me.position.z;

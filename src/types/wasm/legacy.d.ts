@@ -26,8 +26,6 @@ export interface CustomExports extends WebAssembly.Exports {
     __wbindgen_realloc: (ptr: number, oldSize: number, newSize: number, tag: number) => number;
     __wbindgen_free(ptr: number, size: number, tag: number): void;
     __wbindgen_start: () => void;
-
-    closure28_externref_shim: (arg0: number, arg1: number, arg2: any) => void;
 }
 
 export class WASM {
@@ -43,17 +41,17 @@ export class WASM {
     }
 
     processDate: number | null;
-    processListeners: Array<() => void>;
+    processListeners: Array<(result: string) => void>;
 
     initWasm(): Promise<void>;
 
     getStringFromWasm(ptr: number, len: number): string;
-    passStringToWasm(str: string): { ptr: number; len: number; };
+    passStringToWasm(str: string): [number, number];
     addToExternrefTable(obj: any): number;
 
     getImports(): WebAssembly.Imports;
 
-    process(string: string, customDate?: number): void;
+    process(string: string, customDate?: number): Promise<string>;
     validate(string: string): string;
     getYawPitch(): GetYawPitch;
     resetYawPitch(): void;

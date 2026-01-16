@@ -12,7 +12,7 @@ export class LookAtPosDispatch {
     }
 
     validate() {
-        return this.pos && this.pos.x && this.pos.y && this.pos.z;
+        return this.pos && Number.isFinite(this.pos.x) && Number.isFinite(this.pos.y) && Number.isFinite(this.pos.z);
     }
 
     check(bot) {

@@ -18,10 +18,9 @@ export class ReloadDispatch {
         const playerActiveWeapon = bot.me.weapons[bot.me.activeGun];
 
         if (playerActiveWeapon.ammo) {
-            const newRounds = Math.min(
-                Math.min(playerActiveWeapon.ammo.capacity, playerActiveWeapon.ammo.reload) - playerActiveWeapon.ammo.rounds,
-                playerActiveWeapon.ammo.store
-            );
+            const maxLoad = Math.min(playerActiveWeapon.ammo.capacity, playerActiveWeapon.ammo.reload);
+            const needed = Math.max(0, maxLoad - playerActiveWeapon.ammo.rounds);
+            const newRounds = Math.min(needed, playerActiveWeapon.ammo.store);
 
             playerActiveWeapon.ammo.rounds += newRounds;
             playerActiveWeapon.ammo.store -= newRounds;

@@ -6,14 +6,14 @@ export class GoToAmmoDispatch {
     }
 
     check(bot) {
-        return bot.me.playing && bot.game.collectables[0].length;
+        return bot.me.playing && bot.game.collectibles[0].length;
     }
 
     execute(bot) {
         let minDistance = 2000;
         let closestAmmo = null;
 
-        for (const ammo of bot.game.collectables[0]) {
+        for (const ammo of bot.game.collectibles[0]) {
             const dx = ammo.x - bot.me.position.x;
             const dy = ammo.y - bot.me.position.y;
             const dz = ammo.z - bot.me.position.z;

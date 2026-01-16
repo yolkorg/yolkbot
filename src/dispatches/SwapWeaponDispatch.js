@@ -7,7 +7,7 @@ export class SwapWeaponDispatch {
     }
 
     validate() {
-        return typeof this.manualWeapon === 'number' || typeof this.manualWeapon === 'undefined';
+        return [0, 1].includes(this.manualWeapon) || typeof this.manualWeapon === 'undefined';
     }
 
     check(bot) {

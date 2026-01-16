@@ -11,7 +11,7 @@ const processCollectItemPacket = (bot) => {
     const player = bot.players[playerId];
     if (!player) return;
 
-    bot.game.collectables[type] = bot.game.collectables[type].filter(c => c.id !== id);
+    bot.game.collectibles[type] = bot.game.collectibles[type].filter(c => c.id !== id);
 
     if (type === CollectType.Ammo) {
         const playerWeapon = player.weapons[applyToWeaponIdx];

@@ -1,1 +1,1 @@
-export declare const wasmBytes: string;
+export declare const wasmBytes: Uint8Array;

@@ -78,7 +78,7 @@ export declare const GameMode: {
     KOTC: number;
 };
 
-export declare const GameOptionFlags: {
+export declare const GameOptionFlag: {
     Locked: number;
     NoTeamChange: number;
     NoTeamShuffle: number;
@@ -108,7 +108,7 @@ export declare const Movement: {
     Scope: number;
 };
 
-export declare const PlayTypes: {
+export declare const PlayType: {
     joinPublic: number;
     createPrivate: number;
     joinPrivate: number;

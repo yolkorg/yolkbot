@@ -3,7 +3,7 @@ import { Movement } from '../constants/index.js';
 export class MovementDispatch {
     constructor(inputKeys) {
         if (typeof inputKeys === typeof 0) this.inputKeys = inputKeys;
-        else if (typeof inputKeys === typeof []) this.inputKeys = inputKeys.reduce((a, b) => a | b, 0);
+        else if (Array.isArray(inputKeys)) this.inputKeys = inputKeys.reduce((a, b) => a | b, 0);
     }
 
     validate() {
