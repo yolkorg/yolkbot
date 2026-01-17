@@ -11,7 +11,7 @@ export class ReloadDispatch {
             !bot.state.reloading &&
             !bot.state.swappingGun &&
             !bot.state.usingMelee &&
-            bot.me.weapons[bot.me.activeGun].rounds < bot.me.weapons[bot.me.activeGun].ammo?.capacity &&
+            bot.me.weapons[bot.me.activeGun].ammo?.rounds < bot.me.weapons[bot.me.activeGun].ammo?.capacity &&
             bot.me.weapons[bot.me.activeGun].ammo?.store > 0;
     }
 

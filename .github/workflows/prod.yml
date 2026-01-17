@@ -26,6 +26,5 @@ jobs:
       - name: build browser
         run: bun run build/browser.ts
 
-        # auth is handled thru OIDC (id-token)
       - name: publish to npm
-        run: npm publish
+        run: npm publish --provenance

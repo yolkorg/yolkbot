@@ -51,7 +51,7 @@ export class CommOut {
     packString(str) {
         if (typeof str !== 'string') str = '';
         if (str.length > 255) {
-            console.trace('trucanated packString to fit int8 (shell protocol); this should not happen (report it on Github)s')
+            console.trace('truncated packString to fit int8 (shell protocol); this should not happen (report it on GitHub)')
             str = str.slice(0, 255);
         }
         this.packInt8(str.length);
