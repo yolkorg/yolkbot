@@ -155,7 +155,7 @@ export interface RawLoginData {
     dateModified: string;
     accountAge: number;
     statsLifetime: Stats;
-    statsMonthly: Stats;
+    statsCurrent: Stats;
     eggsSpent: number | null;
     eggsSpentMonthly: number | null;
     challenges: RawChallenge[];
@@ -194,7 +194,7 @@ export interface Account {
     firebase: RawFirebase;
     firebaseId: string;
     sessionId: string;
-    session: string;
+    session: number;
     email: string;
     password: string;
     cw: ChiknWinnerStatus;
@@ -212,7 +212,6 @@ export interface Account {
     challenges: Challenges[];
     adminRoles: number;
     rawLoginData: RawLoginData;
-    isDoubleEggWeeknd: () => boolean;
 }
 
 export interface GameOptions {
@@ -284,11 +283,12 @@ export interface RawGameData {
 
 export interface FindGameResponse {
     ok: true;
-    region: string;
-    subdomain: string;
-    id: string;
-    private: boolean;
     raw: RawGameData;
+    id: string;
+    uuid: string;
+    region: string;
+    private: boolean;
+    subdomain: string;
 }
 
 export interface Game {
@@ -452,6 +452,7 @@ export class Bot {
     on(event: 'playerCollectGrenade', cb: (player: GamePlayer, itemId: number) => void): void;
     on(event: 'playerDamage', cb: (player: GamePlayer, oldHp: number, newHp: number) => void): void;
     on(event: 'playerDeath', cb: (killed: GamePlayer, killer: GamePlayer, oldKilled: GamePlayer, damageInt: number) => void): void;
+    on(event: 'playerEndReload', cb: (player: GamePlayer, weapon: CreatedGun) => void): void;
     on(event: 'playerEndStreak', cb: (player: GamePlayer, streakType: number) => void): void;
     on(event: 'playerEnterZone', cb: (player: GamePlayer) => void): void;
     on(event: 'playerFire', cb: (player: GamePlayer, weapon: CreatedGun, bullet: FireBullet) => void): void;
@@ -462,9 +463,9 @@ export class Bot {
     on(event: 'playerMelee', cb: (player: GamePlayer) => void): void;
     on(event: 'playerMove', cb: (player: GamePlayer, oldPosition: Position, newPosition: Position) => void): void;
     on(event: 'playerPause', cb: (player: GamePlayer) => void): void;
-    on(event: 'playerReload', cb: (player: GamePlayer, weapon: CreatedGun) => void): void;
     on(event: 'playerRespawn', cb: (player: GamePlayer) => void): void;
     on(event: 'playerRotate', cb: (player: GamePlayer, oldView: View, newView: View) => void): void;
+    on(event: 'playerStartReload', cb: (player: GamePlayer, weapon: CreatedGun) => void): void;
     on(event: 'playerSwapWeapon', cb: (player: GamePlayer, nowActive: number) => void): void;
     on(event: 'playerSwitchTeam', cb: (player: GamePlayer, oldTeam: number, newTeam: number) => void): void;
     on(event: 'playerThrowGrenade', cb: (player: GamePlayer, position: Position, dPosition: Position) => void): void;

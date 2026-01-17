@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-latest_version=$(curl -s https://registry.npmjs.com/yolkbot | jq -r '.["dist-tags"].alpha')
+latest_version=$(curl -sf https://registry.npmjs.com/yolkbot | jq -r '.["dist-tags"].alpha // "0.0.0-0"')
 
-new_version=$(echo $latest_version | awk -F- '{print $NF}')
+new_version=$(echo "$latest_version" | awk -F- '{print $NF}')
 new_version=$((new_version + 1))
 new_version="0.0.0-$new_version"
 

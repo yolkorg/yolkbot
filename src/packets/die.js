@@ -16,7 +16,7 @@ const processDiePacket = (bot) => {
 
     const oldKilled = killed ? structuredClone(killed) : null;
 
-    if (killed) {
+    if (bot.me && killed) {
         if (killed.id === bot.me.id) {
             bot.lastDeathTime = Date.now();
 

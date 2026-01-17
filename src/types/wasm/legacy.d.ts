@@ -1,4 +1,7 @@
-import { MovementXY } from './util';
+export interface MovementXY {
+    movementX: number;
+    movementY: number;
+}
 
 export interface GetYawPitch {
     yaw: number;

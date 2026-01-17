@@ -6,8 +6,7 @@ const processChatPacket = (bot) => {
     const text = CommIn.unPackString();
 
     const player = bot.players[id];
-
-    bot.$emit('chat', player, text, msgFlags);
+    if (player) bot.$emit('chat', player, text, msgFlags);
 };
 
 export default processChatPacket;

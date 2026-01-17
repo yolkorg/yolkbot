@@ -6,3 +6,4 @@ export declare function createGun<T extends { ammo: { capacity: number; store: n
 export declare function createError<T = string>(message: T): { ok: false; error: T };
 export declare function fetchMap(name: string, hash: string): Promise<MapJSON>;
 export declare function initKotcZones(meshData: Array<Position>): Array<Array<Zone>>;
+export declare function isDoubleEggWeeknd(): boolean;

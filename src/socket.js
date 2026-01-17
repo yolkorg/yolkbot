@@ -81,9 +81,9 @@ export class yolkws {
 
                 this.socket.removeEventListener('error', errorListener);
 
-                this.socket.addEventListener('message', (...data) => this.onmessage(...data));
-                this.socket.addEventListener('close', (...data) => this.onclose(...data));
-                this.socket.addEventListener('error', (...data) => this.onerror(...data));
+                this.socket.addEventListener('message', (messageEvent) => this.onmessage(messageEvent));
+                this.socket.addEventListener('close', (closeEvent) => this.onclose(closeEvent));
+                this.socket.addEventListener('error', (event) => this.onerror(event));
 
                 resolve(true);
             });

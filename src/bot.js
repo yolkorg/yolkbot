@@ -85,7 +85,7 @@ import processSwapWeaponPacket from './packets/swapWeapon.js';
 const mod = (n, m) => ((n % m) + m) % m;
 
 export class Bot {
-    static Intents = Intents;
+    intents = [];
 
     regionList = [];
     matchmakerListeners = [];
@@ -101,7 +101,8 @@ export class Bot {
     errorLogger = (...args) => console.error(...args);
 
     constructor(params = {}) {
-        if (params.proxy && typeof process === 'undefined') throw new Error('proxies do not work in this environment');
+        if (params.proxy && typeof process === 'undefined')
+            throw new Error('proxies do not work in this environment');
 
         this.intents = params.intents || [];
 
@@ -109,6 +110,9 @@ export class Bot {
             const ballCap = findItemById(1001);
             if (!ballCap) throw new Error('you cannot use the COSMETIC_DATA intent inside of the browser bundles');
         }
+
+        if (this.intents.includes(Intents.SIMULATION) && !this.intents.includes(Intents.PATHFINDING))
+            throw new Error('the SIMULATION intent requires the PATHFINDING intent');
 
         this.instance = params.instance || 'shellshock.io';
         this.protocol = params.protocol || 'wss';
@@ -221,7 +225,7 @@ export class Bot {
             }
         }
 
-        this.#initialGame = this.game;
+        this.#initialGame = JSON.parse(JSON.stringify(this.game));
 
         this.account = {
             // used for auth
@@ -273,14 +277,10 @@ export class Bot {
 
             rawLoginData: {},
 
-            eggBalance: 0,
-            isDoubleEggWeeknd: () => {
-                const day = new Date().getUTCDay();
-                return (day >= 5 && new Date().getUTCHours() >= 20) || day === 6 || day === 0;
-            }
+            eggBalance: 0
         }
 
-        this.#initialAccount = this.account;
+        this.#initialAccount = JSON.parse(JSON.stringify(this.account));
 
         this.api = new API({
             proxy: this.proxy,
@@ -549,7 +549,17 @@ export class Bot {
             }));
         });
 
-        return { ok: true, region: game.region, subdomain: game.subdomain, id: game.id, private: game.private, raw: game };
+        if (!game.ok) return game;
+
+        return {
+            ok: true,
+            raw: game,
+            id: game.id,
+            uuid: game.uuid,
+            region: game.region,
+            private: game.private,
+            subdomain: game.subdomain
+        };
     }
 
     async createPrivateGame(region, mode, map) {
@@ -605,10 +615,13 @@ export class Bot {
             }));
         });
 
+        if (!game.ok) return game;
+
         return {
             ok: true,
             raw: game,
             id: game.id,
+            uuid: game.uuid,
             region: game.region,
             private: game.private,
             subdomain: game.subdomain
@@ -674,7 +687,7 @@ export class Bot {
         // useAltGameURL format: ${this.protocol}://${this.instance}/servers/${this.game.raw.subdomain}/game/${id}
         // not useAltGameURL form: ${this.protocol}://${this.game.raw.subdomain}.${this.instance}/game/${id}
 
-        const host = (this.state.useAltGameURL || this.host === 'proxy.yolkbot.xyz') ?
+        const host = (this.state.useAltGameURL || this.instance === 'proxy.yolkbot.xyz') ?
             `${this.instance}/servers/${this.game.raw.subdomain}` :
             `${this.game.raw.subdomain}.${this.instance}`;
 
@@ -1318,7 +1331,7 @@ export class Bot {
         if (result.result === 'SUCCESS') {
             this.account.eggBalance += result.eggsGiven;
             result.itemIds.forEach((id) => this.account.ownedItemIds.push(id));
-            return { ok: true, rewards: { eggs: result.eggsGiven, items: result.itemIds } };
+            return { ok: true, eggsGiven: result.eggsGiven, itemIds: result.itemIds };
         }
 
         const isInEnum = Object.values(ClaimURLError).includes(result.result);
@@ -1341,7 +1354,7 @@ export class Bot {
         if (result.result === 'SUCCESS') {
             this.account.eggBalance += result.eggsGiven;
             result.itemIds.forEach((id) => this.account.ownedItemIds.push(id));
-            return { ok: true, rewards: { eggs: result.eggsGiven, items: result.itemIds } };
+            return { ok: true, eggsGiven: result.eggsGiven, itemIds: result.itemIds };
         }
 
         const isInEnum = Object.values(ClaimSocialError).includes(result.result);

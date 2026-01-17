@@ -41,7 +41,7 @@ export class SaveLoadoutDispatch {
         if (isType(load.meleeId, ItemType.Melee) && !isDefault(load.meleeId) && !bot.account.ownedItemIds.includes(load.meleeId)) return false;
 
         // invalid classidx param
-        if (typeof load.classIdx === 'number' && load.classIdx > 6 || load.classIdx < 0) return false;
+        if (typeof load.classIdx === 'number' && (load.classIdx > 6 || load.classIdx < 0)) return false;
 
         // validate that you own the primary guns you're trying to use
         if (this.changes.primaryId) {

@@ -6,10 +6,12 @@ const processHitMePacket = (bot) => {
     CommIn.unPackFloat();
     CommIn.unPackFloat();
 
-    const oldHealth = bot.me.hp;
-    bot.me.hp = hp;
+    if (bot.me) {
+        const oldHealth = bot.me.hp;
+        bot.me.hp = hp;
 
-    bot.$emit('playerDamage', bot.me, oldHealth, bot.me.hp);
+        bot.$emit('playerDamage', bot.me, oldHealth, bot.me.hp);
+    }
 }
 
 export default processHitMePacket;

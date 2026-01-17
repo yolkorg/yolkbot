@@ -116,6 +116,16 @@ export const initKotcZones = (meshData) => {
                 zoneIds[nIdx] = zone;
                 queue[tail++] = nIdx;
             }
+            // y - 1
+            if (y > minY && (nIdx = cellIndex[flatIdx - strideY]) !== -1 && !zoneIds[nIdx]) {
+                zoneIds[nIdx] = zone;
+                queue[tail++] = nIdx;
+            }
+            // y + 1
+            if (y < maxY && (nIdx = cellIndex[flatIdx + strideY]) !== -1 && !zoneIds[nIdx]) {
+                zoneIds[nIdx] = zone;
+                queue[tail++] = nIdx;
+            }
             // z - 1
             if (z > minZ && (nIdx = cellIndex[flatIdx - strideZ]) !== -1 && !zoneIds[nIdx]) {
                 zoneIds[nIdx] = zone;
@@ -132,4 +142,9 @@ export const initKotcZones = (meshData) => {
     }
 
     return zones;
+}
+
+export const isDoubleEggWeeknd = () => {
+    const day = new Date().getUTCDay();
+    return (day >= 5 && new Date().getUTCHours() >= 20) || day === 6 || day === 0;
 }

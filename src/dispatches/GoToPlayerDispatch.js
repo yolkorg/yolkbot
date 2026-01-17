@@ -8,7 +8,7 @@ export class GoToPlayerDispatch {
     }
 
     $grabPlayer(bot) {
-        return bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        return bot.players[this.idOrName.toString()] || Object.values(bot.players).find(player => player.name === this.idOrName);
     }
 
     validate(bot) {
@@ -20,7 +20,7 @@ export class GoToPlayerDispatch {
         if (!bot.me.playing) return false;
 
         const target = this.$grabPlayer(bot);
-        return target && target.playing && target.position && target.position.x;
+        return target && target.playing && target.position && Number.isFinite(target.position.x);
     }
 
     execute(bot) {

@@ -109,9 +109,9 @@ export declare const Movement: {
 };
 
 export declare const PlayType: {
-    joinPublic: number;
-    createPrivate: number;
-    joinPrivate: number;
+    JoinPublic: number;
+    CreatePrivate: number;
+    JoinPrivate: number;
 };
 
 export declare const ShellStreak: {

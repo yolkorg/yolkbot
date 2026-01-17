@@ -9,7 +9,7 @@ export class GoToSpatulaDispatch {
         return bot.me.playing &&
             bot.game.spatula &&
             bot.game.spatula.coords &&
-            bot.game.spatula.coords.x;
+            Number.isFinite(bot.game.spatula.coords.x);
     }
 
     execute(bot) {

@@ -6,6 +6,8 @@ import { Intents } from '../enums.js';
 const processPingPacket = (bot) => {
     if (!bot.intents.includes(Intents.PING)) return;
 
+    if (bot.pingTimeoutId) clearTimeout(bot.pingTimeoutId);
+
     const oldPing = bot.ping ?? 0;
 
     bot.ping = bot.lastPingTime ? Date.now() - bot.lastPingTime : 0;

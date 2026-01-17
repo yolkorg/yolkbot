@@ -18,7 +18,7 @@ const parseChunkedBody = (body) => {
         }
 
         const size = parseInt(sizeHex, 16);
-        if (Number.isNaN(size) && size === 0) break;
+        if (Number.isNaN(size) || size === 0) break;
 
         i = rnIdx + 2;
         chunks.push(body.slice(i, i + size));

@@ -20,10 +20,10 @@ declare class yolkws {
 
     tryConnect($tries?: number): Promise<boolean>;
 
-    onmessage: (data: Data) => void;
     onopen: () => void;
-    onclose: (code: number, reason: string) => void;
-    onerror: (err: Error) => void;
+    onmessage: (data: MessageEvent) => void;
+    onclose: (code: CloseEvent) => void;
+    onerror: (err: Event) => void;
 
     send(data: Data): void;
     close(code?: number, reason?: string): void;

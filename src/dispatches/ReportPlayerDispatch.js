@@ -21,7 +21,7 @@ export class ReportPlayerDispatch {
     }
 
     $grabPlayer(bot) {
-        return bot.players[this.idOrName.toString()] || bot.players.find(player => player.name === this.idOrName);
+        return bot.players[this.idOrName.toString()] || Object.values(bot.players).find(player => player.name === this.idOrName);
     }
 
     validate() {

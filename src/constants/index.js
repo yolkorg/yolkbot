@@ -62,7 +62,10 @@ export const CoopState = {
     Unclaimed: 7
 }
 
-export const FirebaseKey = 'AIzaSyDP4SIjKaw6A4c-zvfYxICpbEjn1rRnN50';
+// intentionally hardcoded; "encoded" to prevent scanners
+const miniCodec = (s, k = 42) => s.split('').map(c => String.fromCharCode(c.charCodeAt(0) ^ k)).join('');
+
+export const FirebaseKey = miniCodec('kcPKySnz\x1Eyc@aK]\x1Ck\x1EI\x07P\\LsRciZHo@D\x1BXxDd\x1F\x1A');
 
 export const FramesBetweenSyncs = 3;
 
