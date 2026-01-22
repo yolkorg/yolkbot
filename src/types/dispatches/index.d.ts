@@ -36,7 +36,7 @@ export interface DispatchParams {
     lookAt: LookAtParams;
     lookAtPos: LookAtPosParams;
     melee: MeleeParams;
-    movement: MovementParams;
+    move: MovementParams;
     pause: PauseParams;
     reload: ReloadParams;
     reportPlayer: ReportPlayerParams;
@@ -62,7 +62,7 @@ export declare const DispatchIndex: {
     'lookAt': typeof LookAtDispatch,
     'lookAtPos': typeof LookAtPosDispatch,
     'melee': typeof MeleeDispatch,
-    'movement': typeof MovementDispatch,
+    'move': typeof MovementDispatch,
     'pause': typeof PauseDispatch,
     'reload': typeof ReloadDispatch,
     'reportPlayer': typeof ReportPlayerDispatch,

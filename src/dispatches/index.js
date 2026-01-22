@@ -36,7 +36,7 @@ export const DispatchIndex = {
     'lookAt': LookAtDispatch,
     'lookAtPos': LookAtPosDispatch,
     'melee': MeleeDispatch,
-    'movement': MovementDispatch,
+    'move': MovementDispatch,
     'pause': PauseDispatch,
     'reload': ReloadDispatch,
     'reportPlayer': ReportPlayerDispatch,
