@@ -1,7 +1,7 @@
 {
     "name": "yolkbot",
     "description": "yolkbot builds your dream shell shockers bot.",
-    "version": "0.0.0-184",
+    "version": "1.5.0",
     "keywords": [
         "shell shockers",
         "league bot",
@@ -30,44 +30,32 @@
     "exports": {
         "./package.json": "./package.json",
         ".": {
-            "import": "./dist/bot.js",
-            "types": "./dist/bot.d.ts"
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
         },
         "./api": {
             "import": "./dist/api.js",
             "types": "./dist/api.d.ts"
         },
+        "./bot": {
+            "import": "./dist/bot.js",
+            "types": "./dist/bot.d.ts"
+        },
         "./enums": {
             "import": "./dist/enums.js",
             "types": "./dist/enums.d.ts"
         },
-        "./browser": "./browser/build/module.js",
-        "./browser/*": "./browser/build/*.js",
-        "./browser/*.js": "./browser/build/*.js",
-        "./comm/*": {
-            "import": "./dist/comm/*.js",
-            "types": "./dist/comm/*.d.ts"
-        },
-        "./comm/*.js": {
-            "import": "./dist/comm/*.js",
-            "types": "./dist/comm/*.d.ts"
+        "./socket": {
+            "import": "./dist/socket.js",
+            "types": "./dist/socket.d.ts"
         },
         "./util": {
             "import": "./dist/util.js",
             "types": "./dist/util.d.ts"
         },
-        "./pathing/*": {
-            "import": "./dist/pathing/*.js",
-            "types": "./dist/pathing/*.d.ts"
-        },
-        "./pathing/*.js": {
-            "import": "./dist/pathing/*.js",
-            "types": "./dist/pathing/*.d.ts"
-        },
-        "./bot": {
-            "import": "./dist/bot.js",
-            "types": "./dist/bot.d.ts"
-        },
+        "./browser": "./browser/build/module.js",
+        "./browser/*": "./browser/build/*.js",
+        "./browser/*.js": "./browser/build/*.js",
         "./bot/*": {
             "import": "./dist/bot/*.js",
             "types": "./dist/bot/*.d.ts"
@@ -75,6 +63,14 @@
         "./bot/*.js": {
             "import": "./dist/bot/*.js",
             "types": "./dist/bot/*.d.ts"
+        },
+        "./comm/*": {
+            "import": "./dist/comm/*.js",
+            "types": "./dist/comm/*.d.ts"
+        },
+        "./comm/*.js": {
+            "import": "./dist/comm/*.js",
+            "types": "./dist/comm/*.d.ts"
         },
         "./constants": {
             "import": "./dist/constants/index.js",
@@ -112,9 +108,13 @@
             "import": "./dist/dispatches/*.js",
             "types": "./dist/dispatches/*.d.ts"
         },
-        "./socket": {
-            "import": "./dist/socket.js",
-            "types": "./dist/socket.d.ts"
+        "./pathing/*": {
+            "import": "./dist/pathing/*.js",
+            "types": "./dist/pathing/*.d.ts"
+        },
+        "./pathing/*.js": {
+            "import": "./dist/pathing/*.js",
+            "types": "./dist/pathing/*.d.ts"
         },
         "./wasm": {
             "import": "./dist/wasm/direct.js",
@@ -131,12 +131,14 @@
     },
     "typesVersions": {
         "*": {
-            ".": ["dist/bot.d.ts"],
+            ".": ["dist/index.d.ts"],
             "api": ["dist/api.d.ts"],
-            "comm/*": ["dist/comm/*.d.ts"],
-            "util": ["dist/util.d.ts"],
             "bot": ["dist/bot/*.d.ts"],
+            "enums": ["dist/enums.d.ts"],
+            "socket": ["dist/socket.d.ts"],
+            "util": ["dist/util.d.ts"],
             "bot/*": ["dist/bot/*.d.ts"],
+            "comm/*": ["dist/comm/*.d.ts"],
             "constants": ["dist/constants/*.d.ts"],
             "constants/*": ["dist/constants/*.d.ts"],
             "dispatch": ["dist/dispatches.d.ts"],

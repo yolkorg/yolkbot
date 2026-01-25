@@ -458,7 +458,10 @@ export class Bot {
                 return this.matchmaker.send(JSON.stringify({ command: 'validateUUID', hash: await validate(data.uuid) }));
             }
 
-            if (data.command === 'gameFound' || data.error) uuidTimeouts.forEach((t) => clearTimeout(t));
+            if (uuidTimeouts.length) {
+                uuidTimeouts.forEach((t) => clearTimeout(t));
+                uuidTimeouts.length = 0;
+            }
 
             this.matchmakerListeners.forEach((listener) => listener(data));
         }

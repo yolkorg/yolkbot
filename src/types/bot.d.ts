@@ -374,7 +374,6 @@ export interface GameStateChanges {
 }
 
 export class Bot {
-    static Intents: Intents;
     intents: number[];
 
     regionList: Region[];
@@ -481,7 +480,7 @@ export class Bot {
     emit<K extends keyof DispatchParams>(type: K, ...args: DispatchParams[K]): boolean;
 
     packetHandlers: Record<number, () => void>;
-    processPacket(data: number[]): void;
+    processPacket(data: ArrayBuffer): void;
 
     checkChiknWinner(): Promise<{ ok: true, cw: ChiknWinnerStatus } | APIError>;
     playChiknWinner(doPrematureCooldownCheck: boolean): Promise<ChiknWinnerResponse | APIError | ChicknWinnerError>;

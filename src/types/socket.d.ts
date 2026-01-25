@@ -21,12 +21,12 @@ declare class yolkws {
     tryConnect($tries?: number): Promise<boolean>;
 
     onopen: () => void;
-    onmessage: (data: MessageEvent) => void;
-    onclose: (code: CloseEvent) => void;
-    onerror: (err: Event) => void;
+    onmessage: (event: MessageEvent) => void;
+    onclose: (event: CloseEvent) => void;
+    onerror: (event: Event) => void;
 
     send(data: Data): void;
-    close(code?: number, reason?: string): void;
+    close(data?: number): void;
 }
 
 export default yolkws;

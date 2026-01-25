@@ -82,7 +82,7 @@ export class yolkws {
                 this.socket.removeEventListener('error', errorListener);
 
                 this.socket.addEventListener('message', (messageEvent) => this.onmessage(messageEvent));
-                this.socket.addEventListener('close', (closeEvent) => this.onclose(closeEvent));
+                this.socket.addEventListener('close', (closeEvent) => !this.autoReconnect && this.onclose(closeEvent));
                 this.socket.addEventListener('error', (event) => this.onerror(event));
 
                 resolve(true);

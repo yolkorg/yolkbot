@@ -51,10 +51,18 @@ export class API {
                 ws.close();
             };
 
-            ws.onerror = () => !resolved && resolve(createError(APIError.InternalError));
+            ws.onerror = (error) => {
+                if (resolved) return;
+                resolved = true;
+
+                this.errorLogger('queryServices: websocket error! command:', request.cmd, 'and data:', request, 'error:', error);
+
+                resolve(createError(APIError.InternalError));
+            };
 
             ws.onclose = () => {
                 if (resolved) return;
+                resolved = true;
 
                 this.errorLogger('queryServices: services closed before sending back message');
                 this.errorLogger('queryServices: command:', request.cmd, 'and data:', request);

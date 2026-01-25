@@ -47,5 +47,7 @@ const build = async (module: Module) => {
     } else console.error(results.logs.join('\n'));
 }
 
-(async () => await build({ name: 'global', entry: path.join(rootDir, 'browser', 'globalEntry.js') }))();
-(async () => await build({ name: 'module', entry: path.join(rootDir, 'src', 'index.js') }))();
+await Promise.all([
+    build({ name: 'global', entry: path.join(rootDir, 'browser', 'globalEntry.js') }),
+    build({ name: 'module', entry: path.join(rootDir, 'src', 'index.js') })
+]);
