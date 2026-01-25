@@ -218,7 +218,7 @@ export class Bot {
                 stage: CoopState.Capturing, // this is shell default
                 zoneIdx: 0,
                 activeZone: [],
-                capturing: 0,
+                teamCapturing: 0,
                 captureProgress: 0,
                 numCapturing: 0,
                 capturePercent: 0.0
@@ -738,7 +738,6 @@ export class Bot {
             let cx = this.climbX;
             let cz = this.climbZ;
             this.climbing = false;
-            this.capturing = false;
             cell = getMapCellAt(cx, Math.floor(this.me.position.y + 0.25), cz);
             if (cell && Math.floor(cell.ry / Math.PI90) == this.climbRY && cell.mesh && cell.mesh.colliderType == "ladder") {
                 this.climbing = true;

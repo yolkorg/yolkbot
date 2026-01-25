@@ -265,7 +265,7 @@ export interface GameKOTC {
     stage: number;
     zoneIdx: number;
     activeZone: Zone[];
-    capturing: number;
+    teamCapturing: number;
     captureProgress: number;
     numCapturing: number;
     capturePercent: number;

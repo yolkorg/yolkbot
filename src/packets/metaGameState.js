@@ -30,7 +30,7 @@ const processMetaGameStatePacket = (bot) => {
 
         bot.game.kotc.stage = CommIn.unPackInt8U(); // constants.CoopState
         bot.game.kotc.zoneIdx = CommIn.unPackInt8U(); // a number to represent which 'active zone' kotc is using
-        bot.game.kotc.capturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
+        bot.game.kotc.teamCapturing = CommIn.unPackInt8U(); // the team capturing, named "teams" in shell src
         bot.game.kotc.captureProgress = CommIn.unPackInt16U(); // progress of the coop capture
         bot.game.kotc.numCapturing = CommIn.unPackInt8U(); // number of players capturing - number/1000
         bot.game.teamScore[1] = CommIn.unPackInt8U(); // team 1 (blue) score

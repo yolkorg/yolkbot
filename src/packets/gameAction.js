@@ -28,7 +28,7 @@ const processGameActionPacket = (bot) => {
             bot.game.kotc.stage = CoopState.Capturing;
             bot.game.kotc.zoneIdx = 0;
             bot.game.kotc.activeZone = null;
-            bot.game.kotc.capturing = 0;
+            bot.game.kotc.teamCapturing = 0;
             bot.game.kotc.captureProgress = 0;
             bot.game.kotc.numCapturing = 0;
             bot.game.kotc.capturePercent = 0.0;
