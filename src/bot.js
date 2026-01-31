@@ -450,7 +450,7 @@ export class Bot {
                 const timeout = setTimeout(() => {
                     console.error('createMatchmaker: the matchmaker did not respond to our validateUUID')
                     console.error('createMatchmaker: this means yolkbot is broken, please report this on Github');
-                    console.error('createMatchmaker: https://github.com/yolkorg/yolkbot (or join the Discord)');
+                    console.error('createMatchmaker: https://github.com/yolkop/yolkbot (or join the Discord)');
                 }, 5000);
 
                 uuidTimeouts.push(timeout);

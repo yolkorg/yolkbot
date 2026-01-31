@@ -10,13 +10,13 @@
     ],
     "homepage": "https://yolkbot.xyz",
     "bugs": {
-        "url": "https://github.com/yolkorg/yolkbot/issues",
+        "url": "https://github.com/yolkop/yolkbot/issues",
         "email": "hello@villainsrule.xyz"
     },
     "author": "1ust",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/yolkorg/yolkbot.git"
+        "url": "git+https://github.com/yolkop/yolkbot.git"
     },
     "type": "module",
     "license": "SEE LICENSE IN LICENSE.md",

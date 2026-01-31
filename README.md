@@ -6,7 +6,7 @@
   </picture>
   <h3>a fast, reliable, multipurpose, & always working shell shockers automation library!</h3>
   <p>
-    <a href='https://github.com/yolkorg/yolkbot'>github</a> | 
+    <a href='https://github.com/yolkop/yolkbot'>github</a> | 
     <a href='https://yolkbot.xyz/docs'>documentation</a> |
     <a href='https://npmjs.com/yolkbot'>npm</a> |
     <a href='https://discord.gg/VUVRmmCXzN'>discord</a>

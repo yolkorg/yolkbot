@@ -6,7 +6,7 @@ All Rights Reserved.
 
 This Software is the sole property of the copyright holder. Any prior arrangements, partnerships, or agreements are hereby revoked and superseded by this license.
 
-This license applies retroactively to all versions of yolkbot software, including all code, scripts, documentation, and associated materials created by or under the yolkorg organization (collectively, the "Software").
+This license applies retroactively to all versions of yolkbot software, including all code, scripts, documentation, and associated materials created by or under the yolkop organization (collectively, the "Software").
 
 By using, copying, modifying, or distributing the Software, you agree to be bound by the terms of this license.
 
