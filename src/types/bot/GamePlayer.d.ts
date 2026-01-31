@@ -105,7 +105,7 @@ export class GamePlayer {
     isVip: boolean;
     showBadge: boolean;
     streak: number;
-    streakRewards: number[];
+    shellStreaks: number[];
     scale: number;
     position: Position;
     jumping: boolean;

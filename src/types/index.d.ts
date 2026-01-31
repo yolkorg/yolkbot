@@ -11,7 +11,6 @@ export declare const Comm: {
     CommOut: typeof import('./comm/CommOut.js').CommOut;
 };
 
-export declare const Constants: typeof import('./constants/index.js');
 export declare const Challenges: typeof import('./constants/challenges.js').Challenges;
 export declare const CloseCode: typeof import('./constants/CloseCode.js').CloseCode;
 export declare const CommCode: typeof import('./constants/CommCode.js').CommCode;
