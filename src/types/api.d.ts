@@ -47,6 +47,8 @@ export class API {
     customKey?: string | null;
     connectionTimeout: number;
 
+    idToken: string | null;
+
     constructor(params?: APIParams);
 
     queryServices(request: QueryRequest): Promise<QueryResponse | ReturnError>;

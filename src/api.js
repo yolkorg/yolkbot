@@ -16,6 +16,8 @@ const baseHeaders = {
 export class API {
     errorLogger = (...args) => console.error(...args);
 
+    idToken = null;
+
     constructor(params = {}) {
         this.proxy = params.proxy;
         this.instance = params.instance || 'shellshock.io';
