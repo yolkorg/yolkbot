@@ -72,10 +72,6 @@
             "import": "./dist/comm/*.js",
             "types": "./dist/comm/*.d.ts"
         },
-        "./constants": {
-            "import": "./dist/constants/index.js",
-            "types": "./dist/constants/index.d.ts"
-        },
         "./constants/*": {
             "import": "./dist/constants/*.js",
             "types": "./dist/constants/*.d.ts"
@@ -139,7 +135,6 @@
             "util": ["dist/util.d.ts"],
             "bot/*": ["dist/bot/*.d.ts"],
             "comm/*": ["dist/comm/*.d.ts"],
-            "constants": ["dist/constants/*.d.ts"],
             "constants/*": ["dist/constants/*.d.ts"],
             "dispatch": ["dist/dispatches.d.ts"],
             "dispatch/*": ["dist/dispatches/*.d.ts"],
@@ -156,6 +151,7 @@
     "devDependencies": {
         "@stylistic/eslint-plugin": "^4.4.1",
         "@types/bun": "^1.3.5",
-        "eslint": "^9.39.2"
+        "eslint": "^9.39.2",
+        "tsx": "^4.21.0"
     }
 }

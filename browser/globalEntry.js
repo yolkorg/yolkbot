@@ -1,12 +1,10 @@
 import { API } from '../src/api.js';
-import { Bot } from '../src/bot.js';
+import { Bot } from '../src/bot/bot.js';
 import * as Enums from '../src/enums.js';
 import { yolkws } from '../src/socket.js';
 import * as util from '../src/util.js';
 
 import { GamePlayer } from '../src/bot/GamePlayer.js';
-
-import * as Constants from '../src/constants/index.js';
 
 import { Challenges } from '../src/constants/challenges.js';
 import { CloseCode } from '../src/constants/CloseCode.js';
